@@ -1,0 +1,576 @@
+@extends('layouts.app')
+
+@section('title', 'Boletas - Sistema APR')
+
+@section('content')
+<div class="page-header">
+    <h2 class="page-title">
+        <i class="fas fa-file-invoice-dollar"></i>
+        Gestión de Boletas
+    </h2>
+    <div class="header-actions">
+        <a href="{{ route('boletas.generar') }}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i>
+            Generar Boletas
+        </a>
+        <a href="{{ route('boletas.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Nueva Boleta
+        </a>
+    </div>
+</div>
+
+<!-- Alertas -->
+@if(session('success'))
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ session('error') }}
+    </div>
+@endif
+
+<!-- Estadísticas -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-primary">
+            <i class="fas fa-file-invoice"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">{{ $estadisticas['total_boletas'] }}</div>
+            <div class="stat-label">Total Boletas</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon bg-warning">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">{{ $estadisticas['pendientes'] }}</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon bg-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">{{ $estadisticas['vencidas'] }}</div>
+            <div class="stat-label">Vencidas</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon bg-success">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">{{ $estadisticas['pagadas'] }}</div>
+            <div class="stat-label">Pagadas</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon bg-info">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">${{ number_format($estadisticas['total_pendiente'], 0, ',', '.') }}</div>
+            <div class="stat-label">Total Pendiente</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon bg-secondary">
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">${{ number_format($estadisticas['total_mes_actual'], 0, ',', '.') }}</div>
+            <div class="stat-label">Total Mes Actual</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="GET" action="{{ route('boletas.index') }}" class="filter-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text"
+                           name="search"
+                           class="form-control"
+                           placeholder="Buscar por número o socio..."
+                           value="{{ request('search') }}">
+                </div>
+
+                <div class="form-group">
+                    <input type="month"
+                           name="mes"
+                           class="form-control"
+                           value="{{ request('mes') }}">
+                </div>
+
+                <div class="form-group">
+                    <select name="estado" class="form-control">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+                        <option value="pagada" {{ request('estado') == 'pagada' ? 'selected' : '' }}>Pagada</option>
+                        <option value="vencida" {{ request('estado') == 'vencida' ? 'selected' : '' }}>Vencida</option>
+                        <option value="anulada" {{ request('estado') == 'anulada' ? 'selected' : '' }}>Anulada</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <select name="id_socio" class="form-control">
+                        <option value="">Todos los socios</option>
+                        @foreach($socios as $socio)
+                            <option value="{{ $socio->id }}" {{ request('id_socio') == $socio->id ? 'selected' : '' }}>
+                                {{ $socio->numero_socio }} - {{ $socio->nombre_completo }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                    Filtrar
+                </button>
+
+                @if(request()->hasAny(['search', 'mes', 'estado', 'id_socio']))
+                    <a href="{{ route('boletas.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Limpiar
+                    </a>
+                @endif
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de Boletas -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Socio</th>
+                        <th>Mes</th>
+                        <th>Emisión</th>
+                        <th>Vencimiento</th>
+                        <th>Consumo</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($boletas as $boleta)
+                        <tr class="{{ $boleta->estado == 'vencida' ? 'row-danger' : '' }}">
+                            <td><strong>{{ $boleta->numero_boleta }}</strong></td>
+                            <td>
+                                <a href="{{ route('socios.show', $boleta->socio->id) }}">
+                                    {{ $boleta->socio->numero_socio }} - {{ $boleta->socio->nombre_completo }}
+                                </a>
+                            </td>
+                            <td>{{ $boleta->mes_texto }}</td>
+                            <td>{{ $boleta->fecha_emision_formateada }}</td>
+                            <td>
+                                {{ $boleta->fecha_vencimiento_formateada }}
+                                @if($boleta->dias_atraso > 0)
+                                    <br><small class="text-danger">
+                                        <i class="fas fa-exclamation-triangle"></i> {{ $boleta->dias_atraso }} días
+                                    </small>
+                                @endif
+                            </td>
+                            <td>{{ $boleta->consumo_m3 }} m³</td>
+                            <td><strong>{{ $boleta->total_formateado }}</strong></td>
+                            <td>{!! $boleta->estado_badge !!}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ route('boletas.show', $boleta->id) }}"
+                                       class="btn btn-sm btn-info"
+                                       title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    @if($boleta->estado !== 'pagada')
+                                    <a href="{{ route('boletas.edit', $boleta->id) }}"
+                                       class="btn btn-sm btn-warning"
+                                       title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    @endif
+                                    <a href="{{ route('boletas.imprimir', $boleta->id) }}"
+                                       class="btn btn-sm btn-secondary"
+                                       title="Imprimir"
+                                       target="_blank">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                    @if($boleta->estado !== 'pagada' && $boleta->pagos->count() == 0)
+                                    <form action="{{ route('boletas.destroy', $boleta->id) }}"
+                                          method="POST"
+                                          style="display: inline;"
+                                          onsubmit="return confirm('¿Está seguro de eliminar esta boleta?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger"
+                                                title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="9" class="text-center text-muted">
+                                <i class="fas fa-inbox"></i>
+                                <p>No se encontraron boletas</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        @if($boletas->hasPages())
+            <div class="pagination-wrapper">
+                {{ $boletas->links() }}
+            </div>
+        @endif
+    </div>
+</div>
+@endsection
+
+@section('styles')
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+    }
+
+    .page-title i {
+        color: var(--primary);
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .mb-3 {
+        margin-bottom: 20px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: var(--white);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border: 1px solid var(--gray-200);
+    }
+
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+    }
+
+    .stat-icon.bg-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+    .stat-icon.bg-success { background: linear-gradient(135deg, #10b981, #059669); }
+    .stat-icon.bg-warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .stat-icon.bg-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .stat-icon.bg-info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .stat-icon.bg-secondary { background: linear-gradient(135deg, #6b7280, #4b5563); }
+
+    .stat-content {
+        flex: 1;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--dark);
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        font-weight: 500;
+    }
+
+    .card {
+        background: var(--white);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .card-body {
+        padding: 24px;
+    }
+
+    .filter-form .form-row {
+        display: grid;
+        grid-template-columns: 2fr repeat(3, 1fr) auto auto;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius);
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table thead {
+        background: var(--gray-50);
+    }
+
+    .table th {
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: var(--gray-700);
+        font-size: 0.875rem;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .table td {
+        padding: 12px;
+        border-bottom: 1px solid var(--gray-200);
+        font-size: 0.95rem;
+    }
+
+    .table tbody tr:hover {
+        background: var(--gray-50);
+    }
+
+    .row-danger {
+        background-color: #fee2e2 !important;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: var(--radius);
+        border: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.875rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+        background: var(--gray-200);
+        color: var(--gray-700);
+    }
+
+    .btn-secondary:hover {
+        background: var(--gray-300);
+    }
+
+    .btn-info {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-warning {
+        background: #f59e0b;
+        color: white;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .badge {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .badge-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .badge-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-danger {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .badge-secondary {
+        background: var(--gray-200);
+        color: var(--gray-700);
+    }
+
+    .alert {
+        padding: 16px 20px;
+        border-radius: var(--radius);
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+    }
+
+    .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-muted {
+        color: var(--gray-500);
+    }
+
+    .text-danger {
+        color: #991b1b;
+    }
+
+    .pagination-wrapper {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .header-actions {
+            width: 100%;
+        }
+
+        .filter-form .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+@endsection

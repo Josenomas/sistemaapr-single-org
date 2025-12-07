@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan:*)",
+      "Bash(mysql:*)",
+      "Read(//c/xampp/mysql/bin/**)",
+      "Bash(cat:*)",
+      "Bash(/c/xampp/mysql/bin/mysql:*)",
+      "Bash(dir:*)",
+      "Bash(nslookup:*)",
+      "Bash(dig:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
