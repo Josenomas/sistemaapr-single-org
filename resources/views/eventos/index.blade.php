@@ -8,10 +8,12 @@
         <i class="fas fa-calendar-alt"></i>
         Gestión de Eventos
     </h2>
-    <a href="{{ route('eventos.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nuevo Evento
-    </a>
+    <div>
+        <a href="{{ route('eventos.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Nuevo Evento
+        </a>
+    </div>
 </div>
 
 <div class="card">
