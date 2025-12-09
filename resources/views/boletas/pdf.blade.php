@@ -367,18 +367,6 @@
             font-weight: bold;
             text-transform: uppercase;
         }
-
-        /* Salto de página */
-        .page-break {
-            page-break-before: always;
-            page-break-after: always;
-        }
-
-        /* Comprobante en segunda página */
-        .comprobante-page {
-            page-break-before: always;
-            padding: 20px;
-        }
     </style>
 </head>
 <body>
@@ -469,47 +457,44 @@
                 Historial de Consumo (Últimos 12 Meses)
             </h2>
 
-            <div style="position: relative; height: 120px; margin: 10px 0;">
-                <?php
-                    $maxConsumo = $historialConsumo->max('consumo') ?: 10;
-                    $anchoTotal = 100;
-                    $anchoBarra = ($anchoTotal / max($historialConsumo->count(), 1)) - 1;
-                ?>
+            <?php
+                $maxConsumo = $historialConsumo->max('consumo') ?: 10;
+            ?>
 
-                <!-- Eje Y (valores) -->
-                <div style="position: absolute; left: 0; top: 0; bottom: 20px; width: 30px; border-right: 1px solid #000;">
-                    <div style="position: absolute; top: 0; right: 5px; font-size: 7px;">{{ number_format($maxConsumo, 0) }} m³</div>
-                    <div style="position: absolute; top: 50%; right: 5px; font-size: 7px; transform: translateY(-50%);">{{ number_format($maxConsumo/2, 0) }} m³</div>
-                    <div style="position: absolute; bottom: 0; right: 5px; font-size: 7px;">0 m³</div>
-                </div>
-
-                <!-- Área de barras -->
-                <div style="position: absolute; left: 35px; right: 0; top: 0; bottom: 20px; border-bottom: 2px solid #000;">
-                    @foreach($historialConsumo as $index => $item)
-                        <?php
-                            $altura = $maxConsumo > 0 ? ($item['consumo'] / $maxConsumo) * 100 : 0;
-                            $left = ($index * ($anchoBarra + 1));
-                        ?>
-                        <div style="position: absolute; left: {{ $left }}%; bottom: 0; width: {{ $anchoBarra }}%; height: {{ $altura }}%; background: {{ $item['mes'] == $boleta->mes ? '#000' : '#666' }}; border: 1px solid #000;">
-                            <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 7px; font-weight: bold; white-space: nowrap;">
-                                {{ number_format($item['consumo'], 1) }}
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                <!-- Eje X (meses) -->
-                <div style="position: absolute; left: 35px; right: 0; bottom: 0; height: 20px; display: flex; justify-content: space-between;">
+            <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                <!-- Fila de valores de consumo -->
+                <tr>
                     @foreach($historialConsumo as $item)
-                        <div style="font-size: 6px; text-align: center; flex: 1; transform: rotate(-45deg); transform-origin: top left; margin-top: 8px;">
-                            {{ substr($item['mes_texto'], 0, 3) }}
-                        </div>
+                    <td style="width: {{ 100 / $historialConsumo->count() }}%; text-align: center; vertical-align: bottom; padding: 2px; font-size: 7px; font-weight: bold;">
+                        {{ number_format($item['consumo'], 1) }}
+                    </td>
                     @endforeach
-                </div>
-            </div>
+                </tr>
+                <!-- Fila de barras -->
+                <tr style="height: 80px; vertical-align: bottom;">
+                    @foreach($historialConsumo as $item)
+                    <?php
+                        $altura = $maxConsumo > 0 ? ($item['consumo'] / $maxConsumo) * 100 : 0;
+                        $esActual = $item['mes'] == $boleta->mes;
+                    ?>
+                    <td style="text-align: center; vertical-align: bottom; padding: 2px;">
+                        <div style="background: {{ $esActual ? '#000' : '#ccc' }}; border: 1px solid #000; height: {{ $altura }}px; max-height: 80px; margin: 0 auto; width: 80%;">
+                        </div>
+                    </td>
+                    @endforeach
+                </tr>
+                <!-- Fila de meses -->
+                <tr>
+                    @foreach($historialConsumo as $item)
+                    <td style="text-align: center; padding: 5px 2px; font-size: 6px; border-top: 2px solid #000;">
+                        {{ substr($item['mes_texto'], 0, 3) }}
+                    </td>
+                    @endforeach
+                </tr>
+            </table>
 
             <div style="text-align: center; font-size: 8px; color: #666; margin-top: 5px;">
-                * La barra negra indica el período actual
+                * La barra negra indica el período actual | Consumo máximo: {{ number_format($maxConsumo, 1) }} m³
             </div>
         </div>
         @endif
@@ -773,106 +758,6 @@
             <div class="footer-note">
                 DOCUMENTO GENERADO ELECTRÓNICAMENTE - {{ now()->format('d/m/Y H:i:s') }}<br>
                 ESTE DOCUMENTO ES VÁLIDO SIN FIRMA NI TIMBRE
-            </div>
-        </div>
-    </div>
-
-    <!-- SEGUNDA PÁGINA: COMPROBANTE PARA EL CLIENTE -->
-    <div class="comprobante-page">
-        <div style="text-align: center; margin-bottom: 15px;">
-            <div style="border: 2px dashed #000; padding: 5px; display: inline-block; margin-bottom: 10px;">
-                ✂ - - - - - CORTE AQUÍ - COMPROBANTE PARA EL CLIENTE - - - - - ✂
-            </div>
-        </div>
-
-        <!-- Comprobante completo en segunda página -->
-        <div style="border: 3px solid #000; padding: 20px; background: #fff; max-width: 700px; margin: 0 auto;">
-            <div style="text-align: center; background: #000; color: #fff; padding: 10px; margin: -20px -20px 20px -20px; font-weight: bold; font-size: 14px; letter-spacing: 2px;">
-                COMPROBANTE DE PAGO - SISTEMA APR
-            </div>
-
-            <table style="width: 100%; font-size: 12px; margin-bottom: 20px;">
-                <tr>
-                    <td style="width: 50%; padding: 10px; border: 1px solid #000; background: #f0f0f0;">
-                        <strong>Boleta Nº:</strong><br>
-                        <span style="font-size: 18px; font-weight: bold;">{{ $boleta->numero_boleta }}</span>
-                    </td>
-                    <td style="width: 50%; padding: 10px; border: 1px solid #000; background: #f0f0f0;">
-                        <strong>Socio Nº:</strong><br>
-                        <span style="font-size: 18px; font-weight: bold;">{{ $boleta->socio->numero_socio }}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="padding: 10px; border: 1px solid #000;">
-                        <strong>Nombre Completo:</strong><br>
-                        <span style="font-size: 14px; font-weight: bold;">{{ $boleta->socio->nombre_completo }}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #000;">
-                        <strong>Período Facturado:</strong><br>
-                        <span style="font-size: 14px; font-weight: bold;">{{ $boleta->mes_texto }}</span>
-                    </td>
-                    <td style="padding: 10px; border: 1px solid #000;">
-                        <strong>Fecha de Vencimiento:</strong><br>
-                        <span style="font-size: 14px; font-weight: bold; color: #c62828;">{{ $boleta->fecha_vencimiento_formateada }}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="padding: 15px; border: 3px solid #000; text-align: center; background: #000; color: #fff;">
-                        <div style="font-size: 14px; margin-bottom: 5px;">TOTAL A PAGAR</div>
-                        <div style="font-size: 28px; font-weight: bold; letter-spacing: 2px;">{{ $boleta->total_formateado }}</div>
-                    </td>
-                </tr>
-            </table>
-
-            <div style="padding: 15px; border: 2px dashed #1976d2; background: #e3f2fd; margin-bottom: 20px;">
-                <div style="font-size: 11px; font-weight: bold; margin-bottom: 10px; color: #0d47a1;">
-                    📍 INSTRUCCIONES DE PAGO:
-                </div>
-                <div style="font-size: 10px; line-height: 1.6;">
-                    ✓ Pague antes de la fecha de vencimiento para evitar recargos por mora.<br>
-                    ✓ Conserve este comprobante como respaldo de pago.<br>
-                    ✓ Presente este documento al momento de realizar el pago.<br>
-                    ✓ Ante cualquier consulta, comuníquese con nosotros.
-                </div>
-            </div>
-
-            <table style="width: 100%; font-size: 9px; margin-bottom: 20px;">
-                <tr>
-                    <td style="width: 50%; padding: 10px; vertical-align: top; border: 1px solid #000;">
-                        <strong style="font-size: 10px;">💳 TRANSFERENCIA BANCARIA:</strong><br><br>
-                        <strong>Banco:</strong> [Nombre del Banco]<br>
-                        <strong>Cuenta:</strong> [Número de cuenta]<br>
-                        <strong>RUT:</strong> [RUT de la APR]<br>
-                        <strong>Email:</strong> pagos@apr.cl<br>
-                        <strong>Referencia:</strong> {{ $boleta->numero_boleta }}
-                    </td>
-                    <td style="width: 50%; padding: 10px; vertical-align: top; border: 1px solid #000;">
-                        <strong style="font-size: 10px;">🏢 PAGO PRESENCIAL:</strong><br><br>
-                        <strong>Lugar:</strong> Oficina APR<br>
-                        <strong>Días:</strong> Lunes a Viernes<br>
-                        <strong>Horario:</strong> 09:00 - 17:00 hrs<br>
-                        <strong>Sábados:</strong> 09:00 - 12:00 hrs
-                    </td>
-                </tr>
-            </table>
-
-            @if($mesesAdeudados > 0)
-            <div style="padding: 15px; border: 3px solid #c62828; background: #ffebee; margin-bottom: 20px;">
-                <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px; color: #b71c1c; text-align: center;">
-                    ⚠️ ATENCIÓN: DEUDA PENDIENTE
-                </div>
-                <div style="font-size: 11px; text-align: center;">
-                    <strong>Meses adeudados:</strong> {{ $mesesAdeudados }}<br>
-                    <strong style="font-size: 14px; color: #c62828;">Total adeudado: ${{ number_format($totalAdeudado, 0, ',', '.') }}</strong>
-                </div>
-            </div>
-            @endif
-
-            <div style="border-top: 2px solid #000; padding-top: 15px; font-size: 8px; text-align: center; color: #666;">
-                DOCUMENTO GENERADO ELECTRÓNICAMENTE - {{ now()->format('d/m/Y H:i:s') }}<br>
-                CONSERVE ESTE COMPROBANTE HASTA CONFIRMAR SU PAGO
             </div>
         </div>
     </div>

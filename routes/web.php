@@ -29,6 +29,8 @@ use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\ConfiguracionTarifasController;
 use App\Http\Controllers\FlowController;
 use App\Http\Controllers\ContactoController;
+use App\Http\Controllers\ConsultaPublicaController;
+use App\Http\Controllers\EventosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +42,16 @@ use App\Http\Controllers\ContactoController;
 Route::get('/', function () {
     return view('landing');
 })->name('landing');
+
+// Conoce tu Boleta - Página informativa
+Route::get('/conoce-tu-boleta', function () {
+    return view('conoce-boleta');
+})->name('conoce.boleta');
+
+// Consulta Pública de Pagos
+Route::get('/consultar-cuenta', [ConsultaPublicaController::class, 'mostrarFormulario'])->name('consulta.pago');
+Route::post('/consultar-cuenta/buscar', [ConsultaPublicaController::class, 'buscarPorRut'])->name('consulta.buscar');
+Route::post('/consultar-cuenta/generar-pago', [ConsultaPublicaController::class, 'generarPago'])->name('consulta.generar.pago');
 
 // Formulario de contacto
 Route::post('/contacto', [ContactoController::class, 'enviar'])->name('contacto.enviar');
@@ -269,5 +281,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('configuraciones-tarifas', ConfiguracionTarifasController::class);
     Route::get('/configuraciones-tarifas-simulador', [ConfiguracionTarifasController::class, 'simulador'])->name('configuraciones-tarifas.simulador');
     Route::post('/configuraciones-tarifas-calcular', [ConfiguracionTarifasController::class, 'calcular'])->name('configuraciones-tarifas.calcular');
+
+    // ========================================
+    // GESTIÓN DE EVENTOS
+    // ========================================
+    Route::middleware('permission:eventos')->group(function () {
+        Route::resource('eventos', EventosController::class);
+    });
 
 });

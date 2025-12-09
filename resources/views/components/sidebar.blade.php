@@ -282,6 +282,22 @@
             </a>
         </div>
 
+        <!-- Eventos -->
+        <div class="nav-section">
+            <div class="nav-section-title">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Eventos</span>
+            </div>
+            <a href="{{ route('eventos.index') }}" class="nav-item {{ request()->routeIs('eventos.*') ? 'active' : '' }}">
+                <i class="fas fa-calendar-check"></i>
+                <span>Ver Eventos</span>
+            </a>
+            <a href="{{ route('eventos.create') }}" class="nav-item">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Nuevo Evento</span>
+            </a>
+        </div>
+
         <!-- Reportes -->
         <div class="nav-section">
             <div class="nav-section-title">

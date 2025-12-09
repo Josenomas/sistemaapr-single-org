@@ -242,6 +242,10 @@
                         <input type="checkbox" name="permisos[]" value="historial_pagos" {{ in_array('historial_pagos', old('permisos', $permisosActuales)) ? 'checked' : '' }}>
                         <span>Historial de Pagos</span>
                     </label>
+                    <label class="permission-item">
+                        <input type="checkbox" name="permisos[]" value="eventos" {{ in_array('eventos', old('permisos', $permisosActuales)) ? 'checked' : '' }}>
+                        <span>Eventos</span>
+                    </label>
                 </div>
             </div>
 

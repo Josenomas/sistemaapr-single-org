@@ -103,27 +103,35 @@
         /* Hero Section */
         .hero {
             margin-top: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('/Logo1.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             color: white;
             padding: 100px 2rem;
             text-align: center;
+            position: relative;
         }
 
         .hero-content {
             max-width: 800px;
             margin: 0 auto;
+            position: relative;
+            z-index: 2;
         }
 
         .hero h1 {
             font-size: 3.5rem;
             margin-bottom: 1.5rem;
             line-height: 1.2;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6);
         }
 
         .hero p {
             font-size: 1.25rem;
             margin-bottom: 2rem;
             opacity: 0.95;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 0, 0, 0.6);
         }
 
         .cta-buttons {
@@ -134,8 +142,8 @@
         }
 
         .btn-primary {
-            background: white;
-            color: var(--primary);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
             padding: 1rem 2rem;
             border-radius: 8px;
             text-decoration: none;
@@ -145,11 +153,13 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
         }
 
         .btn-secondary {
@@ -495,7 +505,8 @@
             </a>
             <ul class="nav-links">
                 <li><a href="#features">Características</a></li>
-                <li><a href="#modules">Módulos</a></li>
+                <li><a href="{{ route('conoce.boleta') }}">Conoce tu Boleta</a></li>
+                <li><a href="{{ route('consulta.pago') }}">Pagar Cuenta</a></li>
                 <li><a href="#pricing">Precios</a></li>
                 <li><a href="#contact">Contacto</a></li>
             </ul>
@@ -509,15 +520,20 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h1>💧 Gestión Integral para tu APR</h1>
+            <h1>💧 Gestión Integral para tu SSR
             <p>Sistema completo de administración para Agua Potable Rural. Controla socios, lecturas, boletas, pagos y más en una sola plataforma moderna y fácil de usar.</p>
             <div class="cta-buttons">
-                <a href="#contact" class="btn-primary">
-                    <i class="fas fa-rocket"></i>
-                    Solicitar Demo
+                <a href="{{ route('consulta.pago') }}" class="btn-primary">
+                    <i class="fas fa-credit-card"></i>
+                    Pagar mi Cuenta
                 </a>
-                <a href="#features" class="btn-secondary">
-                    Ver Características
+                <a href="{{ route('conoce.boleta') }}" class="btn-secondary">
+                    <i class="fas fa-file-invoice"></i>
+                    Conoce tu Boleta
+                </a>
+                <a href="#contact" class="btn-secondary">
+                    <i class="fas fa-rocket"></i>
+                    Contáctanos
                 </a>
             </div>
         </div>
@@ -575,60 +591,131 @@
         </div>
     </section>
 
-    <!-- Modules Section -->
-    <section id="modules" class="modules">
-        <div class="section-title">
-            <h2>Módulos Incluidos</h2>
-            <p>Todo lo que necesitas en un solo sistema</p>
+    <!-- Before & After Section -->
+    <section style="padding: 100px 2rem; background: #1f2937; color: white;">
+        <div class="section-title" style="color: white;">
+            <h2>Del Trabajo Manual a la Gestión Centralizada</h2>
+            <p style="color: rgba(255, 255, 255, 0.8);">Transforma tu forma de trabajar</p>
         </div>
-        <div class="modules-grid">
-            <div class="module-item">
-                <i class="fas fa-users"></i>
-                <strong>Gestión de Socios</strong>
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 3rem; align-items: center;">
+            <!-- Antes: Trabajo Manual -->
+            <div style="background: rgba(220, 38, 38, 0.1); border: 2px solid #dc2626; padding: 3rem; border-radius: 12px;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📋</div>
+                    <h3 style="font-size: 2rem; color: #fca5a5; margin-bottom: 1rem;">Antes: Trabajo Manual</h3>
+                </div>
+                <ul style="list-style: none; padding: 0; font-size: 1.05rem; line-height: 2;">
+                    <li style="padding: 10px 0; border-bottom: 1px solid rgba(220, 38, 38, 0.3); display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #dc2626; font-size: 1.3rem;">✗</span>
+                        <span>Libros de registro en papel, difíciles de buscar y actualizar</span>
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid rgba(220, 38, 38, 0.3); display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #dc2626; font-size: 1.3rem;">✗</span>
+                        <span>Cálculos manuales de boletas propensos a errores</span>
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid rgba(220, 38, 38, 0.3); display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #dc2626; font-size: 1.3rem;">✗</span>
+                        <span>Información dispersa en múltiples cuadernos y archivos</span>
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid rgba(220, 38, 38, 0.3); display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #dc2626; font-size: 1.3rem;">✗</span>
+                        <span>Horas perdidas buscando datos de socios o pagos anteriores</span>
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid rgba(220, 38, 38, 0.3); display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #dc2626; font-size: 1.3rem;">✗</span>
+                        <span>Riesgo de pérdida de información por daño o extravío</span>
+                    </li>
+                    <li style="padding: 10px 0; display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #dc2626; font-size: 1.3rem;">✗</span>
+                        <span>Reportes y estadísticas elaborados manualmente cada mes</span>
+                    </li>
+                </ul>
             </div>
-            <div class="module-item">
-                <i class="fas fa-tachometer-alt"></i>
-                <strong>Lecturas de Medidores</strong>
+
+            <!-- Después: Sistema Centralizado -->
+            <div style="background: linear-gradient(135deg, #10b981, #059669); padding: 3rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🚀</div>
+                    <h3 style="font-size: 2rem; margin-bottom: 1rem;">Ahora: Sistema Centralizado</h3>
+                </div>
+                <ul style="list-style: none; padding: 0; font-size: 1.05rem; line-height: 2;">
+                    <li style="padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #d1fae5; font-size: 1.3rem;">✓</span>
+                        <span><strong>Todo en un solo lugar:</strong> Accede a toda tu información desde cualquier dispositivo</span>
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #d1fae5; font-size: 1.3rem;">✓</span>
+                        <span><strong>Automatización total:</strong> Genera boletas masivas en segundos, sin errores</span>
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #d1fae5; font-size: 1.3rem;">✓</span>
+                        <span><strong>Búsqueda instantánea:</strong> Encuentra cualquier dato en milisegundos</span>
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #d1fae5; font-size: 1.3rem;">✓</span>
+                        <span><strong>Respaldo automático:</strong> Tu información siempre segura y disponible</span>
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #d1fae5; font-size: 1.3rem;">✓</span>
+                        <span><strong>Reportes en tiempo real:</strong> Visualiza estadísticas al instante con gráficos</span>
+                    </li>
+                    <li style="padding: 10px 0; display: flex; align-items: flex-start; gap: 12px;">
+                        <span style="color: #d1fae5; font-size: 1.3rem;">✓</span>
+                        <span><strong>Ahorra tiempo y dinero:</strong> Reduce horas de trabajo administrativo</span>
+                    </li>
+                </ul>
             </div>
-            <div class="module-item">
-                <i class="fas fa-file-invoice-dollar"></i>
-                <strong>Generación de Boletas</strong>
+        </div>
+
+        <!-- Estadísticas de impacto -->
+        <div style="max-width: 1000px; margin: 4rem auto 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: 12px;">
+                <div style="font-size: 3rem; font-weight: bold; color: #10b981; margin-bottom: 0.5rem;">80%</div>
+                <div style="font-size: 1rem; opacity: 0.9;">Menos tiempo en tareas administrativas</div>
             </div>
-            <div class="module-item">
-                <i class="fas fa-dollar-sign"></i>
-                <strong>Control de Pagos</strong>
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: 12px;">
+                <div style="font-size: 3rem; font-weight: bold; color: #10b981; margin-bottom: 0.5rem;">100%</div>
+                <div style="font-size: 1rem; opacity: 0.9;">Información centralizada y accesible</div>
             </div>
-            <div class="module-item">
-                <i class="fas fa-bell"></i>
-                <strong>Notificaciones</strong>
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: 12px;">
+                <div style="font-size: 3rem; font-weight: bold; color: #10b981; margin-bottom: 0.5rem;">0</div>
+                <div style="font-size: 1rem; opacity: 0.9;">Errores de cálculo en boletas</div>
             </div>
-            <div class="module-item">
-                <i class="fas fa-boxes"></i>
-                <strong>Inventario</strong>
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: 12px;">
+                <div style="font-size: 3rem; font-weight: bold; color: #10b981; margin-bottom: 0.5rem;">24/7</div>
+                <div style="font-size: 1rem; opacity: 0.9;">Acceso desde cualquier lugar</div>
             </div>
-            <div class="module-item">
-                <i class="fas fa-shopping-cart"></i>
-                <strong>Compras</strong>
+        </div>
+    </section>
+
+    <!-- Mission & Vision Section -->
+    <section id="mision-vision" style="padding: 100px 2rem; background: white;">
+        <div class="section-title">
+            <h2>Misión y Visión</h2>
+            <p>Nuestro compromiso con el agua potable rural</p>
+        </div>
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 3rem;">
+            <!-- Misión -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 3rem; border-radius: 12px; color: white; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+                <h3 style="font-size: 1.8rem; margin-bottom: 1.5rem;">Nuestra Misión</h3>
+                <p style="font-size: 1.1rem; line-height: 1.8; opacity: 0.95;">
+                    Crear una plataforma <strong>fácil de usar e intuitiva</strong> que simplifique la gestión diaria de los sistemas de agua potable rural.
+                    Diseñamos cada función pensando en la <strong>experiencia del usuario</strong>, eliminando la complejidad y permitiendo que cualquier persona,
+                    sin conocimientos técnicos avanzados, pueda administrar eficientemente su APR. Nuestro objetivo es que la tecnología sea un <strong>aliado accesible</strong>,
+                    no una barrera, democratizando la gestión del agua en zonas rurales.
+                </p>
             </div>
-            <div class="module-item">
-                <i class="fas fa-tools"></i>
-                <strong>Trabajos Realizados</strong>
-            </div>
-            <div class="module-item">
-                <i class="fas fa-calendar-check"></i>
-                <strong>Asistencias</strong>
-            </div>
-            <div class="module-item">
-                <i class="fas fa-user-tie"></i>
-                <strong>Directiva</strong>
-            </div>
-            <div class="module-item">
-                <i class="fas fa-ticket-alt"></i>
-                <strong>Mesa de Ayuda</strong>
-            </div>
-            <div class="module-item">
-                <i class="fas fa-history"></i>
-                <strong>Actividad Reciente</strong>
+            <!-- Visión -->
+            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 3rem; border-radius: 12px; color: white; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🌟</div>
+                <h3 style="font-size: 1.8rem; margin-bottom: 1.5rem;">Nuestra Visión</h3>
+                <p style="font-size: 1.1rem; line-height: 1.8; opacity: 0.95;">
+                    Ser reconocidos como la plataforma más <strong>intuitiva y amigable</strong> para la gestión de agua potable rural,
+                    donde la <strong>simplicidad y la eficiencia</strong> se encuentran. Aspiramos a que cada APR en Chile pueda gestionar sus operaciones
+                    con <strong>confianza y autonomía</strong>, utilizando una herramienta que se adapta a sus necesidades reales,
+                    con una <strong>interfaz clara</strong>, <strong>flujos de trabajo naturales</strong> y un <strong>diseño pensado para humanos</strong>, no para expertos en tecnología.
+                </p>
             </div>
         </div>
     </section>
