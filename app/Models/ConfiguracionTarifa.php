@@ -141,7 +141,8 @@ class ConfiguracionTarifa extends Model
             ];
         }
 
-        $cargoConsumo = $tramo->monto;  // Monto por consumo
+        $valorUnitario = $tramo->monto;  // Valor por m³
+        $cargoConsumo = $valorUnitario * $consumo;  // Consumo × valor unitario
         $cargoFijo = $tramo->cargo_fijo ?? 0;
         $subtotal = $cargoConsumo + $cargoFijo;  // Subtotal antes de IVA
         $ivaPorcentaje = $tramo->iva ?? 0;
@@ -153,6 +154,7 @@ class ConfiguracionTarifa extends Model
             'monto_base' => $subtotal,  // Subtotal (consumo + cargo fijo)
             'cargo_fijo' => $cargoFijo,
             'cargo_consumo' => $cargoConsumo,
+            'valor_unitario' => $valorUnitario,
             'iva_porcentaje' => $ivaPorcentaje,
             'iva' => $montoIva,
             'total' => $total
