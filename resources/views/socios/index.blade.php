@@ -252,5 +252,41 @@
         display: flex;
         justify-content: center;
     }
+
+    /* Ajustar tamaño de las flechas de paginación */
+    .pagination-wrapper nav {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .pagination-wrapper nav a,
+    .pagination-wrapper nav span {
+        min-width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .pagination-wrapper nav a svg,
+    .pagination-wrapper nav span svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .pagination-wrapper nav a:hover {
+        background: var(--gray-100);
+    }
+
+    .pagination-wrapper nav .active {
+        background: var(--primary);
+        color: white;
+    }
 </style>
 @endsection
