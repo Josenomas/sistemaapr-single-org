@@ -160,11 +160,29 @@
                                class="custom-control-input"
                                id="notificar"
                                name="notificar"
+                               value="1"
                                {{ old('notificar', $evento->notificar) ? 'checked' : '' }}>
                         <label class="custom-control-label" for="notificar">
                             Activar notificaciones
                         </label>
                     </div>
+                </div>
+            </div>
+
+            <div class="form-row" id="dias-notificacion-group" style="display:none;">
+                <div class="form-group col-md-4">
+                    <label for="dias_notificacion" class="form-label">Días de anticipación</label>
+                    <input type="number"
+                           class="form-control @error('dias_notificacion') is-invalid @enderror"
+                           id="dias_notificacion"
+                           name="dias_notificacion"
+                           min="1"
+                           max="30"
+                           value="{{ old('dias_notificacion', $evento->dias_notificacion ?? 3) }}">
+                    <small class="form-text text-muted">Con cuántos días de anticipación notificar</small>
+                    @error('dias_notificacion')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
@@ -382,10 +400,22 @@ document.getElementById('recurrencia').addEventListener('change', function() {
     }
 });
 
-// Mostrar el campo si ya está seleccionado mensual (en caso de errores de validación)
+document.getElementById('notificar').addEventListener('change', function() {
+    const diasNotificacionGroup = document.getElementById('dias-notificacion-group');
+    if (this.checked) {
+        diasNotificacionGroup.style.display = 'block';
+    } else {
+        diasNotificacionGroup.style.display = 'none';
+    }
+});
+
+// Mostrar campos si ya están seleccionados (en caso de errores de validación)
 document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('recurrencia').value === 'mensual') {
         document.getElementById('dia-recurrencia-group').style.display = 'block';
+    }
+    if (document.getElementById('notificar').checked) {
+        document.getElementById('dias-notificacion-group').style.display = 'block';
     }
 });
 </script>

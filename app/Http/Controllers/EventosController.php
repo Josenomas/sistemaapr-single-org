@@ -56,12 +56,17 @@ class EventosController extends Controller
             'icono' => 'required|string|max:100',
             'color' => 'required|in:primary,success,warning,danger,info',
             'notificar' => 'nullable|boolean',
-            'dias_notificacion' => 'nullable|integer|min:1',
+            'dias_notificacion' => 'nullable|integer|min:1|max:30',
         ]);
 
         try {
             $validated['activo'] = 1;
             $validated['notificar'] = $request->has('notificar') ? 1 : 0;
+
+            // Si no se marca notificar, poner dias_notificacion en null
+            if (!$validated['notificar']) {
+                $validated['dias_notificacion'] = null;
+            }
 
             $evento = Evento::create($validated);
 
@@ -115,11 +120,16 @@ class EventosController extends Controller
             'icono' => 'required|string|max:100',
             'color' => 'required|in:primary,success,warning,danger,info',
             'notificar' => 'nullable|boolean',
-            'dias_notificacion' => 'nullable|integer|min:1',
+            'dias_notificacion' => 'nullable|integer|min:1|max:30',
         ]);
 
         try {
             $validated['notificar'] = $request->has('notificar') ? 1 : 0;
+
+            // Si no se marca notificar, poner dias_notificacion en null
+            if (!$validated['notificar']) {
+                $validated['dias_notificacion'] = null;
+            }
 
             $evento->update($validated);
 
