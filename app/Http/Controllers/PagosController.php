@@ -8,7 +8,9 @@ use App\Models\Boleta;
 use App\Models\Socio;
 use App\Helpers\ActividadHelper;
 use App\Services\FlowPaymentService;
+use App\Mail\LinkPagoFlowMail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class PagosController extends Controller
 {
@@ -452,17 +454,34 @@ class PagosController extends Controller
             );
 
             if ($resultado['success']) {
+                // Enviar correo con el link de pago
+                try {
+                    Mail::to($validated['email'])->send(
+                        new LinkPagoFlowMail(
+                            $boleta->socio,
+                            $boleta,
+                            $resultado['url'],
+                            $montoPendiente
+                        )
+                    );
+                } catch (\Exception $e) {
+                    \Log::error('Error al enviar correo de pago Flow', [
+                        'error' => $e->getMessage(),
+                        'email' => $validated['email'],
+                    ]);
+                }
+
                 // Registrar actividad
                 ActividadHelper::registrar(
                     'Pagos',
-                    "Link de pago Flow generado - Boleta: {$boleta->numero_boleta} - Socio: {$boleta->socio->nombre_completo} - Monto: $" . number_format($montoPendiente, 0, ',', '.'),
+                    "Link de pago Flow generado y enviado - Boleta: {$boleta->numero_boleta} - Socio: {$boleta->socio->nombre_completo} - Email: {$validated['email']} - Monto: $" . number_format($montoPendiente, 0, ',', '.'),
                     auth()->id()
                 );
 
                 return response()->json([
                     'success' => true,
                     'url' => $resultado['url'],
-                    'message' => 'Link de pago generado exitosamente',
+                    'message' => 'Link de pago generado y enviado exitosamente al correo ' . $validated['email'],
                 ]);
             }
 
