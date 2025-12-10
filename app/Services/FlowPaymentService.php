@@ -177,19 +177,17 @@ class FlowPaymentService
      */
     private function firmarParametros($params)
     {
-        // Ordenar parámetros alfabéticamente
+        // Ordenar parámetros alfabéticamente por clave
         ksort($params);
 
-        // Concatenar parámetros
+        // Concatenar parámetros (clave + valor)
         $string = '';
         foreach ($params as $key => $value) {
             $string .= $key . $value;
         }
 
-        // Agregar secret key
-        $string .= $this->secretKey;
-
         // Generar firma HMAC SHA256
+        // Flow usa el secretKey como clave HMAC, NO se concatena al string
         return hash_hmac('sha256', $string, $this->secretKey);
     }
 
