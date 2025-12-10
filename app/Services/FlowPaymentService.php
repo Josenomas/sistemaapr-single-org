@@ -60,10 +60,8 @@ class FlowPaymentService
                 'urlReturn' => $urlRetorno,
             ];
 
-            // Agregar firma (debe excluir apiKey según documentación)
-            $paramsParaFirmar = $params;
-            unset($paramsParaFirmar['apiKey']);
-            $params['s'] = $this->firmarParametros($paramsParaFirmar);
+            // Agregar firma (incluye todos los parámetros según documentación Flow)
+            $params['s'] = $this->firmarParametros($params);
 
             // Log de parámetros enviados (DEBUG)
             \Log::info('Flow - Creando pago', [
@@ -125,8 +123,8 @@ class FlowPaymentService
                 'token' => $token,
             ];
 
-            $paramsParaFirmar = ['token' => $token];
-            $params['s'] = $this->firmarParametros($paramsParaFirmar);
+            // Agregar firma (incluye todos los parámetros)
+            $params['s'] = $this->firmarParametros($params);
 
             $response = $this->realizarPeticion('/payment/getStatus', $params);
 
