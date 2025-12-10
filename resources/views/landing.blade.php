@@ -479,18 +479,163 @@
             transform: translateY(-4px);
         }
 
+        /* Hamburger Menu */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
+            .nav {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .logo i {
+                font-size: 1.5rem;
+            }
+
+            .menu-toggle {
+                display: block;
             }
 
             .nav-links {
                 display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                gap: 0;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                padding: 0.75rem 0;
+                border-bottom: 1px solid var(--gray-200);
+            }
+
+            .btn-login {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .hero {
+                padding: 60px 1.5rem;
+                margin-top: 60px;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                padding: 0.875rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .features,
+            .modules,
+            .pricing,
+            .contact {
+                padding: 60px 1.5rem;
+            }
+
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+
+            .section-title p {
+                font-size: 1rem;
+            }
+
+            .features-grid,
+            .modules-grid,
+            .pricing-cards {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
             }
 
             .pricing-card.featured {
                 transform: scale(1);
+            }
+
+            .pricing-card:hover {
+                transform: translateY(-8px) scale(1);
+            }
+
+            /* Before & After Section */
+            section[style*="padding: 100px"] {
+                padding: 60px 1.5rem !important;
+            }
+
+            div[style*="grid-template-columns: repeat(auto-fit, minmax(500px, 1fr))"] {
+                grid-template-columns: 1fr !important;
+                gap: 2rem !important;
+            }
+
+            div[style*="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr))"] {
+                grid-template-columns: 1fr !important;
+                gap: 2rem !important;
+            }
+
+            div[style*="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"] {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+
+            /* Ajustar tamaños de fuente en móvil */
+            div[style*="font-size: 4rem"] {
+                font-size: 3rem !important;
+            }
+
+            div[style*="font-size: 3rem"][style*="font-weight: bold"] {
+                font-size: 2.5rem !important;
+            }
+
+            h3[style*="font-size: 2rem"] {
+                font-size: 1.5rem !important;
+            }
+
+            h3[style*="font-size: 1.8rem"] {
+                font-size: 1.4rem !important;
+            }
+
+            p[style*="font-size: 1.1rem"],
+            li[style*="font-size: 1.05rem"] {
+                font-size: 0.95rem !important;
+            }
+
+            /* Reducir padding de las cards */
+            div[style*="padding: 3rem"] {
+                padding: 2rem !important;
             }
         }
     </style>
@@ -503,7 +648,10 @@
                 <i class="fas fa-tint"></i>
                 Sistema APR
             </a>
-            <ul class="nav-links">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-links" id="navLinks">
                 <li><a href="#features">Características</a></li>
                 <li><a href="{{ route('conoce.boleta') }}">Conoce tu Boleta</a></li>
                 <li><a href="{{ route('consulta.pago') }}">Pagar Cuenta</a></li>
@@ -853,7 +1001,24 @@
                         block: 'start'
                     });
                 }
+                // Cerrar menú móvil después de hacer clic
+                document.getElementById('navLinks').classList.remove('active');
             });
+        });
+
+        // Toggle menú móvil
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+
+        // Cerrar menú al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            const nav = document.getElementById('navLinks');
+            const toggle = document.getElementById('menuToggle');
+
+            if (!nav.contains(event.target) && !toggle.contains(event.target)) {
+                nav.classList.remove('active');
+            }
         });
     </script>
 </body>
