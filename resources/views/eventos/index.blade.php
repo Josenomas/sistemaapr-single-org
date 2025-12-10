@@ -56,22 +56,10 @@
                             <td>
                                 <div class="action-buttons">
                                     <a href="{{ route('eventos.edit', $evento->id) }}"
-                                       class="btn btn-sm btn-warning"
+                                       class="btn-icon btn-icon-warning"
                                        title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('eventos.destroy', $evento->id) }}"
-                                          method="POST"
-                                          style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="btn btn-sm btn-danger"
-                                                onclick="return confirm('¿Está seguro de eliminar este evento?')"
-                                                title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -98,6 +86,58 @@
 
 @section('styles')
 <style>
+/* Consistente con el resto del sistema */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.page-title i {
+    color: var(--primary);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), #1e40af);
+    color: white;
+    padding: 12px 24px;
+    border-radius: var(--radius);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+}
+
+.card-body {
+    padding: 24px;
+}
+
 .table-responsive {
     overflow-x: auto;
 }
@@ -105,7 +145,7 @@
 .table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
 }
 
 .table thead {
@@ -113,13 +153,16 @@
 }
 
 .table th {
-    padding: 12px 16px;
+    padding: 14px 16px;
     text-align: left;
     font-weight: 600;
     color: var(--gray-700);
-    border-bottom: 2px solid var(--gray-200);
+    border-bottom: 2px solid var(--gray-300);
     border-right: 1px solid var(--gray-200);
     white-space: nowrap;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .table th:last-child {
@@ -127,7 +170,7 @@
 }
 
 .table td {
-    padding: 12px 16px;
+    padding: 14px 16px;
     border-bottom: 1px solid var(--gray-200);
     border-right: 1px solid var(--gray-200);
     vertical-align: middle;
@@ -137,117 +180,137 @@
     border-right: none;
 }
 
+.table tbody tr {
+    transition: all 0.2s;
+}
+
 .table tbody tr:hover {
     background: var(--gray-50);
 }
 
 .event-icon-mini {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 0.875rem;
+    font-size: 1rem;
 }
 
-.bg-primary { background-color: #2563eb !important; }
-.bg-success { background-color: #10b981 !important; }
-.bg-warning { background-color: #f59e0b !important; }
-.bg-danger { background-color: #ef4444 !important; }
-.bg-info { background-color: #06b6d4 !important; }
+.bg-primary { background: linear-gradient(135deg, #2563eb, #1e40af) !important; }
+.bg-success { background: linear-gradient(135deg, #10b981, #059669) !important; }
+.bg-warning { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
+.bg-danger { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
+.bg-info { background: linear-gradient(135deg, #06b6d4, #0891b2) !important; }
 
 .badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 10px;
-    border-radius: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .badge-primary {
     background: rgba(37, 99, 235, 0.1);
     color: #2563eb;
+    border: 1px solid rgba(37, 99, 235, 0.2);
 }
 
 .badge-success {
     background: rgba(16, 185, 129, 0.1);
     color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .badge-warning {
     background: rgba(245, 158, 11, 0.1);
     color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .badge-danger {
     background: rgba(239, 68, 68, 0.1);
     color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .badge-info {
     background: rgba(6, 182, 212, 0.1);
     color: #06b6d4;
+    border: 1px solid rgba(6, 182, 212, 0.2);
 }
 
 .countdown-badge {
     display: inline-flex;
     align-items: center;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
 }
 
 .countdown-badge.urgent {
     background: rgba(239, 68, 68, 0.1);
     color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .countdown-badge.soon {
     background: rgba(245, 158, 11, 0.1);
     color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
-.countdown-badge.normal {
+.countdown-badge:not(.urgent):not(.soon) {
     background: rgba(16, 185, 129, 0.1);
     color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .action-buttons {
     display: flex;
     gap: 8px;
+    justify-content: center;
 }
 
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 0.875rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    text-decoration: none;
     transition: all 0.2s;
+    cursor: pointer;
+    border: none;
 }
 
-.btn-warning {
+.btn-icon-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.btn-icon-warning:hover {
     background: #f59e0b;
     color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
 }
 
-.btn-warning:hover {
-    background: #d97706;
+.text-center {
+    text-align: center;
 }
 
-.btn-danger {
-    background: #ef4444;
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #dc2626;
+.text-muted {
+    color: var(--gray-500);
 }
 
 .pagination-wrapper {
