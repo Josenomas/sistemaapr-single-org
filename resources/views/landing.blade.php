@@ -535,30 +535,38 @@
             }
 
             .hero {
-                padding: 60px 1.5rem;
+                padding: 80px 1.5rem;
                 margin-top: 60px;
+            }
+
+            .hero-content {
+                padding: 0 0.5rem;
             }
 
             .hero h1 {
                 font-size: 1.8rem;
-                margin-bottom: 1rem;
+                margin-bottom: 1.5rem;
+                line-height: 1.3;
             }
 
             .hero p {
-                font-size: 1rem;
-                margin-bottom: 1.5rem;
+                font-size: 0.95rem;
+                margin-bottom: 2rem;
+                line-height: 1.6;
             }
 
             .cta-buttons {
                 flex-direction: column;
-                gap: 0.75rem;
+                gap: 1rem;
+                padding: 0 1rem;
             }
 
             .btn-primary,
             .btn-secondary {
                 width: 100%;
-                padding: 0.875rem 1.5rem;
+                padding: 1rem 1.5rem;
                 font-size: 1rem;
+                justify-content: center;
             }
 
             .features,
