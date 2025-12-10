@@ -141,17 +141,18 @@ class ConfiguracionTarifa extends Model
             ];
         }
 
-        $montoBase = $tramo->monto;
+        $cargoConsumo = $tramo->monto;  // Monto por consumo
         $cargoFijo = $tramo->cargo_fijo ?? 0;
+        $subtotal = $cargoConsumo + $cargoFijo;  // Subtotal antes de IVA
         $ivaPorcentaje = $tramo->iva ?? 0;
-        $montoIva = round($montoBase * ($ivaPorcentaje / 100), 0);
-        $total = $montoBase + $montoIva;
+        $montoIva = round($subtotal * ($ivaPorcentaje / 100), 0);
+        $total = $subtotal + $montoIva;
 
         return [
             'tramo' => $tramo,
-            'monto_base' => $montoBase,
+            'monto_base' => $subtotal,  // Subtotal (consumo + cargo fijo)
             'cargo_fijo' => $cargoFijo,
-            'cargo_consumo' => $montoBase - $cargoFijo,
+            'cargo_consumo' => $cargoConsumo,
             'iva_porcentaje' => $ivaPorcentaje,
             'iva' => $montoIva,
             'total' => $total
