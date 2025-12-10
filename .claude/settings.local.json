@@ -8,7 +8,12 @@
       "Bash(/c/xampp/mysql/bin/mysql:*)",
       "Bash(dir:*)",
       "Bash(nslookup:*)",
-      "Bash(dig:*)"
+      "Bash(dig:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nImplementación módulo de Eventos y mejoras en Dashboard\n\n- Módulo completo de Eventos con CRUD\n  * Migración y modelo Evento con lógica de recurrencia\n  * Controller con operaciones CRUD y actividad logging\n  * Vistas index, create, edit con diseño consistente\n  * Sistema de permisos integrado en usuarios\n  * Integración en sidebar y dashboard\n\n- Sistema de consulta pública de pagos\n  * ConsultaPublicaController para consultas sin auth\n  * Vistas consulta-pago, resultado-consulta, conoce-boleta\n  * Integración con Flow para pagos públicos\n\n- Mejoras visuales en Dashboard\n  * Líneas de separación entre secciones\n  * Título \"Accesos Directos\" agregado\n  * Eliminadas transiciones de expansión de color\n  * Animaciones suaves mantenidas\n\n- Ajustes de diseño\n  * Botón \"Pagar mi Cuenta\" con mejor contraste\n  * Tablas con bordes verticales para mejor organización\n  * Estilos consistentes en todos los módulos\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(sudo chown:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

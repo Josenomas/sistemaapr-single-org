@@ -12,7 +12,7 @@ return [
     */
 
     // Modo de operación (sandbox o production)
-    'mode' => env('FLOW_MODE', 'sandbox'),
+    'mode' => env('FLOW_ENVIRONMENT', env('FLOW_MODE', 'sandbox')),
 
     // API Key de Flow
     'api_key' => env('FLOW_API_KEY', ''),

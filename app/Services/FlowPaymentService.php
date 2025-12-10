@@ -21,6 +21,14 @@ class FlowPaymentService
         $this->secretKey = config('flow.secret_key');
         $this->apiUrl = config('flow.api_url')[$mode];
         $this->paymentUrl = config('flow.payment_url')[$mode];
+
+        // Log temporal para debug
+        \Log::info('Flow Service Initialized', [
+            'mode' => $mode,
+            'apiKey' => $this->apiKey ? 'SET (length: ' . strlen($this->apiKey) . ')' : 'NOT SET',
+            'secretKey' => $this->secretKey ? 'SET (length: ' . strlen($this->secretKey) . ')' : 'NOT SET',
+            'apiUrl' => $this->apiUrl,
+        ]);
     }
 
     /**
@@ -42,6 +50,7 @@ class FlowPaymentService
 
             // Preparar parámetros
             $params = [
+                'apiKey' => $this->apiKey,
                 'commerceOrder' => $flowOrder,
                 'subject' => $subject,
                 'currency' => 'CLP',
@@ -51,8 +60,18 @@ class FlowPaymentService
                 'urlReturn' => $urlRetorno,
             ];
 
-            // Agregar firma
-            $params['s'] = $this->firmarParametros($params);
+            // Agregar firma (debe excluir apiKey según documentación)
+            $paramsParaFirmar = $params;
+            unset($paramsParaFirmar['apiKey']);
+            $params['s'] = $this->firmarParametros($paramsParaFirmar);
+
+            // Log de parámetros enviados (DEBUG)
+            \Log::info('Flow - Creando pago', [
+                'apiKey_length' => strlen($this->apiKey),
+                'params_keys' => array_keys($params),
+                'has_apiKey' => isset($params['apiKey']),
+                'apiKey_first_chars' => substr($this->apiKey, 0, 10) . '...',
+            ]);
 
             // Realizar petición HTTP a Flow
             $response = $this->realizarPeticion('/payment/create', $params);
@@ -102,10 +121,12 @@ class FlowPaymentService
         try {
             // Obtener datos del pago
             $params = [
+                'apiKey' => $this->apiKey,
                 'token' => $token,
             ];
 
-            $params['s'] = $this->firmarParametros($params);
+            $paramsParaFirmar = ['token' => $token];
+            $params['s'] = $this->firmarParametros($paramsParaFirmar);
 
             $response = $this->realizarPeticion('/payment/getStatus', $params);
 
@@ -178,9 +199,6 @@ class FlowPaymentService
     private function realizarPeticion($endpoint, $params)
     {
         $url = $this->apiUrl . $endpoint;
-
-        // Agregar API Key
-        $params['apiKey'] = $this->apiKey;
 
         // Inicializar cURL
         $ch = curl_init();
