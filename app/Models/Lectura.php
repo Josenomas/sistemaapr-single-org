@@ -71,6 +71,14 @@ class Lectura extends Model
     }
 
     /**
+     * Accessor para consumo (alias de consumo_m3)
+     */
+    public function getConsumoAttribute()
+    {
+        return $this->consumo_m3;
+    }
+
+    /**
      * Calcular consumo automáticamente
      */
     public static function boot()
@@ -78,9 +86,11 @@ class Lectura extends Model
         parent::boot();
 
         static::creating(function ($lectura) {
-            if (!$lectura->consumo_m3) {
-                $lectura->consumo_m3 = $lectura->lectura_actual - $lectura->lectura_anterior;
-            }
+            $lectura->consumo_m3 = $lectura->lectura_actual - $lectura->lectura_anterior;
+        });
+
+        static::updating(function ($lectura) {
+            $lectura->consumo_m3 = $lectura->lectura_actual - $lectura->lectura_anterior;
         });
     }
 }
