@@ -53,8 +53,15 @@ class LimpiarDatos extends Command
             ];
 
             foreach ($tablas as $tabla) {
-                DB::table($tabla)->truncate();
-                $this->info("✓ Tabla '{$tabla}' limpiada");
+                // Verificar si la tabla existe
+                $existe = DB::select("SHOW TABLES LIKE '{$tabla}'");
+
+                if (!empty($existe)) {
+                    DB::table($tabla)->truncate();
+                    $this->info("✓ Tabla '{$tabla}' limpiada");
+                } else {
+                    $this->warn("⚠ Tabla '{$tabla}' no existe, omitida");
+                }
             }
 
             // Reactivar verificación de claves foráneas
