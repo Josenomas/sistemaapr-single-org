@@ -28,6 +28,7 @@ use App\Http\Controllers\HistorialPagosController;
 use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\ConfiguracionTarifasController;
 use App\Http\Controllers\FlowController;
+use App\Http\Controllers\ImportarLecturasController;
 use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\ConsultaPublicaController;
 use App\Http\Controllers\EventosController;
@@ -90,6 +91,12 @@ Route::middleware('auth')->group(function () {
         Route::resource('lecturas', LecturasController::class);
         Route::get('/lecturas-masivo', [LecturasController::class, 'masivo'])->name('lecturas.masivo');
         Route::post('/lecturas-masivo', [LecturasController::class, 'storeMasivo'])->name('lecturas.storeMasivo');
+
+        // Importación masiva CSV
+        Route::get('/lecturas-importar', [ImportarLecturasController::class, 'index'])->name('lecturas.importar.index');
+        Route::post('/lecturas-importar', [ImportarLecturasController::class, 'importar'])->name('lecturas.importar.procesar');
+        Route::post('/lecturas-importar-confirmar', [ImportarLecturasController::class, 'confirmar'])->name('lecturas.importar.confirmar');
+        Route::get('/lecturas-importar-plantilla', [ImportarLecturasController::class, 'descargarPlantilla'])->name('lecturas.importar.plantilla');
     });
 
     // ========================================
