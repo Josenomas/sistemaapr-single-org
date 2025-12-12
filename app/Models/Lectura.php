@@ -20,9 +20,9 @@ class Lectura extends Model
     ];
 
     protected $casts = [
-        'lectura_anterior' => 'decimal:2',
-        'lectura_actual' => 'decimal:2',
-        'consumo_m3' => 'decimal:2',
+        'lectura_anterior' => 'decimal:3',
+        'lectura_actual' => 'decimal:3',
+        'consumo_m3' => 'decimal:3',
         'fecha_lectura' => 'date',
         'fecha_creacion' => 'datetime',
     ];
