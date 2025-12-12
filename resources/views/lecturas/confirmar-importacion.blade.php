@@ -49,7 +49,7 @@
                                 echo $meses[(int)$fecha[1]] . ' ' . $fecha[0];
                             @endphp
                         </td>
-                        <td>{{ number_format($dato['lectura_actual'], 3) }} m³</td>
+                        <td>{{ rtrim(rtrim(number_format($dato['lectura_actual'], 3), '0'), '.') }} m³</td>
                         <td>{{ date('d/m/Y', strtotime($dato['fecha_lectura'])) }}</td>
                     </tr>
                     @endforeach
