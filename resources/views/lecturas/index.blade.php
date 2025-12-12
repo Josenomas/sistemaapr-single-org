@@ -79,9 +79,9 @@
                                 echo $meses[(int)$fecha[1]] . ' ' . $fecha[0];
                             @endphp
                         </td>
-                        <td>{{ format_lectura($lectura->lectura_anterior) }} m³</td>
-                        <td>{{ format_lectura($lectura->lectura_actual) }} m³</td>
-                        <td><span class="badge badge-info">{{ format_lectura($lectura->consumo) }} m³</span></td>
+                        <td>{{ number_format($lectura->lectura_anterior, 3, '.', ',') }} m³</td>
+                        <td>{{ number_format($lectura->lectura_actual, 3, '.', ',') }} m³</td>
+                        <td><span class="badge badge-info">{{ number_format($lectura->consumo, 3, '.', ',') }} m³</span></td>
                         <td>{{ date('d/m/Y', strtotime($lectura->fecha_lectura)) }}</td>
                         <td>
                             <div class="btn-group">
