@@ -280,6 +280,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/reportes/financiero', [ReportesController::class, 'reporteFinanciero'])->name('reportes.financiero');
         Route::get('/reportes/consumo', [ReportesController::class, 'reporteConsumo'])->name('reportes.consumo');
         Route::get('/reportes/operacional', [ReportesController::class, 'reporteOperacional'])->name('reportes.operacional');
+
+        // Descargas PDF
+        Route::get('/reportes/socios/descargar', [ReportesController::class, 'descargarReporteSocios'])->name('reportes.socios.descargar');
+        Route::get('/reportes/financiero/descargar', [ReportesController::class, 'descargarReporteFinanciero'])->name('reportes.financiero.descargar');
+        Route::get('/reportes/consumo/descargar', [ReportesController::class, 'descargarReporteConsumo'])->name('reportes.consumo.descargar');
+        Route::get('/reportes/operacional/descargar', [ReportesController::class, 'descargarReporteOperacional'])->name('reportes.operacional.descargar');
     });
 
     // ========================================

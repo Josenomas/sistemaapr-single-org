@@ -375,10 +375,16 @@
             <i class="fas fa-tint"></i>
             Reporte de Consumo
         </h2>
-        <a href="{{ route('reportes.index') }}" class="back-btn">
-            <i class="fas fa-arrow-left"></i>
-            Volver al Centro de Reportes
-        </a>
+        <div style="display: flex; gap: 12px;">
+            <a href="{{ route('reportes.consumo.descargar', request()->query()) }}" class="btn btn-success">
+                <i class="fas fa-file-pdf"></i>
+                Descargar PDF
+            </a>
+            <a href="{{ route('reportes.index') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Volver
+            </a>
+        </div>
     </div>
 
     <!-- Estadísticas -->

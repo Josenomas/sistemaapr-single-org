@@ -336,10 +336,16 @@
             <i class="fas fa-users"></i>
             Reporte de Socios
         </h2>
-        <a href="{{ route('reportes.index') }}" class="back-btn">
-            <i class="fas fa-arrow-left"></i>
-            Volver al Centro de Reportes
-        </a>
+        <div style="display: flex; gap: 12px;">
+            <a href="{{ route('reportes.socios.descargar', request()->query()) }}" class="btn btn-success">
+                <i class="fas fa-file-pdf"></i>
+                Descargar PDF
+            </a>
+            <a href="{{ route('reportes.index') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Volver
+            </a>
+        </div>
     </div>
 
     <!-- Estadísticas -->
