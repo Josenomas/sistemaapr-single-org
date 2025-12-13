@@ -256,19 +256,23 @@ class HistorialConsumoController extends Controller
                 // Calcular periodo en formato YYYY-MM
                 $periodo = $lectura->fecha_lectura->format('Y-m');
 
-                // Crear registro de historial
-                HistorialConsumo::create([
-                    'id_socio' => $lectura->id_socio,
-                    'id_lectura' => $lectura->id,
-                    'periodo' => $periodo,
-                    'lectura_anterior' => $lecturaAnt,
-                    'lectura_actual' => $lectura->lectura_actual,
-                    'consumo_m3' => $consumo,
-                    'monto_consumo' => $lectura->boleta ? $lectura->boleta->total : 0,
-                    'promedio_diario' => $promedioDiario,
-                    'anomalia' => $anomalia,
-                    'observaciones' => $lectura->observaciones
-                ]);
+                // Crear o actualizar registro de historial (evitar duplicados)
+                HistorialConsumo::updateOrCreate(
+                    [
+                        'id_socio' => $lectura->id_socio,
+                        'periodo' => $periodo
+                    ],
+                    [
+                        'id_lectura' => $lectura->id,
+                        'lectura_anterior' => $lecturaAnt,
+                        'lectura_actual' => $lectura->lectura_actual,
+                        'consumo_m3' => $consumo,
+                        'monto_consumo' => $lectura->boleta ? $lectura->boleta->total : 0,
+                        'promedio_diario' => $promedioDiario,
+                        'anomalia' => $anomalia,
+                        'observaciones' => $lectura->observaciones
+                    ]
+                );
 
                 $sincronizados++;
             }
