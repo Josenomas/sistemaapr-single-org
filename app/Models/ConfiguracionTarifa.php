@@ -107,11 +107,12 @@ class ConfiguracionTarifa extends Model
 
     /**
      * Calcular monto por tipo de cliente, consumo y fecha
+     * SISTEMA PROGRESIVO POR TRAMOS: Cada tramo cobra solo los m³ que caen dentro de su rango
      *
      * @param string $tipoCliente residencial|comercial|industrial
      * @param float $consumo Consumo en m³
      * @param string $fecha Fecha en formato Y-m-d (opcional, usa hoy si no se especifica)
-     * @return array ['tramo' => objeto, 'monto_base' => decimal, 'iva' => decimal, 'total' => decimal, 'cargo_fijo' => decimal]
+     * @return array ['tramos_detalle' => array, 'monto_base' => decimal, 'iva' => decimal, 'total' => decimal, 'cargo_fijo' => decimal]
      */
     public static function calcularMontoPorConsumo($tipoCliente, $consumo, $fecha = null)
     {
@@ -119,42 +120,91 @@ class ConfiguracionTarifa extends Model
             $fecha = date('Y-m-d');
         }
 
-        $tramo = self::activos()
+        // Obtener TODOS los tramos vigentes para este tipo de cliente, ordenados
+        $tramos = self::activos()
                      ->porTipoCliente($tipoCliente)
                      ->vigentesEn($fecha)
-                     ->where('consumo_desde', '<=', $consumo)
-                     ->where(function($query) use ($consumo) {
-                         $query->whereNull('consumo_hasta')
-                               ->orWhere('consumo_hasta', '>=', $consumo);
-                     })
                      ->ordenados()
-                     ->first();
+                     ->get();
 
-        if (!$tramo) {
+        if ($tramos->isEmpty()) {
             return [
+                'tramos_detalle' => [],
                 'tramo' => null,
                 'monto_base' => 0,
                 'cargo_fijo' => 0,
+                'cargo_consumo' => 0,
                 'iva' => 0,
                 'total' => 0,
-                'error' => 'No se encontró tarifa vigente para el tipo de cliente y consumo especificados'
+                'error' => 'No se encontró tarifa vigente para el tipo de cliente especificado'
             ];
         }
 
-        $valorUnitario = $tramo->monto;  // Valor por m³
-        $cargoConsumo = $valorUnitario * $consumo;  // Consumo × valor unitario
-        $cargoFijo = $tramo->cargo_fijo ?? 0;
-        $subtotal = $cargoConsumo + $cargoFijo;  // Subtotal antes de IVA
-        $ivaPorcentaje = $tramo->iva ?? 0;
+        $cargoConsumoTotal = 0;
+        $consumoRestante = $consumo;
+        $tramosDetalle = [];
+        $cargoFijo = 0;
+        $ivaPorcentaje = 0;
+        $ultimoTramo = null;
+
+        // Procesar cada tramo de forma progresiva
+        foreach ($tramos as $tramo) {
+            if ($consumo < $tramo->consumo_desde) {
+                continue; // Este tramo no aplica, el consumo no llega aquí
+            }
+
+            $desde = $tramo->consumo_desde;
+            $hasta = $tramo->consumo_hasta ?? PHP_INT_MAX;
+
+            // Calcular cuántos m³ caen en este tramo
+            $m3EnEsteTramo = 0;
+
+            if ($consumo <= $hasta) {
+                // El consumo cae dentro de este tramo
+                $m3EnEsteTramo = $consumo - $desde;
+            } else {
+                // El consumo supera este tramo, tomar todo el rango
+                $m3EnEsteTramo = $hasta - $desde;
+            }
+
+            if ($m3EnEsteTramo > 0) {
+                $subtotalTramo = $m3EnEsteTramo * $tramo->monto;
+                $cargoConsumoTotal += $subtotalTramo;
+
+                $tramosDetalle[] = [
+                    'nombre' => $tramo->nombre,
+                    'rango' => $tramo->rango_descripcion,
+                    'm3_en_tramo' => $m3EnEsteTramo,
+                    'valor_unitario' => $tramo->monto,
+                    'subtotal' => $subtotalTramo
+                ];
+
+                $ultimoTramo = $tramo;
+            }
+
+            // Si el consumo está dentro de este tramo, ya terminamos
+            if ($consumo <= $hasta) {
+                break;
+            }
+        }
+
+        // Obtener cargo fijo e IVA del primer tramo (o del último aplicable)
+        $tramoBase = $tramos->first();
+        $cargoFijo = $tramoBase->cargo_fijo ?? 0;
+        $ivaPorcentaje = $tramoBase->iva ?? 0;
+
+        // Calcular totales
+        $subtotal = $cargoConsumoTotal + $cargoFijo;
         $montoIva = round($subtotal * ($ivaPorcentaje / 100), 0);
         $total = $subtotal + $montoIva;
 
         return [
-            'tramo' => $tramo,
-            'monto_base' => $subtotal,  // Subtotal (consumo + cargo fijo)
+            'tramos_detalle' => $tramosDetalle,
+            'tramo' => $ultimoTramo ?? $tramoBase, // Para retrocompatibilidad
+            'monto_base' => $subtotal,
             'cargo_fijo' => $cargoFijo,
-            'cargo_consumo' => $cargoConsumo,
-            'valor_unitario' => $valorUnitario,
+            'cargo_consumo' => $cargoConsumoTotal,
+            'valor_unitario' => $tramoBase->monto, // Para retrocompatibilidad
             'iva_porcentaje' => $ivaPorcentaje,
             'iva' => $montoIva,
             'total' => $total

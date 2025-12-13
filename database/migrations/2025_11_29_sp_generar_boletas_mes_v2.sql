@@ -1,7 +1,8 @@
 -- ============================================
--- Procedimiento Almacenado: sp_generar_boletas_mes (VERSION 2 - Sistema de Tramos)
--- Fecha: 2025-11-29
--- Descripción: Genera boletas masivas usando sistema de tramos por tipo de cliente
+-- Procedimiento Almacenado: sp_generar_boletas_mes (VERSION 3 - Sistema Progresivo de Tramos)
+-- Fecha: 2025-12-13
+-- Descripción: Genera boletas masivas usando sistema PROGRESIVO de tramos por tipo de cliente
+--              Cada tramo cobra solo los m³ que caen dentro de su rango
 -- ============================================
 
 USE `sistema_apr`;
@@ -14,26 +15,52 @@ DELIMITER $$
 CREATE PROCEDURE `sp_generar_boletas_mes`(IN p_mes VARCHAR(7))
 BEGIN
     DECLARE done INT DEFAULT FALSE;
+    DECLARE done_tramos INT DEFAULT FALSE;
     DECLARE v_id_socio INT;
     DECLARE v_numero_socio VARCHAR(20);
     DECLARE v_tipo_cliente VARCHAR(20);
+    DECLARE v_exento_iva TINYINT;
     DECLARE v_consumo DECIMAL(10,2);
     DECLARE v_cargo_fijo DECIMAL(10,2);
-    DECLARE v_monto_base DECIMAL(10,2);
+    DECLARE v_cargo_consumo DECIMAL(10,2);
+    DECLARE v_subtotal DECIMAL(10,2);
     DECLARE v_iva_porcentaje DECIMAL(5,2);
     DECLARE v_monto_iva DECIMAL(10,2);
     DECLARE v_total DECIMAL(10,2);
     DECLARE v_id_lectura INT;
-    DECLARE v_nombre_tramo VARCHAR(100);
     DECLARE v_numero_boleta VARCHAR(50);
     DECLARE v_fecha_emision DATE;
     DECLARE v_fecha_vencimiento DATE;
 
+    -- Variables para cálculo progresivo de tramos
+    DECLARE v_tramo_nombre VARCHAR(100);
+    DECLARE v_tramo_desde DECIMAL(10,2);
+    DECLARE v_tramo_hasta DECIMAL(10,2);
+    DECLARE v_tramo_monto DECIMAL(10,2);
+    DECLARE v_tramo_cargo_fijo DECIMAL(10,2);
+    DECLARE v_tramo_iva DECIMAL(5,2);
+    DECLARE v_m3_en_tramo DECIMAL(10,2);
+    DECLARE v_subtotal_tramo DECIMAL(10,2);
+    DECLARE v_observaciones TEXT;
+
     -- Cursor para recorrer todos los socios activos
     DECLARE cur_socios CURSOR FOR
-        SELECT s.id, s.numero_socio, s.tipo_cliente
+        SELECT s.id, s.numero_socio,
+               CAST(s.tipo_cliente AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_unicode_ci,
+               s.exento_iva
         FROM socios s
         WHERE s.activo = 1 AND s.estado != 'desconectado';
+
+    -- Cursor para recorrer TODOS los tramos del tipo de cliente
+    DECLARE cur_tramos CURSOR FOR
+        SELECT ct.nombre, ct.consumo_desde, ct.consumo_hasta, ct.monto, ct.cargo_fijo, ct.iva
+        FROM configuraciones_tarifas ct
+        WHERE CAST(ct.tipo_cliente AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_unicode_ci =
+              CAST(v_tipo_cliente AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_unicode_ci
+          AND ct.activo = 1
+          AND ct.vigente_desde <= v_fecha_emision
+          AND (ct.vigente_hasta IS NULL OR ct.vigente_hasta >= v_fecha_emision)
+        ORDER BY ct.orden ASC;
 
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
@@ -44,7 +71,7 @@ BEGIN
     OPEN cur_socios;
 
     read_loop: LOOP
-        FETCH cur_socios INTO v_id_socio, v_numero_socio, v_tipo_cliente;
+        FETCH cur_socios INTO v_id_socio, v_numero_socio, v_tipo_cliente, v_exento_iva;
         IF done THEN
             LEAVE read_loop;
         END IF;
@@ -53,11 +80,12 @@ BEGIN
         SET v_id_lectura = NULL;
         SET v_consumo = 0;
         SET v_cargo_fijo = 0;
-        SET v_monto_base = 0;
+        SET v_cargo_consumo = 0;
+        SET v_subtotal = 0;
         SET v_iva_porcentaje = 0;
         SET v_monto_iva = 0;
         SET v_total = 0;
-        SET v_nombre_tramo = NULL;
+        SET v_observaciones = '';
 
         -- 1. Obtener lectura del mes para este socio
         SELECT id, consumo_m3 INTO v_id_lectura, v_consumo
@@ -70,51 +98,90 @@ BEGIN
             SET v_consumo = 0;
         END IF;
 
-        -- 2. Buscar el tramo correspondiente según tipo de cliente y consumo
-        -- El tramo se determina por: consumo >= consumo_desde AND (consumo <= consumo_hasta OR consumo_hasta IS NULL)
-        SELECT
-            ct.nombre,
-            ct.monto,
-            ct.cargo_fijo,
-            ct.iva
-        INTO
-            v_nombre_tramo,
-            v_monto_base,
-            v_cargo_fijo,
-            v_iva_porcentaje
-        FROM configuraciones_tarifas ct
-        WHERE ct.tipo_cliente = v_tipo_cliente
-          AND ct.activo = 1
-          AND ct.vigente_desde <= v_fecha_emision
-          AND (ct.vigente_hasta IS NULL OR ct.vigente_hasta >= v_fecha_emision)
-          AND v_consumo >= ct.consumo_desde
-          AND (ct.consumo_hasta IS NULL OR v_consumo <= ct.consumo_hasta)
-        ORDER BY ct.orden ASC
-        LIMIT 1;
+        -- 2. CALCULO PROGRESIVO POR TRAMOS
+        -- Recorrer TODOS los tramos y calcular cuántos m³ caen en cada uno
+        SET done_tramos = FALSE;
 
-        -- Si no se encontró tramo (error de configuración), usar valores por defecto
-        IF v_nombre_tramo IS NULL THEN
-            SET v_nombre_tramo = 'Sin tarifa configurada';
-            SET v_monto_base = 0;
-            SET v_cargo_fijo = 0;
-            SET v_iva_porcentaje = 0;
-        END IF;
+        BLOCK_TRAMOS: BEGIN
+            DECLARE CONTINUE HANDLER FOR NOT FOUND SET done_tramos = TRUE;
 
-        -- 3. Calcular IVA si aplica
-        IF v_iva_porcentaje IS NOT NULL AND v_iva_porcentaje > 0 THEN
-            SET v_monto_iva = ROUND(v_monto_base * (v_iva_porcentaje / 100), 0);
+            OPEN cur_tramos;
+
+            tramos_loop: LOOP
+                FETCH cur_tramos INTO v_tramo_nombre, v_tramo_desde, v_tramo_hasta,
+                                      v_tramo_monto, v_tramo_cargo_fijo, v_tramo_iva;
+
+                IF done_tramos THEN
+                    LEAVE tramos_loop;
+                END IF;
+
+                -- Si el consumo no llega a este tramo, continuar con el siguiente
+                IF v_consumo < v_tramo_desde THEN
+                    ITERATE tramos_loop;
+                END IF;
+
+                -- Obtener cargo_fijo e IVA del primer tramo que aplica
+                IF v_cargo_fijo = 0 THEN
+                    SET v_cargo_fijo = IFNULL(v_tramo_cargo_fijo, 0);
+                    SET v_iva_porcentaje = IFNULL(v_tramo_iva, 0);
+                END IF;
+
+                -- Calcular cuántos m³ caen en este tramo
+                SET v_m3_en_tramo = 0;
+
+                IF v_tramo_hasta IS NULL THEN
+                    -- Tramo abierto (ej: 30+ m³)
+                    SET v_m3_en_tramo = v_consumo - v_tramo_desde;
+                ELSEIF v_consumo <= v_tramo_hasta THEN
+                    -- El consumo cae dentro de este tramo
+                    SET v_m3_en_tramo = v_consumo - v_tramo_desde;
+                ELSE
+                    -- El consumo supera este tramo, tomar todo el rango
+                    SET v_m3_en_tramo = v_tramo_hasta - v_tramo_desde;
+                END IF;
+
+                -- Sumar al cargo de consumo total
+                IF v_m3_en_tramo > 0 THEN
+                    SET v_subtotal_tramo = v_m3_en_tramo * v_tramo_monto;
+                    SET v_cargo_consumo = v_cargo_consumo + v_subtotal_tramo;
+
+                    -- Agregar a observaciones para desglose
+                    IF LENGTH(v_observaciones) > 0 THEN
+                        SET v_observaciones = CONCAT(v_observaciones, ' | ');
+                    END IF;
+                    SET v_observaciones = CONCAT(v_observaciones, v_tramo_nombre, ': ',
+                                                  ROUND(v_m3_en_tramo, 2), 'm³ × $',
+                                                  FORMAT(v_tramo_monto, 0), ' = $',
+                                                  FORMAT(v_subtotal_tramo, 0));
+                END IF;
+
+                -- Si el consumo está dentro de este tramo, ya terminamos
+                IF v_tramo_hasta IS NULL OR v_consumo <= v_tramo_hasta THEN
+                    LEAVE tramos_loop;
+                END IF;
+
+            END LOOP tramos_loop;
+
+            CLOSE cur_tramos;
+        END BLOCK_TRAMOS;
+
+        -- 3. Calcular subtotal (cargo_consumo + cargo_fijo)
+        SET v_subtotal = v_cargo_consumo + v_cargo_fijo;
+
+        -- 4. Calcular IVA solo si NO está exento
+        IF v_exento_iva = 0 AND v_iva_porcentaje > 0 THEN
+            SET v_monto_iva = ROUND(v_subtotal * (v_iva_porcentaje / 100), 0);
         ELSE
             SET v_monto_iva = 0;
         END IF;
 
-        -- 4. Calcular total (monto base + IVA)
-        -- Nota: El monto_base YA incluye el cargo_fijo, según diseño de tramos
-        SET v_total = v_monto_base + v_monto_iva;
+        -- 5. Calcular total
+        SET v_total = v_subtotal + v_monto_iva;
 
-        -- 5. Generar número de boleta único
+        -- 6. Generar número de boleta único
         SET v_numero_boleta = CONCAT('BOL-', p_mes, '-', LPAD(v_id_socio, 4, '0'));
 
-        -- 6. Insertar la boleta en la base de datos
+        -- 7. Insertar la boleta en la base de datos
         INSERT INTO boletas (
             numero_boleta,
             id_socio,
@@ -139,13 +206,13 @@ BEGIN
             v_fecha_emision,
             v_fecha_vencimiento,
             v_consumo,
-            v_cargo_fijo,                -- Cargo fijo del tramo
-            v_monto_base - v_cargo_fijo, -- Cargo por consumo = monto_base - cargo_fijo
-            v_monto_iva,                 -- IVA va en otros_cargos
-            0,                           -- Sin descuentos por defecto
+            v_cargo_fijo,
+            v_cargo_consumo,
+            v_monto_iva,
+            0,
             v_total,
             'pendiente',
-            CONCAT('Generada automáticamente - ', v_nombre_tramo),
+            CONCAT('Generada automáticamente - Sistema Progresivo | ', v_observaciones),
             1
         );
 
