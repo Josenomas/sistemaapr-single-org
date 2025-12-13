@@ -13,14 +13,14 @@ class EliminarLecturasDesdeFebreroCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'lecturas:eliminar-desde-febrero';
+    protected $signature = 'lecturas:eliminar-meses';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Elimina todas las lecturas desde febrero 2025 en adelante';
+    protected $description = 'Elimina lecturas de julio y agosto 2025';
 
     /**
      * Execute the console command.
@@ -29,7 +29,7 @@ class EliminarLecturasDesdeFebreroCommand extends Command
      */
     public function handle()
     {
-        $this->warn('⚠️  ADVERTENCIA: Este comando eliminará TODAS las lecturas desde febrero 2025 en adelante.');
+        $this->warn('⚠️  ADVERTENCIA: Este comando eliminará las lecturas de julio y agosto 2025.');
         $this->warn('Esta acción NO se puede deshacer.');
 
         if (!$this->confirm('¿Estás seguro de continuar?', false)) {
@@ -39,9 +39,9 @@ class EliminarLecturasDesdeFebreroCommand extends Command
 
         $this->info('Contando lecturas a eliminar...');
 
-        $count = Lectura::where('mes', '>=', '2025-02')->count();
+        $count = Lectura::whereIn('mes', ['2025-07', '2025-08'])->count();
 
-        $this->info("Se encontraron {$count} lecturas desde febrero 2025 en adelante.");
+        $this->info("Se encontraron {$count} lecturas de julio y agosto 2025.");
 
         if ($count === 0) {
             $this->info('No hay lecturas para eliminar.');
@@ -58,7 +58,7 @@ class EliminarLecturasDesdeFebreroCommand extends Command
         DB::beginTransaction();
 
         try {
-            $deleted = Lectura::where('mes', '>=', '2025-02')->delete();
+            $deleted = Lectura::whereIn('mes', ['2025-07', '2025-08'])->delete();
 
             DB::commit();
 
