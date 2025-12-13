@@ -332,72 +332,6 @@
         color: var(--gray-500);
     }
 
-    .stat-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 16px;
-        padding-top: 16px;
-        border-top: 1px solid var(--gray-100);
-    }
-
-    .stat-trend {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.875rem;
-        font-weight: 700;
-        transition: all 0.3s;
-    }
-
-    .stat-trend.positive {
-        background: rgba(16, 185, 129, 0.1);
-        color: #059669;
-    }
-
-    .stat-trend.negative {
-        background: rgba(239, 68, 68, 0.1);
-        color: #dc2626;
-    }
-
-    .stat-trend i {
-        font-size: 0.75rem;
-    }
-
-    .stat-sparkline {
-        width: 100px;
-        height: 30px;
-    }
-
-    .stat-percentage {
-        flex: 1;
-        margin-right: 12px;
-    }
-
-    .percentage-bar {
-        width: 100%;
-        height: 8px;
-        background: var(--gray-200);
-        border-radius: 4px;
-        overflow: hidden;
-        margin-bottom: 6px;
-    }
-
-    .percentage-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #10b981, #059669);
-        border-radius: 4px;
-        transition: width 1s ease-out;
-    }
-
-    .percentage-text {
-        font-size: 0.8125rem;
-        color: var(--gray-600);
-        font-weight: 600;
-    }
-
     .section-card {
         background: var(--white);
         border-radius: var(--radius);
@@ -964,13 +898,7 @@
                 </div>
             </div>
             <div class="stat-value">{{ $totalClientes }}</div>
-            <div class="stat-footer">
-                <div class="stat-trend {{ $evolucionClientes >= 0 ? 'positive' : 'negative' }}">
-                    <i class="fas fa-{{ $evolucionClientes >= 0 ? 'arrow-up' : 'arrow-down' }}"></i>
-                    {{ abs($evolucionClientes) }}%
-                </div>
-                <div class="stat-sparkline" data-values="{{ json_encode($sparklineClientes) }}"></div>
-            </div>
+            <div class="stat-description">Socios activos</div>
         </div>
 
         <div class="stat-card">
@@ -981,13 +909,7 @@
                 </div>
             </div>
             <div class="stat-value">{{ $boletasEmitidas }}</div>
-            <div class="stat-footer">
-                <div class="stat-trend {{ $evolucionBoletas >= 0 ? 'positive' : 'negative' }}">
-                    <i class="fas fa-{{ $evolucionBoletas >= 0 ? 'arrow-up' : 'arrow-down' }}"></i>
-                    {{ abs($evolucionBoletas) }}%
-                </div>
-                <div class="stat-sparkline" data-values="{{ json_encode($sparklineBoletas) }}"></div>
-            </div>
+            <div class="stat-description">Del mes {{ $mesPasado }}</div>
         </div>
 
         <div class="stat-card">
@@ -998,15 +920,7 @@
                 </div>
             </div>
             <div class="stat-value">{{ $pagosPendientes }}</div>
-            <div class="stat-footer">
-                <div class="stat-percentage">
-                    <div class="percentage-bar">
-                        <div class="percentage-fill" style="width: {{ $porcentajePagadas }}%"></div>
-                    </div>
-                    <span class="percentage-text">{{ $porcentajePagadas }}% pagadas</span>
-                </div>
-                <div class="stat-sparkline" data-values="{{ json_encode($sparklinePagos) }}"></div>
-            </div>
+            <div class="stat-description">Del mes {{ $mesPasado }}</div>
         </div>
 
         <div class="stat-card">
@@ -1017,13 +931,7 @@
                 </div>
             </div>
             <div class="stat-value">{{ $incidentesAbiertos }}</div>
-            <div class="stat-footer">
-                <div class="stat-trend {{ $evolucionIncidentes <= 0 ? 'positive' : 'negative' }}">
-                    <i class="fas fa-{{ $evolucionIncidentes <= 0 ? 'arrow-down' : 'arrow-up' }}"></i>
-                    {{ abs($evolucionIncidentes) }}%
-                </div>
-                <div class="stat-sparkline" data-values="{{ json_encode($sparklineIncidentes) }}"></div>
-            </div>
+            <div class="stat-description">Requieren atención</div>
         </div>
     </div>
 
@@ -1313,79 +1221,5 @@ getWeather();
 
 // Actualizar clima cada 30 minutos
 setInterval(getWeather, 1800000);
-
-// Renderizar sparklines (mini gráficos)
-function drawSparkline(canvas, values) {
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-    const max = Math.max(...values, 1); // Evitar división por 0
-    const min = Math.min(...values, 0);
-    const range = max - min || 1;
-
-    // Limpiar canvas
-    ctx.clearRect(0, 0, width, height);
-
-    // Configurar estilo
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    // Dibujar línea
-    ctx.beginPath();
-    values.forEach((value, index) => {
-        const x = (index / (values.length - 1)) * width;
-        const y = height - ((value - min) / range) * height;
-
-        if (index === 0) {
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
-    });
-    ctx.stroke();
-
-    // Dibujar área bajo la línea (gradiente)
-    const gradient = ctx.createLinearGradient(0, 0, 0, height);
-    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
-    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
-
-    ctx.fillStyle = gradient;
-    ctx.lineTo(width, height);
-    ctx.lineTo(0, height);
-    ctx.closePath();
-    ctx.fill();
-
-    // Dibujar punto final (último valor)
-    const lastX = width;
-    const lastY = height - ((values[values.length - 1] - min) / range) * height;
-
-    ctx.beginPath();
-    ctx.arc(lastX, lastY, 3, 0, 2 * Math.PI);
-    ctx.fillStyle = '#3b82f6';
-    ctx.fill();
-
-    // Borde blanco alrededor del punto
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-}
-
-// Inicializar sparklines
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.stat-sparkline').forEach(element => {
-        const values = JSON.parse(element.getAttribute('data-values'));
-
-        // Crear canvas
-        const canvas = document.createElement('canvas');
-        canvas.width = 100;
-        canvas.height = 30;
-        element.appendChild(canvas);
-
-        // Dibujar sparkline
-        drawSparkline(canvas, values);
-    });
-});
 </script>
 @endsection
