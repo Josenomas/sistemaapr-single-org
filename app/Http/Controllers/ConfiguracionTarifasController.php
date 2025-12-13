@@ -246,6 +246,21 @@ class ConfiguracionTarifasController extends Controller
             ], 404);
         }
 
+        // Formatear desglose de tramos para la vista
+        $desgloseTramos = [];
+        if (isset($resultado['tramos_detalle']) && !empty($resultado['tramos_detalle'])) {
+            foreach ($resultado['tramos_detalle'] as $tramo) {
+                $desgloseTramos[] = [
+                    'nombre' => $tramo['nombre'],
+                    'rango' => $tramo['rango'],
+                    'consumo_m3' => $tramo['m3_en_tramo'],
+                    'precio_unitario' => $tramo['valor_unitario'],
+                    'monto' => $tramo['subtotal'],
+                    'monto_formateado' => '$' . number_format($tramo['subtotal'], 0, ',', '.')
+                ];
+            }
+        }
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -265,6 +280,7 @@ class ConfiguracionTarifasController extends Controller
                 'monto_iva_formateado' => '$' . number_format($resultado['iva'], 0, ',', '.'),
                 'total' => $resultado['total'],
                 'total_formateado' => '$' . number_format($resultado['total'], 0, ',', '.'),
+                'desglose_tramos' => $desgloseTramos
             ]
         ]);
     }
