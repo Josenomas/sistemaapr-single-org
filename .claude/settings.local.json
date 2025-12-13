@@ -9,7 +9,8 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nAdd: Importador masivo de lecturas vía CSV\n\n- Nuevo controlador ImportarLecturasController\n- Vista de carga de archivo CSV con validaciones\n- Vista de confirmación antes de importar\n- Descarga de plantilla CSV de ejemplo\n- Validaciones: socio existe, formato mes, lectura numérica\n- Calcula automáticamente lectura anterior y consumo\n- Omite lecturas duplicadas (mismo socio y mes)\n- Transacciones seguras con rollback en caso de error\n- Solo para usuarios con permiso de lecturas\n\nFormato CSV:\nnumero_socio,mes,lectura_actual,fecha_lectura\nSOC-0001,2025-01,120.50,15/01/2025\n\nRuta: /lecturas-importar\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git push:*)",
       "Bash(git commit:*)",
-      "Bash(git revert:*)"
+      "Bash(git revert:*)",
+      "Bash(ssh:*)"
     ],
     "deny": [],
     "ask": []

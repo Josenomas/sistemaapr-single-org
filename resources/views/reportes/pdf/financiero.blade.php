@@ -253,10 +253,10 @@
             @forelse($ingresos as $pago)
             <tr>
                 <td>{{ \Carbon\Carbon::parse($pago->fecha_pago)->format('d/m/Y') }}</td>
-                <td>{{ $pago->numero_comprobante }}</td>
+                <td>{{ $pago->numero_comprobante ?? '-' }}</td>
                 <td>{{ $pago->socio->nombre_completo ?? 'N/A' }}</td>
                 <td>{{ ucfirst($pago->metodo_pago) }}</td>
-                <td class="text-right">${{ number_format($pago->monto_total, 0, ',', '.') }}</td>
+                <td class="text-right">${{ number_format($pago->monto_pagado, 0, ',', '.') }}</td>
             </tr>
             @empty
             <tr>
@@ -285,10 +285,10 @@
         <tbody>
             @forelse($egresos as $egreso)
             <tr>
-                <td>{{ \Carbon\Carbon::parse($egreso->fecha)->format('d/m/Y') }}</td>
-                <td>{{ ucfirst($egreso->tipo) }}</td>
+                <td>{{ \Carbon\Carbon::parse($egreso->fecha_compra)->format('d/m/Y') }}</td>
+                <td>{{ ucfirst($egreso->tipo_compra ?? 'General') }}</td>
                 <td>{{ $egreso->descripcion ?? '-' }}</td>
-                <td class="text-right">${{ number_format($egreso->monto, 0, ',', '.') }}</td>
+                <td class="text-right">${{ number_format($egreso->total, 0, ',', '.') }}</td>
             </tr>
             @empty
             <tr>

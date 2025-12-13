@@ -373,10 +373,10 @@
         <tbody>
             @forelse($trabajos as $trabajo)
             <tr>
-                <td>{{ \Carbon\Carbon::parse($trabajo->fecha)->format('d/m/Y') }}</td>
-                <td>{{ ucfirst($trabajo->tipo) }}</td>
+                <td>{{ \Carbon\Carbon::parse($trabajo->fecha_inicio)->format('d/m/Y') }}</td>
+                <td>{{ ucfirst($trabajo->tipo_trabajo) }}</td>
                 <td>{{ $trabajo->descripcion }}</td>
-                <td>{{ $trabajo->funcionario->nombre_completo ?? 'N/A' }}</td>
+                <td>{{ $trabajo->responsable->nombre_completo ?? 'N/A' }}</td>
                 <td><span class="badge {{ $trabajo->estado }}">{{ ucfirst($trabajo->estado) }}</span></td>
             </tr>
             @empty

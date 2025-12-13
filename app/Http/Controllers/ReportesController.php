@@ -254,58 +254,36 @@ class ReportesController extends Controller
      */
     public function descargarReporteFinanciero(Request $request)
     {
-        $fechaInicio = $request->fecha_inicio ?? date('Y-m-01');
-        $fechaFin = $request->fecha_fin ?? date('Y-m-t');
+        $fecha_inicio = $request->fecha_inicio ?? date('Y-m-01');
+        $fecha_fin = $request->fecha_fin ?? date('Y-m-t');
 
-        $ingresos = Pago::whereBetween('fecha_pago', [$fechaInicio, $fechaFin])
-                       ->select('metodo_pago', DB::raw('sum(monto_pagado) as total'))
-                       ->groupBy('metodo_pago')
+        // Obtener todos los pagos individuales
+        $ingresos = Pago::with('socio')
+                       ->whereBetween('fecha_pago', [$fecha_inicio, $fecha_fin])
+                       ->orderBy('fecha_pago', 'desc')
                        ->get();
 
-        $totalIngresos = Pago::whereBetween('fecha_pago', [$fechaInicio, $fechaFin])->sum('monto_pagado');
-
+        // Obtener todas las compras individuales
         $egresos = Compra::where('activo', 1)
-                        ->whereBetween('fecha_compra', [$fechaInicio, $fechaFin])
-                        ->select('tipo_compra', DB::raw('sum(total) as total'))
-                        ->groupBy('tipo_compra')
+                        ->whereBetween('fecha_compra', [$fecha_inicio, $fecha_fin])
+                        ->orderBy('fecha_compra', 'desc')
                         ->get();
 
-        $totalEgresos = Compra::where('activo', 1)
-                             ->whereBetween('fecha_compra', [$fechaInicio, $fechaFin])
-                             ->sum('total');
-
-        $balance = $totalIngresos - $totalEgresos;
-
-        $boletasPendientes = Boleta::where('activo', 1)
-                                   ->where('estado', 'pendiente')
-                                   ->whereBetween('fecha_emision', [$fechaInicio, $fechaFin])
-                                   ->sum('total');
-
-        $mesesPeriodo = $this->obtenerMesesEntreFechas($fechaInicio, $fechaFin);
-        $comparativoMensual = [];
-
-        foreach ($mesesPeriodo as $mes) {
-            $ingresosMes = Pago::whereRaw("DATE_FORMAT(fecha_pago, '%Y-%m') = ?", [$mes])->sum('monto_pagado');
-            $egresosMes = Compra::where('activo', 1)->whereRaw("DATE_FORMAT(fecha_compra, '%Y-%m') = ?", [$mes])->sum('total');
-
-            $comparativoMensual[] = [
-                'mes' => $mes,
-                'ingresos' => $ingresosMes,
-                'egresos' => $egresosMes,
-                'balance' => $ingresosMes - $egresosMes
-            ];
-        }
+        // Estadísticas
+        $estadisticas = [
+            'total_ingresos' => $ingresos->sum('monto_pagado'),
+            'total_egresos' => $egresos->sum('total'),
+            'balance' => $ingresos->sum('monto_pagado') - $egresos->sum('total'),
+            'ingresos_por_metodo' => $ingresos->groupBy('metodo_pago')->map->sum('monto_pagado'),
+            'egresos_por_tipo' => $egresos->groupBy('tipo_compra')->map->sum('total'),
+        ];
 
         $pdf = Pdf::loadView('reportes.pdf.financiero', compact(
             'ingresos',
-            'totalIngresos',
             'egresos',
-            'totalEgresos',
-            'balance',
-            'boletasPendientes',
-            'comparativoMensual',
-            'fechaInicio',
-            'fechaFin'
+            'estadisticas',
+            'fecha_inicio',
+            'fecha_fin'
         ));
 
         return $pdf->download('reporte-financiero-' . date('Y-m-d') . '.pdf');
@@ -354,20 +332,19 @@ class ReportesController extends Controller
      */
     public function descargarReporteConsumo(Request $request)
     {
-        $periodo = $request->periodo ?? date('Y-m');
+        $mes = $request->periodo ?? date('Y-m');
 
         $consumos = HistorialConsumo::with('socio')
                                    ->where('activo', 1)
-                                   ->where('periodo', $periodo)
+                                   ->where('periodo', $mes)
                                    ->orderBy('consumo_m3', 'desc')
                                    ->get();
 
         $estadisticas = [
-            'total_registros' => $consumos->count(),
             'consumo_total' => $consumos->sum('consumo_m3'),
-            'consumo_promedio' => $consumos->avg('consumo_m3'),
-            'consumo_maximo' => $consumos->max('consumo_m3'),
-            'consumo_minimo' => $consumos->min('consumo_m3'),
+            'consumo_promedio' => $consumos->avg('consumo_m3') ?? 0,
+            'consumo_maximo' => $consumos->max('consumo_m3') ?? 0,
+            'consumo_minimo' => $consumos->min('consumo_m3') ?? 0,
             'anomalias' => [
                 'alto' => $consumos->where('anomalia', 'alto')->count(),
                 'bajo' => $consumos->where('anomalia', 'bajo')->count(),
@@ -375,16 +352,8 @@ class ReportesController extends Controller
             ]
         ];
 
-        $distribucion = [
-            '0-5 m³' => $consumos->where('consumo_m3', '<=', 5)->count(),
-            '6-10 m³' => $consumos->whereBetween('consumo_m3', [6, 10])->count(),
-            '11-15 m³' => $consumos->whereBetween('consumo_m3', [11, 15])->count(),
-            '16-20 m³' => $consumos->whereBetween('consumo_m3', [16, 20])->count(),
-            '21+ m³' => $consumos->where('consumo_m3', '>', 20)->count(),
-        ];
-
-        $pdf = Pdf::loadView('reportes.pdf.consumo', compact('consumos', 'estadisticas', 'distribucion', 'periodo'));
-        return $pdf->download('reporte-consumo-' . $periodo . '.pdf');
+        $pdf = Pdf::loadView('reportes.pdf.consumo', compact('consumos', 'estadisticas', 'mes'));
+        return $pdf->download('reporte-consumo-' . $mes . '.pdf');
     }
 
     /**
@@ -452,49 +421,41 @@ class ReportesController extends Controller
         $fechaInicio = $request->fecha_inicio ?? date('Y-m-01');
         $fechaFin = $request->fecha_fin ?? date('Y-m-t');
 
-        $tickets = Ticket::where('activo', 1)
+        $tickets = Ticket::with('socio')
+                        ->where('activo', 1)
                         ->whereBetween('fecha_reporte', [$fechaInicio, $fechaFin])
+                        ->orderBy('fecha_reporte', 'desc')
                         ->get();
 
-        $ticketsEstadisticas = [
-            'total' => $tickets->count(),
-            'por_estado' => $tickets->groupBy('estado')->map->count(),
-            'por_prioridad' => $tickets->groupBy('prioridad')->map->count(),
-            'por_tipo' => $tickets->groupBy('tipo_ticket')->map->count(),
-            'tiempo_promedio_resolucion' => $tickets->where('estado', 'resuelto')->avg('tiempo_resolucion'),
-        ];
-
-        $trabajos = TrabajoRealizado::where('activo', 1)
+        $trabajos = TrabajoRealizado::with('responsable')
+                          ->where('activo', 1)
                           ->whereBetween('fecha_inicio', [$fechaInicio, $fechaFin])
+                          ->orderBy('fecha_inicio', 'desc')
                           ->get();
 
-        $trabajosEstadisticas = [
-            'total' => $trabajos->count(),
-            'por_estado' => $trabajos->groupBy('estado')->map->count(),
-            'por_tipo' => $trabajos->groupBy('tipo_trabajo')->map->count(),
-            'costo_total' => $trabajos->sum('costo_real'),
-        ];
-
-        $cortes = CorteSuministro::where('activo', 1)
+        $cortes = CorteSuministro::with('socio')
+                      ->where('activo', 1)
                       ->whereBetween('fecha_corte', [$fechaInicio, $fechaFin])
+                      ->orderBy('fecha_corte', 'desc')
                       ->get();
 
-        $cortesEstadisticas = [
-            'total' => $cortes->count(),
-            'por_estado' => $cortes->groupBy('estado')->map->count(),
-            'por_motivo' => $cortes->groupBy('motivo')->map->count(),
-            'reconexiones' => $cortes->where('estado', 'reconectado')->count(),
+        $estadisticas = [
+            'total_tickets' => $tickets->count(),
+            'tickets_por_estado' => $tickets->groupBy('estado')->map->count(),
+            'tickets_por_prioridad' => $tickets->groupBy('prioridad')->map->count(),
+            'total_trabajos' => $trabajos->count(),
+            'trabajos_por_estado' => $trabajos->groupBy('estado')->map->count(),
+            'trabajos_por_tipo' => $trabajos->groupBy('tipo_trabajo')->map->count(),
+            'total_cortes' => $cortes->count(),
+            'cortes_por_estado' => $cortes->groupBy('estado')->map->count(),
+            'cortes_por_motivo' => $cortes->groupBy('motivo')->map->count(),
         ];
 
         $pdf = Pdf::loadView('reportes.pdf.operacional', compact(
             'tickets',
-            'ticketsEstadisticas',
             'trabajos',
-            'trabajosEstadisticas',
             'cortes',
-            'cortesEstadisticas',
-            'fechaInicio',
-            'fechaFin'
+            'estadisticas'
         ));
 
         return $pdf->download('reporte-operacional-' . date('Y-m-d') . '.pdf');

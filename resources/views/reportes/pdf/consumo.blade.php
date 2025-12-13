@@ -259,10 +259,10 @@
             @foreach($rangos as $nombre => $rango)
                 @php
                     $enRango = $consumos->filter(function($c) use ($rango) {
-                        return $c->consumo >= $rango['min'] && $c->consumo < $rango['max'];
+                        return $c->consumo_m3 >= $rango['min'] && $c->consumo_m3 < $rango['max'];
                     });
                     $cantidad = $enRango->count();
-                    $total = $enRango->sum('consumo');
+                    $total = $enRango->sum('consumo_m3');
                 @endphp
                 <tr>
                     <td>{{ $nombre }}</td>
@@ -287,16 +287,16 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($consumos as $lectura)
+            @forelse($consumos as $historial)
             <tr>
-                <td><strong>{{ $lectura->socio->numero_socio ?? 'N/A' }}</strong></td>
-                <td>{{ $lectura->socio->nombre_completo ?? 'N/A' }}</td>
-                <td>{{ $lectura->socio->sector ?? 'N/A' }}</td>
-                <td class="text-right">{{ number_format($lectura->lectura_anterior, 2, ',', '.') }}</td>
-                <td class="text-right">{{ number_format($lectura->lectura_actual, 2, ',', '.') }}</td>
-                <td class="text-right">{{ number_format($lectura->consumo, 2, ',', '.') }}</td>
+                <td><strong>{{ $historial->socio->numero_socio ?? 'N/A' }}</strong></td>
+                <td>{{ $historial->socio->nombre_completo ?? 'N/A' }}</td>
+                <td>{{ $historial->socio->sector ?? 'N/A' }}</td>
+                <td class="text-right">{{ number_format($historial->lectura_anterior, 2, ',', '.') }}</td>
+                <td class="text-right">{{ number_format($historial->lectura_actual, 2, ',', '.') }}</td>
+                <td class="text-right">{{ number_format($historial->consumo_m3, 2, ',', '.') }}</td>
                 <td class="text-center">
-                    @if($lectura->consumo == 0 || $lectura->consumo > 100 || $lectura->lectura_actual < $lectura->lectura_anterior)
+                    @if($historial->anomalia && in_array($historial->anomalia, ['alto', 'bajo', 'cero']))
                         <span class="badge anomalia">Anomalía</span>
                     @else
                         <span class="badge normal">Normal</span>
