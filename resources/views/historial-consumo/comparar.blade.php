@@ -27,10 +27,10 @@
             <div class="form-row">
                 <div class="form-group form-group-large">
                     <label for="socios">Socios a Comparar:</label>
-                    <select id="socios" name="socios[]" class="form-control" multiple required size="8">
+                    <select id="socios" name="socios_comparar[]" class="form-control" multiple required size="8">
                         @foreach($socios as $s)
                             <option value="{{ $s->id }}"
-                                {{ in_array($s->id, request('socios', [])) ? 'selected' : '' }}>
+                                {{ in_array($s->id, request('socios_comparar', [])) ? 'selected' : '' }}>
                                 {{ $s->nombre_completo }} - {{ $s->rut }}
                             </option>
                         @endforeach
