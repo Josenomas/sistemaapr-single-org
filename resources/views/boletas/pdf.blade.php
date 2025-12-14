@@ -570,7 +570,10 @@
                     <?php
                         // Calcular subtotal (sin IVA)
                         $subtotal = $boleta->cargo_consumo + $boleta->cargo_fijo + $boleta->otros_cargos - $boleta->descuentos - $boleta->subsidio;
-                        $iva = $subtotal * 0.19;
+
+                        // Verificar si el socio está exento de IVA
+                        $exentoIva = $boleta->socio->exento_iva ?? 0;
+                        $iva = ($exentoIva == 0) ? ($subtotal * 0.19) : 0;
                         $totalConIva = $subtotal + $iva;
                     ?>
                     <div class="total-row">
@@ -604,7 +607,7 @@
                         <div class="value">${{ number_format($subtotal, 0, ',', '.') }}</div>
                     </div>
                     <div class="total-row">
-                        <div class="label">IVA (19%):</div>
+                        <div class="label">IVA (19%){{ $exentoIva == 1 ? ' - EXENTO' : '' }}:</div>
                         <div class="value">${{ number_format($iva, 0, ',', '.') }}</div>
                     </div>
                 </div>
