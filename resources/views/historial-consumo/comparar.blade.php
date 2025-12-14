@@ -320,9 +320,13 @@
             scales: {
                 y: {
                     beginAtZero: true,
+                    suggestedMax: Math.max(...comparacionData.map(item => parseFloat(item.consumo_m3))) * 1.2,
                     title: {
                         display: true,
                         text: 'Consumo (m³)'
+                    },
+                    ticks: {
+                        precision: 1
                     }
                 },
                 x: {
