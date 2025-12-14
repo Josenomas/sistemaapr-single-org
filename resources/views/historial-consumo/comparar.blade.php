@@ -448,6 +448,12 @@
         margin-bottom: 20px;
     }
 
+    @media (max-width: 1200px) {
+        .comparison-form .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
     .form-group {
         display: flex;
         flex-direction: column;
@@ -500,9 +506,22 @@
 
     .stats-row {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
         margin-bottom: 32px;
+    }
+
+    @media (max-width: 768px) {
+        .stats-row {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
     }
 
     .stat-card {
@@ -608,8 +627,31 @@
         height: 400px;
     }
 
+    @media (max-width: 768px) {
+        .chart-container {
+            height: 300px;
+        }
+    }
+
     .table-responsive {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    @media (max-width: 768px) {
+        .table-responsive {
+            margin: 0 -15px;
+            padding: 0 15px;
+        }
+
+        .table {
+            font-size: 0.8rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 8px 6px;
+        }
     }
 
     .table {

@@ -403,9 +403,18 @@
         margin-left: 260px;
         padding: 32px;
         min-height: calc(100vh - 74px);
+        max-width: calc(100% - 260px);
+        overflow-x: hidden;
     }
 
     /* Responsive */
+    @media (max-width: 1200px) {
+        .content-wrapper {
+            padding: 20px;
+            max-width: calc(100% - 260px);
+        }
+    }
+
     @media (max-width: 768px) {
         .sidebar {
             left: -260px;
@@ -418,6 +427,8 @@
 
         .content-wrapper {
             margin-left: 0;
+            padding: 15px;
+            max-width: 100%;
         }
 
         .sidebar-overlay {
