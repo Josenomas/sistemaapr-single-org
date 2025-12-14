@@ -105,6 +105,9 @@ class SociosController extends Controller
             'tipo_cliente' => 'required|in:residencial,comercial,industrial',
             'numero_medidor' => 'nullable|string|max:50',
             'estado' => 'required|in:activo,suspendido,moroso,desconectado',
+            'subsidio_porcentaje' => 'nullable|numeric|min:0|max:100',
+            'descuento_monto' => 'nullable|numeric|min:0',
+            'observaciones_subsidio' => 'nullable|string|max:255',
         ]);
 
         // Capturar cambios antes de actualizar
@@ -121,6 +124,9 @@ class SociosController extends Controller
             'tipo_cliente' => 'Tipo de Cliente',
             'numero_medidor' => 'N° Medidor',
             'estado' => 'Estado',
+            'subsidio_porcentaje' => 'Subsidio (%)',
+            'descuento_monto' => 'Descuento ($)',
+            'observaciones_subsidio' => 'Descripción Subsidio',
         ];
 
         foreach ($validated as $campo => $valorNuevo) {
