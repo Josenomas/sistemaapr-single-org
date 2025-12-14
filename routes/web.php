@@ -257,6 +257,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/historial-consumo/{id}', [HistorialConsumoController::class, 'show'])->name('historial-consumo.show');
         Route::get('/historial-consumo/socio/{id}/analisis', [HistorialConsumoController::class, 'analisisSocio'])->name('historial-consumo.analisis-socio');
         Route::get('/historial-consumo-comparar', [HistorialConsumoController::class, 'comparar'])->name('historial-consumo.comparar');
+        Route::get('/historial-consumo-comparar-pdf', [HistorialConsumoController::class, 'descargarComparacion'])->name('historial-consumo.comparar.pdf');
         Route::get('/historial-consumo-sincronizar', [HistorialConsumoController::class, 'sincronizar'])->name('historial-consumo.sincronizar');
     });
 

@@ -125,6 +125,16 @@
         </div>
     </div>
 
+    <!-- Botón de descarga PDF -->
+    <div class="text-right mb-3">
+        <a href="{{ route('historial-consumo.comparar.pdf', array_merge(['periodo' => request('periodo')], ['socios_comparar' => request('socios_comparar')])) }}"
+           class="btn btn-danger"
+           target="_blank">
+            <i class="fas fa-file-pdf"></i>
+            Descargar PDF
+        </a>
+    </div>
+
     <!-- Gráfico de Comparación -->
     <div class="card">
         <div class="card-header">
@@ -714,6 +724,19 @@
 
     .text-muted {
         color: var(--gray-500);
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .btn-danger {
+        background: #dc2626;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #b91c1c;
     }
 
     .empty-state {

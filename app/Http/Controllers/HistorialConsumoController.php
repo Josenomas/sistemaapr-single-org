@@ -289,6 +289,41 @@ class HistorialConsumoController extends Controller
     }
 
     /**
+     * Descargar comparación de consumo en PDF
+     */
+    public function descargarComparacion(Request $request)
+    {
+        $periodo = $request->periodo ?? date('Y-m');
+        $sociosIds = $request->socios_comparar ?? [];
+
+        if (empty($sociosIds)) {
+            return redirect()->back()->with('error', 'Debe seleccionar al menos un socio para generar el PDF.');
+        }
+
+        $comparacion = HistorialConsumo::whereIn('id_socio', $sociosIds)
+                                      ->where('periodo', $periodo)
+                                      ->where('activo', 1)
+                                      ->with('socio')
+                                      ->get();
+
+        if ($comparacion->isEmpty()) {
+            return redirect()->back()->with('error', 'No hay datos para el período y socios seleccionados.');
+        }
+
+        // Calcular estadísticas de comparación
+        $estadisticasComparacion = [
+            'promedio_grupo' => $comparacion->avg('consumo_m3'),
+            'maximo' => $comparacion->max('consumo_m3'),
+            'minimo' => $comparacion->min('consumo_m3'),
+            'total' => $comparacion->sum('consumo_m3'),
+            'desviacion' => $comparacion->count() > 1 ? $this->calcularDesviacionEstandar($comparacion->pluck('consumo_m3')->toArray()) : 0
+        ];
+
+        $pdf = \PDF::loadView('historial-consumo.pdf.comparacion', compact('comparacion', 'estadisticasComparacion', 'periodo'));
+        return $pdf->download('comparacion-consumo-' . $periodo . '.pdf');
+    }
+
+    /**
      * Calcular desviación estándar
      */
     private function calcularDesviacionEstandar($valores)
