@@ -266,22 +266,38 @@
     console.log('Datos de comparación:', comparacionData);
     console.log('Promedio grupo:', promedio);
 
+    // Preparar datos para el gráfico
+    const labels = [];
+    const consumos = [];
+
+    comparacionData.forEach(item => {
+        console.log('Item:', item);
+        const nombreCompleto = item.socio?.nombre_completo || item.socio?.nombre || 'Sin nombre';
+        const consumo = parseFloat(item.consumo_m3) || 0;
+        labels.push(nombreCompleto);
+        consumos.push(consumo);
+        console.log(`${nombreCompleto}: ${consumo} m³`);
+    });
+
+    console.log('Labels:', labels);
+    console.log('Consumos:', consumos);
+
     const chart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: comparacionData.map(item => item.socio.nombre_completo),
+            labels: labels,
             datasets: [
                 {
                     label: 'Consumo (m³)',
-                    data: comparacionData.map(item => parseFloat(item.consumo_m3)),
-                    backgroundColor: comparacionData.map(item => {
-                        if (item.consumo_m3 > promedio * 1.2) return 'rgba(245, 158, 11, 0.7)';
-                        if (item.consumo_m3 < promedio * 0.8) return 'rgba(59, 130, 246, 0.7)';
+                    data: consumos,
+                    backgroundColor: consumos.map(consumo => {
+                        if (consumo > promedio * 1.2) return 'rgba(245, 158, 11, 0.7)';
+                        if (consumo < promedio * 0.8) return 'rgba(59, 130, 246, 0.7)';
                         return 'rgba(16, 185, 129, 0.7)';
                     }),
-                    borderColor: comparacionData.map(item => {
-                        if (item.consumo_m3 > promedio * 1.2) return 'rgb(245, 158, 11)';
-                        if (item.consumo_m3 < promedio * 0.8) return 'rgb(59, 130, 246)';
+                    borderColor: consumos.map(consumo => {
+                        if (consumo > promedio * 1.2) return 'rgb(245, 158, 11)';
+                        if (consumo < promedio * 0.8) return 'rgb(59, 130, 246)';
                         return 'rgb(16, 185, 129)';
                     }),
                     borderWidth: 2
@@ -320,7 +336,7 @@
             scales: {
                 y: {
                     beginAtZero: true,
-                    suggestedMax: Math.max(...comparacionData.map(item => parseFloat(item.consumo_m3))) * 1.2,
+                    suggestedMax: Math.max(...consumos) * 1.2,
                     title: {
                         display: true,
                         text: 'Consumo (m³)'
