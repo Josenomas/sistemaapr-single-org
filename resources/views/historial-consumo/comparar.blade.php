@@ -263,6 +263,9 @@
     const comparacionData = @json($comparacion);
     const promedio = {{ $estadisticasComparacion['promedio_grupo'] }};
 
+    console.log('Datos de comparación:', comparacionData);
+    console.log('Promedio grupo:', promedio);
+
     const chart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -270,7 +273,7 @@
             datasets: [
                 {
                     label: 'Consumo (m³)',
-                    data: comparacionData.map(item => item.consumo_m3),
+                    data: comparacionData.map(item => parseFloat(item.consumo_m3)),
                     backgroundColor: comparacionData.map(item => {
                         if (item.consumo_m3 > promedio * 1.2) return 'rgba(245, 158, 11, 0.7)';
                         if (item.consumo_m3 < promedio * 0.8) return 'rgba(59, 130, 246, 0.7)';
@@ -297,7 +300,7 @@
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,
