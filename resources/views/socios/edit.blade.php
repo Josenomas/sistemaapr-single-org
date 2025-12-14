@@ -196,9 +196,85 @@
                 </div>
             </div>
 
+            <!-- Subsidios y Descuentos -->
+            <div class="card mb-3" style="background: #f0f9ff; border: 1px solid #3b82f6;">
+                <div class="card-header" style="background: #3b82f6; color: white;">
+                    <h4 style="margin: 0; font-size: 1rem;">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        Subsidios y Descuentos
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <!-- Subsidio Porcentaje -->
+                        <div class="form-group col-md-4">
+                            <label for="subsidio_porcentaje" class="form-label">
+                                <i class="fas fa-percent"></i> Subsidio por Porcentaje (%)
+                            </label>
+                            <input type="number"
+                                   class="form-control @error('subsidio_porcentaje') is-invalid @enderror"
+                                   id="subsidio_porcentaje"
+                                   name="subsidio_porcentaje"
+                                   value="{{ old('subsidio_porcentaje', $socio->subsidio_porcentaje ?? 0) }}"
+                                   min="0"
+                                   max="100"
+                                   step="0.01"
+                                   placeholder="Ej: 50 para 50%">
+                            <small class="form-text text-muted">Ej: 50 = 50% de descuento (subsidio municipal)</small>
+                            @error('subsidio_porcentaje')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Descuento Monto Fijo -->
+                        <div class="form-group col-md-4">
+                            <label for="descuento_monto" class="form-label">
+                                <i class="fas fa-dollar-sign"></i> Descuento Monto Fijo ($)
+                            </label>
+                            <input type="number"
+                                   class="form-control @error('descuento_monto') is-invalid @enderror"
+                                   id="descuento_monto"
+                                   name="descuento_monto"
+                                   value="{{ old('descuento_monto', $socio->descuento_monto ?? 0) }}"
+                                   min="0"
+                                   step="0.01"
+                                   placeholder="Ej: 3000">
+                            <small class="form-text text-muted">Ej: 3000 = $3,000 de descuento fijo (convenio)</small>
+                            @error('descuento_monto')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Observaciones del Subsidio -->
+                        <div class="form-group col-md-4">
+                            <label for="observaciones_subsidio" class="form-label">
+                                <i class="fas fa-info-circle"></i> Descripción
+                            </label>
+                            <input type="text"
+                                   class="form-control @error('observaciones_subsidio') is-invalid @enderror"
+                                   id="observaciones_subsidio"
+                                   name="observaciones_subsidio"
+                                   value="{{ old('observaciones_subsidio', $socio->observaciones_subsidio) }}"
+                                   maxlength="255"
+                                   placeholder="Ej: Subsidio Municipal, Convenio APR">
+                            <small class="form-text text-muted">Motivo del subsidio o descuento</small>
+                            @error('observaciones_subsidio')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" style="margin: 15px 0 0 0; font-size: 0.875rem;">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Nota:</strong> Puedes aplicar subsidio por porcentaje, descuento fijo, o ambos.
+                        El subsidio por porcentaje se calcula sobre el subtotal antes del descuento fijo.
+                    </div>
+                </div>
+            </div>
+
             <!-- Observaciones -->
             <div class="form-group">
-                <label for="observaciones" class="form-label">Observaciones</label>
+                <label for="observaciones" class="form-label">Observaciones Generales</label>
                 <textarea class="form-control @error('observaciones') is-invalid @enderror"
                           id="observaciones"
                           name="observaciones"

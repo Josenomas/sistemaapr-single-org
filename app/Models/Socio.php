@@ -20,6 +20,9 @@ class Socio extends Model
         'email',
         'tipo_cliente',
         'exento_iva',
+        'subsidio_porcentaje',
+        'descuento_monto',
+        'observaciones_subsidio',
         'numero_medidor',
         'estado',
         'fecha_ingreso',
@@ -30,6 +33,8 @@ class Socio extends Model
     protected $casts = [
         'activo' => 'boolean',
         'exento_iva' => 'boolean',
+        'subsidio_porcentaje' => 'decimal:2',
+        'descuento_monto' => 'decimal:2',
         'fecha_ingreso' => 'date',
         'fecha_creacion' => 'datetime',
         'fecha_actualizacion' => 'datetime',

@@ -568,8 +568,24 @@
             <div class="totales-grid">
                 <div class="totales-left">
                     <?php
-                        // Calcular subtotal (sin IVA)
-                        $subtotal = $boleta->cargo_consumo + $boleta->cargo_fijo + $boleta->otros_cargos - $boleta->descuentos - $boleta->subsidio;
+                        // Calcular subtotal inicial
+                        $subtotalInicial = $boleta->cargo_consumo + $boleta->cargo_fijo + $boleta->otros_cargos;
+
+                        // Obtener datos de subsidio/descuento del socio
+                        $subsidio_porcentaje = $boleta->socio->subsidio_porcentaje ?? 0;
+                        $descuento_monto = $boleta->socio->descuento_monto ?? 0;
+
+                        // Calcular subsidio por porcentaje
+                        $monto_subsidio = 0;
+                        if ($subsidio_porcentaje > 0) {
+                            $monto_subsidio = round($subtotalInicial * ($subsidio_porcentaje / 100), 0);
+                        }
+
+                        // Monto descuento fijo
+                        $monto_descuento = $descuento_monto;
+
+                        // Calcular subtotal después de subsidios/descuentos (para IVA)
+                        $subtotal = $subtotalInicial - $monto_subsidio - $monto_descuento;
 
                         // Verificar si el socio está exento de IVA
                         $exentoIva = $boleta->socio->exento_iva ?? 0;
@@ -590,16 +606,16 @@
                         <div class="value">{{ $boleta->otros_cargos_formateado }}</div>
                     </div>
                     @endif
-                    @if($boleta->descuentos > 0)
-                    <div class="total-row">
-                        <div class="label">Descuentos:</div>
-                        <div class="value">-{{ $boleta->descuentos_formateado }}</div>
+                    @if($monto_subsidio > 0)
+                    <div class="total-row" style="color: #1565c0;">
+                        <div class="label">Subsidio ({{ $subsidio_porcentaje }}%):</div>
+                        <div class="value">-${{ number_format($monto_subsidio, 0, ',', '.') }}</div>
                     </div>
                     @endif
-                    @if($boleta->subsidio > 0)
-                    <div class="total-row">
-                        <div class="label">Subsidio:</div>
-                        <div class="value">-{{ $boleta->subsidio_formateado }}</div>
+                    @if($monto_descuento > 0)
+                    <div class="total-row" style="color: #1565c0;">
+                        <div class="label">Descuento Fijo:</div>
+                        <div class="value">-${{ number_format($monto_descuento, 0, ',', '.') }}</div>
                     </div>
                     @endif
                     <div class="total-row" style="border-top: 2px solid #999; padding-top: 8px; margin-top: 5px;">
@@ -696,11 +712,16 @@
             </div>
         </div>
 
-        @if($boleta->observaciones)
+        @if($boleta->observaciones || ($boleta->socio->observaciones_subsidio && ($subsidio_porcentaje > 0 || $descuento_monto > 0)))
         <!-- Observaciones -->
         <div class="observaciones-section">
             <h3>Observaciones:</h3>
+            @if($boleta->socio->observaciones_subsidio && ($subsidio_porcentaje > 0 || $descuento_monto > 0))
+            <p style="margin-bottom: 5px;"><strong style="color: #1565c0;">💰 {{ $boleta->socio->observaciones_subsidio }}</strong></p>
+            @endif
+            @if($boleta->observaciones)
             <p>{{ $boleta->observaciones }}</p>
+            @endif
         </div>
         @endif
 

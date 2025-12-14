@@ -1,8 +1,9 @@
 -- ============================================
--- Procedimiento Almacenado: sp_generar_boletas_mes (VERSION 3 - Sistema Progresivo de Tramos)
--- Fecha: 2025-12-13
+-- Procedimiento Almacenado: sp_generar_boletas_mes (VERSION 4 - Con Subsidios y Descuentos)
+-- Fecha: 2025-12-14
 -- Descripción: Genera boletas masivas usando sistema PROGRESIVO de tramos por tipo de cliente
 --              Cada tramo cobra solo los m³ que caen dentro de su rango
+--              Aplica subsidios por porcentaje y descuentos por monto fijo
 -- ============================================
 
 USE `sistema_apr`;
@@ -20,10 +21,14 @@ BEGIN
     DECLARE v_numero_socio VARCHAR(20);
     DECLARE v_tipo_cliente VARCHAR(20);
     DECLARE v_exento_iva TINYINT;
+    DECLARE v_subsidio_porcentaje DECIMAL(5,2);
+    DECLARE v_descuento_monto DECIMAL(10,2);
     DECLARE v_consumo DECIMAL(10,2);
     DECLARE v_cargo_fijo DECIMAL(10,2);
     DECLARE v_cargo_consumo DECIMAL(10,2);
     DECLARE v_subtotal DECIMAL(10,2);
+    DECLARE v_monto_subsidio DECIMAL(10,2);
+    DECLARE v_monto_descuento DECIMAL(10,2);
     DECLARE v_iva_porcentaje DECIMAL(5,2);
     DECLARE v_monto_iva DECIMAL(10,2);
     DECLARE v_total DECIMAL(10,2);
@@ -47,7 +52,9 @@ BEGIN
     DECLARE cur_socios CURSOR FOR
         SELECT s.id, s.numero_socio,
                CAST(s.tipo_cliente AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_unicode_ci,
-               s.exento_iva
+               s.exento_iva,
+               IFNULL(s.subsidio_porcentaje, 0),
+               IFNULL(s.descuento_monto, 0)
         FROM socios s
         WHERE s.activo = 1 AND s.estado != 'desconectado';
 
@@ -75,7 +82,8 @@ BEGIN
     OPEN cur_socios;
 
     read_loop: LOOP
-        FETCH cur_socios INTO v_id_socio, v_numero_socio, v_tipo_cliente, v_exento_iva;
+        FETCH cur_socios INTO v_id_socio, v_numero_socio, v_tipo_cliente, v_exento_iva,
+                              v_subsidio_porcentaje, v_descuento_monto;
         IF done THEN
             LEAVE read_loop;
         END IF;
@@ -86,6 +94,8 @@ BEGIN
         SET v_cargo_fijo = 0;
         SET v_cargo_consumo = 0;
         SET v_subtotal = 0;
+        SET v_monto_subsidio = 0;
+        SET v_monto_descuento = 0;
         SET v_iva_porcentaje = 0;
         SET v_monto_iva = 0;
         SET v_total = 0;
@@ -172,20 +182,52 @@ BEGIN
         -- 3. Calcular subtotal (cargo_consumo + cargo_fijo)
         SET v_subtotal = v_cargo_consumo + v_cargo_fijo;
 
-        -- 4. Calcular IVA solo si NO está exento
+        -- 4. Calcular subsidios y descuentos
+        SET v_monto_subsidio = 0;
+        SET v_monto_descuento = 0;
+
+        -- Aplicar subsidio por porcentaje sobre el subtotal
+        IF v_subsidio_porcentaje > 0 THEN
+            SET v_monto_subsidio = ROUND(v_subtotal * (v_subsidio_porcentaje / 100), 0);
+
+            -- Agregar a observaciones
+            IF LENGTH(v_observaciones) > 0 THEN
+                SET v_observaciones = CONCAT(v_observaciones, ' | ');
+            END IF;
+            SET v_observaciones = CONCAT(v_observaciones, 'Subsidio ',
+                                          v_subsidio_porcentaje, '%: -$',
+                                          FORMAT(v_monto_subsidio, 0));
+        END IF;
+
+        -- Aplicar descuento por monto fijo
+        IF v_descuento_monto > 0 THEN
+            SET v_monto_descuento = v_descuento_monto;
+
+            -- Agregar a observaciones
+            IF LENGTH(v_observaciones) > 0 THEN
+                SET v_observaciones = CONCAT(v_observaciones, ' | ');
+            END IF;
+            SET v_observaciones = CONCAT(v_observaciones, 'Descuento fijo: -$',
+                                          FORMAT(v_monto_descuento, 0));
+        END IF;
+
+        -- Calcular subtotal después de subsidios y descuentos
+        SET v_subtotal = v_subtotal - v_monto_subsidio - v_monto_descuento;
+
+        -- 5. Calcular IVA solo si NO está exento (sobre subtotal con subsidios aplicados)
         IF v_exento_iva = 0 AND v_iva_porcentaje > 0 THEN
             SET v_monto_iva = ROUND(v_subtotal * (v_iva_porcentaje / 100), 0);
         ELSE
             SET v_monto_iva = 0;
         END IF;
 
-        -- 5. Calcular total
+        -- 6. Calcular total
         SET v_total = v_subtotal + v_monto_iva;
 
-        -- 6. Generar número de boleta único
+        -- 7. Generar número de boleta único
         SET v_numero_boleta = CONCAT('BOL-', p_mes, '-', LPAD(v_id_socio, 4, '0'));
 
-        -- 7. Insertar la boleta en la base de datos
+        -- 8. Insertar la boleta en la base de datos
         INSERT INTO boletas (
             numero_boleta,
             id_socio,
@@ -213,7 +255,7 @@ BEGIN
             v_cargo_fijo,
             v_cargo_consumo,
             v_monto_iva,
-            0,
+            (v_monto_subsidio + v_monto_descuento),
             v_total,
             'pendiente',
             CONCAT('Generada automáticamente - Sistema Progresivo | ', v_observaciones),
