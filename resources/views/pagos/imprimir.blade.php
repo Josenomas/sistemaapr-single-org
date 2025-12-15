@@ -6,8 +6,8 @@
     <title>Comprobante de Pago - {{ $pago->numero_recibo }}</title>
     <style>
         @page {
-            size: legal; /* Tamaño oficio: 8.5" x 14" */
-            margin: 15mm;
+            size: letter;
+            margin: 10mm;
         }
 
         * {
@@ -17,499 +17,332 @@
         }
 
         body {
-            font-family: 'Arial', 'Helvetica', sans-serif;
-            font-size: 10pt;
-            line-height: 1.5;
-            color: #000;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 11pt;
+            color: #1f2937;
             background: #fff;
+            line-height: 1.5;
         }
 
-        .comprobante-container {
-            width: 100%;
+        .comprobante {
             max-width: 800px;
             margin: 0 auto;
             background: white;
-            border: 3px solid #2563eb;
-            position: relative;
+            border: 2px solid #e5e7eb;
         }
 
-        /* Header con degradado profesional */
-        .header-main {
-            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        /* Header simple y profesional */
+        .header {
+            background: #1e40af;
             color: white;
-            padding: 25px 30px;
-            position: relative;
-            overflow: hidden;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .header-main::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-        }
-
-        .header-content {
-            display: table;
-            width: 100%;
-            position: relative;
-            z-index: 1;
-        }
-
-        .empresa-info {
-            display: table-cell;
-            width: 60%;
-            vertical-align: middle;
-        }
-
-        .empresa-info h1 {
-            font-size: 22pt;
+        .header-left h1 {
+            font-size: 24pt;
             font-weight: 700;
             margin-bottom: 5px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .empresa-info p {
+        .header-left p {
             font-size: 10pt;
-            opacity: 0.95;
-            margin: 2px 0;
+            opacity: 0.9;
         }
 
-        .recibo-box {
-            display: table-cell;
-            width: 40%;
+        .header-right {
             text-align: right;
-            vertical-align: middle;
         }
 
-        .recibo-inner {
-            display: inline-block;
+        .recibo-numero {
             background: white;
-            color: #1e3a8a;
-            border: 3px solid white;
-            border-radius: 8px;
-            padding: 15px 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .recibo-inner .tipo {
-            font-size: 11pt;
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-
-        .recibo-inner .numero {
-            font-size: 20pt;
+            color: #1e40af;
+            padding: 12px 24px;
+            border-radius: 4px;
             font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        /* Sello PAGADO más profesional */
-        .sello-pagado {
-            position: absolute;
-            top: 120px;
-            right: 40px;
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-            color: white;
-            padding: 12px 30px;
             font-size: 18pt;
-            font-weight: 700;
-            border-radius: 50px;
-            transform: rotate(-15deg);
-            box-shadow: 0 6px 12px rgba(5, 150, 105, 0.4);
-            border: 3px solid white;
-            z-index: 10;
-            letter-spacing: 3px;
         }
 
-        /* Fecha y datos destacados */
-        .info-destacada {
-            background: linear-gradient(to right, #f0f9ff, #e0f2fe);
-            padding: 15px 30px;
-            border-bottom: 2px solid #2563eb;
-            display: table;
-            width: 100%;
+        .recibo-label {
+            font-size: 9pt;
+            color: white;
+            opacity: 0.9;
+            margin-bottom: 5px;
         }
 
-        .info-item {
-            display: table-cell;
-            width: 33.33%;
-            padding: 0 10px;
+        /* Sello pagado simple */
+        .estado-pagado {
+            background: #10b981;
+            color: white;
             text-align: center;
-        }
-
-        .info-item strong {
-            display: block;
-            font-size: 8pt;
-            color: #1e3a8a;
-            text-transform: uppercase;
-            margin-bottom: 3px;
-            font-weight: 600;
-        }
-
-        .info-item span {
-            font-size: 12pt;
+            padding: 15px;
+            font-size: 14pt;
             font-weight: 700;
-            color: #000;
+            letter-spacing: 4px;
         }
 
-        /* Monto pagado destacado */
-        .monto-section {
-            background: linear-gradient(135deg, #dcfce7 0%, #86efac 100%);
-            border: 3px solid #10b981;
-            border-left: none;
-            border-right: none;
-            padding: 25px 30px;
+        /* Monto destacado */
+        .monto-principal {
             text-align: center;
-        }
-
-        .monto-label {
-            font-size: 11pt;
-            font-weight: 600;
-            color: #065f46;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .monto-valor {
-            font-size: 36pt;
-            font-weight: 700;
-            color: #065f46;
-            line-height: 1;
-        }
-
-        /* Secciones de información */
-        .seccion {
-            padding: 20px 30px;
+            padding: 40px 30px;
+            background: #f9fafb;
             border-bottom: 1px solid #e5e7eb;
         }
 
-        .seccion-titulo {
-            font-weight: 700;
-            font-size: 11pt;
-            margin-bottom: 15px;
-            color: #1e3a8a;
+        .monto-label {
+            font-size: 10pt;
+            color: #6b7280;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding-bottom: 8px;
-            border-bottom: 3px solid #2563eb;
+            margin-bottom: 10px;
         }
 
-        .datos-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .dato-item {
-            display: flex;
-            align-items: baseline;
-        }
-
-        .dato-label {
-            font-weight: 600;
-            color: #374151;
-            min-width: 140px;
-            font-size: 9pt;
-        }
-
-        .dato-valor {
-            color: #000;
-            font-weight: 500;
-            font-size: 10pt;
-        }
-
-        /* Detalle de boleta */
-        .detalle-boleta {
-            background: linear-gradient(to right, #fef3c7, #fef08a);
-            border: 2px solid #f59e0b;
-            border-radius: 8px;
-            padding: 20px 30px;
-            margin: 0 30px 20px;
-        }
-
-        .detalle-boleta-titulo {
+        .monto-valor {
+            font-size: 48pt;
             font-weight: 700;
-            font-size: 11pt;
-            color: #92400e;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            color: #1e40af;
         }
 
-        .detalle-boleta-grid {
+        /* Secciones de información */
+        .info-section {
+            padding: 25px 30px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .section-title {
+            font-size: 11pt;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #1e40af;
+        }
+
+        .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-row.full {
+            grid-column: 1 / -1;
+        }
+
+        .info-label {
+            font-size: 9pt;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 11pt;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        /* Box de boleta */
+        .boleta-box {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 0 30px 25px;
+        }
+
+        .boleta-box .section-title {
+            color: #92400e;
+            border-bottom-color: #f59e0b;
+            margin-bottom: 12px;
+        }
+
+        .boleta-box .info-value {
+            font-weight: 600;
         }
 
         /* Método de pago badge */
-        .metodo-badge {
+        .metodo-pago {
             display: inline-block;
-            background: linear-gradient(135deg, #2563eb, #1e40af);
+            background: #1e40af;
             color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
+            padding: 8px 20px;
+            border-radius: 4px;
             font-weight: 600;
             font-size: 10pt;
-            letter-spacing: 0.5px;
         }
 
         /* Observaciones */
         .observaciones {
             background: #f9fafb;
-            border-left: 4px solid #2563eb;
-            padding: 15px 30px;
-            margin: 0 30px 20px;
+            border-left: 4px solid #1e40af;
+            padding: 15px 20px;
+            margin: 0 30px 25px;
             font-style: italic;
-            color: #374151;
+            color: #4b5563;
         }
 
-        /* Firma */
-        .firma-section {
-            padding: 30px;
-            text-align: center;
-        }
-
-        .firma-box {
-            display: inline-block;
-            border-top: 2px solid #000;
-            padding-top: 8px;
-            min-width: 300px;
-        }
-
-        .firma-texto {
-            font-size: 9pt;
-            color: #374151;
-            font-weight: 600;
-        }
-
-        /* Footer profesional */
+        /* Footer */
         .footer {
-            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-            color: white;
-            padding: 20px 30px;
+            background: #f9fafb;
+            padding: 25px 30px;
             text-align: center;
+            border-top: 2px solid #e5e7eb;
         }
 
         .footer-title {
-            font-size: 13pt;
+            font-size: 12pt;
             font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
+            color: #1e40af;
+            margin-bottom: 10px;
         }
 
         .footer-text {
             font-size: 9pt;
-            opacity: 0.95;
+            color: #6b7280;
             line-height: 1.6;
         }
 
-        .footer-marca {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        .footer-fecha {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
             font-size: 8pt;
-            opacity: 0.8;
+            color: #9ca3af;
         }
 
-        /* Estilos de impresión */
         @media print {
             body {
                 background: white;
             }
-
-            .comprobante-container {
-                border: 2px solid #2563eb;
-                max-width: 100%;
-            }
-
-            .sello-pagado {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+            .comprobante {
+                border: none;
             }
         }
     </style>
 </head>
 <body>
-    <div class="comprobante-container">
-        <!-- Sello PAGADO -->
-        <div class="sello-pagado">✓ PAGADO</div>
-
-        <!-- Header Profesional -->
-        <div class="header-main">
-            <div class="header-content">
-                <div class="empresa-info">
-                    <h1>SISTEMA APR</h1>
-                    <p><strong>AGUA POTABLE RURAL</strong></p>
-                    <p>Asociación de Agua Potable Rural</p>
-                    <p>Teléfono: (XX) XXXX-XXXX | Email: contacto@apr.cl</p>
-                </div>
-                <div class="recibo-box">
-                    <div class="recibo-inner">
-                        <div class="tipo">RECIBO N°</div>
-                        <div class="numero">{{ $pago->numero_recibo }}</div>
-                    </div>
-                </div>
+    <div class="comprobante">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1>SISTEMA APR</h1>
+                <p>Agua Potable Rural</p>
+                <p>Teléfono: (XX) XXXX-XXXX</p>
+            </div>
+            <div class="header-right">
+                <div class="recibo-label">COMPROBANTE DE PAGO</div>
+                <div class="recibo-numero">{{ $pago->numero_recibo }}</div>
             </div>
         </div>
 
-        <!-- Información Destacada -->
-        <div class="info-destacada">
-            <div class="info-item" style="border-right: 1px solid #cbd5e1;">
-                <strong>Fecha de Pago</strong>
-                <span>{{ $pago->fecha_pago_formateada }}</span>
-            </div>
-            <div class="info-item" style="border-right: 1px solid #cbd5e1;">
-                <strong>Método de Pago</strong>
-                <span>{{ ucfirst($pago->metodo_pago) }}</span>
-            </div>
-            <div class="info-item">
-                <strong>Estado</strong>
-                <span style="color: #059669;">✓ Pagado</span>
-            </div>
-        </div>
+        <!-- Estado Pagado -->
+        <div class="estado-pagado">✓ PAGADO</div>
 
-        <!-- Monto Pagado Destacado -->
-        <div class="monto-section">
+        <!-- Monto Principal -->
+        <div class="monto-principal">
             <div class="monto-label">Monto Pagado</div>
             <div class="monto-valor">{{ $pago->monto_pagado_formateado }}</div>
         </div>
 
-        <!-- Datos del Socio -->
-        <div class="seccion">
-            <div class="seccion-titulo">📋 Datos del Socio</div>
-            <div class="datos-grid">
-                <div class="dato-item">
-                    <div class="dato-label">Número de Socio:</div>
-                    <div class="dato-valor">{{ $pago->socio->numero_socio }}</div>
+        <!-- Información del Pago -->
+        <div class="info-section">
+            <div class="section-title">Información del Pago</div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">Fecha de Pago</span>
+                    <span class="info-value">{{ $pago->fecha_pago_formateada }}</span>
                 </div>
-                <div class="dato-item">
-                    <div class="dato-label">RUT:</div>
-                    <div class="dato-valor">{{ $pago->socio->rut }}</div>
-                </div>
-                <div class="dato-item" style="grid-column: 1 / -1;">
-                    <div class="dato-label">Nombre Completo:</div>
-                    <div class="dato-valor" style="font-weight: 700; font-size: 11pt;">{{ $pago->socio->nombre_completo }}</div>
-                </div>
-                <div class="dato-item" style="grid-column: 1 / -1;">
-                    <div class="dato-label">Dirección:</div>
-                    <div class="dato-valor">{{ $pago->socio->direccion ?? 'No especificada' }}</div>
-                </div>
-                @if($pago->socio->telefono)
-                <div class="dato-item">
-                    <div class="dato-label">Teléfono:</div>
-                    <div class="dato-valor">{{ $pago->socio->telefono }}</div>
-                </div>
-                @endif
-                @if($pago->socio->email)
-                <div class="dato-item">
-                    <div class="dato-label">Email:</div>
-                    <div class="dato-valor">{{ $pago->socio->email }}</div>
-                </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Detalle de Boleta Pagada -->
-        <div class="detalle-boleta">
-            <div class="detalle-boleta-titulo">
-                <span>📄</span>
-                <span>DETALLE DE LA BOLETA PAGADA</span>
-            </div>
-            <div class="detalle-boleta-grid">
-                <div class="dato-item">
-                    <div class="dato-label">N° Boleta:</div>
-                    <div class="dato-valor" style="font-weight: 700;">{{ $pago->boleta->numero_boleta }}</div>
-                </div>
-                <div class="dato-item">
-                    <div class="dato-label">Período:</div>
-                    <div class="dato-valor" style="font-weight: 700;">{{ $pago->boleta->mes_texto }}</div>
-                </div>
-                <div class="dato-item">
-                    <div class="dato-label">Total Boleta:</div>
-                    <div class="dato-valor">{{ $pago->boleta->total_formateado }}</div>
-                </div>
-                <div class="dato-item">
-                    <div class="dato-label">Estado Boleta:</div>
-                    <div class="dato-valor" style="color: #059669; font-weight: 600;">{{ ucfirst($pago->boleta->estado) }}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Detalle del Pago -->
-        <div class="seccion">
-            <div class="seccion-titulo">💳 Información del Pago</div>
-            <div class="datos-grid">
-                <div class="dato-item">
-                    <div class="dato-label">Método de Pago:</div>
-                    <div class="dato-valor">
-                        <span class="metodo-badge">{{ strtoupper($pago->metodo_pago) }}</span>
-                    </div>
+                <div class="info-row">
+                    <span class="info-label">Método de Pago</span>
+                    <span class="info-value">
+                        <span class="metodo-pago">{{ strtoupper($pago->metodo_pago) }}</span>
+                    </span>
                 </div>
                 @if($pago->numero_comprobante)
-                <div class="dato-item">
-                    <div class="dato-label">N° Comprobante:</div>
-                    <div class="dato-valor" style="font-weight: 700;">{{ $pago->numero_comprobante }}</div>
+                <div class="info-row">
+                    <span class="info-label">N° Comprobante</span>
+                    <span class="info-value">{{ $pago->numero_comprobante }}</span>
                 </div>
                 @endif
-                <div class="dato-item">
-                    <div class="dato-label">Fecha de Registro:</div>
-                    <div class="dato-valor">{{ $pago->fecha_creacion->format('d/m/Y H:i') }}</div>
+                <div class="info-row">
+                    <span class="info-label">Fecha de Registro</span>
+                    <span class="info-value">{{ $pago->fecha_creacion->format('d/m/Y H:i') }}</span>
                 </div>
-                @if($pago->usuarioRegistro)
-                <div class="dato-item">
-                    <div class="dato-label">Registrado por:</div>
-                    <div class="dato-valor">{{ $pago->usuarioRegistro->nombre_usuario ?? $pago->usuarioRegistro->name }}</div>
+            </div>
+        </div>
+
+        <!-- Datos del Socio -->
+        <div class="info-section">
+            <div class="section-title">Datos del Cliente</div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">N° Socio</span>
+                    <span class="info-value">{{ $pago->socio->numero_socio }}</span>
                 </div>
-                @endif
+                <div class="info-row">
+                    <span class="info-label">RUT</span>
+                    <span class="info-value">{{ $pago->socio->rut }}</span>
+                </div>
+                <div class="info-row full">
+                    <span class="info-label">Nombre Completo</span>
+                    <span class="info-value" style="font-size: 12pt; font-weight: 600;">{{ $pago->socio->nombre_completo }}</span>
+                </div>
+                <div class="info-row full">
+                    <span class="info-label">Dirección</span>
+                    <span class="info-value">{{ $pago->socio->direccion ?? 'No especificada' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalle de Boleta -->
+        <div class="boleta-box">
+            <div class="section-title">Detalle de la Boleta Pagada</div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">N° Boleta</span>
+                    <span class="info-value">{{ $pago->boleta->numero_boleta }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Período</span>
+                    <span class="info-value">{{ $pago->boleta->mes_texto }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Total Boleta</span>
+                    <span class="info-value">{{ $pago->boleta->total_formateado }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Estado</span>
+                    <span class="info-value" style="color: #10b981; font-weight: 700;">{{ ucfirst($pago->boleta->estado) }}</span>
+                </div>
             </div>
         </div>
 
         <!-- Observaciones -->
         @if($pago->observaciones)
         <div class="observaciones">
-            <strong style="font-style: normal; color: #1e3a8a;">📝 Observaciones:</strong><br>
+            <strong style="font-style: normal; color: #1e40af;">Observaciones:</strong><br>
             {{ $pago->observaciones }}
         </div>
         @endif
 
-        <!-- Firma -->
-        <div class="firma-section">
-            <div class="firma-box">
-                <div class="firma-texto">
-                    Firma y Timbre Autorizado<br>
-                    <strong>AGUA POTABLE RURAL</strong>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer Profesional -->
+        <!-- Footer -->
         <div class="footer">
-            <div class="footer-title">✓ GRACIAS POR SU PAGO</div>
+            <div class="footer-title">Gracias por su pago</div>
             <div class="footer-text">
-                Este documento es un comprobante válido de pago.<br>
-                Conserve este comprobante para cualquier consulta o reclamo futuro.<br>
-                Para más información, contacte con nosotros.
+                Este comprobante certifica el pago realizado.<br>
+                Conserve este documento para cualquier consulta futura.
             </div>
-            <div class="footer-marca">
-                Documento generado electrónicamente el {{ now()->format('d/m/Y H:i:s') }}<br>
-                Sistema APR - Gestión de Agua Potable Rural
+            <div class="footer-fecha">
+                Documento generado el {{ now()->format('d/m/Y H:i:s') }} | Sistema APR
             </div>
         </div>
     </div>
-
-    <script>
-        // Auto-imprimir al cargar la página
-        window.onload = function() {
-            window.print();
-        };
-    </script>
 </body>
 </html>
