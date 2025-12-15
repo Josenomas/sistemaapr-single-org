@@ -296,7 +296,11 @@
                 <tr>
                     <td style="width: 50%; padding: 5px;">
                         <div class="firma-label">APROBADO POR:</div>
-                        <div class="firma-box"></div>
+                        <div class="firma-box">
+                            {{ $pago->usuarioRegistro->nombre_usuario ?? $pago->usuarioRegistro->name ?? 'SISTEMA APR' }}
+                            <br>
+                            <small>Fecha: {{ $pago->fecha_creacion->format('d/m/Y H:i') }}</small>
+                        </div>
                     </td>
                     <td style="width: 50%; padding: 5px;">
                         <div class="firma-label">SELLO DE LA EMPRESA:</div>
@@ -306,11 +310,7 @@
                 <tr>
                     <td colspan="2" style="padding: 5px;">
                         <div class="firma-label">ELABORADO POR:</div>
-                        <div class="firma-box">
-                            {{ $pago->usuarioRegistro->nombre_usuario ?? $pago->usuarioRegistro->name ?? 'SISTEMA APR' }}
-                            <br>
-                            <small>Fecha: {{ $pago->fecha_creacion->format('d/m/Y H:i') }}</small>
-                        </div>
+                        <div class="firma-box"></div>
                     </td>
                 </tr>
             </table>
