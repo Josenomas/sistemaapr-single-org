@@ -120,6 +120,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:pagos')->group(function () {
         Route::resource('pagos', PagosController::class);
         Route::get('/pagos/{id}/imprimir', [PagosController::class, 'imprimir'])->name('pagos.imprimir');
+        Route::get('/pagos/{id}/descargar-recibo', [PagosController::class, 'descargarRecibo'])->name('pagos.descargar-recibo');
         Route::get('/api/socios/{id}/boletas-pendientes', [PagosController::class, 'boletasPendientes'])->name('pagos.boletasPendientes');
         Route::get('/reporte-caja', [PagosController::class, 'reporteCaja'])->name('pagos.reporteCaja');
         Route::post('/pagos/generar-link-flow', [PagosController::class, 'generarLinkFlow'])->name('pagos.generarLinkFlow');

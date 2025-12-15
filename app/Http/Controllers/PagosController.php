@@ -191,10 +191,10 @@ class PagosController extends Controller
 
             DB::commit();
 
-            // Descargar directamente el PDF del comprobante
-            $pdf = \PDF::loadView('pagos.imprimir', compact('pago'));
-
-            return $pdf->download('Recibo-' . $pago->numero_recibo . '.pdf');
+            // Redirigir con mensaje de éxito y trigger para descarga del PDF
+            return redirect()->route('pagos.create')
+                           ->with('success', 'Pago registrado exitosamente')
+                           ->with('download_recibo', $pago->id);
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()
@@ -373,6 +373,24 @@ class PagosController extends Controller
         );
 
         return view('pagos.imprimir', compact('pago'));
+    }
+
+    /**
+     * Descargar recibo de pago como PDF
+     */
+    public function descargarRecibo($id)
+    {
+        $pago = Pago::with(['boleta.socio', 'socio'])->findOrFail($id);
+
+        // Registrar actividad
+        ActividadHelper::registrar(
+            'Pagos',
+            "Recibo descargado [{$pago->numero_recibo}] - Socio: {$pago->socio->nombre_completo}",
+            auth()->id()
+        );
+
+        $pdf = \PDF::loadView('pagos.imprimir', compact('pago'));
+        return $pdf->download('Recibo-' . $pago->numero_recibo . '.pdf');
     }
 
     /**

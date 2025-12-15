@@ -633,6 +633,11 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-descargar PDF si viene de registro exitoso
+    @if(session('download_recibo'))
+    window.open('{{ route("pagos.descargar-recibo", session("download_recibo")) }}', '_blank');
+    @endif
+
     const selectBoleta = document.getElementById('id_boleta');
     const infoBoleta = document.getElementById('infoBoleta');
     const montoInput = document.getElementById('monto_pagado');
