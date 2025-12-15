@@ -191,9 +191,10 @@ class PagosController extends Controller
 
             DB::commit();
 
-            // Redirigir directamente a imprimir el comprobante
-            return redirect()->route('pagos.imprimir', $pago->id)
-                           ->with('success', 'Pago registrado exitosamente');
+            // Descargar directamente el PDF del comprobante
+            $pdf = \PDF::loadView('pagos.imprimir', compact('pago'));
+
+            return $pdf->download('Recibo-' . $pago->numero_recibo . '.pdf');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()
