@@ -447,6 +447,25 @@
                         <span class="estado-badge">{{ $boleta->estado_texto }}</span>
                     </div>
                 </div>
+                @if($boleta->socio->subsidio_porcentaje > 0 || $boleta->socio->descuento_monto > 0)
+                <div class="cliente-row" style="background: #e3f2fd; padding: 8px; border-left: 3px solid #1565c0;">
+                    <div class="cliente-label" style="color: #1565c0; font-weight: bold;">
+                        <i class="fas fa-hand-holding-usd"></i> Beneficio:
+                    </div>
+                    <div class="cliente-value" colspan="3" style="color: #1565c0; font-weight: bold;">
+                        @if($boleta->socio->subsidio_porcentaje > 0)
+                            Subsidio {{ number_format($boleta->socio->subsidio_porcentaje, 0) }}%
+                        @endif
+                        @if($boleta->socio->descuento_monto > 0)
+                            @if($boleta->socio->subsidio_porcentaje > 0) + @endif
+                            Descuento ${{ number_format($boleta->socio->descuento_monto, 0, ',', '.') }}
+                        @endif
+                        @if($boleta->socio->observaciones_subsidio)
+                            <br><span style="font-size: 8px; font-weight: normal; color: #555;">({{ $boleta->socio->observaciones_subsidio }})</span>
+                        @endif
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
 
