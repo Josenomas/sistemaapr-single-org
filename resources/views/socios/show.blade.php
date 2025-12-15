@@ -90,6 +90,29 @@
                         <value>{{ $socio->fecha_creacion->diffForHumans() }}</value>
                     </div>
 
+                    @if($socio->subsidio_porcentaje > 0 || $socio->descuento_monto > 0)
+                    <div class="info-item full-width" style="background: #e3f2fd; padding: 12px; border-radius: 6px; border-left: 4px solid #1565c0;">
+                        <label style="color: #1565c0; font-weight: bold;">
+                            <i class="fas fa-hand-holding-usd"></i> Subsidios y Descuentos
+                        </label>
+                        <value>
+                            @if($socio->subsidio_porcentaje > 0)
+                                <span class="badge badge-info" style="font-size: 0.9rem; margin-right: 10px;">
+                                    <i class="fas fa-percent"></i> Subsidio: {{ number_format($socio->subsidio_porcentaje, 2) }}%
+                                </span>
+                            @endif
+                            @if($socio->descuento_monto > 0)
+                                <span class="badge badge-success" style="font-size: 0.9rem; margin-right: 10px;">
+                                    <i class="fas fa-dollar-sign"></i> Descuento: ${{ number_format($socio->descuento_monto, 0, ',', '.') }}
+                                </span>
+                            @endif
+                            @if($socio->observaciones_subsidio)
+                                <br><small style="color: #555; margin-top: 5px; display: block;">{{ $socio->observaciones_subsidio }}</small>
+                            @endif
+                        </value>
+                    </div>
+                    @endif
+
                     @if($socio->observaciones)
                     <div class="info-item full-width">
                         <label>Observaciones</label>
