@@ -307,12 +307,6 @@
                         <div class="firma-box"></div>
                     </td>
                 </tr>
-                <tr>
-                    <td colspan="2" style="padding: 5px;">
-                        <div class="firma-label">ELABORADO POR:</div>
-                        <div class="firma-box"></div>
-                    </td>
-                </tr>
             </table>
         </div>
 
