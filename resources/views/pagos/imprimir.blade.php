@@ -7,7 +7,7 @@
     <style>
         @page {
             size: letter;
-            margin: 15mm;
+            margin: 8mm;
         }
 
         * {
@@ -18,7 +18,7 @@
 
         body {
             font-family: Arial, Helvetica, sans-serif;
-            font-size: 11pt;
+            font-size: 9.5pt;
             color: #000;
             background: #fff;
         }
@@ -26,17 +26,17 @@
         .comprobante {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 12px;
             border: 2px solid #000;
         }
 
         /* Título principal */
         .titulo-principal {
             text-align: center;
-            font-size: 20pt;
+            font-size: 16pt;
             font-weight: bold;
-            margin-bottom: 25px;
-            padding: 15px 0;
+            margin-bottom: 12px;
+            padding: 8px 0;
             border-bottom: 3px solid #000;
             letter-spacing: 2px;
         }
@@ -45,27 +45,27 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
 
         td {
             border: 1px solid #000;
-            padding: 8px 10px;
+            padding: 5px 8px;
             vertical-align: top;
         }
 
         .label-cell {
             background: #e0e0e0;
             font-weight: bold;
-            font-size: 9pt;
+            font-size: 8pt;
             text-transform: uppercase;
             width: 35%;
         }
 
         .value-cell {
             background: #fff;
-            font-size: 11pt;
-            min-height: 30px;
+            font-size: 9.5pt;
+            min-height: 20px;
         }
 
         .header-row {
@@ -80,7 +80,7 @@
         .seccion-header {
             display: table;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
         }
 
         .header-left {
@@ -99,30 +99,30 @@
         .monto-destacado {
             background: #f0f0f0;
             border: 2px solid #000;
-            padding: 20px;
+            padding: 12px;
             text-align: center;
-            margin: 20px 0;
+            margin: 8px 0;
         }
 
         .monto-label {
-            font-size: 10pt;
+            font-size: 9pt;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .monto-valor {
-            font-size: 36pt;
+            font-size: 28pt;
             font-weight: bold;
         }
 
         /* Tabla de detalle */
         .tabla-detalle {
-            margin: 20px 0;
+            margin: 8px 0;
         }
 
         .tabla-detalle td {
             text-align: center;
-            font-size: 10pt;
+            font-size: 9pt;
         }
 
         .tabla-detalle .total-row {
@@ -132,31 +132,31 @@
 
         /* Sección de firma */
         .seccion-firma {
-            margin-top: 40px;
+            margin-top: 15px;
         }
 
         .firma-box {
             border: 1px solid #000;
-            min-height: 80px;
-            padding: 10px;
+            min-height: 60px;
+            padding: 8px;
             text-align: center;
         }
 
         .firma-label {
             background: #d0d0d0;
             font-weight: bold;
-            font-size: 9pt;
-            padding: 5px;
+            font-size: 8pt;
+            padding: 4px;
             text-transform: uppercase;
         }
 
         /* Footer */
         .footer {
-            margin-top: 30px;
-            padding-top: 15px;
+            margin-top: 12px;
+            padding-top: 10px;
             border-top: 2px solid #000;
             text-align: center;
-            font-size: 9pt;
+            font-size: 8pt;
         }
 
         @media print {
