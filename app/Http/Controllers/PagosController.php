@@ -394,6 +394,75 @@ class PagosController extends Controller
     }
 
     /**
+     * Buscar socio por RUT y obtener boletas pendientes
+     */
+    public function buscarPorRut(Request $request)
+    {
+        $validated = $request->validate([
+            'rut' => 'required|string',
+        ]);
+
+        try {
+            // Buscar socio por RUT
+            $socio = Socio::where('rut', $validated['rut'])
+                         ->where('estado', 'activo')
+                         ->first();
+
+            if (!$socio) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se encontró ningún socio activo con el RUT: ' . $validated['rut'],
+                ], 404);
+            }
+
+            // Obtener boletas pendientes del socio
+            $boletas = Boleta::where('id_socio', $socio->id)
+                            ->whereIn('estado', ['pendiente', 'vencida'])
+                            ->orderBy('fecha_vencimiento')
+                            ->get();
+
+            // Formatear boletas para el frontend
+            $boletasFormateadas = $boletas->map(function($boleta) use ($socio) {
+                return [
+                    'id' => $boleta->id,
+                    'numero_boleta' => $boleta->numero_boleta,
+                    'socio_nombre' => $socio->nombre_completo,
+                    'mes_texto' => $boleta->mes_texto,
+                    'total' => $boleta->total,
+                    'total_formateado' => $boleta->total_formateado,
+                    'estado' => $boleta->estado,
+                    'estado_texto' => $boleta->estado_texto,
+                    'fecha_vencimiento_formateada' => $boleta->fecha_vencimiento_formateada,
+                ];
+            });
+
+            // Registrar actividad
+            ActividadHelper::registrar(
+                'Pagos',
+                "Búsqueda por RUT realizada - RUT: {$validated['rut']} - Socio: {$socio->nombre_completo} - Boletas pendientes: " . $boletas->count(),
+                auth()->id()
+            );
+
+            return response()->json([
+                'success' => true,
+                'socio' => [
+                    'id' => $socio->id,
+                    'nombre_completo' => $socio->nombre_completo,
+                    'rut' => $socio->rut,
+                    'numero_socio' => $socio->numero_socio,
+                ],
+                'boletas' => $boletasFormateadas,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al buscar el socio: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Obtener boletas pendientes de un socio (API)
      */
     public function boletasPendientes($socioId)

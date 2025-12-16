@@ -53,6 +53,29 @@
                 </div>
             </div>
 
+            <!-- Búsqueda por RUT -->
+            <div class="search-box">
+                <h4><i class="fas fa-search"></i> Búsqueda Rápida por RUT</h4>
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="buscar_rut" class="form-label">RUT del Socio</label>
+                        <input type="text"
+                               class="form-control"
+                               id="buscar_rut"
+                               placeholder="Ej: 12345678-9"
+                               maxlength="12">
+                        <small class="form-help">Ingrese el RUT para buscar las boletas pendientes del socio</small>
+                    </div>
+                    <div class="form-group col-md-4" style="display: flex; align-items: flex-end;">
+                        <button type="button" class="btn btn-primary" id="btnBuscarRut" style="width: 100%;">
+                            <i class="fas fa-search"></i>
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+                <div id="resultadoBusqueda" style="display: none;"></div>
+            </div>
+
             <div class="form-row">
                 <!-- Boleta a Pagar -->
                 <div class="form-group col-md-12">
@@ -370,6 +393,24 @@
         margin-top: 4px;
     }
 
+    .search-box {
+        background: #f0fdf4;
+        border: 2px solid #10b981;
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .search-box h4 {
+        margin: 0 0 12px 0;
+        color: #059669;
+        font-size: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
     .info-box {
         background: #eff6ff;
         border: 1px solid #3b82f6;
@@ -651,9 +692,124 @@ document.addEventListener('DOMContentLoaded', function() {
     const emailFlow = document.getElementById('email_flow');
     const linkGenerado = document.getElementById('linkGenerado');
     const formPago = document.getElementById('formPago');
+    const buscarRutInput = document.getElementById('buscar_rut');
+    const btnBuscarRut = document.getElementById('btnBuscarRut');
+    const resultadoBusqueda = document.getElementById('resultadoBusqueda');
 
     let totalBoleta = 0;
     let boletaSeleccionada = null;
+
+    // Búsqueda por RUT
+    btnBuscarRut.addEventListener('click', async function() {
+        const rut = buscarRutInput.value.trim();
+
+        if (!rut) {
+            alert('Por favor ingrese un RUT');
+            buscarRutInput.focus();
+            return;
+        }
+
+        // Deshabilitar botón
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+
+        try {
+            const response = await fetch('{{ route("pagos.buscarPorRut") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ rut: rut })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Limpiar select de boletas
+                selectBoleta.innerHTML = '<option value="">Seleccione una boleta</option>';
+
+                if (data.boletas.length > 0) {
+                    // Agregar boletas del socio
+                    data.boletas.forEach(boleta => {
+                        const option = document.createElement('option');
+                        option.value = boleta.id;
+                        option.setAttribute('data-socio', boleta.socio_nombre);
+                        option.setAttribute('data-periodo', boleta.mes_texto);
+                        option.setAttribute('data-total', boleta.total);
+                        option.setAttribute('data-total-fmt', boleta.total_formateado);
+                        option.setAttribute('data-estado', boleta.estado_texto);
+                        option.setAttribute('data-vencimiento', boleta.fecha_vencimiento_formateada);
+
+                        let textoEstado = boleta.estado === 'vencida' ? ' (VENCIDA)' : '';
+                        option.textContent = `${boleta.numero_boleta} - ${boleta.socio_nombre} - ${boleta.mes_texto} - ${boleta.total_formateado}${textoEstado}`;
+
+                        selectBoleta.appendChild(option);
+                    });
+
+                    // Mostrar resultado
+                    resultadoBusqueda.style.display = 'block';
+                    resultadoBusqueda.innerHTML = `
+                        <div class="alert" style="background: #d1fae5; border: 1px solid #10b981; color: #065f46; margin-top: 12px;">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <strong>Socio encontrado: ${data.socio.nombre_completo}</strong>
+                                <p style="margin: 4px 0 0 0;">Se encontraron ${data.boletas.length} boleta(s) pendiente(s). Seleccione una para continuar.</p>
+                            </div>
+                        </div>
+                    `;
+
+                    // Auto-seleccionar primera boleta si solo hay una
+                    if (data.boletas.length === 1) {
+                        selectBoleta.selectedIndex = 1;
+                        selectBoleta.dispatchEvent(new Event('change'));
+                    }
+                } else {
+                    // No hay boletas pendientes
+                    resultadoBusqueda.style.display = 'block';
+                    resultadoBusqueda.innerHTML = `
+                        <div class="alert" style="background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; margin-top: 12px;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Socio encontrado: ${data.socio.nombre_completo}</strong>
+                                <p style="margin: 4px 0 0 0;">Este socio no tiene boletas pendientes de pago.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                // No se encontró el socio
+                resultadoBusqueda.style.display = 'block';
+                resultadoBusqueda.innerHTML = `
+                    <div class="alert" style="background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; margin-top: 12px;">
+                        <i class="fas fa-times-circle"></i>
+                        <div>
+                            <strong>Socio no encontrado</strong>
+                            <p style="margin: 4px 0 0 0;">${data.message}</p>
+                        </div>
+                    </div>
+                `;
+
+                // Limpiar select
+                selectBoleta.innerHTML = '<option value="">Seleccione una boleta</option>';
+            }
+        } catch (error) {
+            alert('Error al buscar el socio: ' + error.message);
+            resultadoBusqueda.style.display = 'none';
+        } finally {
+            // Rehabilitar botón
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-search"></i> Buscar';
+        }
+    });
+
+    // Buscar al presionar Enter en el campo RUT
+    buscarRutInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            btnBuscarRut.click();
+        }
+    });
 
     // Manejar cambio de boleta
     selectBoleta.addEventListener('change', function() {
