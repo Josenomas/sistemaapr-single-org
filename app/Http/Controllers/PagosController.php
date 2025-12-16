@@ -403,15 +403,15 @@ class PagosController extends Controller
         ]);
 
         try {
-            // Buscar socio por RUT
+            // Buscar socio por RUT (activo o moroso)
             $socio = Socio::where('rut', $validated['rut'])
-                         ->where('estado', 'activo')
+                         ->whereIn('estado', ['activo', 'moroso'])
                          ->first();
 
             if (!$socio) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No se encontró ningún socio activo con el RUT: ' . $validated['rut'],
+                    'message' => 'No se encontró ningún socio con el RUT: ' . $validated['rut'] . '. Verifique que el RUT esté correcto y que el socio no esté inactivo.',
                 ], 404);
             }
 
