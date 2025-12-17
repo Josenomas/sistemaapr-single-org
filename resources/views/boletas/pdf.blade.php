@@ -373,7 +373,7 @@
     <div class="boleta-container">
         <!-- Banda superior -->
         <div class="header-band">
-            BOLETA DE CONSUMO - AGUA POTABLE RURAL
+            BOLETA DE CONSUMO - AGUA POTABLE RURAL PITRELAHUE
         </div>
 
         <!-- Header principal -->
@@ -381,9 +381,9 @@
             <div class="header-top">
                 <div class="empresa-info">
                     <h1>SISTEMA APR</h1>
-                    <p><strong>AGUA POTABLE RURAL</strong></p>
-                    <p>ASOCIACIÓN DE AGUA POTABLE RURAL</p>
-                    <p>Teléfono: (XX) XXXX-XXXX | Email: contacto@apr.cl</p>
+                    <p><strong>AGUA POTABLE RURAL PITRELAHUE</strong></p>
+                    <p>Captación, tratamiento y distribución de agua</p>
+                    <p>RUT: 65.552.000-7 | Email: apr.pitrilahue@gmail.com</p>
                 </div>
                 <div class="boleta-numero-box">
                     <div class="boleta-numero-inner">
@@ -759,10 +759,10 @@
                     <div style="display: table-cell; width: 50%; vertical-align: top; padding-right: 10px;">
                         <strong style="font-size: 9px; color: #0d47a1; text-transform: uppercase;">📍 Pago Presencial:</strong>
                         <div style="font-size: 8px; margin-top: 5px; line-height: 1.5;">
-                            <strong>Lugar:</strong> Oficina APR - [Dirección de la oficina]<br>
-                            <strong>Días de atención:</strong> Lunes a Viernes<br>
-                            <strong>Horario:</strong> 09:00 a 13:00 hrs. y 14:00 a 17:00 hrs.<br>
-                            <strong>Sábados:</strong> 09:00 a 12:00 hrs.
+                            <strong>Lugar:</strong> Oficina APR<br>
+                            <strong>Días de atención:</strong> Sábado y Domingo<br>
+                            <strong>Sábado:</strong> 09:00 a 14:00 hrs.<br>
+                            <strong>Domingo:</strong> 09:00 a 14:00 hrs.
                         </div>
                     </div>
                     <div style="display: table-cell; width: 50%; vertical-align: top; padding-left: 10px; border-left: 1px solid #1976d2;">
@@ -771,7 +771,7 @@
                             <strong>Banco:</strong> [Nombre del Banco]<br>
                             <strong>Cuenta Corriente:</strong> [Número de cuenta]<br>
                             <strong>RUT:</strong> [RUT de la APR]<br>
-                            <strong>Email comprobante:</strong> pagos@apr.cl<br>
+                            <strong>Email comprobante:</strong> apr.pitrilahue@gmail.com<br>
                             <strong>Referencia:</strong> Boleta N° {{ $boleta->numero_boleta }}
                         </div>
                     </div>
