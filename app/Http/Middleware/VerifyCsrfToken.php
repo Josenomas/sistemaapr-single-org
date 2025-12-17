@@ -12,6 +12,6 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        'flow/confirmar', // Callback de Flow (servidor a servidor)
     ];
 }
