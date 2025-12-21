@@ -106,6 +106,7 @@
                         <option value="efectivo" {{ request('metodo_pago') == 'efectivo' ? 'selected' : '' }}>Efectivo</option>
                         <option value="transferencia" {{ request('metodo_pago') == 'transferencia' ? 'selected' : '' }}>Transferencia</option>
                         <option value="cheque" {{ request('metodo_pago') == 'cheque' ? 'selected' : '' }}>Cheque</option>
+                        <option value="credito" {{ request('metodo_pago') == 'credito' ? 'selected' : '' }}>Crédito/Débito (Flow)</option>
                     </select>
                 </div>
 
@@ -220,6 +221,10 @@
                                 @elseif($pago->metodo_pago == 'cheque')
                                     <span class="badge badge-secondary">
                                         <i class="fas fa-money-check"></i> Cheque
+                                    </span>
+                                @elseif($pago->metodo_pago == 'credito')
+                                    <span class="badge badge-success">
+                                        <i class="fas fa-credit-card"></i> Crédito/Débito
                                     </span>
                                 @endif
                             </td>

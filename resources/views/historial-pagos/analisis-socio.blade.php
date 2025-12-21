@@ -204,6 +204,10 @@
                                     <span class="badge badge-secondary">
                                         <i class="fas fa-money-check"></i> Cheque
                                     </span>
+                                @elseif($pago->metodo_pago == 'credito')
+                                    <span class="badge badge-success">
+                                        <i class="fas fa-credit-card"></i> Crédito/Débito
+                                    </span>
                                 @endif
                             </td>
                             <td>
