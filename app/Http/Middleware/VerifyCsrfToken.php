@@ -13,5 +13,6 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'flow/confirmar', // Callback de Flow (servidor a servidor)
+        'flow/retorno',   // Retorno de Flow después del pago
     ];
 }
