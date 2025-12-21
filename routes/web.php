@@ -67,7 +67,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/flow/confirmar', [FlowController::class, 'confirmar'])->name('flow.confirmar');
 Route::match(['get', 'post'], '/flow/retorno', [FlowController::class, 'retorno'])->name('flow.retorno');
 Route::get('/comprobante-pago/{id}', [PagosController::class, 'comprobante'])->name('comprobante.publico');
-Route::post('/comprobante-pago/{id}/enviar', [PagosController::class, 'enviarComprobante'])->name('comprobante.enviar');
+Route::get('/comprobante-pago/{id}/descargar', [PagosController::class, 'descargarComprobante'])->name('comprobante.descargar');
 
 // Rutas protegidas (requieren autenticación)
 Route::middleware('auth')->group(function () {
