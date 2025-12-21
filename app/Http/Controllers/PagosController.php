@@ -400,9 +400,17 @@ class PagosController extends Controller
     {
         $pago = Pago::with(['boleta.socio', 'socio'])->findOrFail($id);
 
-        // NO registrar actividad porque no hay usuario autenticado
-        // Solo mostrar el comprobante
+        // Detectar si es dispositivo móvil
+        $userAgent = request()->header('User-Agent');
+        $isMobile = preg_match('/Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i', $userAgent);
 
+        // En móvil, descargar automáticamente el PDF
+        if ($isMobile) {
+            $pdf = \PDF::loadView('pagos.imprimir', compact('pago'));
+            return $pdf->download('Comprobante-' . $pago->numero_recibo . '.pdf');
+        }
+
+        // En desktop, mostrar en pantalla
         return view('pagos.imprimir', compact('pago'));
     }
 
