@@ -142,7 +142,7 @@ class FlowController extends Controller
                     ]);
 
                     if ($pago) {
-                        return redirect()->route('pagos.imprimir', $pago->id)
+                        return redirect()->route('comprobante.publico', $pago->id)
                                        ->with('success', '¡Pago realizado exitosamente!');
                     }
 
@@ -157,7 +157,7 @@ class FlowController extends Controller
 
                         if ($pagoCreado) {
                             Log::info('Flow - Pago creado en retorno', ['pago_id' => $pagoCreado->id]);
-                            return redirect()->route('pagos.imprimir', $pagoCreado->id)
+                            return redirect()->route('comprobante.publico', $pagoCreado->id)
                                            ->with('success', '¡Pago realizado exitosamente!');
                         }
                     } catch (\Exception $e) {

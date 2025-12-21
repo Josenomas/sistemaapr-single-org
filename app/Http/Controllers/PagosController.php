@@ -394,6 +394,19 @@ class PagosController extends Controller
     }
 
     /**
+     * Comprobante de pago público (sin autenticación) para pagos de Flow
+     */
+    public function comprobante($id)
+    {
+        $pago = Pago::with(['boleta.socio', 'socio'])->findOrFail($id);
+
+        // NO registrar actividad porque no hay usuario autenticado
+        // Solo mostrar el comprobante
+
+        return view('pagos.imprimir', compact('pago'));
+    }
+
+    /**
      * Buscar socio por RUT y obtener boletas pendientes
      */
     public function buscarPorRut(Request $request)
