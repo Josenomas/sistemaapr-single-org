@@ -92,7 +92,10 @@ class FlowController extends Controller
         try {
             $token = $request->input('token');
 
+            Log::info('Flow - Retorno iniciado', ['token' => $token]);
+
             if (!$token) {
+                Log::error('Flow - Retorno sin token');
                 return redirect()->route('pagos.index')
                                ->with('error', 'Token de pago no proporcionado');
             }
@@ -103,15 +106,27 @@ class FlowController extends Controller
                                         ->first();
 
             if (!$transaccion) {
+                Log::error('Flow - Transacción no encontrada en retorno', ['token' => $token]);
                 return redirect()->route('pagos.index')
                                ->with('error', 'Transacción no encontrada');
             }
+
+            Log::info('Flow - Transacción encontrada', [
+                'transaccion_id' => $transaccion->id,
+                'estado' => $transaccion->estado,
+                'flow_order' => $transaccion->flow_order,
+            ]);
 
             // Confirmar estado actualizado con Flow
             $resultado = $this->flowService->confirmarPago($token);
 
             if ($resultado['success']) {
                 $transaccion->refresh();
+
+                Log::info('Flow - Estado confirmado', [
+                    'estado' => $transaccion->estado,
+                    'flow_order' => $transaccion->flow_order,
+                ]);
 
                 // Redirigir según estado
                 if ($transaccion->estado === 'pagado') {
@@ -120,13 +135,40 @@ class FlowController extends Controller
                                ->orderBy('id', 'desc')
                                ->first();
 
+                    Log::info('Flow - Búsqueda de pago', [
+                        'flow_order' => $transaccion->flow_order,
+                        'pago_encontrado' => $pago ? 'SI' : 'NO',
+                        'pago_id' => $pago->id ?? null,
+                    ]);
+
                     if ($pago) {
                         return redirect()->route('pagos.imprimir', $pago->id)
                                        ->with('success', '¡Pago realizado exitosamente!');
                     }
 
+                    // Si no encontró el pago, intentar crearlo ahora
+                    Log::warning('Flow - Pago no encontrado, intentando crear', [
+                        'flow_order' => $transaccion->flow_order,
+                    ]);
+
+                    try {
+                        $responseData = $resultado['response'] ?? [];
+                        $pagoCreado = $this->crearRegistroPago($transaccion, $responseData);
+
+                        if ($pagoCreado) {
+                            Log::info('Flow - Pago creado en retorno', ['pago_id' => $pagoCreado->id]);
+                            return redirect()->route('pagos.imprimir', $pagoCreado->id)
+                                           ->with('success', '¡Pago realizado exitosamente!');
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('Flow - Error al crear pago en retorno', [
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString(),
+                        ]);
+                    }
+
                     return redirect()->route('pagos.index')
-                                   ->with('success', '¡Pago realizado exitosamente!');
+                                   ->with('success', '¡Pago realizado exitosamente! El comprobante estará disponible en unos momentos.');
                 } elseif ($transaccion->estado === 'rechazado') {
                     return redirect()->route('pagos.create', ['boleta_id' => $transaccion->id_boleta])
                                    ->with('error', 'El pago fue rechazado. Por favor, intente nuevamente.');
@@ -136,16 +178,22 @@ class FlowController extends Controller
                 }
             }
 
+            Log::error('Flow - Error al confirmar pago', [
+                'resultado' => $resultado,
+            ]);
+
             return redirect()->route('pagos.index')
                            ->with('error', 'Error al verificar el estado del pago');
 
         } catch (\Exception $e) {
             Log::error('Flow - Error en retorno', [
+                'token' => $request->input('token') ?? 'N/A',
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return redirect()->route('pagos.index')
-                           ->with('error', 'Error al procesar el retorno del pago: ' . $e->getMessage());
+                           ->with('error', 'Error al procesar el retorno del pago');
         }
     }
 
