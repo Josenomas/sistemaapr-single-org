@@ -428,12 +428,13 @@ class PagosController extends Controller
 
             // Generar PDF
             $pdf = \PDF::loadView('pagos.imprimir', compact('pago'));
+            $pdfOutput = $pdf->output();
 
-            // Enviar email
-            \Mail::send([], [], function ($message) use ($pdf, $pago, $validated) {
+            // Enviar email inmediatamente (sin cola)
+            \Mail::send([], [], function ($message) use ($pdfOutput, $pago, $validated) {
                 $message->to($validated['email'])
                     ->subject('Comprobante de Pago - ' . $pago->numero_recibo . ' - APR Pitrilahue')
-                    ->attachData($pdf->output(), 'Comprobante-' . $pago->numero_recibo . '.pdf', [
+                    ->attachData($pdfOutput, 'Comprobante-' . $pago->numero_recibo . '.pdf', [
                         'mime' => 'application/pdf',
                     ])
                     ->setBody(
