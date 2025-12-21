@@ -213,6 +213,7 @@ class HistorialPagosController extends Controller
                 'efectivo' => $datos->where('metodo_pago', 'efectivo')->sum('monto_pagado'),
                 'transferencia' => $datos->where('metodo_pago', 'transferencia')->sum('monto_pagado'),
                 'cheque' => $datos->where('metodo_pago', 'cheque')->sum('monto_pagado'),
+                'credito' => $datos->where('metodo_pago', 'credito')->sum('monto_pagado'),
             ]
         ];
 
