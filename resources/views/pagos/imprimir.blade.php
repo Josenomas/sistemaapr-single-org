@@ -166,36 +166,6 @@
             .comprobante {
                 border: 2px solid #000;
             }
-            .boton-descarga {
-                display: none !important;
-            }
-        }
-
-        /* Botón de descarga */
-        .boton-descarga {
-            max-width: 800px;
-            margin: 20px auto;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .btn-descargar {
-            display: inline-block;
-            background: #2563eb;
-            color: white;
-            padding: 15px 40px;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 12pt;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-        }
-
-        .btn-descargar:hover {
-            background: #1d4ed8;
-            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -346,13 +316,6 @@
             Este documento certifica el pago realizado. Conserve este comprobante para cualquier consulta futura.<br>
             Documento generado el {{ now()->format('d/m/Y H:i:s') }}
         </div>
-    </div>
-
-    <!-- Botón de descarga (solo visible en pantalla, no en PDF) -->
-    <div class="boton-descarga">
-        <a href="{{ route('comprobante.descargar', $pago->id) }}" class="btn-descargar">
-            📥 Descargar Comprobante PDF
-        </a>
     </div>
 </body>
 </html>
