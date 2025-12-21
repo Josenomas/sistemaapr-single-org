@@ -476,12 +476,14 @@ class PagosController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error al enviar comprobante por email', [
                 'pago_id' => $id,
+                'email' => $validated['email'] ?? 'N/A',
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error al enviar el comprobante. Por favor, intente nuevamente.',
+                'message' => 'Error de conexión con el servidor de correo. Por favor, intente nuevamente más tarde o contacte a apr.pitrilahue@gmail.com',
             ], 500);
         }
     }
