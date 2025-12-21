@@ -65,7 +65,7 @@ Route::middleware('guest')->group(function () {
 
 // Rutas públicas de Flow (callbacks sin autenticación)
 Route::post('/flow/confirmar', [FlowController::class, 'confirmar'])->name('flow.confirmar');
-Route::get('/flow/retorno', [FlowController::class, 'retorno'])->name('flow.retorno');
+Route::match(['get', 'post'], '/flow/retorno', [FlowController::class, 'retorno'])->name('flow.retorno');
 
 // Rutas protegidas (requieren autenticación)
 Route::middleware('auth')->group(function () {
