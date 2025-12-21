@@ -415,6 +415,78 @@ class PagosController extends Controller
     }
 
     /**
+     * Enviar comprobante por email (ruta pública)
+     */
+    public function enviarComprobante(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'email' => 'required|email',
+            ]);
+
+            $pago = Pago::with(['boleta.socio', 'socio'])->findOrFail($id);
+
+            // Generar PDF
+            $pdf = \PDF::loadView('pagos.imprimir', compact('pago'));
+
+            // Enviar email
+            \Mail::send([], [], function ($message) use ($pdf, $pago, $validated) {
+                $message->to($validated['email'])
+                    ->subject('Comprobante de Pago - ' . $pago->numero_recibo . ' - APR Pitrilahue')
+                    ->attachData($pdf->output(), 'Comprobante-' . $pago->numero_recibo . '.pdf', [
+                        'mime' => 'application/pdf',
+                    ])
+                    ->setBody(
+                        '<html><body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                                <h2 style="color: #2563eb;">🧾 Comprobante de Pago - APR Pitrilahue</h2>
+                                <p>Estimado/a <strong>' . $pago->socio->nombre_completo . '</strong>,</p>
+                                <p>Adjunto encontrará su comprobante de pago correspondiente a:</p>
+                                <ul style="background: #f3f4f6; padding: 20px; border-radius: 8px;">
+                                    <li><strong>N° Recibo:</strong> ' . $pago->numero_recibo . '</li>
+                                    <li><strong>Fecha de pago:</strong> ' . $pago->fecha_pago_formateada . '</li>
+                                    <li><strong>Monto:</strong> ' . $pago->monto_pagado_formateado . '</li>
+                                    <li><strong>Concepto:</strong> Pago de boleta ' . $pago->boleta->numero_boleta . '</li>
+                                    <li><strong>Período:</strong> ' . $pago->boleta->mes_texto . '</li>
+                                </ul>
+                                <p>Gracias por su pago. Conserve este comprobante para futuras consultas.</p>
+                                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+                                <p style="font-size: 12px; color: #6b7280;">
+                                    <strong>APR Pitrilahue - Agua Potable Rural</strong><br>
+                                    Oficina APR - Sábado y Domingo 09:00-14:00 hrs.<br>
+                                    Email: apr.pitrilahue@gmail.com
+                                </p>
+                            </div>
+                        </body></html>',
+                        'text/html'
+                    );
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Comprobante enviado exitosamente',
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Por favor, ingrese un correo electrónico válido',
+            ], 422);
+
+        } catch (\Exception $e) {
+            \Log::error('Error al enviar comprobante por email', [
+                'pago_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al enviar el comprobante. Por favor, intente nuevamente.',
+            ], 500);
+        }
+    }
+
+    /**
      * Buscar socio por RUT y obtener boletas pendientes
      */
     public function buscarPorRut(Request $request)

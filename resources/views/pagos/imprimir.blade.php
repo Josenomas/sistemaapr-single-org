@@ -166,6 +166,77 @@
             .comprobante {
                 border: 2px solid #000;
             }
+            .formulario-email {
+                display: none !important;
+            }
+        }
+
+        /* Formulario de email */
+        .formulario-email {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .formulario-email h3 {
+            margin: 0 0 15px 0;
+            color: #2563eb;
+            font-size: 14pt;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #374151;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 10pt;
+        }
+
+        .btn-enviar {
+            background: #2563eb;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10pt;
+            font-weight: bold;
+        }
+
+        .btn-enviar:hover {
+            background: #1d4ed8;
+        }
+
+        .mensaje-exito {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .mensaje-error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
         }
     </style>
 </head>
@@ -317,5 +388,80 @@
             Documento generado el {{ now()->format('d/m/Y H:i:s') }}
         </div>
     </div>
+
+    <!-- Formulario de envío por email (solo visible en pantalla, no en PDF) -->
+    <div class="formulario-email">
+        <h3>📧 ¿Desea enviar una copia del comprobante por correo?</h3>
+
+        <div class="mensaje-exito" id="mensajeExito">
+            ✅ ¡Comprobante enviado exitosamente!
+        </div>
+
+        <div class="mensaje-error" id="mensajeError">
+            ❌ Error al enviar el comprobante. Por favor, intente nuevamente.
+        </div>
+
+        <form id="formEnviarEmail" onsubmit="enviarComprobante(event)">
+            <div class="form-group">
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required>
+            </div>
+
+            <button type="submit" class="btn-enviar" id="btnEnviar">
+                Enviar Comprobante
+            </button>
+        </form>
+    </div>
+
+    <script>
+        async function enviarComprobante(event) {
+            event.preventDefault();
+
+            const btnEnviar = document.getElementById('btnEnviar');
+            const mensajeExito = document.getElementById('mensajeExito');
+            const mensajeError = document.getElementById('mensajeError');
+            const email = document.getElementById('email').value;
+
+            // Ocultar mensajes previos
+            mensajeExito.style.display = 'none';
+            mensajeError.style.display = 'none';
+
+            // Deshabilitar botón
+            btnEnviar.disabled = true;
+            btnEnviar.textContent = 'Enviando...';
+
+            try {
+                const response = await fetch('{{ route("comprobante.enviar", $pago->id) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    mensajeExito.style.display = 'block';
+                    document.getElementById('formEnviarEmail').reset();
+
+                    // Ocultar mensaje después de 5 segundos
+                    setTimeout(() => {
+                        mensajeExito.style.display = 'none';
+                    }, 5000);
+                } else {
+                    mensajeError.textContent = '❌ ' + (data.message || 'Error al enviar el comprobante');
+                    mensajeError.style.display = 'block';
+                }
+            } catch (error) {
+                mensajeError.textContent = '❌ Error de conexión. Por favor, intente nuevamente.';
+                mensajeError.style.display = 'block';
+            } finally {
+                btnEnviar.disabled = false;
+                btnEnviar.textContent = 'Enviar Comprobante';
+            }
+        }
+    </script>
 </body>
 </html>
