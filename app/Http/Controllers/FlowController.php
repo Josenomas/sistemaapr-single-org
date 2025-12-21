@@ -32,6 +32,8 @@ class FlowController extends Controller
                 return response('Token no proporcionado', 400);
             }
 
+            Log::info('Flow - Iniciando confirmación', ['token' => $token]);
+
             // Confirmar pago con Flow
             $resultado = $this->flowService->confirmarPago($token);
 
@@ -42,11 +44,21 @@ class FlowController extends Controller
                 Log::info('Flow - Confirmación exitosa', [
                     'token' => $token,
                     'status' => $responseData['status'] ?? null,
+                    'transaccion_id' => $transaccion->id ?? null,
                 ]);
 
                 // Si el pago fue exitoso, crear registro de pago
                 if ($transaccion->estado === 'pagado') {
-                    $this->crearRegistroPago($transaccion, $responseData);
+                    try {
+                        $this->crearRegistroPago($transaccion, $responseData);
+                        Log::info('Flow - Pago registrado correctamente', ['token' => $token]);
+                    } catch (\Exception $e) {
+                        // Aunque falle el registro, respondemos 200 a Flow
+                        Log::error('Flow - Error al crear pago pero transacción confirmada', [
+                            'token' => $token,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
                 }
 
                 return response('CONFIRMADO', 200);
@@ -57,15 +69,18 @@ class FlowController extends Controller
                 'message' => $resultado['message'] ?? 'Error desconocido',
             ]);
 
-            return response('ERROR', 500);
+            // Incluso con error, devolver 200 para que Flow no reintente
+            return response('CONFIRMADO', 200);
 
         } catch (\Exception $e) {
             Log::error('Flow - Excepción en confirmación', [
+                'token' => $request->input('token') ?? 'N/A',
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return response('ERROR: ' . $e->getMessage(), 500);
+            // Devolver 200 aunque haya error para evitar reintentos de Flow
+            return response('CONFIRMADO', 200);
         }
     }
 
@@ -153,7 +168,14 @@ class FlowController extends Controller
                 return $pagoExistente;
             }
 
+            // Cargar relaciones necesarias
+            $transaccion->load(['boleta', 'socio']);
             $boleta = $transaccion->boleta;
+            $socio = $transaccion->socio;
+
+            if (!$boleta || !$socio) {
+                throw new \Exception('No se encontró la boleta o socio asociado a la transacción');
+            }
 
             // Generar número de recibo
             $numeroRecibo = Pago::generarNumeroRecibo();
@@ -178,9 +200,10 @@ class FlowController extends Controller
             }
 
             // Registrar actividad
+            $montoFormateado = '$' . number_format($transaccion->monto, 0, ',', '.');
             ActividadHelper::registrar(
                 'Pagos',
-                "Pago automático Flow - Recibo: {$numeroRecibo} - Socio: {$transaccion->socio->nombre_completo} - Monto: " . $transaccion->monto_formateado . " - Order: {$transaccion->flow_order}"
+                "Pago automático Flow - Recibo: {$numeroRecibo} - Socio: {$socio->nombre_completo} - Monto: {$montoFormateado} - Order: {$transaccion->flow_order}"
             );
 
             DB::commit();
@@ -197,8 +220,9 @@ class FlowController extends Controller
             DB::rollBack();
 
             Log::error('Flow - Error al crear pago', [
-                'flow_order' => $transaccion->flow_order,
+                'flow_order' => $transaccion->flow_order ?? 'N/A',
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             throw $e;
