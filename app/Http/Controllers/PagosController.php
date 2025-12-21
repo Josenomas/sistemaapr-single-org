@@ -404,13 +404,15 @@ class PagosController extends Controller
         $userAgent = request()->header('User-Agent');
         $isMobile = preg_match('/Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i', $userAgent);
 
-        // En móvil, descargar automáticamente el PDF
+        // En móvil, mostrar página de confirmación con descarga automática
         if ($isMobile) {
-            $pdf = \PDF::loadView('pagos.imprimir', compact('pago'));
-            return $pdf->download('Comprobante-' . $pago->numero_recibo . '.pdf');
+            return view('pagos.confirmacion-movil', [
+                'pago' => $pago,
+                'exito' => true,
+            ]);
         }
 
-        // En desktop, mostrar en pantalla
+        // En desktop, mostrar en pantalla con botón de descarga
         return view('pagos.imprimir', compact('pago'));
     }
 
