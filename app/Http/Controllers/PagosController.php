@@ -404,16 +404,12 @@ class PagosController extends Controller
         $userAgent = request()->header('User-Agent');
         $isMobile = preg_match('/Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i', $userAgent);
 
-        // En móvil, mostrar página de confirmación con descarga automática
-        if ($isMobile) {
-            return view('pagos.confirmacion-movil', [
-                'pago' => $pago,
-                'exito' => true,
-            ]);
-        }
-
-        // En desktop, mostrar en pantalla con botón de descarga
-        return view('pagos.imprimir', compact('pago'));
+        // Mostrar página de confirmación (tanto móvil como desktop)
+        return view('pagos.confirmacion', [
+            'pago' => $pago,
+            'exito' => true,
+            'isMobile' => $isMobile,
+        ]);
     }
 
     /**
