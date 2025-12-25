@@ -14,18 +14,19 @@
     </a>
 </div>
 
-<!-- Filtros -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h3 class="card-title">
-            <i class="fas fa-filter"></i>
-            Filtros y Configuración
-        </h3>
-    </div>
-    <div class="card-body">
-        <form action="{{ url('/lecturas-masivo') }}" method="POST" id="formMasivo">
-            @csrf
+<!-- Formulario completo -->
+<form action="{{ url('/lecturas-masivo') }}" method="POST" id="formMasivo">
+    @csrf
 
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-filter"></i>
+                Filtros y Configuración
+            </h3>
+        </div>
+        <div class="card-body">
             <div class="form-row">
                 <div class="form-group col-md-3">
                     <label for="mes" class="form-label required">Mes/Año</label>
@@ -71,12 +72,11 @@
                     </button>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
-</div>
 
-<!-- Tabla de Lecturas -->
-<div class="card">
+    <!-- Tabla de Lecturas -->
+    <div class="card">
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-list"></i>
@@ -155,7 +155,7 @@
         </div>
 
         <div class="form-actions mt-4">
-            <button type="submit" class="btn btn-primary" form="formMasivo">
+            <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i>
                 Guardar Todas las Lecturas
             </button>
@@ -166,6 +166,7 @@
         </div>
     </div>
 </div>
+</form>
 @endsection
 
 @section('styles')
