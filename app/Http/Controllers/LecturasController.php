@@ -240,8 +240,8 @@ class LecturasController extends Controller
 
         $registradas = 0;
         foreach ($validated['lecturas'] as $lecturaData) {
-            // Solo procesar si tiene lectura actual
-            if (!isset($lecturaData['lectura_actual']) || $lecturaData['lectura_actual'] <= 0) {
+            // Solo procesar si tiene lectura actual (permitir 0 o mayor)
+            if (!isset($lecturaData['lectura_actual']) || $lecturaData['lectura_actual'] === '' || $lecturaData['lectura_actual'] === null) {
                 continue;
             }
 
@@ -251,7 +251,7 @@ class LecturasController extends Controller
                                       ->orderBy('mes', 'desc')
                                       ->first();
 
-            $lecturaAnteriorValor = isset($lecturaData['lectura_anterior']) && $lecturaData['lectura_anterior'] > 0
+            $lecturaAnteriorValor = isset($lecturaData['lectura_anterior']) && $lecturaData['lectura_anterior'] >= 0
                                   ? $lecturaData['lectura_anterior']
                                   : ($lecturaAnterior ? $lecturaAnterior->lectura_actual : 0);
 
@@ -262,7 +262,7 @@ class LecturasController extends Controller
                 'mes' => $validated['mes'],
                 'lectura_anterior' => $lecturaAnteriorValor,
                 'lectura_actual' => $lecturaData['lectura_actual'],
-                'consumo' => $consumo,
+                'consumo_m3' => $consumo,
                 'fecha_lectura' => $validated['fecha_lectura'],
                 'observaciones' => $lecturaData['observaciones'] ?? null,
                 'id_usuario_registro' => auth()->id(),
