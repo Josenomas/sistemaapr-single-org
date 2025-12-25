@@ -230,6 +230,13 @@ class LecturasController extends Controller
      */
     public function storeMasivo(Request $request)
     {
+        // DEBUG: Log request data
+        \Log::info('INICIO storeMasivo', [
+            'mes' => $request->mes,
+            'fecha_lectura' => $request->fecha_lectura,
+            'total_lecturas' => count($request->lecturas ?? [])
+        ]);
+
         $validated = $request->validate([
             'mes' => 'required|string|size:7',
             'fecha_lectura' => 'required|date',
@@ -238,10 +245,14 @@ class LecturasController extends Controller
             'lecturas.*.lectura_actual' => 'nullable|numeric|min:0',
         ]);
 
+        \Log::info('VALIDACION OK', ['validated_count' => count($validated['lecturas'])]);
+
         $registradas = 0;
-        foreach ($validated['lecturas'] as $lecturaData) {
+        $errores = [];
+        foreach ($validated['lecturas'] as $index => $lecturaData) {
             // Solo procesar si tiene lectura actual (permitir 0 o mayor)
             if (!isset($lecturaData['lectura_actual']) || $lecturaData['lectura_actual'] === '' || $lecturaData['lectura_actual'] === null) {
+                \Log::info("SKIP lectura #{$index}", ['razon' => 'sin lectura_actual']);
                 continue;
             }
 
@@ -257,18 +268,32 @@ class LecturasController extends Controller
 
             $consumo = $lecturaData['lectura_actual'] - $lecturaAnteriorValor;
 
-            Lectura::create([
-                'id_socio' => $lecturaData['id_socio'],
-                'mes' => $validated['mes'],
-                'lectura_anterior' => $lecturaAnteriorValor,
-                'lectura_actual' => $lecturaData['lectura_actual'],
-                'consumo_m3' => $consumo,
-                'fecha_lectura' => $validated['fecha_lectura'],
-                'observaciones' => $lecturaData['observaciones'] ?? null,
-                'id_usuario_registro' => auth()->id(),
-            ]);
+            try {
+                $lectura = Lectura::create([
+                    'id_socio' => $lecturaData['id_socio'],
+                    'mes' => $validated['mes'],
+                    'lectura_anterior' => $lecturaAnteriorValor,
+                    'lectura_actual' => $lecturaData['lectura_actual'],
+                    'consumo_m3' => $consumo,
+                    'fecha_lectura' => $validated['fecha_lectura'],
+                    'observaciones' => $lecturaData['observaciones'] ?? null,
+                    'id_usuario_registro' => auth()->id(),
+                ]);
 
-            $registradas++;
+                \Log::info("GUARDADA lectura #{$index}", [
+                    'id' => $lectura->id,
+                    'id_socio' => $lectura->id_socio,
+                    'lectura_actual' => $lectura->lectura_actual
+                ]);
+
+                $registradas++;
+            } catch (\Exception $e) {
+                \Log::error("ERROR guardando lectura #{$index}", [
+                    'error' => $e->getMessage(),
+                    'data' => $lecturaData
+                ]);
+                $errores[] = "Socio {$lecturaData['id_socio']}: {$e->getMessage()}";
+            }
         }
 
         // Registrar actividad masiva
@@ -277,11 +302,21 @@ class LecturasController extends Controller
         $fecha = explode('-', $validated['mes']);
         $mesTexto = $meses[(int)$fecha[1]] . ' ' . $fecha[0];
 
+        \Log::info('FIN storeMasivo', [
+            'registradas' => $registradas,
+            'errores_count' => count($errores)
+        ]);
+
         ActividadHelper::registrar(
             'Lecturas',
             "Registro masivo de lecturas: {$registradas} lecturas registradas para {$mesTexto}",
             auth()->id()
         );
+
+        if (count($errores) > 0) {
+            return redirect()->route('lecturas.index')
+                            ->with('warning', "Se registraron {$registradas} lecturas. Errores: " . implode(', ', $errores));
+        }
 
         return redirect()->route('lecturas.index')
                         ->with('success', "Se registraron {$registradas} lecturas exitosamente");
