@@ -235,7 +235,7 @@ class LecturasController extends Controller
             'fecha_lectura' => 'required|date',
             'lecturas' => 'required|array',
             'lecturas.*.id_socio' => 'required|exists:socios,id',
-            'lecturas.*.lectura_actual' => 'required|numeric|min:0',
+            'lecturas.*.lectura_actual' => 'nullable|numeric|min:0',
         ]);
 
         $registradas = 0;
