@@ -479,8 +479,21 @@
                                     <span class="boleta-detail-value">{{ \Carbon\Carbon::parse($boleta->fecha_vencimiento)->format('d/m/Y') }}</span>
                                 </div>
                                 <div class="boleta-detail">
-                                    <span class="boleta-detail-label">Monto</span>
-                                    <span class="boleta-detail-value monto-destacado">${{ number_format($boleta->total, 0, ',', '.') }}</span>
+                                    <span class="boleta-detail-label">
+                                        @php
+                                            $totalPagado = $boleta->pagos->sum('monto_pagado');
+                                            $saldoPendiente = $boleta->total - $totalPagado;
+                                        @endphp
+                                        @if($totalPagado > 0)
+                                            Saldo Pendiente
+                                            <small style="display: block; font-weight: normal; color: var(--gray-500);">
+                                                (Total: ${{ number_format($boleta->total, 0, ',', '.') }} - Abonado: ${{ number_format($totalPagado, 0, ',', '.') }})
+                                            </small>
+                                        @else
+                                            Monto
+                                        @endif
+                                    </span>
+                                    <span class="boleta-detail-value monto-destacado">${{ number_format($saldoPendiente, 0, ',', '.') }}</span>
                                 </div>
                             </div>
                         </div>

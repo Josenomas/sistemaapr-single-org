@@ -57,11 +57,17 @@ class ConsultaPublicaController extends Controller
             $boletas = Boleta::where('id_socio', $socio->id)
                 ->where('activo', 1)
                 ->whereIn('estado', ['pendiente', 'vencida'])
+                ->with('pagos')
                 ->orderBy('mes', 'asc')
                 ->get();
 
-            // Calcular total de deuda
-            $totalDeuda = $boletas->sum('total');
+            // Calcular total de deuda considerando pagos parciales
+            $totalDeuda = 0;
+            foreach ($boletas as $boleta) {
+                $totalPagado = $boleta->pagos->sum('monto_pagado');
+                $saldoPendiente = $boleta->total - $totalPagado;
+                $totalDeuda += $saldoPendiente;
+            }
 
             return view('resultado-consulta', compact('socio', 'boletas', 'totalDeuda'));
 
