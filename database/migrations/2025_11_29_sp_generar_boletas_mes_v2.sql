@@ -224,10 +224,16 @@ BEGIN
         -- 6. Calcular total
         SET v_total = v_subtotal + v_monto_iva;
 
-        -- 7. Generar número de boleta único
+        -- 7. Verificar si ya existe una boleta para este socio en este mes
+        IF EXISTS (SELECT 1 FROM boletas WHERE id_socio = v_id_socio AND mes = p_mes AND activo = 1) THEN
+            -- Ya existe boleta, continuar con el siguiente socio
+            ITERATE read_loop;
+        END IF;
+
+        -- 8. Generar número de boleta único
         SET v_numero_boleta = CONCAT('BOL-', p_mes, '-', LPAD(v_id_socio, 4, '0'));
 
-        -- 8. Insertar la boleta en la base de datos
+        -- 9. Insertar la boleta en la base de datos
         INSERT INTO boletas (
             numero_boleta,
             id_socio,
