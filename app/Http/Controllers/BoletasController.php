@@ -289,8 +289,10 @@ class BoletasController extends Controller
     {
         $mesActual = date('Y-m');
 
-        // Verificar si ya existen boletas para TODOS los socios activos
-        $sociosActivos = Socio::where('activo', 1)->count();
+        // Verificar si ya existen boletas para TODOS los socios activos (excluyendo desconectados)
+        $sociosActivos = Socio::where('activo', 1)
+                              ->where('estado', '!=', 'desconectado')
+                              ->count();
         $boletasExistentes = Boleta::activos()->where('mes', $mesActual)->count();
 
         if ($boletasExistentes >= $sociosActivos) {
