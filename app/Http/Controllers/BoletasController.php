@@ -289,12 +289,13 @@ class BoletasController extends Controller
     {
         $mesActual = date('Y-m');
 
-        // Verificar si ya existen boletas del mes
+        // Verificar si ya existen boletas para TODOS los socios activos
+        $sociosActivos = Socio::where('activo', 1)->count();
         $boletasExistentes = Boleta::activos()->where('mes', $mesActual)->count();
 
-        if ($boletasExistentes > 0) {
+        if ($boletasExistentes >= $sociosActivos) {
             return redirect()->route('boletas.index')
-                           ->with('error', "Ya existen {$boletasExistentes} boletas para el mes {$mesActual}");
+                           ->with('error', "Ya se generaron boletas para todos los socios del mes {$mesActual}");
         }
 
         return view('boletas.generar', compact('mesActual'));
