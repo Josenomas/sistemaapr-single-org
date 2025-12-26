@@ -295,9 +295,17 @@ class BoletasController extends Controller
                               ->count();
         $boletasExistentes = Boleta::activos()->where('mes', $mesActual)->count();
 
+        // DEBUG: Ver los números
+        \Log::info('Generación de boletas', [
+            'mes' => $mesActual,
+            'socios_activos' => $sociosActivos,
+            'boletas_existentes' => $boletasExistentes,
+            'puede_generar' => ($boletasExistentes < $sociosActivos)
+        ]);
+
         if ($boletasExistentes >= $sociosActivos) {
             return redirect()->route('boletas.index')
-                           ->with('error', "Ya se generaron boletas para todos los socios del mes {$mesActual}");
+                           ->with('error', "Ya se generaron boletas para todos los socios del mes {$mesActual} (Socios: {$sociosActivos}, Boletas: {$boletasExistentes})");
         }
 
         return view('boletas.generar', compact('mesActual'));
