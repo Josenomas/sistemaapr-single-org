@@ -400,10 +400,17 @@ class BoletasController extends Controller
         $boletasPendientes = Boleta::activos()
             ->where('id_socio', $boleta->id_socio)
             ->whereIn('estado', ['pendiente', 'vencida'])
+            ->with('pagos')
             ->orderBy('mes', 'asc')
             ->get();
 
-        $totalAdeudado = $boletasPendientes->sum('total');
+        // Calcular total adeudado considerando pagos parciales
+        $totalAdeudado = 0;
+        foreach ($boletasPendientes as $boletaPendiente) {
+            $totalPagado = $boletaPendiente->pagos->sum('monto_pagado');
+            $saldoPendiente = $boletaPendiente->total - $totalPagado;
+            $totalAdeudado += $saldoPendiente;
+        }
         $mesesAdeudados = $boletasPendientes->count();
 
         // Generar PDF

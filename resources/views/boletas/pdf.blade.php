@@ -716,7 +716,15 @@
                     <div style="margin-top: 8px; padding: 5px; background: #fff; border: 1px solid #c62828; font-size: 8px;">
                         <strong>Períodos pendientes:</strong><br>
                         @foreach($boletasPendientes as $bp)
-                            • {{ $bp->mes_texto }} - ${{ number_format($bp->total, 0, ',', '.') }}<br>
+                            @php
+                                $totalPagado = $bp->pagos->sum('monto_pagado');
+                                $saldoPendiente = $bp->total - $totalPagado;
+                            @endphp
+                            • {{ $bp->mes_texto }} - ${{ number_format($saldoPendiente, 0, ',', '.') }}
+                            @if($totalPagado > 0)
+                                <span style="color: #666; font-size: 7px;">(abonado: ${{ number_format($totalPagado, 0, ',', '.') }})</span>
+                            @endif
+                            <br>
                         @endforeach
                     </div>
                 </div>
