@@ -201,10 +201,29 @@
                     <span class="detalle-label">Fecha de pago</span>
                     <span class="detalle-valor">{{ $pago->fecha_pago_formateada }}</span>
                 </div>
-                <div class="detalle-item">
-                    <span class="detalle-label">Monto pagado</span>
-                    <span class="detalle-valor">{{ $pago->monto_pagado_formateado }}</span>
-                </div>
+
+                @if(count($pagos) > 1)
+                    <div class="detalle-item">
+                        <span class="detalle-label">Boletas pagadas</span>
+                        <span class="detalle-valor">{{ count($pagos) }} boletas</span>
+                    </div>
+                    @foreach($pagos as $p)
+                    <div class="detalle-item">
+                        <span class="detalle-label">{{ $p->boleta->numero_boleta }} ({{ $p->boleta->mes_texto }})</span>
+                        <span class="detalle-valor">{{ $p->monto_pagado_formateado }}</span>
+                    </div>
+                    @endforeach
+                    <div class="detalle-item" style="background: #dbeafe; margin: 10px -20px -20px -20px; padding: 15px 20px; border-radius: 0 0 12px 12px;">
+                        <span class="detalle-label" style="font-weight: 600; color: #1e40af;">TOTAL PAGADO</span>
+                        <span class="detalle-valor" style="font-size: 18px; color: #1e40af;">${{ number_format($montoTotal, 0, ',', '.') }}</span>
+                    </div>
+                @else
+                    <div class="detalle-item">
+                        <span class="detalle-label">Monto pagado</span>
+                        <span class="detalle-valor">{{ $pago->monto_pagado_formateado }}</span>
+                    </div>
+                @endif
+
                 <div class="detalle-item">
                     <span class="detalle-label">Método de pago</span>
                     <span class="detalle-valor">{{ strtoupper($pago->metodo_pago) }}</span>
