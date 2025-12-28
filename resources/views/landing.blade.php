@@ -982,16 +982,16 @@
         <p><strong>Sistema APR</strong> - Gestión Integral de Agua Potable Rural</p>
         <p>&copy; 2025 Todos los derechos reservados</p>
         <div class="social-links">
-            <a href="https://facebook.com/tuapr" target="_blank" rel="noopener noreferrer" title="Síguenos en Facebook">
+            <a href="https://facebook.com/sistemaapr" target="_blank" rel="noopener noreferrer" title="Síguenos en Facebook">
                 <i class="fab fa-facebook"></i>
             </a>
-            <a href="https://twitter.com/tuapr" target="_blank" rel="noopener noreferrer" title="Síguenos en Twitter">
+            <a href="https://twitter.com/sistemaapr" target="_blank" rel="noopener noreferrer" title="Síguenos en Twitter">
                 <i class="fab fa-twitter"></i>
             </a>
-            <a href="https://instagram.com/tuapr" target="_blank" rel="noopener noreferrer" title="Síguenos en Instagram">
+            <a href="https://instagram.com/sistemaapr" target="_blank" rel="noopener noreferrer" title="Síguenos en Instagram">
                 <i class="fab fa-instagram"></i>
             </a>
-            <a href="https://linkedin.com/company/tuapr" target="_blank" rel="noopener noreferrer" title="Síguenos en LinkedIn">
+            <a href="https://linkedin.com/company/sistemaapr" target="_blank" rel="noopener noreferrer" title="Síguenos en LinkedIn">
                 <i class="fab fa-linkedin"></i>
             </a>
         </div>
