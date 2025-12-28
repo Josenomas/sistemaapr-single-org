@@ -99,6 +99,8 @@ class BoletasController extends Controller
             'otros_cargos' => 'nullable|numeric|min:0',
             'descuentos' => 'nullable|numeric|min:0',
             'observaciones' => 'nullable|string'
+        ], [
+            'fecha_vencimiento.after_or_equal' => 'La fecha de vencimiento debe ser igual o posterior a la fecha de emisión.'
         ]);
 
         try {
@@ -193,6 +195,8 @@ class BoletasController extends Controller
             'descuentos' => 'nullable|numeric|min:0',
             'estado' => 'required|in:pendiente,vencida,anulada',
             'observaciones' => 'nullable|string'
+        ], [
+            'fecha_vencimiento.after_or_equal' => 'La fecha de vencimiento debe ser igual o posterior a la fecha de emisión.'
         ]);
 
         try {
