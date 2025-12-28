@@ -23,6 +23,7 @@ class TransaccionFlow extends Model
         'payment_data',
         'fecha_pago',
         'observaciones',
+        'boletas_ids',
         'activo',
     ];
 
