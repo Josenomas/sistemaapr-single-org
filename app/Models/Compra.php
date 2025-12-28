@@ -41,6 +41,9 @@ class Compra extends Model
         'activo' => 'boolean'
     ];
 
+    // Deshabilitar timestamps automáticos
+    public $timestamps = false;
+
     // Relaciones
     public function responsable()
     {
