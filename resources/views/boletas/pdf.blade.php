@@ -383,7 +383,7 @@
                     <h1>SISTEMA APR</h1>
                     <p><strong>AGUA POTABLE RURAL PITRELAHUE</strong></p>
                     <p>Captación, tratamiento y distribución de agua</p>
-                    <p>RUT: 65.552.000-7 | Email: apr.pitrilahue@gmail.com</p>
+                    <p>RUT: 65.552.000-7 | Email: sistemaapr@gmail.com</p>
                 </div>
                 <div class="boleta-numero-box">
                     <div class="boleta-numero-inner">
@@ -779,7 +779,7 @@
                             <strong>Banco:</strong> [Nombre del Banco]<br>
                             <strong>Cuenta Corriente:</strong> [Número de cuenta]<br>
                             <strong>RUT:</strong> [RUT de la APR]<br>
-                            <strong>Email comprobante:</strong> apr.pitrilahue@gmail.com<br>
+                            <strong>Email comprobante:</strong> sistemaapr@gmail.com<br>
                             <strong>Referencia:</strong> Boleta N° {{ $boleta->numero_boleta }}
                         </div>
                     </div>

@@ -120,7 +120,7 @@ class ConsultaPublicaController extends Controller
             }
 
             // Email del socio (o usar uno genérico si no tiene)
-            $email = $socio->email ?: 'apr.pitrilahue@gmail.com';
+            $email = $socio->email ?: env('MAIL_FROM_ADDRESS', 'sistemaapr@gmail.com');
 
             // Subject del pago
             $cantidadBoletas = $boletas->count();
