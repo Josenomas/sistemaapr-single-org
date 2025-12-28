@@ -497,10 +497,23 @@ class PagosController extends Controller
      */
     public function boletasPendientes($socioId)
     {
-        $boletas = Boleta::where('id_socio', $socioId)
+        $boletas = Boleta::with('pagos')
+                        ->where('id_socio', $socioId)
                         ->whereIn('estado', ['pendiente', 'vencida'])
                         ->orderBy('fecha_vencimiento')
                         ->get();
+
+        // Calcular saldo pendiente para cada boleta
+        $boletas = $boletas->map(function($boleta) {
+            $totalPagado = $boleta->pagos->sum('monto_pagado');
+            $saldoPendiente = $boleta->total - $totalPagado;
+
+            // Agregar saldo pendiente al objeto
+            $boleta->saldo_pendiente = $saldoPendiente;
+            $boleta->total_pagado = $totalPagado;
+
+            return $boleta;
+        });
 
         return response()->json($boletas);
     }

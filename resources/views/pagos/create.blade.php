@@ -734,15 +734,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     data.boletas.forEach(boleta => {
                         const option = document.createElement('option');
                         option.value = boleta.id;
+
+                        // Usar saldo pendiente si existe, sino usar total
+                        const saldoPendiente = boleta.saldo_pendiente !== undefined ? boleta.saldo_pendiente : boleta.total;
+                        const saldoFormateado = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(saldoPendiente);
+
                         option.setAttribute('data-socio', boleta.socio_nombre);
                         option.setAttribute('data-periodo', boleta.mes_texto);
-                        option.setAttribute('data-total', boleta.total);
-                        option.setAttribute('data-total-fmt', boleta.total_formateado);
+                        option.setAttribute('data-total', saldoPendiente);
+                        option.setAttribute('data-total-fmt', saldoFormateado);
                         option.setAttribute('data-estado', boleta.estado_texto);
                         option.setAttribute('data-vencimiento', boleta.fecha_vencimiento_formateada);
+                        option.setAttribute('data-total-pagado', boleta.total_pagado || 0);
 
                         let textoEstado = boleta.estado === 'vencida' ? ' (VENCIDA)' : '';
-                        option.textContent = `${boleta.numero_boleta} - ${boleta.socio_nombre} - ${boleta.mes_texto} - ${boleta.total_formateado}${textoEstado}`;
+                        let textoParcial = boleta.total_pagado > 0 ? ' (Abonado: ' + new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(boleta.total_pagado) + ')' : '';
+                        option.textContent = `${boleta.numero_boleta} - ${boleta.socio_nombre} - ${boleta.mes_texto} - ${saldoFormateado}${textoParcial}${textoEstado}`;
 
                         selectBoleta.appendChild(option);
                     });
