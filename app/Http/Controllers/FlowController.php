@@ -299,7 +299,7 @@ class FlowController extends Controller
                     'metodo_pago' => 'flow',
                     'numero_comprobante' => 'FLOW-' . $transaccion->flow_order . ' / Token: ' . substr($transaccion->token, 0, 20),
                     'observaciones' => count($boletasConSaldo) > 1
-                        ? "Pago múltiple Flow ({$index + 1} de " . count($boletasConSaldo) . "). Order: {$transaccion->flow_order}"
+                        ? "Pago múltiple Flow (" . ($index + 1) . " de " . count($boletasConSaldo) . "). Order: {$transaccion->flow_order}"
                         : "Pago Flow. Order: {$transaccion->flow_order}",
                     'id_usuario_registro' => null,
                 ]);
