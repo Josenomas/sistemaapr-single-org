@@ -463,7 +463,27 @@ class PagosController extends Controller
     {
         $pago = Pago::with(['boleta.socio', 'socio'])->findOrFail($id);
 
-        $pdf = \PDF::loadView('pagos.imprimir', compact('pago'));
+        // Detectar si es pago múltiple Flow
+        $pagos = [$pago]; // Por defecto, solo el pago actual
+        $montoTotal = $pago->monto_pagado;
+
+        if (str_contains($pago->numero_comprobante, 'FLOW-')) {
+            // Extraer el flow_order del número de comprobante
+            preg_match('/FLOW-(\d+)/', $pago->numero_comprobante, $matches);
+            if (isset($matches[1])) {
+                $flowOrder = $matches[1];
+
+                // Buscar todos los pagos con el mismo flow_order
+                $pagos = Pago::with(['boleta.socio', 'socio'])
+                    ->where('numero_comprobante', 'LIKE', "FLOW-{$flowOrder}%")
+                    ->orderBy('id', 'asc')
+                    ->get();
+
+                $montoTotal = $pagos->sum('monto_pagado');
+            }
+        }
+
+        $pdf = \PDF::loadView('pagos.imprimir', compact('pago', 'pagos', 'montoTotal'));
         return $pdf->download('Comprobante-' . $pago->numero_recibo . '.pdf');
     }
 

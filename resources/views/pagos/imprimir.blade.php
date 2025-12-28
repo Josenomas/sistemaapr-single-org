@@ -247,7 +247,7 @@
         <!-- Monto Destacado -->
         <div class="monto-destacado">
             <div class="monto-label">MONTO TOTAL PAGADO</div>
-            <div class="monto-valor">{{ $pago->monto_pagado_formateado }}</div>
+            <div class="monto-valor">${{ number_format($montoTotal ?? $pago->monto_pagado, 0, ',', '.') }}</div>
         </div>
 
         <!-- Tabla de Detalle -->
@@ -258,15 +258,26 @@
                 <td style="width: 20%;">PERÍODO</td>
                 <td style="width: 25%;">MONTO</td>
             </tr>
-            <tr>
-                <td style="font-weight: bold;">{{ $pago->boleta->numero_boleta }}</td>
-                <td>SERVICIO DE AGUA POTABLE</td>
-                <td>{{ $pago->boleta->mes_texto }}</td>
-                <td style="font-weight: bold;">{{ $pago->monto_pagado_formateado }}</td>
-            </tr>
+            @if(count($pagos ?? []) > 1)
+                @foreach($pagos as $p)
+                <tr>
+                    <td style="font-weight: bold;">{{ $p->boleta->numero_boleta }}</td>
+                    <td>SERVICIO DE AGUA POTABLE</td>
+                    <td>{{ $p->boleta->mes_texto }}</td>
+                    <td style="font-weight: bold;">{{ $p->monto_pagado_formateado }}</td>
+                </tr>
+                @endforeach
+            @else
+                <tr>
+                    <td style="font-weight: bold;">{{ $pago->boleta->numero_boleta }}</td>
+                    <td>SERVICIO DE AGUA POTABLE</td>
+                    <td>{{ $pago->boleta->mes_texto }}</td>
+                    <td style="font-weight: bold;">{{ $pago->monto_pagado_formateado }}</td>
+                </tr>
+            @endif
             <tr class="total-row">
                 <td colspan="3" style="text-align: right; padding-right: 15px;">TOTAL:</td>
-                <td style="font-size: 12pt;">{{ $pago->monto_pagado_formateado }}</td>
+                <td style="font-size: 12pt;">${{ number_format($montoTotal ?? $pago->monto_pagado, 0, ',', '.') }}</td>
             </tr>
         </table>
 
