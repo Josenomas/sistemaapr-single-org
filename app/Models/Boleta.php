@@ -246,7 +246,8 @@ class Boleta extends Model
     // Métodos auxiliares
     public static function generarNumeroBoleta()
     {
-        $ultimaBoleta = self::orderBy('id', 'desc')->first();
+        // Buscar el número más alto de boleta, sin importar si está activa o no
+        $ultimaBoleta = self::orderByRaw('CAST(SUBSTRING(numero_boleta, 5) AS UNSIGNED) DESC')->first();
         $numero = $ultimaBoleta ? intval(substr($ultimaBoleta->numero_boleta, 4)) + 1 : 1;
         return 'BOL-' . str_pad($numero, 8, '0', STR_PAD_LEFT);
     }
