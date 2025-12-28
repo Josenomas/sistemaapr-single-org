@@ -85,25 +85,47 @@ class PagosController extends Controller
 
         // Si viene un boleta_id específico, cargar esa boleta
         if ($boletaId) {
-            $boleta = Boleta::with('socio')->findOrFail($boletaId);
+            $boleta = Boleta::with(['socio', 'pagos'])->findOrFail($boletaId);
+
+            // Calcular saldo pendiente
+            $totalPagado = $boleta->pagos->sum('monto_pagado');
+            $boleta->saldo_pendiente = $boleta->total - $totalPagado;
+            $boleta->total_pagado = $totalPagado;
+
             $boletas = collect([$boleta]);
         }
         // Si viene un socio_id, cargar solo boletas de ese socio
         elseif ($socioId) {
             $boletas = Boleta::activos()
-                            ->with('socio')
+                            ->with(['socio', 'pagos'])
                             ->where('id_socio', $socioId)
                             ->whereIn('estado', ['pendiente', 'vencida'])
                             ->orderBy('fecha_vencimiento')
                             ->get();
+
+            // Calcular saldo pendiente para cada boleta
+            $boletas = $boletas->map(function($b) {
+                $totalPagado = $b->pagos->sum('monto_pagado');
+                $b->saldo_pendiente = $b->total - $totalPagado;
+                $b->total_pagado = $totalPagado;
+                return $b;
+            });
         }
         // Por defecto, cargar TODAS las boletas pendientes o vencidas
         else {
             $boletas = Boleta::activos()
-                            ->with('socio')
+                            ->with(['socio', 'pagos'])
                             ->whereIn('estado', ['pendiente', 'vencida'])
                             ->orderBy('fecha_vencimiento')
                             ->get();
+
+            // Calcular saldo pendiente para cada boleta
+            $boletas = $boletas->map(function($b) {
+                $totalPagado = $b->pagos->sum('monto_pagado');
+                $b->saldo_pendiente = $b->total - $totalPagado;
+                $b->total_pagado = $totalPagado;
+                return $b;
+            });
         }
 
         return view('pagos.create', compact('socios', 'boletas', 'boleta'));

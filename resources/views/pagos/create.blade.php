@@ -86,22 +86,47 @@
                             required>
                         <option value="">Seleccione una boleta</option>
                         @if($boleta)
-                            <option value="{{ $boleta->id }}" selected>
-                                {{ $boleta->numero_boleta }} - {{ $boleta->socio->nombre_completo }} - {{ $boleta->mes_texto }} - {{ $boleta->total_formateado }}
+                            @php
+                                $saldoPendiente = $boleta->saldo_pendiente ?? $boleta->total;
+                                $saldoFormateado = '$' . number_format($saldoPendiente, 0, ',', '.');
+                                $totalPagado = $boleta->total_pagado ?? 0;
+                            @endphp
+                            <option value="{{ $boleta->id }}"
+                                    selected
+                                    data-socio="{{ $boleta->socio->nombre_completo }}"
+                                    data-periodo="{{ $boleta->mes_texto }}"
+                                    data-total="{{ $saldoPendiente }}"
+                                    data-total-fmt="{{ $saldoFormateado }}"
+                                    data-estado="{{ $boleta->estado_texto }}"
+                                    data-vencimiento="{{ $boleta->fecha_vencimiento_formateada }}"
+                                    data-total-pagado="{{ $totalPagado }}">
+                                {{ $boleta->numero_boleta }} - {{ $boleta->socio->nombre_completo }} - {{ $boleta->mes_texto }} - {{ $saldoFormateado }}
+                                @if($totalPagado > 0)
+                                    (Abonado: ${{ number_format($totalPagado, 0, ',', '.') }})
+                                @endif
                                 @if($boleta->estado == 'vencida')
                                     (VENCIDA)
                                 @endif
                             </option>
                         @else
                             @foreach($boletas as $b)
+                                @php
+                                    $saldoPendiente = $b->saldo_pendiente ?? $b->total;
+                                    $saldoFormateado = '$' . number_format($saldoPendiente, 0, ',', '.');
+                                    $totalPagado = $b->total_pagado ?? 0;
+                                @endphp
                                 <option value="{{ $b->id }}"
                                         data-socio="{{ $b->socio->nombre_completo }}"
                                         data-periodo="{{ $b->mes_texto }}"
-                                        data-total="{{ $b->total }}"
-                                        data-total-fmt="{{ $b->total_formateado }}"
+                                        data-total="{{ $saldoPendiente }}"
+                                        data-total-fmt="{{ $saldoFormateado }}"
                                         data-estado="{{ $b->estado_texto }}"
-                                        data-vencimiento="{{ $b->fecha_vencimiento_formateada }}">
-                                    {{ $b->numero_boleta }} - {{ $b->socio->nombre_completo }} - {{ $b->mes_texto }} - {{ $b->total_formateado }}
+                                        data-vencimiento="{{ $b->fecha_vencimiento_formateada }}"
+                                        data-total-pagado="{{ $totalPagado }}">
+                                    {{ $b->numero_boleta }} - {{ $b->socio->nombre_completo }} - {{ $b->mes_texto }} - {{ $saldoFormateado }}
+                                    @if($totalPagado > 0)
+                                        (Abonado: ${{ number_format($totalPagado, 0, ',', '.') }})
+                                    @endif
                                     @if($b->estado == 'vencida')
                                         (VENCIDA)
                                     @endif
@@ -122,7 +147,18 @@
                 <div class="info-grid-box">
                     <div><strong>Socio:</strong> <span id="info_socio">{{ $boleta->socio->nombre_completo ?? '' }}</span></div>
                     <div><strong>Período:</strong> <span id="info_periodo">{{ $boleta->mes_texto ?? '' }}</span></div>
-                    <div><strong>Total:</strong> <span id="info_total">{{ $boleta->total_formateado ?? '' }}</span></div>
+                    <div><strong>Total:</strong> <span id="info_total">
+                        @if($boleta)
+                            @php
+                                $saldoPendiente = $boleta->saldo_pendiente ?? $boleta->total;
+                                $totalPagado = $boleta->total_pagado ?? 0;
+                            @endphp
+                            ${{ number_format($saldoPendiente, 0, ',', '.') }}
+                            @if($totalPagado > 0)
+                                <small style="display: block; color: #6b7280;">(Abonado: ${{ number_format($totalPagado, 0, ',', '.') }})</small>
+                            @endif
+                        @endif
+                    </span></div>
                     <div><strong>Estado:</strong> <span id="info_estado">{{ $boleta->estado_texto ?? '' }}</span></div>
                     <div><strong>Vencimiento:</strong> <span id="info_vencimiento">{{ $boleta->fecha_vencimiento_formateada ?? '' }}</span></div>
                 </div>
