@@ -99,7 +99,8 @@ class ConsultaPublicaController extends Controller
 
             // Obtener IDs de boletas
             $boletasIds = explode(',', $validated['boletas']);
-            $boletas = Boleta::whereIn('id', $boletasIds)
+            $boletas = Boleta::with('pagos')
+                ->whereIn('id', $boletasIds)
                 ->where('id_socio', $socio->id)
                 ->where('activo', 1)
                 ->whereIn('estado', ['pendiente', 'vencida'])
@@ -110,8 +111,13 @@ class ConsultaPublicaController extends Controller
                     ->with('error', 'No se encontraron boletas válidas para pagar.');
             }
 
-            // Calcular monto total
-            $montoTotal = $boletas->sum('total');
+            // Calcular monto total considerando pagos parciales
+            $montoTotal = 0;
+            foreach ($boletas as $boleta) {
+                $totalPagado = $boleta->pagos->sum('monto_pagado');
+                $saldoPendiente = $boleta->total - $totalPagado;
+                $montoTotal += $saldoPendiente;
+            }
 
             // Validar que el monto coincida
             if (abs($montoTotal - $validated['monto_total']) > 0.01) {
