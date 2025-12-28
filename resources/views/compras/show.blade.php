@@ -213,24 +213,7 @@
         </div>
 
         <!-- Información del Sistema -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-info-circle"></i>
-                    Información del Sistema
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="info-item">
-                    <label>Registrado</label>
-                    <value>{{ $compra->created_at->format('d/m/Y H:i') }}</value>
-                </div>
-                <div class="info-item">
-                    <label>Última Actualización</label>
-                    <value>{{ $compra->updated_at->format('d/m/Y H:i') }}</value>
-                </div>
-            </div>
-        </div>
+        <!-- Card de Información del Sistema removido - timestamps deshabilitados -->
     </div>
 </div>
 @endsection
