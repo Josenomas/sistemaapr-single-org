@@ -143,14 +143,17 @@ class ConsultaPublicaController extends Controller
             );
 
             if ($resultado['success']) {
-                // Guardar en la transacción las boletas adicionales en observaciones
-                if ($cantidadBoletas > 1) {
-                    $transaccion = $resultado['transaccion'];
-                    $boletasTexto = $boletas->pluck('numero_boleta')->implode(', ');
-                    $transaccion->update([
-                        'observaciones' => "Pago múltiple - Boletas: {$boletasTexto}"
-                    ]);
-                }
+                // Guardar todas las boletas en la transacción
+                $transaccion = $resultado['transaccion'];
+                $boletasIds = $boletas->pluck('id')->toArray();
+                $boletasTexto = $boletas->pluck('numero_boleta')->implode(', ');
+
+                $transaccion->update([
+                    'boletas_ids' => json_encode($boletasIds), // Guardar IDs de todas las boletas
+                    'observaciones' => $cantidadBoletas > 1
+                        ? "Pago múltiple - Boletas: {$boletasTexto}"
+                        : null
+                ]);
 
                 // Redirigir a Flow
                 return redirect($resultado['url']);

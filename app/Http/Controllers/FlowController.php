@@ -216,53 +216,134 @@ class FlowController extends Controller
                 return $pagoExistente;
             }
 
-            // Cargar relaciones necesarias
-            $transaccion->load(['boleta', 'socio']);
-            $boleta = $transaccion->boleta;
+            // Cargar socio
+            $transaccion->load('socio');
             $socio = $transaccion->socio;
 
-            if (!$boleta || !$socio) {
-                throw new \Exception('No se encontró la boleta o socio asociado a la transacción');
+            if (!$socio) {
+                throw new \Exception('No se encontró el socio asociado a la transacción');
             }
 
-            // Generar número de recibo
-            $numeroRecibo = Pago::generarNumeroRecibo();
+            // Obtener todas las boletas a pagar
+            $boletasIds = [];
+            if (!empty($transaccion->boletas_ids)) {
+                // Pago múltiple - decodificar IDs guardados
+                $boletasIds = json_decode($transaccion->boletas_ids, true);
+            } else {
+                // Pago simple - solo la boleta principal
+                $boletasIds = [$transaccion->id_boleta];
+            }
 
-            // Crear pago
-            $pago = Pago::create([
-                'numero_recibo' => $numeroRecibo,
-                'id_boleta' => $transaccion->id_boleta,
-                'id_socio' => $transaccion->id_socio,
-                'fecha_pago' => $transaccion->fecha_pago ?? now(),
-                'monto_pagado' => $transaccion->monto,
-                'metodo_pago' => 'credito', // o 'debito' según preferencia
-                'numero_comprobante' => 'FLOW-' . $transaccion->flow_order . ' / Token: ' . substr($transaccion->token, 0, 20),
-                'observaciones' => 'Pago realizado mediante Flow. Order: ' . $transaccion->flow_order,
-                'id_usuario_registro' => null, // Pago automático
-            ]);
+            // Cargar boletas con sus pagos
+            $boletas = \App\Models\Boleta::with('pagos')
+                ->whereIn('id', $boletasIds)
+                ->get();
 
-            // Actualizar estado de la boleta
-            $totalPagos = Pago::where('id_boleta', $boleta->id)->sum('monto_pagado');
-            if ($totalPagos >= $boleta->total) {
-                $boleta->update(['estado' => 'pagada']);
+            if ($boletas->isEmpty()) {
+                throw new \Exception('No se encontraron boletas válidas para el pago');
+            }
+
+            // Calcular saldos pendientes de cada boleta
+            $boletasConSaldo = [];
+            $totalSaldoPendiente = 0;
+
+            foreach ($boletas as $boleta) {
+                $totalPagado = $boleta->pagos->sum('monto_pagado');
+                $saldoPendiente = $boleta->total - $totalPagado;
+
+                if ($saldoPendiente > 0) {
+                    $boletasConSaldo[] = [
+                        'boleta' => $boleta,
+                        'saldo' => $saldoPendiente,
+                    ];
+                    $totalSaldoPendiente += $saldoPendiente;
+                }
+            }
+
+            if (empty($boletasConSaldo)) {
+                throw new \Exception('Todas las boletas ya están pagadas');
+            }
+
+            // Distribuir el monto pagado entre las boletas
+            $montoPagado = $transaccion->monto;
+            $montoRestante = $montoPagado;
+            $pagosCreados = [];
+
+            foreach ($boletasConSaldo as $index => $item) {
+                $boleta = $item['boleta'];
+                $saldoPendiente = $item['saldo'];
+
+                // Calcular cuánto pagar de esta boleta
+                if ($index === count($boletasConSaldo) - 1) {
+                    // Última boleta: pagar todo lo que queda
+                    $montoPagarBoleta = $montoRestante;
+                } else {
+                    // Pagar el saldo completo o lo que alcance
+                    $montoPagarBoleta = min($saldoPendiente, $montoRestante);
+                }
+
+                if ($montoPagarBoleta <= 0) {
+                    break;
+                }
+
+                // Generar número de recibo
+                $numeroRecibo = Pago::generarNumeroRecibo();
+
+                // Crear pago para esta boleta
+                $pago = Pago::create([
+                    'numero_recibo' => $numeroRecibo,
+                    'id_boleta' => $boleta->id,
+                    'id_socio' => $transaccion->id_socio,
+                    'fecha_pago' => $transaccion->fecha_pago ?? now(),
+                    'monto_pagado' => $montoPagarBoleta,
+                    'metodo_pago' => 'flow',
+                    'numero_comprobante' => 'FLOW-' . $transaccion->flow_order . ' / Token: ' . substr($transaccion->token, 0, 20),
+                    'observaciones' => count($boletasConSaldo) > 1
+                        ? "Pago múltiple Flow ({$index + 1} de " . count($boletasConSaldo) . "). Order: {$transaccion->flow_order}"
+                        : "Pago Flow. Order: {$transaccion->flow_order}",
+                    'id_usuario_registro' => null,
+                ]);
+
+                $pagosCreados[] = $pago;
+                $montoRestante -= $montoPagarBoleta;
+
+                // Actualizar estado de la boleta
+                $totalPagosBoleta = Pago::where('id_boleta', $boleta->id)->sum('monto_pagado');
+                if ($totalPagosBoleta >= $boleta->total) {
+                    $boleta->update(['estado' => 'pagada']);
+                    Log::info('Flow - Boleta marcada como pagada', [
+                        'boleta_id' => $boleta->id,
+                        'numero_boleta' => $boleta->numero_boleta,
+                    ]);
+                }
+
+                Log::info('Flow - Pago individual creado', [
+                    'boleta_id' => $boleta->id,
+                    'numero_boleta' => $boleta->numero_boleta,
+                    'monto' => $montoPagarBoleta,
+                    'recibo' => $numeroRecibo,
+                ]);
             }
 
             // Registrar actividad
-            $montoFormateado = '$' . number_format($transaccion->monto, 0, ',', '.');
-            ActividadHelper::registrar(
-                'Pagos',
-                "Pago automático Flow - Recibo: {$numeroRecibo} - Socio: {$socio->nombre_completo} - Monto: {$montoFormateado} - Order: {$transaccion->flow_order}"
-            );
+            $montoFormateado = '$' . number_format($montoPagado, 0, ',', '.');
+            $cantidadBoletas = count($pagosCreados);
+            $descripcion = $cantidadBoletas > 1
+                ? "Pago múltiple Flow - {$cantidadBoletas} boletas - Socio: {$socio->nombre_completo} - Total: {$montoFormateado} - Order: {$transaccion->flow_order}"
+                : "Pago Flow - Recibo: {$pagosCreados[0]->numero_recibo} - Socio: {$socio->nombre_completo} - Monto: {$montoFormateado} - Order: {$transaccion->flow_order}";
+
+            ActividadHelper::registrar('Pagos', $descripcion);
 
             DB::commit();
 
-            Log::info('Flow - Pago registrado exitosamente', [
+            Log::info('Flow - Pagos registrados exitosamente', [
                 'flow_order' => $transaccion->flow_order,
-                'pago_id' => $pago->id,
-                'recibo' => $numeroRecibo,
+                'cantidad_pagos' => count($pagosCreados),
+                'monto_total' => $montoPagado,
             ]);
 
-            return $pago;
+            // Retornar el primer pago (para redireccionar al comprobante)
+            return $pagosCreados[0];
 
         } catch (\Exception $e) {
             DB::rollBack();
