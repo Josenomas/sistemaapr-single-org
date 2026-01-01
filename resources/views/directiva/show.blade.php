@@ -206,7 +206,7 @@
     </div>
 </div>
 
-@push('styles')
+@section('styles')
 <style>
     .page-header {
         display: flex;
@@ -493,5 +493,4 @@
         }
     }
 </style>
-@endpush
 @endsection
