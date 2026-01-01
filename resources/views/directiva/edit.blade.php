@@ -2,6 +2,166 @@
 
 @section('title', 'Editar Miembro Directiva - Sistema APR')
 
+@section('styles')
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-title i {
+        color: var(--primary);
+    }
+
+    .card {
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .card-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--gray-200);
+        background: var(--gray-50);
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 24px;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 8px;
+        font-size: 0.875rem;
+    }
+
+    .form-label.required::after {
+        content: ' *';
+        color: var(--danger);
+    }
+
+    .form-control {
+        padding: 10px 14px;
+        border: 1px solid var(--gray-300);
+        border-radius: 6px;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        background: var(--white);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-control.is-invalid {
+        border-color: var(--danger);
+    }
+
+    .invalid-feedback {
+        color: var(--danger);
+        font-size: 0.875rem;
+        margin-top: 4px;
+    }
+
+    .text-muted {
+        color: var(--gray-500);
+        font-size: 0.75rem;
+        margin-top: 4px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .btn {
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-secondary {
+        background: var(--gray-500);
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: var(--gray-600);
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            flex-direction: column;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="page-header">
     <h2 class="page-title">
@@ -174,163 +334,4 @@
         </form>
     </div>
 </div>
-@endsection
-
-<style>
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 32px;
-        padding-bottom: 16px;
-        border-bottom: 2px solid var(--gray-200);
-    }
-
-    .page-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--gray-800);
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .page-title i {
-        color: var(--primary);
-    }
-
-    .card {
-        background: var(--white);
-        border-radius: 8px;
-        box-shadow: var(--shadow);
-        border: 1px solid var(--gray-200);
-    }
-
-    .card-header {
-        padding: 20px 24px;
-        border-bottom: 1px solid var(--gray-200);
-        background: var(--gray-50);
-    }
-
-    .card-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--gray-800);
-        margin: 0;
-    }
-
-    .card-body {
-        padding: 24px;
-    }
-
-    .form-row {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-
-    .form-group {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .form-label {
-        font-weight: 600;
-        color: var(--gray-700);
-        margin-bottom: 8px;
-        font-size: 0.875rem;
-    }
-
-    .form-label.required::after {
-        content: ' *';
-        color: var(--danger);
-    }
-
-    .form-control {
-        padding: 10px 14px;
-        border: 1px solid var(--gray-300);
-        border-radius: 6px;
-        font-size: 0.875rem;
-        transition: all 0.2s;
-        background: var(--white);
-    }
-
-    .form-control:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .form-control.is-invalid {
-        border-color: var(--danger);
-    }
-
-    .invalid-feedback {
-        color: var(--danger);
-        font-size: 0.875rem;
-        margin-top: 4px;
-    }
-
-    .text-muted {
-        color: var(--gray-500);
-        font-size: 0.75rem;
-        margin-top: 4px;
-    }
-
-    .form-actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 32px;
-        padding-top: 24px;
-        border-top: 1px solid var(--gray-200);
-    }
-
-    .btn {
-        padding: 10px 24px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.875rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-        border: none;
-        text-decoration: none;
-    }
-
-    .btn-primary {
-        background: var(--primary);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: var(--primary-dark);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-
-    .btn-secondary {
-        background: var(--gray-500);
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background: var(--gray-600);
-    }
-
-    @media (max-width: 768px) {
-        .form-row {
-            flex-direction: column;
-        }
-
-        .page-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 16px;
-        }
-    }
-</style>
 @endsection
