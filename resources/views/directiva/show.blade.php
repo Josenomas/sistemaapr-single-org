@@ -2,210 +2,6 @@
 
 @section('title', 'Detalle Miembro Directiva - Sistema APR')
 
-@section('content')
-<div class="page-header">
-    <h2 class="page-title">
-        <i class="fas fa-user-tie"></i>
-        Miembro: {{ $directiva->socio->nombre_completo }}
-    </h2>
-    <div class="btn-group">
-        <a href="{{ route('directiva.edit', $directiva->id) }}" class="btn btn-warning">
-            <i class="fas fa-edit"></i>
-            Editar
-        </a>
-        <a href="{{ route('directiva.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i>
-            Volver
-        </a>
-    </div>
-</div>
-
-<div class="row">
-    <!-- Información del Miembro -->
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-id-card"></i>
-                    Información del Miembro de Directiva
-                </h3>
-                {!! $directiva->estado_badge !!}
-            </div>
-            <div class="card-body">
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Nombre Completo</label>
-                        <value><strong>{{ $directiva->socio->nombre_completo }}</strong></value>
-                    </div>
-
-                    <div class="info-item">
-                        <label>RUT</label>
-                        <value>{{ $directiva->socio->rut }}</value>
-                    </div>
-
-                    <div class="info-item">
-                        <label>Cargo</label>
-                        <value>{!! $directiva->cargo_badge !!}</value>
-                    </div>
-
-                    <div class="info-item">
-                        <label>Estado</label>
-                        <value>{!! $directiva->estado_badge !!}</value>
-                    </div>
-
-                    <div class="info-item">
-                        <label>Período</label>
-                        <value>
-                            <span class="badge badge-secondary">
-                                <i class="fas fa-calendar-alt"></i>
-                                {{ $directiva->periodo }}
-                            </span>
-                        </value>
-                    </div>
-
-                    <div class="info-item">
-                        <label>Duración en el Cargo</label>
-                        <value>
-                            <i class="fas fa-clock text-muted"></i>
-                            {{ $directiva->duracion }}
-                        </value>
-                    </div>
-
-                    <div class="info-item">
-                        <label>Fecha de Inicio</label>
-                        <value>{{ $directiva->fecha_inicio->format('d/m/Y') }}</value>
-                    </div>
-
-                    <div class="info-item">
-                        <label>Fecha de Término</label>
-                        <value>
-                            @if($directiva->fecha_termino)
-                                {{ $directiva->fecha_termino->format('d/m/Y') }}
-                            @else
-                                <span class="text-muted">En curso</span>
-                            @endif
-                        </value>
-                    </div>
-
-                    @if($directiva->acta_nombramiento)
-                    <div class="info-item full-width">
-                        <label>Acta de Nombramiento</label>
-                        <value>{{ $directiva->acta_nombramiento }}</value>
-                    </div>
-                    @endif
-
-                    @if($directiva->observaciones)
-                    <div class="info-item full-width">
-                        <label>Observaciones</label>
-                        <value>{{ $directiva->observaciones }}</value>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Información del Socio -->
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-user"></i>
-                    Datos del Socio
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="socio-info">
-                    <div class="info-item-compact">
-                        <label>Nombre</label>
-                        <value>{{ $directiva->socio->nombre }}</value>
-                    </div>
-
-                    <div class="info-item-compact">
-                        <label>Apellido Paterno</label>
-                        <value>{{ $directiva->socio->apellido_paterno }}</value>
-                    </div>
-
-                    @if($directiva->socio->apellido_materno)
-                    <div class="info-item-compact">
-                        <label>Apellido Materno</label>
-                        <value>{{ $directiva->socio->apellido_materno }}</value>
-                    </div>
-                    @endif
-
-                    <div class="info-item-compact">
-                        <label>RUT</label>
-                        <value>{{ $directiva->socio->rut }}</value>
-                    </div>
-
-                    @if($directiva->socio->email)
-                    <div class="info-item-compact">
-                        <label>Email</label>
-                        <value>
-                            <a href="mailto:{{ $directiva->socio->email }}" class="link-primary">
-                                {{ $directiva->socio->email }}
-                            </a>
-                        </value>
-                    </div>
-                    @endif
-
-                    @if($directiva->socio->telefono)
-                    <div class="info-item-compact">
-                        <label>Teléfono</label>
-                        <value>
-                            <a href="tel:{{ $directiva->socio->telefono }}" class="link-primary">
-                                {{ $directiva->socio->telefono }}
-                            </a>
-                        </value>
-                    </div>
-                    @endif
-
-                    <div class="info-item-compact">
-                        <label>Estado Socio</label>
-                        <value>{!! $directiva->socio->estado_badge !!}</value>
-                    </div>
-
-                    <div class="action-link">
-                        <a href="{{ route('socios.show', $directiva->socio->id) }}" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-external-link-alt"></i>
-                            Ver Perfil Completo
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Metadatos -->
-        <div class="card mt-3">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-info-circle"></i>
-                    Información del Registro
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="metadata">
-                    <div class="metadata-item">
-                        <i class="fas fa-calendar-plus"></i>
-                        <div>
-                            <label>Creado</label>
-                            <value>{{ $directiva->fecha_creacion->format('d/m/Y H:i') }}</value>
-                        </div>
-                    </div>
-
-                    <div class="metadata-item">
-                        <i class="fas fa-sync-alt"></i>
-                        <div>
-                            <label>Última Actualización</label>
-                            <value>{{ $directiva->fecha_actualizacion->format('d/m/Y H:i') }}</value>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section('styles')
 <style>
     .page-header {
@@ -493,4 +289,209 @@
         }
     }
 </style>
+@endsection
+
+@section('content')
+<div class="page-header">
+    <h2 class="page-title">
+        <i class="fas fa-user-tie"></i>
+        Miembro: {{ $directiva->socio->nombre_completo }}
+    </h2>
+    <div class="btn-group">
+        <a href="{{ route('directiva.edit', $directiva->id) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i>
+            Editar
+        </a>
+        <a href="{{ route('directiva.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Volver
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Información del Miembro -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-id-card"></i>
+                    Información del Miembro de Directiva
+                </h3>
+                {!! $directiva->estado_badge !!}
+            </div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Nombre Completo</label>
+                        <value><strong>{{ $directiva->socio->nombre_completo }}</strong></value>
+                    </div>
+
+                    <div class="info-item">
+                        <label>RUT</label>
+                        <value>{{ $directiva->socio->rut }}</value>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Cargo</label>
+                        <value>{!! $directiva->cargo_badge !!}</value>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Estado</label>
+                        <value>{!! $directiva->estado_badge !!}</value>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Período</label>
+                        <value>
+                            <span class="badge badge-secondary">
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ $directiva->periodo }}
+                            </span>
+                        </value>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Duración en el Cargo</label>
+                        <value>
+                            <i class="fas fa-clock text-muted"></i>
+                            {{ $directiva->duracion }}
+                        </value>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Fecha de Inicio</label>
+                        <value>{{ $directiva->fecha_inicio->format('d/m/Y') }}</value>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Fecha de Término</label>
+                        <value>
+                            @if($directiva->fecha_termino)
+                                {{ $directiva->fecha_termino->format('d/m/Y') }}
+                            @else
+                                <span class="text-muted">En curso</span>
+                            @endif
+                        </value>
+                    </div>
+
+                    @if($directiva->acta_nombramiento)
+                    <div class="info-item full-width">
+                        <label>Acta de Nombramiento</label>
+                        <value>{{ $directiva->acta_nombramiento }}</value>
+                    </div>
+                    @endif
+
+                    @if($directiva->observaciones)
+                    <div class="info-item full-width">
+                        <label>Observaciones</label>
+                        <value>{{ $directiva->observaciones }}</value>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Socio -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-user"></i>
+                    Datos del Socio
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="socio-info">
+                    <div class="info-item-compact">
+                        <label>Nombre</label>
+                        <value>{{ $directiva->socio->nombre }}</value>
+                    </div>
+
+                    <div class="info-item-compact">
+                        <label>Apellido Paterno</label>
+                        <value>{{ $directiva->socio->apellido_paterno }}</value>
+                    </div>
+
+                    @if($directiva->socio->apellido_materno)
+                    <div class="info-item-compact">
+                        <label>Apellido Materno</label>
+                        <value>{{ $directiva->socio->apellido_materno }}</value>
+                    </div>
+                    @endif
+
+                    <div class="info-item-compact">
+                        <label>RUT</label>
+                        <value>{{ $directiva->socio->rut }}</value>
+                    </div>
+
+                    @if($directiva->socio->email)
+                    <div class="info-item-compact">
+                        <label>Email</label>
+                        <value>
+                            <a href="mailto:{{ $directiva->socio->email }}" class="link-primary">
+                                {{ $directiva->socio->email }}
+                            </a>
+                        </value>
+                    </div>
+                    @endif
+
+                    @if($directiva->socio->telefono)
+                    <div class="info-item-compact">
+                        <label>Teléfono</label>
+                        <value>
+                            <a href="tel:{{ $directiva->socio->telefono }}" class="link-primary">
+                                {{ $directiva->socio->telefono }}
+                            </a>
+                        </value>
+                    </div>
+                    @endif
+
+                    <div class="info-item-compact">
+                        <label>Estado Socio</label>
+                        <value>{!! $directiva->socio->estado_badge !!}</value>
+                    </div>
+
+                    <div class="action-link">
+                        <a href="{{ route('socios.show', $directiva->socio->id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-external-link-alt"></i>
+                            Ver Perfil Completo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metadatos -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    Información del Registro
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="metadata">
+                    <div class="metadata-item">
+                        <i class="fas fa-calendar-plus"></i>
+                        <div>
+                            <label>Creado</label>
+                            <value>{{ $directiva->fecha_creacion->format('d/m/Y H:i') }}</value>
+                        </div>
+                    </div>
+
+                    <div class="metadata-item">
+                        <i class="fas fa-sync-alt"></i>
+                        <div>
+                            <label>Última Actualización</label>
+                            <value>{{ $directiva->fecha_actualizacion->format('d/m/Y H:i') }}</value>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
