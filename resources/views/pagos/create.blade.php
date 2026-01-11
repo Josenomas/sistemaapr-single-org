@@ -174,15 +174,15 @@
                             <span class="radio-custom"></span>
                             <div class="radio-text">
                                 <strong>Pago Completo</strong>
-                                <small>Pagar el monto total de la boleta</small>
+                                <small>Pagar el saldo pendiente completo</small>
                             </div>
                         </label>
                         <label class="radio-option">
                             <input type="radio" name="tipo_pago" value="parcial" id="tipo_parcial">
                             <span class="radio-custom"></span>
                             <div class="radio-text">
-                                <strong>Pago Parcial</strong>
-                                <small>Pagar una parte del monto total</small>
+                                <strong>Pago Parcial (Abono)</strong>
+                                <small>Pagar solo una parte del saldo pendiente</small>
                             </div>
                         </label>
                     </div>
