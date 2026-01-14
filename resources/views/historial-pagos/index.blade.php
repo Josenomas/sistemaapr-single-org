@@ -13,7 +13,7 @@
             <i class="fas fa-exchange-alt"></i>
             Comparar Socios
         </a>
-        <a href="#" class="btn btn-success">
+        <a href="{{ route('historial-pagos.reporte-recaudacion') }}" class="btn btn-success">
             <i class="fas fa-file-invoice-dollar"></i>
             Reporte Recaudación
         </a>
