@@ -32,6 +32,7 @@ use App\Http\Controllers\ImportarLecturasController;
 use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\ConsultaPublicaController;
 use App\Http\Controllers\EventosController;
+use App\Http\Controllers\ActivosFijosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -251,6 +252,13 @@ Route::middleware('auth')->group(function () {
     // ========================================
     Route::middleware('permission:directiva')->group(function () {
         Route::resource('directiva', DirectivaController::class);
+    });
+
+    // ========================================
+    // ACTIVOS FIJOS
+    // ========================================
+    Route::middleware('permission:compras')->group(function () {
+        Route::resource('activos-fijos', ActivosFijosController::class);
     });
 
     // ========================================

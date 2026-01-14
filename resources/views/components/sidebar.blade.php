@@ -208,6 +208,14 @@
                 <i class="fas fa-plus"></i>
                 <span>Registrar Compra</span>
             </a>
+            <a href="{{ route('activos-fijos.index') }}" class="nav-item {{ request()->routeIs('activos-fijos.*') ? 'active' : '' }}">
+                <i class="fas fa-box"></i>
+                <span>Activos Fijos</span>
+            </a>
+            <a href="{{ route('activos-fijos.create') }}" class="nav-item">
+                <i class="fas fa-plus"></i>
+                <span>Registrar Activo</span>
+            </a>
             <a href="{{ route('giros-bancarios.index') }}" class="nav-item {{ request()->routeIs('giros-bancarios.*') ? 'active' : '' }}">
                 <i class="fas fa-money-check-alt"></i>
                 <span>Giros Bancarios</span>
