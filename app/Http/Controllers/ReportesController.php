@@ -87,10 +87,14 @@ class ReportesController extends Controller
                               ->groupBy('metodo_pago')
                               ->get();
 
-        // Top 10 Socios con mayor consumo (mes actual)
+        // Top 10 Socios con mayor consumo (último mes con datos)
+        $ultimoPeriodoConDatos = HistorialConsumo::where('activo', 1)
+                                                 ->orderBy('periodo', 'desc')
+                                                 ->value('periodo') ?? $mesActual;
+
         $topConsumidores = HistorialConsumo::with('socio')
                                           ->where('activo', 1)
-                                          ->where('periodo', $mesActual)
+                                          ->where('periodo', $ultimoPeriodoConDatos)
                                           ->orderBy('consumo_m3', 'desc')
                                           ->limit(10)
                                           ->get();
