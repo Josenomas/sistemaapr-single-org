@@ -990,6 +990,16 @@
                 <div class="quick-action-description">Ver estadísticas y reportes</div>
             </div>
         </a>
+
+        <a href="{{ route('activos-fijos.index') }}" class="quick-action-btn purple">
+            <div class="quick-action-icon purple-bg">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="quick-action-content">
+                <div class="quick-action-title">Activos Fijos</div>
+                <div class="quick-action-description">Gestionar activos del sistema</div>
+            </div>
+        </a>
     </div>
 
     <div class="section-card events-section">
