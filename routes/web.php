@@ -201,6 +201,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:compras')->group(function () {
         Route::resource('compras', ComprasController::class);
         Route::resource('activos-fijos', ActivosFijosController::class);
+        Route::get('/activos-fijos-imprimir', [ActivosFijosController::class, 'imprimir'])->name('activos-fijos.imprimir');
     });
 
     // ========================================

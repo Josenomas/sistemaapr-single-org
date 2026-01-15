@@ -8,10 +8,16 @@
         <i class="fas fa-box"></i>
         Activos Fijos
     </h2>
-    <a href="{{ route('activos-fijos.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nuevo Activo
-    </a>
+    <div class="header-actions">
+        <a href="{{ route('activos-fijos.imprimir') }}" class="btn btn-secondary" target="_blank">
+            <i class="fas fa-print"></i>
+            Imprimir Lista
+        </a>
+        <a href="{{ route('activos-fijos.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Nuevo Activo
+        </a>
+    </div>
 </div>
 
 <div class="card">
@@ -139,6 +145,11 @@
 
     .page-title i {
         color: var(--primary);
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
     }
 
     .card {

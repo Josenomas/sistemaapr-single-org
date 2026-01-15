@@ -238,4 +238,35 @@ class ActivosFijosController extends Controller
                            ->with('error', 'Error al dar de baja el activo: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Imprimir lista de activos fijos
+     */
+    public function imprimir(Request $request)
+    {
+        $query = ActivoFijo::where('activo', 1)->with('responsable');
+
+        // Aplicar filtros si existen
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('codigo_activo', 'like', "%{$search}%")
+                  ->orWhere('nombre', 'like', "%{$search}%")
+                  ->orWhere('marca', 'like', "%{$search}%")
+                  ->orWhere('modelo', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('categoria')) {
+            $query->where('categoria', $request->categoria);
+        }
+
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
+        }
+
+        $activos = $query->orderBy('codigo_activo')->get();
+
+        return view('activos-fijos.imprimir', compact('activos'));
+    }
 }
