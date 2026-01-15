@@ -14,69 +14,23 @@
     </a>
 </div>
 
-<!-- Tarjetas de Estadísticas -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-box fa-3x mr-3"></i>
-                    <div>
-                        <div class="small">Total Activos</div>
-                        <div class="h3 mb-0">{{ $estadisticas['total_activos'] }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card bg-success text-white">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-dollar-sign fa-3x mr-3"></i>
-                    <div>
-                        <div class="small">Valor Total</div>
-                        <div class="h3 mb-0">${{ number_format($estadisticas['valor_total'], 0, ',', '.') }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card bg-info text-white">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-chart-line fa-3x mr-3"></i>
-                    <div>
-                        <div class="small">Valor Actual</div>
-                        <div class="h3 mb-0">${{ number_format($estadisticas['valor_actual'], 0, ',', '.') }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Filtros -->
-<div class="card mb-3">
-    <div class="card-header">
-        <h3 class="card-title">Filtros de Búsqueda</h3>
-    </div>
+<div class="card">
     <div class="card-body">
-        <form method="GET" action="{{ route('activos-fijos.index') }}">
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="search" class="form-label">Buscar</label>
+        <div class="filters-section">
+            <form method="GET" action="{{ route('activos-fijos.index') }}" class="filter-form">
+                <div class="filter-group">
+                    <label for="search">Buscar</label>
                     <input type="text"
-                           class="form-control"
-                           id="search"
                            name="search"
+                           id="search"
+                           class="form-control"
                            placeholder="Código, nombre, marca..."
                            value="{{ request('search') }}">
                 </div>
-                <div class="form-group col-md-3">
-                    <label for="categoria" class="form-label">Categoría</label>
-                    <select class="form-control" id="categoria" name="categoria">
+
+                <div class="filter-group">
+                    <label for="categoria">Categoría</label>
+                    <select name="categoria" id="categoria" class="form-control">
                         <option value="">Todas las categorías</option>
                         <option value="mobiliario" {{ request('categoria') == 'mobiliario' ? 'selected' : '' }}>Mobiliario</option>
                         <option value="equipos_computo" {{ request('categoria') == 'equipos_computo' ? 'selected' : '' }}>Equipos de Cómputo</option>
@@ -87,9 +41,10 @@
                         <option value="otros" {{ request('categoria') == 'otros' ? 'selected' : '' }}>Otros</option>
                     </select>
                 </div>
-                <div class="form-group col-md-3">
-                    <label for="estado" class="form-label">Estado</label>
-                    <select class="form-control" id="estado" name="estado">
+
+                <div class="filter-group">
+                    <label for="estado">Estado</label>
+                    <select name="estado" id="estado" class="form-control">
                         <option value="">Todos los estados</option>
                         <option value="excelente" {{ request('estado') == 'excelente' ? 'selected' : '' }}>Excelente</option>
                         <option value="bueno" {{ request('estado') == 'bueno' ? 'selected' : '' }}>Bueno</option>
@@ -98,20 +53,18 @@
                         <option value="en_reparacion" {{ request('estado') == 'en_reparacion' ? 'selected' : '' }}>En Reparación</option>
                     </select>
                 </div>
-                <div class="form-group col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fas fa-search"></i>
-                        Filtrar
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
 
-<!-- Tabla de Activos -->
-<div class="card">
-    <div class="card-body">
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                    <a href="{{ route('activos-fijos.index') }}" class="btn btn-outline">
+                        <i class="fas fa-times"></i> Limpiar
+                    </a>
+                </div>
+            </form>
+        </div>
+
         <div class="table-responsive">
             <table class="table">
                 <thead>
@@ -160,8 +113,7 @@
     </div>
 </div>
 
-<!-- Paginación -->
-<div class="mt-3">
+<div class="pagination-wrapper">
     {{ $activos->links() }}
 </div>
 @endsection
