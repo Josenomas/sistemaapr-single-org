@@ -41,26 +41,11 @@ class ActivosFijosController extends Controller
             $query->where('id_responsable', $request->responsable);
         }
 
-        // Estadísticas
-        $estadisticas = [
-            'total_activos' => ActivoFijo::activos()->count(),
-            'valor_total' => ActivoFijo::activos()->sum('valor_adquisicion'),
-            'valor_actual' => ActivoFijo::activos()->sum('valor_actual'),
-            'por_categoria' => ActivoFijo::activos()
-                ->select('categoria', DB::raw('count(*) as total'))
-                ->groupBy('categoria')
-                ->pluck('total', 'categoria'),
-            'por_estado' => ActivoFijo::activos()
-                ->select('estado', DB::raw('count(*) as total'))
-                ->groupBy('estado')
-                ->pluck('total', 'estado'),
-        ];
-
         $activos = $query->orderBy('fecha_creacion', 'desc')->paginate(15);
 
         $responsables = Usuario::where('activo', 1)->orderBy('nombre')->get();
 
-        return view('activos-fijos.index', compact('activos', 'estadisticas', 'responsables'));
+        return view('activos-fijos.index', compact('activos', 'responsables'));
     }
 
     /**
@@ -97,7 +82,7 @@ class ActivosFijosController extends Controller
             'observaciones' => 'nullable|string',
             'vida_util_anos' => 'nullable|integer|min:1',
             'fecha_ultimo_mantenimiento' => 'nullable|date',
-            'proxima_revision' => 'nullable|date|after_or_equal:fecha_ultimo_mantenimiento',
+            'proxima_revision' => 'nullable|date' . ($request->filled('fecha_ultimo_mantenimiento') ? '|after_or_equal:fecha_ultimo_mantenimiento' : ''),
         ]);
 
         DB::beginTransaction();
@@ -176,7 +161,7 @@ class ActivosFijosController extends Controller
             'observaciones' => 'nullable|string',
             'vida_util_anos' => 'nullable|integer|min:1',
             'fecha_ultimo_mantenimiento' => 'nullable|date',
-            'proxima_revision' => 'nullable|date|after_or_equal:fecha_ultimo_mantenimiento',
+            'proxima_revision' => 'nullable|date' . ($request->filled('fecha_ultimo_mantenimiento') ? '|after_or_equal:fecha_ultimo_mantenimiento' : ''),
         ]);
 
         DB::beginTransaction();

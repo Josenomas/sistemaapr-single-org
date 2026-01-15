@@ -77,11 +77,21 @@ class ActivoFijo extends Model
 
     /**
      * Generar código de activo único
+     * Usa lockForUpdate para evitar race conditions en concurrencia
      */
     public static function generarCodigoActivo()
     {
-        $ultimoActivo = self::orderBy('id', 'desc')->first();
-        $numero = $ultimoActivo ? $ultimoActivo->id + 1 : 1;
+        $ultimoCodigo = self::lockForUpdate()
+            ->orderBy('codigo_activo', 'desc')
+            ->value('codigo_activo');
+
+        if ($ultimoCodigo) {
+            // Extraer el número del código ACT-000001
+            $numero = (int) str_replace('ACT-', '', $ultimoCodigo) + 1;
+        } else {
+            $numero = 1;
+        }
+
         return 'ACT-' . str_pad($numero, 6, '0', STR_PAD_LEFT);
     }
 
