@@ -196,10 +196,11 @@ Route::middleware('auth')->group(function () {
     });
 
     // ========================================
-    // GESTIÓN DE COMPRAS
+    // GESTIÓN DE COMPRAS Y ACTIVOS FIJOS
     // ========================================
     Route::middleware('permission:compras')->group(function () {
         Route::resource('compras', ComprasController::class);
+        Route::resource('activos-fijos', ActivosFijosController::class);
     });
 
     // ========================================
@@ -252,13 +253,6 @@ Route::middleware('auth')->group(function () {
     // ========================================
     Route::middleware('permission:directiva')->group(function () {
         Route::resource('directiva', DirectivaController::class);
-    });
-
-    // ========================================
-    // ACTIVOS FIJOS
-    // ========================================
-    Route::middleware('permission:compras')->group(function () {
-        Route::resource('activos-fijos', ActivosFijosController::class);
     });
 
     // ========================================
