@@ -9,7 +9,7 @@
         Activos Fijos
     </h2>
     <div class="header-actions">
-        <a href="{{ route('activos-fijos.imprimir') }}" class="btn btn-secondary" target="_blank">
+        <a href="{{ route('activos-fijos.imprimir', request()->only(['search', 'categoria', 'estado'])) }}" class="btn btn-secondary" target="_blank">
             <i class="fas fa-print"></i>
             Imprimir Lista
         </a>

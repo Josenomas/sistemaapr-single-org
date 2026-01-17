@@ -239,6 +239,45 @@
         </div>
     </div>
 
+    @if(request()->hasAny(['search', 'categoria', 'estado']))
+        <div class="info-box">
+            <p><strong>Filtros aplicados:</strong></p>
+            @if(request('search'))
+                <p>🔍 Búsqueda: <strong>{{ request('search') }}</strong></p>
+            @endif
+            @if(request('categoria'))
+                <p>📁 Categoría: <strong>
+                    @php
+                        $categorias = [
+                            'mobiliario' => 'Mobiliario',
+                            'equipos_computo' => 'Equipos de Cómputo',
+                            'equipos_oficina' => 'Equipos de Oficina',
+                            'herramientas' => 'Herramientas',
+                            'vehiculos' => 'Vehículos',
+                            'equipamiento_tecnico' => 'Equipamiento Técnico',
+                            'otros' => 'Otros'
+                        ];
+                        echo $categorias[request('categoria')] ?? request('categoria');
+                    @endphp
+                </strong></p>
+            @endif
+            @if(request('estado'))
+                <p>📊 Estado: <strong>
+                    @php
+                        $estados = [
+                            'excelente' => 'Excelente',
+                            'bueno' => 'Bueno',
+                            'regular' => 'Regular',
+                            'malo' => 'Malo',
+                            'en_reparacion' => 'En Reparación'
+                        ];
+                        echo $estados[request('estado')] ?? request('estado');
+                    @endphp
+                </strong></p>
+            @endif
+        </div>
+    @endif
+
     <div class="resumen">
         <div class="resumen-item">
             <div class="resumen-value">{{ $activos->count() }}</div>
