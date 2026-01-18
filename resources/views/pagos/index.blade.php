@@ -228,7 +228,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $pagos->links() }}
+            {{ $pagos->appends(request()->only(['search', 'fecha_desde', 'fecha_hasta', 'metodo_pago', 'socio_id']))->links() }}
         </div>
     </div>
 </div>
