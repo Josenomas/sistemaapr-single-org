@@ -230,7 +230,7 @@
         <!-- Paginación -->
         @if($directiva->hasPages())
             <div class="pagination-wrapper">
-                {{ $directiva->links() }}
+                {{ $directiva->appends(request()->only(['search', 'cargo', 'estado', 'periodo', 'socio']))->links() }}
             </div>
         @endif
     </div>

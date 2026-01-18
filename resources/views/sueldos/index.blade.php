@@ -161,7 +161,7 @@
             </div>
 
             <div class="pagination-wrapper">
-                {{ $sueldos->links() }}
+                {{ $sueldos->appends(request()->only(['id_funcionario', 'estado', 'anio', 'periodo']))->links() }}
             </div>
         @else
             <div class="empty-state">

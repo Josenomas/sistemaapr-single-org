@@ -134,7 +134,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $vacaciones->links() }}
+            {{ $vacaciones->appends(request()->only(['funcionario', 'estado', 'tipo', 'periodo']))->links() }}
         </div>
     </div>
 </div>

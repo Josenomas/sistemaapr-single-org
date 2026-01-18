@@ -193,7 +193,7 @@
             </div>
 
             <div class="pagination-wrapper">
-                {{ $trabajos->links() }}
+                {{ $trabajos->appends(request()->only(['tipo_trabajo', 'estado', 'prioridad', 'id_responsable', 'fecha_desde', 'fecha_hasta']))->links() }}
             </div>
         @else
             <div class="empty-state">

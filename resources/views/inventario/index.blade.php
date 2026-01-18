@@ -183,7 +183,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $inventario->links() }}
+            {{ $inventario->appends(request()->only(['buscar', 'categoria', 'estado', 'alerta']))->links() }}
         </div>
     </div>
 </div>

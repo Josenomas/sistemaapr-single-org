@@ -171,7 +171,7 @@
             </div>
 
             <div class="pagination-wrapper">
-                {{ $renovaciones->links() }}
+                {{ $renovaciones->appends(request()->only(['id_socio', 'estado', 'motivo', 'fecha_desde', 'fecha_hasta']))->links() }}
             </div>
         @else
             <div class="empty-state">

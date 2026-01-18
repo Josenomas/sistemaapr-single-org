@@ -260,7 +260,7 @@
         <!-- Paginación -->
         @if($pagos->hasPages())
             <div class="pagination-wrapper">
-                {{ $pagos->links() }}
+                {{ $pagos->appends(request()->only(['search', 'socio', 'metodo_pago', 'fecha_desde', 'fecha_hasta', 'monto_min', 'monto_max']))->links() }}
             </div>
         @endif
     </div>

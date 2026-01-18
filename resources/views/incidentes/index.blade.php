@@ -200,7 +200,7 @@
 
             <!-- Paginación -->
             <div class="pagination-wrapper">
-                {{ $incidentes->links() }}
+                {{ $incidentes->appends(request()->only(['tipo', 'estado', 'prioridad']))->links() }}
             </div>
         @else
             <div class="empty-state">

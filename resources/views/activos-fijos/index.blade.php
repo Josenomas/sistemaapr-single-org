@@ -118,7 +118,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $activos->links() }}
+            {{ $activos->appends(request()->only(['search', 'categoria', 'estado']))->links() }}
         </div>
     </div>
 </div>

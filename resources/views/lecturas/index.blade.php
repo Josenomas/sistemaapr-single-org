@@ -106,7 +106,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $lecturas->links() }}
+            {{ $lecturas->appends(request()->only(['mes', 'socio_id']))->links() }}
         </div>
     </div>
 </div>

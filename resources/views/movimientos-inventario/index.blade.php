@@ -208,7 +208,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $movimientos->links() }}
+            {{ $movimientos->appends(request()->only(['search', 'tipo_movimiento', 'id_producto', 'id_responsable', 'fecha_desde', 'fecha_hasta']))->links() }}
         </div>
     </div>
 </div>

@@ -239,7 +239,7 @@
         <!-- Paginación -->
         @if($historiales->hasPages())
             <div class="pagination-wrapper">
-                {{ $historiales->links() }}
+                {{ $historiales->appends(request()->only(['search', 'socio', 'periodo', 'anomalia', 'consumo_min', 'consumo_max']))->links() }}
             </div>
         @endif
     </div>

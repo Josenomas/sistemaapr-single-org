@@ -124,7 +124,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $usuarios->links() }}
+            {{ $usuarios->appends(request()->only(['rol', 'estado']))->links() }}
         </div>
     </div>
 </div>

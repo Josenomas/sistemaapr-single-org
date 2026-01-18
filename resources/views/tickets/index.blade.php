@@ -256,7 +256,7 @@
         <!-- Paginación -->
         @if($tickets->hasPages())
             <div class="pagination-wrapper">
-                {{ $tickets->links() }}
+                {{ $tickets->appends(request()->only(['search', 'tipo_ticket', 'prioridad', 'estado', 'id_asignado']))->links() }}
             </div>
         @endif
     </div>

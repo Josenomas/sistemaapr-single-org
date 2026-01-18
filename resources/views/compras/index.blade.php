@@ -133,7 +133,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $compras->links() }}
+            {{ $compras->appends(request()->only(['proveedor', 'tipo', 'estado', 'fecha_desde', 'fecha_hasta']))->links() }}
         </div>
     </div>
 </div>

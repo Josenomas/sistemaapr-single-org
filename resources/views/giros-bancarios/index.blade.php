@@ -196,7 +196,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $giros->links() }}
+            {{ $giros->appends(request()->only(['search', 'banco', 'estado', 'fecha_desde', 'fecha_hasta', 'beneficiario']))->links() }}
         </div>
     </div>
 </div>

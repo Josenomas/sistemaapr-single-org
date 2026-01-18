@@ -102,7 +102,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $funcionarios->links() }}
+            {{ $funcionarios->appends(request()->only(['estado', 'cargo']))->links() }}
         </div>
     </div>
 </div>

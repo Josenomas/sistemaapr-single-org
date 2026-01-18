@@ -267,7 +267,7 @@
         <!-- Paginación -->
         @if($recordatorios->hasPages())
             <div class="pagination-wrapper">
-                {{ $recordatorios->links() }}
+                {{ $recordatorios->appends(request()->only(['search', 'tipo_recordatorio', 'prioridad', 'estado', 'id_asignado']))->links() }}
             </div>
         @endif
     </div>
