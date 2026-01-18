@@ -206,7 +206,7 @@
         </div>
 
         <div class="pagination-wrapper">
-            {{ $notificaciones->links() }}
+            {{ $notificaciones->appends(request()->only(['search', 'tipo', 'estado', 'destinatario', 'fecha_desde', 'fecha_hasta']))->links() }}
         </div>
     </div>
 </div>
