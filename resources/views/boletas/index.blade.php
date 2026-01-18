@@ -247,7 +247,7 @@
         <!-- Paginación -->
         @if($boletas->hasPages())
             <div class="pagination-wrapper">
-                {{ $boletas->links() }}
+                {{ $boletas->appends(request()->only(['search', 'mes', 'estado', 'id_socio']))->links() }}
             </div>
         @endif
     </div>
