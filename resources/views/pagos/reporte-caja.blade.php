@@ -9,10 +9,10 @@
         Reporte de Caja
     </h2>
     <div class="btn-group">
-        <button onclick="window.print()" class="btn btn-primary">
+        <a href="{{ route('pagos.reporteCaja.imprimir', ['fecha' => $fecha]) }}" class="btn btn-primary" target="_blank">
             <i class="fas fa-print"></i>
             Imprimir
-        </button>
+        </a>
         <a href="{{ route('pagos.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i>
             Volver

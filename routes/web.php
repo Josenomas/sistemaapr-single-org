@@ -127,6 +127,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/pagos/buscar-por-rut', [PagosController::class, 'buscarPorRut'])->name('pagos.buscarPorRut');
         Route::get('/api/socios/{id}/boletas-pendientes', [PagosController::class, 'boletasPendientes'])->name('pagos.boletasPendientes');
         Route::get('/reporte-caja', [PagosController::class, 'reporteCaja'])->name('pagos.reporteCaja');
+        Route::get('/reporte-caja-imprimir', [PagosController::class, 'reporteCajaImprimir'])->name('pagos.reporteCaja.imprimir');
         Route::post('/pagos/generar-link-flow', [PagosController::class, 'generarLinkFlow'])->name('pagos.generarLinkFlow');
     });
 

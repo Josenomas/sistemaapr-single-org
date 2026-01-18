@@ -613,6 +613,29 @@ class PagosController extends Controller
     }
 
     /**
+     * Vista de impresión para reporte de caja
+     */
+    public function reporteCajaImprimir(Request $request)
+    {
+        $fecha = $request->get('fecha', today()->toDateString());
+
+        $pagos = Pago::with(['boleta', 'socio'])
+                    ->whereDate('fecha_pago', $fecha)
+                    ->orderBy('id')
+                    ->get();
+
+        // Totales por método de pago
+        $totalesPorMetodo = Pago::whereDate('fecha_pago', $fecha)
+                                ->select('metodo_pago', DB::raw('SUM(monto_pagado) as total'))
+                                ->groupBy('metodo_pago')
+                                ->get();
+
+        $totalDia = $pagos->sum('monto_pagado');
+
+        return view('pagos.reporte-caja-imprimir', compact('pagos', 'totalesPorMetodo', 'totalDia', 'fecha'));
+    }
+
+    /**
      * Generar link de pago Flow
      */
     public function generarLinkFlow(Request $request)
