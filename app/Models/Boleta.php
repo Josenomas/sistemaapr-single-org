@@ -132,12 +132,18 @@ class Boleta extends Model
      */
     public function getDiasAtrasoAttribute()
     {
-        if ($this->estado !== 'pendiente') {
+        // Solo calcular atraso para boletas pendientes o vencidas (no pagadas ni anuladas)
+        if (!in_array($this->estado, ['pendiente', 'vencida'])) {
             return 0;
         }
 
-        $dias = now()->diffInDays($this->fecha_vencimiento, false);
-        return $dias < 0 ? abs($dias) : 0;
+        // Si la fecha de vencimiento es futura, no hay atraso
+        if ($this->fecha_vencimiento >= now()->startOfDay()) {
+            return 0;
+        }
+
+        // Calcular días de atraso desde la fecha de vencimiento
+        return now()->startOfDay()->diffInDays($this->fecha_vencimiento->startOfDay());
     }
 
     /**
