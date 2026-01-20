@@ -980,7 +980,7 @@
     <!-- Footer -->
     <footer class="footer">
         <p><strong>Sistema APR</strong> - Gestión Integral de Agua Potable Rural</p>
-        <p>&copy; 2025 Todos los derechos reservados</p>
+        <p>&copy; 2026 Todos los derechos reservados</p>
         <div class="social-links">
             <a href="https://facebook.com/sistemaapr" target="_blank" rel="noopener noreferrer" title="Síguenos en Facebook">
                 <i class="fab fa-facebook"></i>
