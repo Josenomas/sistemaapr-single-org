@@ -62,9 +62,9 @@
                         <input type="text"
                                class="form-control"
                                id="buscar_rut"
-                               placeholder="Ej: 12345678-9"
+                               placeholder="12.345.678-9"
                                maxlength="12">
-                        <small class="form-help">Ingrese el RUT para buscar las boletas pendientes del socio</small>
+                        <small class="form-help">El formato se aplicará automáticamente mientras escribe</small>
                     </div>
                     <div class="form-group col-md-4" style="display: flex; align-items: flex-end;">
                         <button type="button" class="btn btn-primary" id="btnBuscarRut" style="width: 100%;">
@@ -734,6 +734,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let totalBoleta = 0;
     let boletaSeleccionada = null;
+
+    // Formatear RUT automáticamente
+    buscarRutInput.addEventListener('input', function(e) {
+        let value = this.value.replace(/[^0-9kK]/g, ''); // Solo números y K
+
+        if (value.length === 0) {
+            this.value = '';
+            return;
+        }
+
+        // Separar cuerpo y dígito verificador
+        let body = value.slice(0, -1);
+        let dv = value.slice(-1).toUpperCase();
+
+        // Formatear el cuerpo con puntos
+        body = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+        // Construir RUT formateado
+        if (value.length <= 1) {
+            this.value = value;
+        } else {
+            this.value = body + '-' + dv;
+        }
+    });
 
     // Búsqueda por RUT
     btnBuscarRut.addEventListener('click', async function() {
