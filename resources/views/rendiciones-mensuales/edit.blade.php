@@ -1,21 +1,22 @@
 @extends('layouts.app')
 
-@section('title', 'Nueva Rendicion Mensual - Sistema APR')
+@section('title', 'Editar Rendicion Mensual - Sistema APR')
 
 @section('content')
 <div class="page-header">
     <h2 class="page-title">
-        <i class="fas fa-plus-circle"></i>
-        Nueva Rendicion Mensual
+        <i class="fas fa-edit"></i>
+        Editar Rendicion Mensual
     </h2>
-    <a href="{{ route('rendiciones-mensuales.index') }}" class="btn btn-secondary">
+    <a href="{{ route('rendiciones-mensuales.show', $rendicion->id) }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i>
         Volver
     </a>
 </div>
 
-<form action="{{ route('rendiciones-mensuales.store') }}" method="POST" id="formRendicion">
+<form action="{{ route('rendiciones-mensuales.update', $rendicion->id) }}" method="POST" id="formRendicion">
     @csrf
+    @method('PUT')
 
     <div class="card mb-3">
         <div class="card-header">
@@ -28,7 +29,7 @@
                     <select name="mes" id="mes" class="form-control @error('mes') is-invalid @enderror" required>
                         <option value="">Seleccione mes</option>
                         @for($i = 1; $i <= 12; $i++)
-                            <option value="{{ $i }}" {{ old('mes') == $i ? 'selected' : '' }}>
+                            <option value="{{ $i }}" {{ old('mes', $rendicion->mes) == $i ? 'selected' : '' }}>
                                 {{ DateTime::createFromFormat('!m', $i)->format('F') }}
                             </option>
                         @endfor
@@ -39,14 +40,14 @@
                 <div class="form-group col-md-4">
                     <label for="anio" class="form-label required">Anio</label>
                     <input type="number" name="anio" id="anio" class="form-control @error('anio') is-invalid @enderror"
-                           value="{{ old('anio', date('Y')) }}" min="2020" max="2100" required>
+                           value="{{ old('anio', $rendicion->anio) }}" min="2020" max="2100" required>
                     @error('anio')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="form-group col-md-4">
                     <label for="saldo_anterior" class="form-label required">Saldo Anterior</label>
                     <input type="number" name="saldo_anterior" id="saldo_anterior" class="form-control @error('saldo_anterior') is-invalid @enderror"
-                           value="{{ old('saldo_anterior', $saldoAnterior) }}" step="0.01" min="0" required>
+                           value="{{ old('saldo_anterior', $rendicion->saldo_anterior) }}" step="0.01" min="0" required>
                     @error('saldo_anterior')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     <small class="form-help">Saldo final del mes anterior</small>
                 </div>
@@ -63,32 +64,32 @@
                 <div class="form-group col-md-6">
                     <label for="ingresos_consumo_agua">Consumo de Agua</label>
                     <input type="number" name="ingresos_consumo_agua" id="ingresos_consumo_agua" class="form-control ingreso-input"
-                           value="{{ old('ingresos_consumo_agua', 0) }}" step="0.01" min="0">
+                           value="{{ old('ingresos_consumo_agua', $rendicion->ingresos_consumo_agua) }}" step="0.01" min="0">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="ingresos_subsidios">Subsidios</label>
                     <input type="number" name="ingresos_subsidios" id="ingresos_subsidios" class="form-control ingreso-input"
-                           value="{{ old('ingresos_subsidios', 0) }}" step="0.01" min="0">
+                           value="{{ old('ingresos_subsidios', $rendicion->ingresos_subsidios) }}" step="0.01" min="0">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="ingresos_aportes_socios">Aportes de Socios</label>
                     <input type="number" name="ingresos_aportes_socios" id="ingresos_aportes_socios" class="form-control ingreso-input"
-                           value="{{ old('ingresos_aportes_socios', 0) }}" step="0.01" min="0">
+                           value="{{ old('ingresos_aportes_socios', $rendicion->ingresos_aportes_socios) }}" step="0.01" min="0">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="ingresos_multas">Multas</label>
                     <input type="number" name="ingresos_multas" id="ingresos_multas" class="form-control ingreso-input"
-                           value="{{ old('ingresos_multas', 0) }}" step="0.01" min="0">
+                           value="{{ old('ingresos_multas', $rendicion->ingresos_multas) }}" step="0.01" min="0">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="ingresos_incorporaciones">Incorporaciones</label>
                     <input type="number" name="ingresos_incorporaciones" id="ingresos_incorporaciones" class="form-control ingreso-input"
-                           value="{{ old('ingresos_incorporaciones', 0) }}" step="0.01" min="0">
+                           value="{{ old('ingresos_incorporaciones', $rendicion->ingresos_incorporaciones) }}" step="0.01" min="0">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="ingresos_otros">Otros Ingresos</label>
                     <input type="number" name="ingresos_otros" id="ingresos_otros" class="form-control ingreso-input"
-                           value="{{ old('ingresos_otros', 0) }}" step="0.01" min="0">
+                           value="{{ old('ingresos_otros', $rendicion->ingresos_otros) }}" step="0.01" min="0">
                 </div>
             </div>
             <div class="total-box bg-success-light">
@@ -107,32 +108,32 @@
                 <div class="form-group col-md-6">
                     <label for="egresos_energia_electrica">Energia Electrica</label>
                     <input type="number" name="egresos_energia_electrica" id="egresos_energia_electrica" class="form-control egreso-input"
-                           value="{{ old('egresos_energia_electrica', 0) }}" step="0.01" min="0">
+                           value="{{ old('egresos_energia_electrica', $rendicion->egresos_energia_electrica) }}" step="0.01" min="0">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="egresos_productos_quimicos">Productos Quimicos</label>
                     <input type="number" name="egresos_productos_quimicos" id="egresos_productos_quimicos" class="form-control egreso-input"
-                           value="{{ old('egresos_productos_quimicos', 0) }}" step="0.01" min="0">
+                           value="{{ old('egresos_productos_quimicos', $rendicion->egresos_productos_quimicos) }}" step="0.01" min="0">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="egresos_reparaciones">Reparaciones</label>
                     <input type="number" name="egresos_reparaciones" id="egresos_reparaciones" class="form-control egreso-input"
-                           value="{{ old('egresos_reparaciones', 0) }}" step="0.01" min="0">
+                           value="{{ old('egresos_reparaciones', $rendicion->egresos_reparaciones) }}" step="0.01" min="0">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="egresos_remuneraciones">Remuneraciones</label>
                     <input type="number" name="egresos_remuneraciones" id="egresos_remuneraciones" class="form-control egreso-input"
-                           value="{{ old('egresos_remuneraciones', 0) }}" step="0.01" min="0">
+                           value="{{ old('egresos_remuneraciones', $rendicion->egresos_remuneraciones) }}" step="0.01" min="0">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="egresos_gastos_administrativos">Gastos Administrativos</label>
                     <input type="number" name="egresos_gastos_administrativos" id="egresos_gastos_administrativos" class="form-control egreso-input"
-                           value="{{ old('egresos_gastos_administrativos', 0) }}" step="0.01" min="0">
+                           value="{{ old('egresos_gastos_administrativos', $rendicion->egresos_gastos_administrativos) }}" step="0.01" min="0">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="egresos_otros">Otros Egresos</label>
                     <input type="number" name="egresos_otros" id="egresos_otros" class="form-control egreso-input"
-                           value="{{ old('egresos_otros', 0) }}" step="0.01" min="0">
+                           value="{{ old('egresos_otros', $rendicion->egresos_otros) }}" step="0.01" min="0">
                 </div>
             </div>
             <div class="total-box bg-danger-light">
@@ -161,7 +162,7 @@
         <div class="card-body">
             <div class="form-group">
                 <label for="observaciones">Observaciones</label>
-                <textarea name="observaciones" id="observaciones" class="form-control" rows="3">{{ old('observaciones') }}</textarea>
+                <textarea name="observaciones" id="observaciones" class="form-control" rows="3">{{ old('observaciones', $rendicion->observaciones) }}</textarea>
             </div>
         </div>
     </div>
@@ -169,9 +170,9 @@
     <div class="form-actions">
         <button type="submit" class="btn btn-primary">
             <i class="fas fa-save"></i>
-            Guardar Rendicion
+            Actualizar Rendicion
         </button>
-        <a href="{{ route('rendiciones-mensuales.index') }}" class="btn btn-secondary">
+        <a href="{{ route('rendiciones-mensuales.show', $rendicion->id) }}" class="btn btn-secondary">
             <i class="fas fa-times"></i>
             Cancelar
         </a>
