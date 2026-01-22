@@ -7,7 +7,7 @@ use App\Models\ActividadReciente;
 use App\Models\Pago;
 use App\Models\Compra;
 use App\Models\Sueldo;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -255,7 +255,7 @@ class RendicionMensualController extends Controller
 
         // Asignar responsable solo si el usuario existe en la BD
         $userId = Auth::id();
-        if (\App\Models\Usuario::find($userId)) {
+        if (User::find($userId)) {
             $rendicion->id_responsable = $userId;
         }
 
