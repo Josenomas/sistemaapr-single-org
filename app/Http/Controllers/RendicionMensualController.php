@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RendicionMensual;
-use App\Models\ActividadReciente;
+use App\Helpers\ActividadHelper;
 use App\Models\Pago;
 use App\Models\Compra;
 use App\Models\Sueldo;
@@ -264,10 +264,9 @@ class RendicionMensualController extends Controller
         $rendicion->save();
 
         // Registrar actividad
-        ActividadReciente::registrar(
-            'rendicion_creada',
-            'Nueva rendición mensual creada: ' . $rendicion->codigo_rendicion . ' - ' . $rendicion->periodo_texto,
-            $rendicion->id
+        ActividadHelper::registrar(
+            'Rendición Mensual',
+            'Nueva rendición mensual creada: ' . $rendicion->codigo_rendicion . ' - ' . $rendicion->periodo_texto
         );
 
         return redirect()->route('rendiciones-mensuales.show', $rendicion->id)
@@ -382,10 +381,9 @@ class RendicionMensualController extends Controller
         $rendicion->save();
 
         // Registrar actividad
-        ActividadReciente::registrar(
-            'rendicion_actualizada',
-            'Rendición mensual actualizada: ' . $rendicion->codigo_rendicion . ' - ' . $rendicion->periodo_texto,
-            $rendicion->id
+        ActividadHelper::registrar(
+            'Rendición Mensual',
+            'Rendición mensual actualizada: ' . $rendicion->codigo_rendicion . ' - ' . $rendicion->periodo_texto
         );
 
         return redirect()->route('rendiciones-mensuales.show', $rendicion->id)
@@ -413,10 +411,9 @@ class RendicionMensualController extends Controller
         $rendicion->save();
 
         // Registrar actividad
-        ActividadReciente::registrar(
-            'rendicion_eliminada',
-            'Rendición mensual eliminada: ' . $codigo . ' - ' . $periodo,
-            null
+        ActividadHelper::registrar(
+            'Rendición Mensual',
+            'Rendición mensual eliminada: ' . $codigo . ' - ' . $periodo
         );
 
         return redirect()->route('rendiciones-mensuales.index')
@@ -471,10 +468,9 @@ class RendicionMensualController extends Controller
         $nombreArchivo = 'Rendicion_' . $rendicion->codigo_rendicion . '_' . $rendicion->periodo . '.pdf';
 
         // Registrar actividad
-        ActividadReciente::registrar(
-            'rendicion_exportada',
-            'Rendición mensual exportada a PDF: ' . $rendicion->codigo_rendicion,
-            $rendicion->id
+        ActividadHelper::registrar(
+            'Rendición Mensual',
+            'Rendición mensual exportada a PDF: ' . $rendicion->codigo_rendicion
         );
 
         return $pdf->download($nombreArchivo);
