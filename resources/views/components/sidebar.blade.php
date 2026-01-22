@@ -82,6 +82,22 @@
             </a>
         </div>
 
+        <!-- Rendición Mensual -->
+        <div class="nav-section">
+            <div class="nav-section-title">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Rendición Mensual</span>
+            </div>
+            <a href="{{ route('rendiciones-mensuales.index') }}" class="nav-item {{ request()->routeIs('rendiciones-mensuales.*') ? 'active' : '' }}">
+                <i class="fas fa-list"></i>
+                <span>Ver Rendiciones</span>
+            </a>
+            <a href="{{ route('rendiciones-mensuales.create') }}" class="nav-item">
+                <i class="fas fa-plus"></i>
+                <span>Nueva Rendición</span>
+            </a>
+        </div>
+
         <!-- Incidentes -->
         <div class="nav-section">
             <div class="nav-section-title">

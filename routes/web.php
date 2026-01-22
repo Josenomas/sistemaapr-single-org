@@ -33,6 +33,7 @@ use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\ConsultaPublicaController;
 use App\Http\Controllers\EventosController;
 use App\Http\Controllers\ActivosFijosController;
+use App\Http\Controllers\RendicionMensualController;
 
 /*
 |--------------------------------------------------------------------------
@@ -203,6 +204,16 @@ Route::middleware('auth')->group(function () {
         Route::resource('compras', ComprasController::class);
         Route::resource('activos-fijos', ActivosFijosController::class);
         Route::get('/activos-fijos-imprimir', [ActivosFijosController::class, 'imprimir'])->name('activos-fijos.imprimir');
+    });
+
+    // ========================================
+    // RENDICIÓN MENSUAL
+    // ========================================
+    Route::middleware(['role:admin,tesorero'])->group(function () {
+        Route::resource('rendiciones-mensuales', RendicionMensualController::class);
+        Route::post('/rendiciones-mensuales/{id}/cerrar-mes', [RendicionMensualController::class, 'cerrarMes'])->name('rendiciones-mensuales.cerrar-mes');
+        Route::post('/rendiciones-mensuales/{id}/reabrir-mes', [RendicionMensualController::class, 'reabrirMes'])->name('rendiciones-mensuales.reabrir-mes');
+        Route::get('/rendiciones-mensuales/{id}/exportar-pdf', [RendicionMensualController::class, 'exportarPDF'])->name('rendiciones-mensuales.exportar-pdf');
     });
 
     // ========================================
