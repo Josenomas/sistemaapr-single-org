@@ -7,6 +7,7 @@ use App\Models\ActividadReciente;
 use App\Models\Pago;
 use App\Models\Compra;
 use App\Models\Sueldo;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -251,7 +252,12 @@ class RendicionMensualController extends Controller
         $rendicion = new RendicionMensual($validated);
         $rendicion->codigo_rendicion = RendicionMensual::generarCodigoRendicion();
         $rendicion->periodo = sprintf('%04d-%02d', $validated['anio'], $validated['mes']);
-        $rendicion->id_responsable = Auth::id();
+
+        // Asignar responsable solo si el usuario existe en la BD
+        $userId = Auth::id();
+        if (\App\Models\Usuario::find($userId)) {
+            $rendicion->id_responsable = $userId;
+        }
 
         // Calcular totales
         $rendicion->calcularTotales();
