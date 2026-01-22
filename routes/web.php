@@ -209,7 +209,7 @@ Route::middleware('auth')->group(function () {
     // ========================================
     // RENDICIÓN MENSUAL
     // ========================================
-    Route::middleware(['role:admin,tesorero'])->group(function () {
+    Route::middleware('permission:pagos')->group(function () {
         Route::resource('rendiciones-mensuales', RendicionMensualController::class);
         Route::post('/rendiciones-mensuales/{id}/cerrar-mes', [RendicionMensualController::class, 'cerrarMes'])->name('rendiciones-mensuales.cerrar-mes');
         Route::post('/rendiciones-mensuales/{id}/reabrir-mes', [RendicionMensualController::class, 'reabrirMes'])->name('rendiciones-mensuales.reabrir-mes');
