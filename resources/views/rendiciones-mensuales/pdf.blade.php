@@ -168,14 +168,14 @@
 <body>
     {{-- Header --}}
     <div class="header">
-        <h1>RENDICIÓN MENSUAL</h1>
+        <h1>RENDICION MENSUAL</h1>
         <h2>Sistema APR - Agua Potable Rural</h2>
     </div>
 
-    {{-- Información General --}}
+    {{-- Informacion General --}}
     <div class="info-box">
         <div class="info-row">
-            <span class="label">Código:</span>
+            <span class="label">Codigo:</span>
             <span class="value">{{ $rendicion->codigo_rendicion }}</span>
         </div>
         <div class="info-row">
@@ -281,12 +281,12 @@
         </thead>
         <tbody>
             <tr>
-                <td>Energía Eléctrica</td>
+                <td>Energia Electrica</td>
                 <td class="text-right">${{ number_format($rendicion->egresos_energia_electrica, 0, ',', '.') }}</td>
                 <td class="text-right">{{ $rendicion->total_egresos > 0 ? number_format(($rendicion->egresos_energia_electrica / $rendicion->total_egresos) * 100, 1) : 0 }}%</td>
             </tr>
             <tr>
-                <td>Productos Químicos</td>
+                <td>Productos Quimicos</td>
                 <td class="text-right">${{ number_format($rendicion->egresos_productos_quimicos, 0, ',', '.') }}</td>
                 <td class="text-right">{{ $rendicion->total_egresos > 0 ? number_format(($rendicion->egresos_productos_quimicos / $rendicion->total_egresos) * 100, 1) : 0 }}%</td>
             </tr>
@@ -329,7 +329,7 @@
     {{-- Footer --}}
     <div class="footer">
         <p>Documento generado el {{ date('d/m/Y H:i') }}</p>
-        <p>Sistema APR - Rendición Mensual {{ $rendicion->codigo_rendicion }}</p>
+        <p>Sistema APR - Rendicion Mensual {{ $rendicion->codigo_rendicion }}</p>
     </div>
 </body>
 </html>

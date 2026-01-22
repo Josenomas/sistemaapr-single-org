@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Rendición Mensual - Sistema APR')
+@section('title', 'Rendicion Mensual - Sistema APR')
 
 @section('content')
 <div class="page-header">
     <h2 class="page-title">
         <i class="fas fa-file-invoice-dollar"></i>
-        Rendición Mensual
+        Rendicion Mensual
     </h2>
     <a href="{{ route('rendiciones-mensuales.create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i>
-        Nueva Rendición
+        Nueva Rendicion
     </a>
 </div>
 
@@ -28,7 +28,7 @@
     </div>
 @endif
 
-<!-- Estadísticas -->
+<!-- Estadisticas -->
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-icon bg-primary">
@@ -66,7 +66,7 @@
         </div>
         <div class="stat-content">
             <div class="stat-value">{{ $estadisticas['anio_actual'] }}</div>
-            <div class="stat-label">Año Actual</div>
+            <div class="stat-label">Anio Actual</div>
         </div>
     </div>
 </div>
@@ -77,12 +77,12 @@
         <form method="GET" action="{{ route('rendiciones-mensuales.index') }}" class="filter-form">
             <div class="form-row">
                 <div class="form-group">
-                    <input type="text" name="search" class="form-control" placeholder="Buscar por código o periodo..." value="{{ request('search') }}">
+                    <input type="text" name="search" class="form-control" placeholder="Buscar por codigo o periodo..." value="{{ request('search') }}">
                 </div>
 
                 <div class="form-group">
                     <select name="anio" class="form-control">
-                        <option value="">Todos los años</option>
+                        <option value="">Todos los anios</option>
                         @foreach($aniosDisponibles as $anio)
                             <option value="{{ $anio }}" {{ request('anio') == $anio ? 'selected' : '' }}>{{ $anio }}</option>
                         @endforeach
@@ -136,7 +136,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Código</th>
+                        <th>Codigo</th>
                         <th>Periodo</th>
                         <th>Saldo Anterior</th>
                         <th>Ingresos</th>
@@ -157,7 +157,7 @@
                             <td class="{{ $rendicion->es_deficit ? 'text-danger' : 'text-success' }}">
                                 <strong>{{ $rendicion->saldo_final_formateado }}</strong>
                                 @if($rendicion->es_deficit)
-                                    <i class="fas fa-exclamation-triangle text-danger" title="Déficit"></i>
+                                    <i class="fas fa-exclamation-triangle text-danger" title="Deficit"></i>
                                 @endif
                             </td>
                             <td>{!! $rendicion->estado_badge !!}</td>
@@ -170,7 +170,7 @@
                                         <a href="{{ route('rendiciones-mensuales.edit', $rendicion->id) }}" class="btn btn-sm btn-warning" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('rendiciones-mensuales.destroy', $rendicion->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Está seguro de eliminar esta rendición?');">
+                                        <form action="{{ route('rendiciones-mensuales.destroy', $rendicion->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Esta seguro de eliminar esta rendicion?');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">

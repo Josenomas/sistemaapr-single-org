@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Nueva Rendición Mensual - Sistema APR')
+@section('title', 'Nueva Rendicion Mensual - Sistema APR')
 
 @section('content')
 <div class="page-header">
     <h2 class="page-title">
         <i class="fas fa-plus-circle"></i>
-        Nueva Rendición Mensual
+        Nueva Rendicion Mensual
     </h2>
     <a href="{{ route('rendiciones-mensuales.index') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i>
@@ -19,7 +19,7 @@
 
     <div class="card mb-3">
         <div class="card-header">
-            <h3><i class="fas fa-calendar"></i> Información del Periodo</h3>
+            <h3><i class="fas fa-calendar"></i> Informacion del Periodo</h3>
         </div>
         <div class="card-body">
             <div class="form-row">
@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="form-group col-md-4">
-                    <label for="anio" class="form-label required">Año</label>
+                    <label for="anio" class="form-label required">Anio</label>
                     <input type="number" name="anio" id="anio" class="form-control @error('anio') is-invalid @enderror"
                            value="{{ old('anio', date('Y')) }}" min="2020" max="2100" required>
                     @error('anio')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -105,12 +105,12 @@
         <div class="card-body">
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label for="egresos_energia_electrica">Energía Eléctrica</label>
+                    <label for="egresos_energia_electrica">Energia Electrica</label>
                     <input type="number" name="egresos_energia_electrica" id="egresos_energia_electrica" class="form-control egreso-input"
                            value="{{ old('egresos_energia_electrica', 0) }}" step="0.01" min="0">
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="egresos_productos_quimicos">Productos Químicos</label>
+                    <label for="egresos_productos_quimicos">Productos Quimicos</label>
                     <input type="number" name="egresos_productos_quimicos" id="egresos_productos_quimicos" class="form-control egreso-input"
                            value="{{ old('egresos_productos_quimicos', 0) }}" step="0.01" min="0">
                 </div>
@@ -169,7 +169,7 @@
     <div class="form-actions">
         <button type="submit" class="btn btn-primary">
             <i class="fas fa-save"></i>
-            Guardar Rendición
+            Guardar Rendicion
         </button>
         <a href="{{ route('rendiciones-mensuales.index') }}" class="btn btn-secondary">
             <i class="fas fa-times"></i>

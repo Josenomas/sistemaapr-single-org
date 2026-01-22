@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Nueva Rendición Mensual - Sistema APR')
+@section('title', 'Nueva Rendicion Mensual - Sistema APR')
 
 @section('content')
 <div class="page-header">
     <h2 class="page-title">
         <i class="fas fa-plus-circle"></i>
-        Nueva Rendición Mensual
+        Nueva Rendicion Mensual
     </h2>
     <a href="{{ route('rendiciones-mensuales.index') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i>
@@ -15,10 +15,10 @@
 </div>
 
 @if(!$montosCalculados)
-    {{-- PASO 1: Seleccionar período --}}
+    {{-- PASO 1: Seleccionar periodo --}}
     <div class="card">
         <div class="card-header">
-            <h3><i class="fas fa-calendar"></i> Seleccionar Período a Rendir</h3>
+            <h3><i class="fas fa-calendar"></i> Seleccionar Periodo a Rendir</h3>
         </div>
         <div class="card-body">
             <form action="{{ route('rendiciones-mensuales.create') }}" method="GET">
@@ -58,14 +58,14 @@
 
                 <div class="alert alert-info mt-3">
                     <i class="fas fa-info-circle"></i>
-                    <strong>¿Cómo funciona?</strong><br>
-                    El sistema calculará automáticamente los montos desde:
+                    <strong>Como funciona?</strong><br>
+                    El sistema calculara automaticamente los montos desde:
                     <ul class="mb-0 mt-2">
                         <li><strong>Ingresos por consumo de agua:</strong> Desde pagos recibidos</li>
                         <li><strong>Egresos de remuneraciones:</strong> Desde sueldos pagados</li>
-                        <li><strong>Egresos de compras:</strong> Desde compras registradas (energía, químicos, reparaciones, etc.)</li>
+                        <li><strong>Egresos de compras:</strong> Desde compras registradas (energia, quimicos, reparaciones, etc.)</li>
                     </ul>
-                    Luego podrás revisar y ajustar los montos antes de guardar.
+                    Luego podras revisar y ajustar los montos antes de guardar.
                 </div>
             </form>
         </div>
@@ -75,7 +75,7 @@
     {{-- PASO 2: Formulario con montos calculados --}}
     <div class="alert alert-success">
         <i class="fas fa-check-circle"></i>
-        <strong>Montos calculados automáticamente</strong><br>
+        <strong>Montos calculados automaticamente</strong><br>
         Los siguientes montos fueron calculados desde las transacciones registradas en el sistema.
         Puedes ajustarlos manualmente si es necesario.
     </div>
@@ -108,7 +108,7 @@
                     <div class="form-group col-md-4">
                         <a href="{{ route('rendiciones-mensuales.create') }}" class="btn btn-secondary mt-4">
                             <i class="fas fa-redo"></i>
-                            Cambiar Período
+                            Cambiar Periodo
                         </a>
                     </div>
                 </div>
@@ -378,10 +378,10 @@
             <div class="card-body">
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="egresos_energia_electrica">Energía Eléctrica</label>
+                        <label for="egresos_energia_electrica">Energia Electrica</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <span class="input-group-text bg-success text-white" title="Calculado automáticamente"><i class="fas fa-calculator"></i></span>
+                                <span class="input-group-text bg-success text-white" title="Calculado automaticamente"><i class="fas fa-calculator"></i></span>
                             </div>
                             <input type="number" name="egresos_energia_electrica" id="egresos_energia_electrica" class="form-control egreso-input"
                                    value="{{ old('egresos_energia_electrica', $montosCalculados['egresos_energia_electrica']) }}" step="0.01" min="0">
@@ -389,7 +389,7 @@
                         <small class="form-help text-success">✓ Desde compras</small>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="egresos_productos_quimicos">Productos Químicos</label>
+                        <label for="egresos_productos_quimicos">Productos Quimicos</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text bg-success text-white" title="Calculado automáticamente"><i class="fas fa-calculator"></i></span>
@@ -503,7 +503,7 @@
             </a>
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i>
-                Guardar Rendición
+                Guardar Rendicion
             </button>
         </div>
     </form>

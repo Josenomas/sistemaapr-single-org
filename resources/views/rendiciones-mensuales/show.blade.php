@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Detalle Rendición Mensual - Sistema APR')
+@section('title', 'Detalle Rendicion Mensual - Sistema APR')
 
 @section('content')
 <div class="page-header">
     <h2 class="page-title">
         <i class="fas fa-file-invoice-dollar"></i>
-        Rendición {{ $rendicion->codigo_rendicion }}
+        Rendicion {{ $rendicion->codigo_rendicion }}
     </h2>
     <div class="header-actions">
         @if($rendicion->estado == 'abierto')
@@ -68,7 +68,7 @@
 
 <!-- Info General -->
 <div class="card mb-3">
-    <div class="card-header"><h3><i class="fas fa-info-circle"></i> Información General</h3></div>
+    <div class="card-header"><h3><i class="fas fa-info-circle"></i> Informacion General</h3></div>
     <div class="card-body">
         <div class="info-grid">
             <div><strong>Periodo:</strong> {{ $rendicion->periodo_texto }}</div>
@@ -138,12 +138,12 @@
         <div class="card-body">
             <table class="detail-table">
                 <tr>
-                    <td>Energía Eléctrica</td>
+                    <td>Energia Electrica</td>
                     <td class="text-right"><strong>${{ number_format($rendicion->egresos_energia_electrica, 0, ',', '.') }}</strong></td>
                     <td class="text-muted">{{ $rendicion->porcentaje_egresos['energia'] }}%</td>
                 </tr>
                 <tr>
-                    <td>Productos Químicos</td>
+                    <td>Productos Quimicos</td>
                     <td class="text-right"><strong>${{ number_format($rendicion->egresos_productos_quimicos, 0, ',', '.') }}</strong></td>
                     <td class="text-muted">{{ $rendicion->porcentaje_egresos['quimicos'] }}%</td>
                 </tr>
@@ -192,9 +192,9 @@
             <button type="button" class="btn btn-success" onclick="abrirModalCerrar()">
                 <i class="fas fa-lock"></i> Cerrar Mes
             </button>
-            <p class="text-muted mt-2">Al cerrar el mes, no se podrá editar esta rendición.</p>
+            <p class="text-muted mt-2">Al cerrar el mes, no se podra editar esta rendicion.</p>
         @else
-            <form action="{{ route('rendiciones-mensuales.reabrir-mes', $rendicion->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Está seguro de reabrir este mes?');">
+            <form action="{{ route('rendiciones-mensuales.reabrir-mes', $rendicion->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Esta seguro de reabrir este mes?');">
                 @csrf
                 <button type="submit" class="btn btn-warning">
                     <i class="fas fa-unlock"></i> Reabrir Mes
@@ -219,8 +219,8 @@
         <form action="{{ route('rendiciones-mensuales.cerrar-mes', $rendicion->id) }}" method="POST">
             @csrf
             <div class="modal-body">
-                <p>¿Está seguro de cerrar la rendición de <strong>{{ $rendicion->periodo_texto }}</strong>?</p>
-                <p class="text-warning"><i class="fas fa-exclamation-triangle"></i> Una vez cerrada, no se podrá editar.</p>
+                <p>Esta seguro de cerrar la rendicion de <strong>{{ $rendicion->periodo_texto }}</strong>?</p>
+                <p class="text-warning"><i class="fas fa-exclamation-triangle"></i> Una vez cerrada, no se podra editar.</p>
                 <div class="form-group">
                     <label for="notas_cierre">Notas de Cierre (opcional)</label>
                     <textarea name="notas_cierre" id="notas_cierre" class="form-control" rows="3"></textarea>
