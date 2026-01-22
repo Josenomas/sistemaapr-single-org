@@ -117,109 +117,198 @@
 
         {{-- Resumen de transacciones encontradas --}}
         <div class="card mb-3">
-            <div class="card-header bg-info-light">
-                <h3><i class="fas fa-database"></i> Transacciones Encontradas</h3>
+            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h3 class="mb-0"><i class="fas fa-database"></i> Transacciones Encontradas en el Sistema</h3>
             </div>
             <div class="card-body">
-                <div class="row">
+                <div class="row mb-4">
                     <div class="col-md-4">
-                        <div class="stat-card">
-                            <div class="stat-value">{{ $detalles['pagos']->count() }}</div>
-                            <div class="stat-label">Pagos Recibidos</div>
+                        <div class="transaction-stat-card bg-success">
+                            <div class="stat-icon">
+                                <i class="fas fa-hand-holding-usd"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number">{{ $detalles['pagos']->count() }}</div>
+                                <div class="stat-title">Pagos Recibidos</div>
+                                <div class="stat-subtitle">Ingresos del periodo</div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="stat-card">
-                            <div class="stat-value">{{ $detalles['compras']->count() }}</div>
-                            <div class="stat-label">Compras Realizadas</div>
+                        <div class="transaction-stat-card bg-warning">
+                            <div class="stat-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number">{{ $detalles['compras']->count() }}</div>
+                                <div class="stat-title">Compras Realizadas</div>
+                                <div class="stat-subtitle">Egresos por compras</div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="stat-card">
-                            <div class="stat-value">{{ $detalles['sueldos']->count() }}</div>
-                            <div class="stat-label">Sueldos Pagados</div>
+                        <div class="transaction-stat-card bg-info">
+                            <div class="stat-icon">
+                                <i class="fas fa-money-check-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number">{{ $detalles['sueldos']->count() }}</div>
+                                <div class="stat-title">Sueldos Pagados</div>
+                                <div class="stat-subtitle">Remuneraciones del periodo</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <button type="button" class="btn btn-sm btn-outline-primary mt-3" data-toggle="collapse" data-target="#detalleTransacciones">
-                    <i class="fas fa-eye"></i>
-                    Ver Detalle de Transacciones
-                </button>
+                <div class="text-center mb-3">
+                    <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#detalleTransacciones">
+                        <i class="fas fa-list-ul"></i>
+                        Ver Detalle Completo de Transacciones
+                    </button>
+                </div>
 
-                <div class="collapse mt-3" id="detalleTransacciones">
-                    <h5>Pagos Recibidos ({{ $detalles['pagos']->count() }})</h5>
-                    <div class="table-responsive mb-3">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Socio</th>
-                                    <th>Monto</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($detalles['pagos'] as $pago)
-                                <tr>
-                                    <td>{{ $pago->fecha_pago_formateada }}</td>
-                                    <td>{{ $pago->socio->nombre ?? '-' }}</td>
-                                    <td>{{ $pago->monto_pagado_formateado }}</td>
-                                </tr>
-                                @empty
-                                <tr><td colspan="3" class="text-center">Sin pagos registrados</td></tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                <div class="collapse" id="detalleTransacciones">
+                    {{-- Pagos Recibidos --}}
+                    <div class="card mb-3">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                Pagos Recibidos ({{ $detalles['pagos']->count() }})
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th width="15%">Fecha</th>
+                                            <th width="55%">Socio</th>
+                                            <th width="30%" class="text-right">Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($detalles['pagos'] as $pago)
+                                        <tr>
+                                            <td><i class="far fa-calendar"></i> {{ $pago->fecha_pago_formateada }}</td>
+                                            <td><i class="fas fa-user"></i> {{ $pago->socio->nombre ?? '-' }}</td>
+                                            <td class="text-right"><strong class="text-success">{{ $pago->monto_pagado_formateado }}</strong></td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="3" class="text-center text-muted py-4">
+                                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                                <br>Sin pagos registrados en este periodo
+                                            </td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                    @if($detalles['pagos']->count() > 0)
+                                    <tfoot class="bg-light">
+                                        <tr>
+                                            <td colspan="2"><strong>TOTAL INGRESOS POR PAGOS</strong></td>
+                                            <td class="text-right"><strong class="text-success">${{ number_format($detalles['pagos']->sum('monto_pagado'), 0, ',', '.') }}</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                    @endif
+                                </table>
+                            </div>
+                        </div>
                     </div>
 
-                    <h5>Compras Realizadas ({{ $detalles['compras']->count() }})</h5>
-                    <div class="table-responsive mb-3">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Proveedor</th>
-                                    <th>Descripción</th>
-                                    <th>Tipo</th>
-                                    <th>Monto</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($detalles['compras'] as $compra)
-                                <tr>
-                                    <td>{{ $compra->fecha_compra_formateada }}</td>
-                                    <td>{{ $compra->proveedor }}</td>
-                                    <td>{{ $compra->descripcion }}</td>
-                                    <td>{!! $compra->tipo_compra_badge !!}</td>
-                                    <td>{{ $compra->total_formateado }}</td>
-                                </tr>
-                                @empty
-                                <tr><td colspan="5" class="text-center">Sin compras registradas</td></tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                    {{-- Compras Realizadas --}}
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-shopping-cart"></i>
+                                Compras Realizadas ({{ $detalles['compras']->count() }})
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th width="10%">Fecha</th>
+                                            <th width="20%">Proveedor</th>
+                                            <th width="35%">Descripción</th>
+                                            <th width="15%">Tipo</th>
+                                            <th width="20%" class="text-right">Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($detalles['compras'] as $compra)
+                                        <tr>
+                                            <td><i class="far fa-calendar"></i> {{ $compra->fecha_compra_formateada }}</td>
+                                            <td><i class="fas fa-truck"></i> {{ $compra->proveedor }}</td>
+                                            <td>{{ \Str::limit($compra->descripcion, 50) }}</td>
+                                            <td>{!! $compra->tipo_compra_badge !!}</td>
+                                            <td class="text-right"><strong class="text-danger">{{ $compra->total_formateado }}</strong></td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">
+                                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                                <br>Sin compras registradas en este periodo
+                                            </td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                    @if($detalles['compras']->count() > 0)
+                                    <tfoot class="bg-light">
+                                        <tr>
+                                            <td colspan="4"><strong>TOTAL EGRESOS POR COMPRAS</strong></td>
+                                            <td class="text-right"><strong class="text-danger">${{ number_format($detalles['compras']->sum('total'), 0, ',', '.') }}</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                    @endif
+                                </table>
+                            </div>
+                        </div>
                     </div>
 
-                    <h5>Sueldos Pagados ({{ $detalles['sueldos']->count() }})</h5>
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Funcionario</th>
-                                    <th>Monto Líquido</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($detalles['sueldos'] as $sueldo)
-                                <tr>
-                                    <td>{{ $sueldo->funcionario->nombre ?? '-' }}</td>
-                                    <td>{{ $sueldo->total_liquido_formateado }}</td>
-                                </tr>
-                                @empty
-                                <tr><td colspan="2" class="text-center">Sin sueldos registrados</td></tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                    {{-- Sueldos Pagados --}}
+                    <div class="card mb-3">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-money-check-alt"></i>
+                                Sueldos Pagados ({{ $detalles['sueldos']->count() }})
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th width="70%">Funcionario</th>
+                                            <th width="30%" class="text-right">Monto Líquido</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($detalles['sueldos'] as $sueldo)
+                                        <tr>
+                                            <td><i class="fas fa-user-tie"></i> {{ $sueldo->funcionario->nombre ?? '-' }}</td>
+                                            <td class="text-right"><strong class="text-danger">{{ $sueldo->total_liquido_formateado }}</strong></td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="2" class="text-center text-muted py-4">
+                                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                                <br>Sin sueldos registrados en este periodo
+                                            </td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                    @if($detalles['sueldos']->count() > 0)
+                                    <tfoot class="bg-light">
+                                        <tr>
+                                            <td><strong>TOTAL EGRESOS POR SUELDOS</strong></td>
+                                            <td class="text-right"><strong class="text-danger">${{ number_format($detalles['sueldos']->sum('total_liquido'), 0, ',', '.') }}</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                    @endif
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -463,6 +552,55 @@
         display: block;
         margin-top: 5px;
         font-size: 12px;
+    }
+
+    /* Nuevos estilos para tarjetas de transacciones */
+    .transaction-stat-card {
+        border-radius: 12px;
+        padding: 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+        margin-bottom: 15px;
+    }
+    .transaction-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    .transaction-stat-card .stat-icon {
+        font-size: 48px;
+        opacity: 0.9;
+    }
+    .transaction-stat-card .stat-info {
+        flex: 1;
+    }
+    .transaction-stat-card .stat-number {
+        font-size: 36px;
+        font-weight: bold;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+    .transaction-stat-card .stat-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .transaction-stat-card .stat-subtitle {
+        font-size: 13px;
+        opacity: 0.9;
+    }
+    .table thead th {
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
     }
 </style>
 @endpush
