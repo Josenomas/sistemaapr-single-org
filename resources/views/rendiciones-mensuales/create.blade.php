@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Nueva Rendici�n Mensual - Sistema APR')
+@section('title', 'Nueva Rendición Mensual - Sistema APR')
 
 @section('content')
 <div class="page-header">
     <h2 class="page-title">
         <i class="fas fa-plus-circle"></i>
-        Nueva Rendici�n Mensual
+        Nueva Rendición Mensual
     </h2>
     <a href="{{ route('rendiciones-mensuales.index') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i>
@@ -14,227 +14,467 @@
     </a>
 </div>
 
-<form action="{{ route('rendiciones-mensuales.store') }}" method="POST" id="formRendicion">
-    @csrf
-
-    <div class="card mb-3">
+@if(!$montosCalculados)
+    {{-- PASO 1: Seleccionar período --}}
+    <div class="card">
         <div class="card-header">
-            <h3><i class="fas fa-calendar"></i> Informaci�n del Periodo</h3>
+            <h3><i class="fas fa-calendar"></i> Seleccionar Período a Rendir</h3>
         </div>
         <div class="card-body">
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="mes" class="form-label required">Mes</label>
-                    <select name="mes" id="mes" class="form-control @error('mes') is-invalid @enderror" required>
-                        <option value="">Seleccione mes</option>
-                        @for($i = 1; $i <= 12; $i++)
-                            <option value="{{ $i }}" {{ old('mes') == $i ? 'selected' : '' }}>
-                                {{ DateTime::createFromFormat('!m', $i)->format('F') }}
-                            </option>
-                        @endfor
-                    </select>
-                    @error('mes')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            <form action="{{ route('rendiciones-mensuales.create') }}" method="GET">
+                <div class="form-row">
+                    <div class="form-group col-md-5">
+                        <label for="mes" class="form-label required">Mes</label>
+                        <select name="mes" id="mes" class="form-control" required>
+                            <option value="">Seleccione mes</option>
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-5">
+                        <label for="anio" class="form-label required">Año</label>
+                        <input type="number" name="anio" id="anio" class="form-control"
+                               value="{{ date('Y') }}" min="2020" max="2100" required>
+                    </div>
+
+                    <div class="form-group col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-calculator"></i>
+                            Calcular
+                        </button>
+                    </div>
                 </div>
 
-                <div class="form-group col-md-4">
-                    <label for="anio" class="form-label required">A�o</label>
-                    <input type="number" name="anio" id="anio" class="form-control @error('anio') is-invalid @enderror"
-                           value="{{ old('anio', date('Y')) }}" min="2020" max="2100" required>
-                    @error('anio')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>¿Cómo funciona?</strong><br>
+                    El sistema calculará automáticamente los montos desde:
+                    <ul class="mb-0 mt-2">
+                        <li><strong>Ingresos por consumo de agua:</strong> Desde pagos recibidos</li>
+                        <li><strong>Egresos de remuneraciones:</strong> Desde sueldos pagados</li>
+                        <li><strong>Egresos de compras:</strong> Desde compras registradas (energía, químicos, reparaciones, etc.)</li>
+                    </ul>
+                    Luego podrás revisar y ajustar los montos antes de guardar.
                 </div>
-
-                <div class="form-group col-md-4">
-                    <label for="saldo_anterior" class="form-label required">Saldo Anterior</label>
-                    <input type="number" name="saldo_anterior" id="saldo_anterior" class="form-control @error('saldo_anterior') is-invalid @enderror"
-                           value="{{ old('saldo_anterior', $saldoAnterior) }}" step="0.01" min="0" required>
-                    @error('saldo_anterior')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    <small class="form-help">Saldo final del mes anterior</small>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 
-    <div class="card mb-3">
-        <div class="card-header bg-success-light">
-            <h3><i class="fas fa-arrow-down"></i> Ingresos</h3>
-        </div>
-        <div class="card-body">
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="ingresos_consumo_agua">Consumo de Agua</label>
-                    <input type="number" name="ingresos_consumo_agua" id="ingresos_consumo_agua" class="form-control ingreso-input"
-                           value="{{ old('ingresos_consumo_agua', 0) }}" step="0.01" min="0">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="ingresos_subsidios">Subsidios</label>
-                    <input type="number" name="ingresos_subsidios" id="ingresos_subsidios" class="form-control ingreso-input"
-                           value="{{ old('ingresos_subsidios', 0) }}" step="0.01" min="0">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="ingresos_aportes_socios">Aportes de Socios</label>
-                    <input type="number" name="ingresos_aportes_socios" id="ingresos_aportes_socios" class="form-control ingreso-input"
-                           value="{{ old('ingresos_aportes_socios', 0) }}" step="0.01" min="0">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="ingresos_multas">Multas</label>
-                    <input type="number" name="ingresos_multas" id="ingresos_multas" class="form-control ingreso-input"
-                           value="{{ old('ingresos_multas', 0) }}" step="0.01" min="0">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="ingresos_incorporaciones">Incorporaciones</label>
-                    <input type="number" name="ingresos_incorporaciones" id="ingresos_incorporaciones" class="form-control ingreso-input"
-                           value="{{ old('ingresos_incorporaciones', 0) }}" step="0.01" min="0">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="ingresos_otros">Otros Ingresos</label>
-                    <input type="number" name="ingresos_otros" id="ingresos_otros" class="form-control ingreso-input"
-                           value="{{ old('ingresos_otros', 0) }}" step="0.01" min="0">
-                </div>
-            </div>
-            <div class="total-box bg-success-light">
-                <strong>Total Ingresos:</strong>
-                <span id="totalIngresos">$0</span>
-            </div>
-        </div>
+@else
+    {{-- PASO 2: Formulario con montos calculados --}}
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        <strong>Montos calculados automáticamente</strong><br>
+        Los siguientes montos fueron calculados desde las transacciones registradas en el sistema.
+        Puedes ajustarlos manualmente si es necesario.
     </div>
 
-    <div class="card mb-3">
-        <div class="card-header bg-danger-light">
-            <h3><i class="fas fa-arrow-up"></i> Egresos</h3>
-        </div>
-        <div class="card-body">
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="egresos_energia_electrica">Energ�a El�ctrica</label>
-                    <input type="number" name="egresos_energia_electrica" id="egresos_energia_electrica" class="form-control egreso-input"
-                           value="{{ old('egresos_energia_electrica', 0) }}" step="0.01" min="0">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="egresos_productos_quimicos">Productos Qu�micos</label>
-                    <input type="number" name="egresos_productos_quimicos" id="egresos_productos_quimicos" class="form-control egreso-input"
-                           value="{{ old('egresos_productos_quimicos', 0) }}" step="0.01" min="0">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="egresos_reparaciones">Reparaciones</label>
-                    <input type="number" name="egresos_reparaciones" id="egresos_reparaciones" class="form-control egreso-input"
-                           value="{{ old('egresos_reparaciones', 0) }}" step="0.01" min="0">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="egresos_remuneraciones">Remuneraciones</label>
-                    <input type="number" name="egresos_remuneraciones" id="egresos_remuneraciones" class="form-control egreso-input"
-                           value="{{ old('egresos_remuneraciones', 0) }}" step="0.01" min="0">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="egresos_gastos_administrativos">Gastos Administrativos</label>
-                    <input type="number" name="egresos_gastos_administrativos" id="egresos_gastos_administrativos" class="form-control egreso-input"
-                           value="{{ old('egresos_gastos_administrativos', 0) }}" step="0.01" min="0">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="egresos_otros">Otros Egresos</label>
-                    <input type="number" name="egresos_otros" id="egresos_otros" class="form-control egreso-input"
-                           value="{{ old('egresos_otros', 0) }}" step="0.01" min="0">
-                </div>
-            </div>
-            <div class="total-box bg-danger-light">
-                <strong>Total Egresos:</strong>
-                <span id="totalEgresos">$0</span>
-            </div>
-        </div>
-    </div>
+    <form action="{{ route('rendiciones-mensuales.store') }}" method="POST" id="formRendicion">
+        @csrf
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="saldo-final-box" id="saldoFinalBox">
-                <h3>Saldo Final</h3>
-                <div class="saldo-calculation">
-                    <div><strong>Saldo Anterior:</strong> <span id="displaySaldoAnterior">$0</span></div>
-                    <div class="text-success"><strong>+ Ingresos:</strong> <span id="displayIngresos">$0</span></div>
-                    <div class="text-danger"><strong>- Egresos:</strong> <span id="displayEgresos">$0</span></div>
-                    <hr>
-                    <div class="saldo-final"><strong>= Saldo Final:</strong> <span id="displaySaldoFinal">$0</span></div>
+        <input type="hidden" name="mes" value="{{ request('mes') }}">
+        <input type="hidden" name="anio" value="{{ request('anio') }}">
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3><i class="fas fa-calendar"></i> Información del Periodo</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label class="form-label">Periodo</label>
+                        <input type="text" class="form-control" value="{{ date('F Y', strtotime(request('anio').'-'.request('mes').'-01')) }}" readonly>
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label for="saldo_anterior" class="form-label required">Saldo Anterior</label>
+                        <input type="number" name="saldo_anterior" id="saldo_anterior" class="form-control @error('saldo_anterior') is-invalid @enderror"
+                               value="{{ old('saldo_anterior', $saldoAnterior) }}" step="0.01" min="0" required>
+                        @error('saldo_anterior')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <small class="form-help">Saldo final del mes anterior</small>
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <a href="{{ route('rendiciones-mensuales.create') }}" class="btn btn-secondary mt-4">
+                            <i class="fas fa-redo"></i>
+                            Cambiar Período
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="form-group">
-                <label for="observaciones">Observaciones</label>
-                <textarea name="observaciones" id="observaciones" class="form-control" rows="3">{{ old('observaciones') }}</textarea>
+        {{-- Resumen de transacciones encontradas --}}
+        <div class="card mb-3">
+            <div class="card-header bg-info-light">
+                <h3><i class="fas fa-database"></i> Transacciones Encontradas</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ $detalles['pagos']->count() }}</div>
+                            <div class="stat-label">Pagos Recibidos</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ $detalles['compras']->count() }}</div>
+                            <div class="stat-label">Compras Realizadas</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ $detalles['sueldos']->count() }}</div>
+                            <div class="stat-label">Sueldos Pagados</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-sm btn-outline-primary mt-3" data-toggle="collapse" data-target="#detalleTransacciones">
+                    <i class="fas fa-eye"></i>
+                    Ver Detalle de Transacciones
+                </button>
+
+                <div class="collapse mt-3" id="detalleTransacciones">
+                    <h5>Pagos Recibidos ({{ $detalles['pagos']->count() }})</h5>
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Socio</th>
+                                    <th>Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($detalles['pagos'] as $pago)
+                                <tr>
+                                    <td>{{ $pago->fecha_pago_formateada }}</td>
+                                    <td>{{ $pago->socio->nombre ?? '-' }}</td>
+                                    <td>{{ $pago->monto_pagado_formateado }}</td>
+                                </tr>
+                                @empty
+                                <tr><td colspan="3" class="text-center">Sin pagos registrados</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h5>Compras Realizadas ({{ $detalles['compras']->count() }})</h5>
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Proveedor</th>
+                                    <th>Descripción</th>
+                                    <th>Tipo</th>
+                                    <th>Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($detalles['compras'] as $compra)
+                                <tr>
+                                    <td>{{ $compra->fecha_compra_formateada }}</td>
+                                    <td>{{ $compra->proveedor }}</td>
+                                    <td>{{ $compra->descripcion }}</td>
+                                    <td>{!! $compra->tipo_compra_badge !!}</td>
+                                    <td>{{ $compra->total_formateado }}</td>
+                                </tr>
+                                @empty
+                                <tr><td colspan="5" class="text-center">Sin compras registradas</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h5>Sueldos Pagados ({{ $detalles['sueldos']->count() }})</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Funcionario</th>
+                                    <th>Monto Líquido</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($detalles['sueldos'] as $sueldo)
+                                <tr>
+                                    <td>{{ $sueldo->funcionario->nombre ?? '-' }}</td>
+                                    <td>{{ $sueldo->total_liquido_formateado }}</td>
+                                </tr>
+                                @empty
+                                <tr><td colspan="2" class="text-center">Sin sueldos registrados</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i>
-            Guardar Rendici�n
-        </button>
-        <a href="{{ route('rendiciones-mensuales.index') }}" class="btn btn-secondary">
-            <i class="fas fa-times"></i>
-            Cancelar
-        </a>
-    </div>
-</form>
+        {{-- INGRESOS --}}
+        <div class="card mb-3">
+            <div class="card-header bg-success-light">
+                <h3><i class="fas fa-arrow-down"></i> Ingresos</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="ingresos_consumo_agua">Consumo de Agua</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-success text-white" title="Calculado automáticamente"><i class="fas fa-calculator"></i></span>
+                            </div>
+                            <input type="number" name="ingresos_consumo_agua" id="ingresos_consumo_agua" class="form-control ingreso-input"
+                                   value="{{ old('ingresos_consumo_agua', $montosCalculados['ingresos_consumo_agua']) }}" step="0.01" min="0">
+                        </div>
+                        <small class="form-help text-success">✓ {{ $detalles['pagos']->count() }} pagos encontrados</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="ingresos_subsidios">Subsidios</label>
+                        <input type="number" name="ingresos_subsidios" id="ingresos_subsidios" class="form-control ingreso-input"
+                               value="{{ old('ingresos_subsidios', $montosCalculados['ingresos_subsidios']) }}" step="0.01" min="0">
+                        <small class="form-help text-muted">Ingresar manualmente</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="ingresos_aportes_socios">Aportes de Socios</label>
+                        <input type="number" name="ingresos_aportes_socios" id="ingresos_aportes_socios" class="form-control ingreso-input"
+                               value="{{ old('ingresos_aportes_socios', $montosCalculados['ingresos_aportes_socios']) }}" step="0.01" min="0">
+                        <small class="form-help text-muted">Ingresar manualmente</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="ingresos_multas">Multas</label>
+                        <input type="number" name="ingresos_multas" id="ingresos_multas" class="form-control ingreso-input"
+                               value="{{ old('ingresos_multas', $montosCalculados['ingresos_multas']) }}" step="0.01" min="0">
+                        <small class="form-help text-muted">Ingresar manualmente</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="ingresos_incorporaciones">Incorporaciones</label>
+                        <input type="number" name="ingresos_incorporaciones" id="ingresos_incorporaciones" class="form-control ingreso-input"
+                               value="{{ old('ingresos_incorporaciones', $montosCalculados['ingresos_incorporaciones']) }}" step="0.01" min="0">
+                        <small class="form-help text-muted">Ingresar manualmente</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="ingresos_otros">Otros Ingresos</label>
+                        <input type="number" name="ingresos_otros" id="ingresos_otros" class="form-control ingreso-input"
+                               value="{{ old('ingresos_otros', $montosCalculados['ingresos_otros']) }}" step="0.01" min="0">
+                        <small class="form-help text-muted">Ingresar manualmente</small>
+                    </div>
+                </div>
+                <div class="total-box bg-success-light">
+                    <strong>Total Ingresos:</strong>
+                    <span id="totalIngresos">$0</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- EGRESOS --}}
+        <div class="card mb-3">
+            <div class="card-header bg-danger-light">
+                <h3><i class="fas fa-arrow-up"></i> Egresos</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="egresos_energia_electrica">Energía Eléctrica</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-success text-white" title="Calculado automáticamente"><i class="fas fa-calculator"></i></span>
+                            </div>
+                            <input type="number" name="egresos_energia_electrica" id="egresos_energia_electrica" class="form-control egreso-input"
+                                   value="{{ old('egresos_energia_electrica', $montosCalculados['egresos_energia_electrica']) }}" step="0.01" min="0">
+                        </div>
+                        <small class="form-help text-success">✓ Desde compras</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="egresos_productos_quimicos">Productos Químicos</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-success text-white" title="Calculado automáticamente"><i class="fas fa-calculator"></i></span>
+                            </div>
+                            <input type="number" name="egresos_productos_quimicos" id="egresos_productos_quimicos" class="form-control egreso-input"
+                                   value="{{ old('egresos_productos_quimicos', $montosCalculados['egresos_productos_quimicos']) }}" step="0.01" min="0">
+                        </div>
+                        <small class="form-help text-success">✓ Desde compras</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="egresos_reparaciones">Reparaciones</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-success text-white" title="Calculado automáticamente"><i class="fas fa-calculator"></i></span>
+                            </div>
+                            <input type="number" name="egresos_reparaciones" id="egresos_reparaciones" class="form-control egreso-input"
+                                   value="{{ old('egresos_reparaciones', $montosCalculados['egresos_reparaciones']) }}" step="0.01" min="0">
+                        </div>
+                        <small class="form-help text-success">✓ Desde compras (materiales, herramientas)</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="egresos_remuneraciones">Remuneraciones</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-success text-white" title="Calculado automáticamente"><i class="fas fa-calculator"></i></span>
+                            </div>
+                            <input type="number" name="egresos_remuneraciones" id="egresos_remuneraciones" class="form-control egreso-input"
+                                   value="{{ old('egresos_remuneraciones', $montosCalculados['egresos_remuneraciones']) }}" step="0.01" min="0">
+                        </div>
+                        <small class="form-help text-success">✓ {{ $detalles['sueldos']->count() }} sueldos encontrados</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="egresos_gastos_administrativos">Gastos Administrativos</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-success text-white" title="Calculado automáticamente"><i class="fas fa-calculator"></i></span>
+                            </div>
+                            <input type="number" name="egresos_gastos_administrativos" id="egresos_gastos_administrativos" class="form-control egreso-input"
+                                   value="{{ old('egresos_gastos_administrativos', $montosCalculados['egresos_gastos_administrativos']) }}" step="0.01" min="0">
+                        </div>
+                        <small class="form-help text-success">✓ Desde compras (servicios, insumos)</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="egresos_otros">Otros Egresos</label>
+                        <input type="number" name="egresos_otros" id="egresos_otros" class="form-control egreso-input"
+                               value="{{ old('egresos_otros', $montosCalculados['egresos_otros']) }}" step="0.01" min="0">
+                        <small class="form-help text-muted">Ingresar manualmente</small>
+                    </div>
+                </div>
+                <div class="total-box bg-danger-light">
+                    <strong>Total Egresos:</strong>
+                    <span id="totalEgresos">$0</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- RESUMEN --}}
+        <div class="card mb-3">
+            <div class="card-header bg-primary-light">
+                <h3><i class="fas fa-calculator"></i> Resumen Final</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value text-muted" id="resumenSaldoAnterior">$0</div>
+                            <div class="stat-label">Saldo Anterior</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value text-success" id="resumenIngresos">$0</div>
+                            <div class="stat-label">Total Ingresos</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value text-danger" id="resumenEgresos">$0</div>
+                            <div class="stat-label">Total Egresos</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value text-primary" id="resumenSaldoFinal">$0</div>
+                            <div class="stat-label">Saldo Final</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- OBSERVACIONES --}}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3><i class="fas fa-comments"></i> Observaciones</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="observaciones">Observaciones (Opcional)</label>
+                    <textarea name="observaciones" id="observaciones" class="form-control" rows="3"
+                              placeholder="Notas o comentarios sobre esta rendición...">{{ old('observaciones') }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        {{-- BOTONES --}}
+        <div class="text-right mb-4">
+            <a href="{{ route('rendiciones-mensuales.index') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                Guardar Rendición
+            </button>
+        </div>
+    </form>
+@endif
+
 @endsection
 
-@section('styles')
+@push('styles')
 <style>
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .page-title { font-size: 1.75rem; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 12px; margin: 0; }
-    .page-title i { color: var(--primary); }
-    .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--gray-200); margin-bottom: 20px; }
-    .card-header { padding: 16px 24px; border-bottom: 1px solid var(--gray-200); background: var(--gray-50); }
-    .card-header h3 { margin: 0; font-size: 1.125rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    .card-body { padding: 24px; }
-    .bg-success-light { background: #d1fae5 !important; }
-    .bg-danger-light { background: #fee2e2 !important; }
-    .form-row { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; margin-bottom: 20px; }
-    .form-group { display: flex; flex-direction: column; }
-    .col-md-12 { grid-column: span 12; }
-    .col-md-6 { grid-column: span 6; }
-    .col-md-4 { grid-column: span 4; }
-    .form-label { font-weight: 600; color: var(--gray-700); margin-bottom: 8px; font-size: 0.875rem; }
-    .form-label.required::after { content: ' *'; color: #ef4444; }
-    .form-control { padding: 10px 14px; border: 1px solid var(--gray-300); border-radius: var(--radius); font-size: 0.875rem; transition: all 0.2s; }
-    .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-    .form-control.is-invalid { border-color: #ef4444; }
-    .invalid-feedback { color: #ef4444; font-size: 0.75rem; margin-top: 4px; }
-    .form-help { color: var(--gray-500); font-size: 0.75rem; margin-top: 4px; }
-    .total-box { padding: 12px 16px; border-radius: var(--radius); margin-top: 16px; font-size: 1.125rem; display: flex; justify-content: space-between; align-items: center; }
-    .saldo-final-box { padding: 20px; background: var(--gray-50); border-radius: var(--radius); border: 2px solid var(--primary); }
-    .saldo-final-box h3 { margin: 0 0 16px 0; color: var(--primary); }
-    .saldo-calculation { font-size: 1rem; }
-    .saldo-calculation > div { padding: 8px 0; }
-    .saldo-final { font-size: 1.25rem; color: var(--primary); padding: 12px 0; }
-    .text-success { color: #059669; }
-    .text-danger { color: #dc2626; }
-    .form-actions { display: flex; gap: 12px; margin-top: 24px; }
-    .btn { padding: 10px 20px; border-radius: var(--radius); border: none; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
-    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
-    .btn-secondary:hover { background: var(--gray-300); }
-    @media (max-width: 768px) {
-        .form-row { grid-template-columns: 1fr; }
-        .col-md-12, .col-md-6, .col-md-4 { grid-column: span 1; }
+    .bg-success-light {
+        background-color: #d4edda !important;
+    }
+    .bg-danger-light {
+        background-color: #f8d7da !important;
+    }
+    .bg-primary-light {
+        background-color: #d1ecf1 !important;
+    }
+    .bg-info-light {
+        background-color: #d6eaf8 !important;
+    }
+    .total-box {
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 15px;
+        font-size: 18px;
+        text-align: right;
+    }
+    .stat-card {
+        text-align: center;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    .stat-value {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .stat-label {
+        font-size: 14px;
+        color: #6c757d;
+    }
+    .form-help {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
     }
 </style>
-@endsection
+@endpush
 
-@section('scripts')
+@push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ingresoInputs = document.querySelectorAll('.ingreso-input');
-    const egresoInputs = document.querySelectorAll('.egreso-input');
-    const saldoAnteriorInput = document.getElementById('saldo_anterior');
-
-    function formatCurrency(value) {
-        return '$' + parseFloat(value).toLocaleString('es-CL', {minimumFractionDigits: 0, maximumFractionDigits: 0});
-    }
-
+    // Calcular totales en tiempo real
     function calcularTotales() {
+        const ingresoInputs = document.querySelectorAll('.ingreso-input');
+        const egresoInputs = document.querySelectorAll('.egreso-input');
+        const saldoAnterior = parseFloat(document.getElementById('saldo_anterior').value) || 0;
+
         let totalIngresos = 0;
         ingresoInputs.forEach(input => {
             totalIngresos += parseFloat(input.value) || 0;
@@ -245,31 +485,33 @@ document.addEventListener('DOMContentLoaded', function() {
             totalEgresos += parseFloat(input.value) || 0;
         });
 
-        const saldoAnterior = parseFloat(saldoAnteriorInput.value) || 0;
         const saldoFinal = saldoAnterior + totalIngresos - totalEgresos;
 
-        document.getElementById('totalIngresos').textContent = formatCurrency(totalIngresos);
-        document.getElementById('totalEgresos').textContent = formatCurrency(totalEgresos);
-        document.getElementById('displaySaldoAnterior').textContent = formatCurrency(saldoAnterior);
-        document.getElementById('displayIngresos').textContent = formatCurrency(totalIngresos);
-        document.getElementById('displayEgresos').textContent = formatCurrency(totalEgresos);
-        document.getElementById('displaySaldoFinal').textContent = formatCurrency(saldoFinal);
+        // Actualizar displays
+        document.getElementById('totalIngresos').textContent = '$' + totalIngresos.toLocaleString('es-CL', {minimumFractionDigits: 0});
+        document.getElementById('totalEgresos').textContent = '$' + totalEgresos.toLocaleString('es-CL', {minimumFractionDigits: 0});
 
-        const saldoFinalSpan = document.getElementById('displaySaldoFinal');
-        if (saldoFinal < 0) {
-            saldoFinalSpan.style.color = '#dc2626';
-            document.getElementById('saldoFinalBox').style.borderColor = '#dc2626';
-        } else {
-            saldoFinalSpan.style.color = '#059669';
-            document.getElementById('saldoFinalBox').style.borderColor = 'var(--primary)';
+        if (document.getElementById('resumenSaldoAnterior')) {
+            document.getElementById('resumenSaldoAnterior').textContent = '$' + saldoAnterior.toLocaleString('es-CL', {minimumFractionDigits: 0});
+            document.getElementById('resumenIngresos').textContent = '$' + totalIngresos.toLocaleString('es-CL', {minimumFractionDigits: 0});
+            document.getElementById('resumenEgresos').textContent = '$' + totalEgresos.toLocaleString('es-CL', {minimumFractionDigits: 0});
+            document.getElementById('resumenSaldoFinal').textContent = '$' + saldoFinal.toLocaleString('es-CL', {minimumFractionDigits: 0});
         }
     }
 
-    ingresoInputs.forEach(input => input.addEventListener('input', calcularTotales));
-    egresoInputs.forEach(input => input.addEventListener('input', calcularTotales));
-    saldoAnteriorInput.addEventListener('input', calcularTotales);
+    document.addEventListener('DOMContentLoaded', function() {
+        // Event listeners para calcular totales
+        document.querySelectorAll('.ingreso-input, .egreso-input').forEach(input => {
+            input.addEventListener('input', calcularTotales);
+        });
 
-    calcularTotales();
-});
+        const saldoAnteriorInput = document.getElementById('saldo_anterior');
+        if (saldoAnteriorInput) {
+            saldoAnteriorInput.addEventListener('input', calcularTotales);
+        }
+
+        // Calcular totales iniciales
+        calcularTotales();
+    });
 </script>
-@endsection
+@endpush

@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\RendicionMensual;
 use App\Models\ActividadReciente;
+use App\Models\Pago;
+use App\Models\Compra;
+use App\Models\Sueldo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class RendicionMensualController extends Controller
@@ -63,7 +67,7 @@ class RendicionMensualController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         // Obtener el último saldo final para usarlo como saldo anterior
         $ultimaRendicion = RendicionMensual::where('activo', true)
@@ -73,7 +77,140 @@ class RendicionMensualController extends Controller
 
         $saldoAnterior = $ultimaRendicion ? $ultimaRendicion->saldo_final : 0;
 
-        return view('rendiciones-mensuales.create', compact('saldoAnterior'));
+        // Si se envió mes y año, calcular montos automáticos
+        $montosCalculados = null;
+        $detalles = null;
+
+        if ($request->filled('mes') && $request->filled('anio')) {
+            $mes = $request->mes;
+            $anio = $request->anio;
+            $periodo = sprintf('%04d-%02d', $anio, $mes);
+
+            // Calcular fechas del periodo
+            $fechaInicio = "{$anio}-{$mes}-01";
+            $fechaFin = date("Y-m-t", strtotime($fechaInicio));
+
+            $montosCalculados = $this->calcularMontosAutomaticos($periodo, $fechaInicio, $fechaFin);
+            $detalles = $this->obtenerDetallesTransacciones($periodo, $fechaInicio, $fechaFin);
+        }
+
+        return view('rendiciones-mensuales.create', compact('saldoAnterior', 'montosCalculados', 'detalles'));
+    }
+
+    /**
+     * Calcular montos automáticos desde las tablas del sistema
+     */
+    private function calcularMontosAutomaticos($periodo, $fechaInicio, $fechaFin)
+    {
+        // INGRESOS
+
+        // Ingresos por consumo de agua (pagos recibidos)
+        $ingresosConsumoAgua = Pago::whereBetween('fecha_pago', [$fechaInicio, $fechaFin])
+            ->sum('monto_pagado');
+
+        // EGRESOS
+
+        // Remuneraciones (sueldos pagados)
+        $egresosRemuneraciones = Sueldo::where('periodo', $periodo)
+            ->where('estado', 'pagado')
+            ->where('activo', true)
+            ->sum('total_liquido');
+
+        // Energía eléctrica (compras con descripción relacionada)
+        $egresosEnergiaElectrica = Compra::whereBetween('fecha_compra', [$fechaInicio, $fechaFin])
+            ->where('activo', true)
+            ->where('estado', 'pagada')
+            ->where(function($q) {
+                $q->where('descripcion', 'LIKE', '%energía%')
+                  ->orWhere('descripcion', 'LIKE', '%eléctrica%')
+                  ->orWhere('descripcion', 'LIKE', '%electricidad%')
+                  ->orWhere('descripcion', 'LIKE', '%luz%');
+            })
+            ->sum('total');
+
+        // Productos químicos (compras con descripción relacionada)
+        $egresosProductosQuimicos = Compra::whereBetween('fecha_compra', [$fechaInicio, $fechaFin])
+            ->where('activo', true)
+            ->where('estado', 'pagada')
+            ->where(function($q) {
+                $q->where('descripcion', 'LIKE', '%químico%')
+                  ->orWhere('descripcion', 'LIKE', '%cloro%')
+                  ->orWhere('descripcion', 'LIKE', '%hipoclorito%')
+                  ->orWhere('descripcion', 'LIKE', '%sulfato%');
+            })
+            ->sum('total');
+
+        // Reparaciones (compras tipo materiales, herramientas, equipos)
+        $egresosReparaciones = Compra::whereBetween('fecha_compra', [$fechaInicio, $fechaFin])
+            ->where('activo', true)
+            ->where('estado', 'pagada')
+            ->whereIn('tipo_compra', ['materiales', 'herramientas', 'equipos'])
+            ->where(function($q) {
+                // Excluir las que ya se contaron en energía y químicos
+                $q->where('descripcion', 'NOT LIKE', '%energía%')
+                  ->where('descripcion', 'NOT LIKE', '%eléctrica%')
+                  ->where('descripcion', 'NOT LIKE', '%electricidad%')
+                  ->where('descripcion', 'NOT LIKE', '%luz%')
+                  ->where('descripcion', 'NOT LIKE', '%químico%')
+                  ->where('descripcion', 'NOT LIKE', '%cloro%')
+                  ->where('descripcion', 'NOT LIKE', '%hipoclorito%')
+                  ->where('descripcion', 'NOT LIKE', '%sulfato%');
+            })
+            ->sum('total');
+
+        // Gastos administrativos (compras tipo servicios e insumos)
+        $egresosGastosAdministrativos = Compra::whereBetween('fecha_compra', [$fechaInicio, $fechaFin])
+            ->where('activo', true)
+            ->where('estado', 'pagada')
+            ->whereIn('tipo_compra', ['servicios', 'insumos'])
+            ->where(function($q) {
+                // Excluir las ya contadas
+                $q->where('descripcion', 'NOT LIKE', '%energía%')
+                  ->where('descripcion', 'NOT LIKE', '%eléctrica%')
+                  ->where('descripcion', 'NOT LIKE', '%electricidad%')
+                  ->where('descripcion', 'NOT LIKE', '%luz%');
+            })
+            ->sum('total');
+
+        return [
+            'ingresos_consumo_agua' => $ingresosConsumoAgua ?? 0,
+            'ingresos_subsidios' => 0,
+            'ingresos_aportes_socios' => 0,
+            'ingresos_multas' => 0,
+            'ingresos_incorporaciones' => 0,
+            'ingresos_otros' => 0,
+            'egresos_energia_electrica' => $egresosEnergiaElectrica ?? 0,
+            'egresos_productos_quimicos' => $egresosProductosQuimicos ?? 0,
+            'egresos_reparaciones' => $egresosReparaciones ?? 0,
+            'egresos_remuneraciones' => $egresosRemuneraciones ?? 0,
+            'egresos_gastos_administrativos' => $egresosGastosAdministrativos ?? 0,
+            'egresos_otros' => 0,
+        ];
+    }
+
+    /**
+     * Obtener detalles de las transacciones para mostrar el desglose
+     */
+    private function obtenerDetallesTransacciones($periodo, $fechaInicio, $fechaFin)
+    {
+        return [
+            'pagos' => Pago::whereBetween('fecha_pago', [$fechaInicio, $fechaFin])
+                ->with('socio')
+                ->orderBy('fecha_pago', 'desc')
+                ->get(),
+
+            'sueldos' => Sueldo::where('periodo', $periodo)
+                ->where('estado', 'pagado')
+                ->where('activo', true)
+                ->with('funcionario')
+                ->get(),
+
+            'compras' => Compra::whereBetween('fecha_compra', [$fechaInicio, $fechaFin])
+                ->where('activo', true)
+                ->where('estado', 'pagada')
+                ->orderBy('fecha_compra', 'desc')
+                ->get(),
+        ];
     }
 
     /**
