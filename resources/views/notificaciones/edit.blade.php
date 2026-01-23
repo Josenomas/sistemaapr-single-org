@@ -183,13 +183,6 @@
                         <label class="checkbox-label">
                             <input type="checkbox"
                                    name="canal[]"
-                                   value="sms"
-                                   {{ in_array('sms', $canales) ? 'checked' : '' }}>
-                            <span>SMS</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox"
-                                   name="canal[]"
                                    value="whatsapp"
                                    {{ in_array('whatsapp', $canales) ? 'checked' : '' }}>
                             <span>WhatsApp</span>
@@ -199,7 +192,7 @@
                                    name="canal[]"
                                    value="sistema"
                                    {{ in_array('sistema', $canales) ? 'checked' : '' }}>
-                            <span>Notificación en Sistema</span>
+                            <span>Notificacion en Sistema</span>
                         </label>
                     </div>
                     @error('canal')
