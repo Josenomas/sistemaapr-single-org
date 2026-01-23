@@ -218,7 +218,7 @@
 </div>
 @endsection
 
-@push('styles')
+@section('styles')
 <style>
     /* Estilos adicionales específicos si son necesarios */
     .filter-title {
@@ -252,4 +252,4 @@
         }
     }
 </style>
-@endpush
+@endsection
