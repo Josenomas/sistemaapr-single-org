@@ -134,10 +134,9 @@ class RendicionMensual extends Model
         $this->save();
 
         // Registrar actividad
-        ActividadReciente::registrar(
-            'rendicion_cerrada',
-            'Rendición ' . $this->codigo_rendicion . ' del periodo ' . $this->periodo_texto . ' cerrada',
-            $this->id
+        \App\Helpers\ActividadHelper::registrar(
+            'Rendición Mensual',
+            'Rendición ' . $this->codigo_rendicion . ' del periodo ' . $this->periodo_texto . ' cerrada'
         );
     }
 
@@ -152,10 +151,9 @@ class RendicionMensual extends Model
         $this->save();
 
         // Registrar actividad
-        ActividadReciente::registrar(
-            'rendicion_reabierta',
-            'Rendición ' . $this->codigo_rendicion . ' del periodo ' . $this->periodo_texto . ' reabierta',
-            $this->id
+        \App\Helpers\ActividadHelper::registrar(
+            'Rendición Mensual',
+            'Rendición ' . $this->codigo_rendicion . ' del periodo ' . $this->periodo_texto . ' reabierta'
         );
     }
 
