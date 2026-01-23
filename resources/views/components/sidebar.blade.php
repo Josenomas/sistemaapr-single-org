@@ -488,3 +488,33 @@
         background: var(--gray-400);
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.querySelector('.sidebar');
+
+    // Restaurar posición del scroll al cargar la página
+    const savedScrollPosition = localStorage.getItem('sidebarScrollPosition');
+    if (savedScrollPosition !== null) {
+        sidebar.scrollTop = parseInt(savedScrollPosition);
+    }
+
+    // Guardar posición del scroll cuando el usuario hace scroll
+    let scrollTimeout;
+    sidebar.addEventListener('scroll', function() {
+        // Usar debounce para evitar guardar en cada pixel de scroll
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(function() {
+            localStorage.setItem('sidebarScrollPosition', sidebar.scrollTop);
+        }, 100);
+    });
+
+    // Guardar posición antes de navegar a otra página
+    const navItems = sidebar.querySelectorAll('.nav-item');
+    navItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+            localStorage.setItem('sidebarScrollPosition', sidebar.scrollTop);
+        });
+    });
+});
+</script>
