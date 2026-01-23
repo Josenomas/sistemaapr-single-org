@@ -220,6 +220,14 @@
 
 @section('styles')
 <style>
+    /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
     /* Stats Row */
     .stats-row {
         display: grid;
