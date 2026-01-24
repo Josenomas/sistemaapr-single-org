@@ -823,6 +823,134 @@
         color: var(--gray-600);
         line-height: 1.5;
     }
+
+    /* Responsive Mobile */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+        }
+
+        .header-info-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+        }
+
+        .quick-actions-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+        }
+
+        .events-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-card {
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-header {
+            padding: 16px;
+        }
+
+        .dashboard-title {
+            font-size: 1.25rem;
+        }
+
+        .dashboard-title i {
+            font-size: 1.25rem;
+        }
+
+        .header-info-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .info-badge {
+            padding: 10px 16px;
+        }
+
+        .info-badge-icon {
+            font-size: 1.25rem;
+        }
+
+        .stat-card {
+            padding: 16px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+        }
+
+        .quick-action-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+        }
+
+        .quick-action-title {
+            font-size: 0.9375rem;
+        }
+
+        .quick-action-description {
+            font-size: 0.75rem;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.125rem;
+        }
+
+        .activity-item {
+            padding: 12px;
+        }
+
+        .activity-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .event-card {
+            padding: 16px;
+        }
+
+        .event-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            font-size: 1.125rem;
+        }
+    }
 </style>
 @endsection
 
