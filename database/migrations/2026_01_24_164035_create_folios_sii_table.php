@@ -24,7 +24,7 @@ return new class extends Migration
             $table->text('caf_xml')->nullable(); // XML del CAF (Código de Autorización de Folios)
             $table->string('estado', 20)->default('activo'); // activo, agotado, vencido
             $table->integer('folios_disponibles')->default(0); // Cantidad de folios disponibles
-            $table->unsignedBigInteger('id_usuario_carga'); // Usuario que cargó el folio
+            $table->unsignedInteger('id_usuario_carga'); // Usuario que cargó el folio
             $table->text('observaciones')->nullable();
             $table->boolean('activo')->default(true);
 
