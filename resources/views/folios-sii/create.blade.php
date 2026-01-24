@@ -23,16 +23,25 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="fas fa-plus-circle"></i> Cargar Nuevo Folio SII</h1>
-        <a href="{{ route('folios-sii.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Volver
-        </a>
-    </div>
+<div class="page-header">
+    <h2 class="page-title">
+        <i class="fas fa-plus-circle"></i>
+        Cargar Nuevo Folio SII
+    </h2>
+    <a href="{{ route('folios-sii.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Volver
+    </a>
+</div>
 
-    <div class="card">
-        <div class="card-body">
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-file-invoice"></i>
+            Información del Folio
+        </h3>
+    </div>
+    <div class="card-body">
             <form action="{{ route('folios-sii.store') }}" method="POST">
                 @csrf
 
