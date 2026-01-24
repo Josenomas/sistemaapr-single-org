@@ -35,9 +35,7 @@ return new class extends Migration
             $table->index('tipo_documento');
             $table->index('estado');
             $table->index('folio_actual');
-
-            // Relación con usuarios
-            $table->foreign('id_usuario_carga')->references('id')->on('usuarios')->onDelete('restrict');
+            $table->index('id_usuario_carga');
         });
     }
 
