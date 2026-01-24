@@ -2,6 +2,26 @@
 
 @section('title', 'Nuevo Folio SII')
 
+@section('styles')
+<style>
+.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.card {
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.alert-info {
+    background-color: #e0f2fe;
+    border-color: #bae6fd;
+    color: #075985;
+}
+</style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -117,13 +137,6 @@
         </p>
     </div>
 </div>
-
-<style>
-.required::after {
-    content: " *";
-    color: #dc3545;
-}
-</style>
 
 <script>
 // Calcular automáticamente cantidad de folios

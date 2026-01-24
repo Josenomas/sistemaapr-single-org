@@ -2,6 +2,15 @@
 
 @section('title', 'Editar Folio SII')
 
+@section('styles')
+<style>
+.required::after {
+    content: " *";
+    color: #dc3545;
+}
+</style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -79,11 +88,4 @@
         </div>
     </div>
 </div>
-
-<style>
-.required::after {
-    content: " *";
-    color: #dc3545;
-}
-</style>
 @endsection
