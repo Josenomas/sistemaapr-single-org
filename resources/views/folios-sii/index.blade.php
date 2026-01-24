@@ -2,6 +2,59 @@
 
 @section('title', 'Folios SII - Sistema APR')
 
+@section('styles')
+<style>
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+</style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="page-header">
@@ -200,55 +253,4 @@
         </div>
     </div>
 </div>
-
-<style>
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.stat-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    color: white;
-}
-
-.stat-content {
-    flex: 1;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1f2937;
-}
-
-.stat-label {
-    font-size: 0.875rem;
-    color: #6b7280;
-}
-</style>
 @endsection
