@@ -86,7 +86,7 @@ class NotificacionesController extends Controller
             'estado' => 'required|in:borrador,programada,enviada,cancelada',
             'fecha_programada' => 'nullable|date',
             'canal' => 'required|array|min:1',
-            'canal.*' => 'in:email,sms,whatsapp,sistema',
+            'canal.*' => 'in:email,whatsapp,sistema',
             'observaciones' => 'nullable|string',
         ]);
 
@@ -211,7 +211,7 @@ class NotificacionesController extends Controller
             'estado' => 'required|in:borrador,programada,enviada,cancelada',
             'fecha_programada' => 'nullable|date',
             'canal' => 'required|array|min:1',
-            'canal.*' => 'in:email,sms,whatsapp,sistema',
+            'canal.*' => 'in:email,whatsapp,sistema',
             'observaciones' => 'nullable|string',
         ]);
 
@@ -387,6 +387,13 @@ class NotificacionesController extends Controller
             if (in_array('email', $canales)) {
                 foreach ($socios as $socio) {
                     \App\Jobs\EnviarNotificacionEmail::dispatch($notificacion, $socio);
+                }
+            }
+
+            // Verificar si el canal incluye whatsapp
+            if (in_array('whatsapp', $canales)) {
+                foreach ($socios as $socio) {
+                    \App\Jobs\EnviarNotificacionWhatsApp::dispatch($notificacion, $socio);
                 }
             }
 
