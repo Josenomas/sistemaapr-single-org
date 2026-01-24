@@ -60,6 +60,10 @@
                 <i class="fas fa-exclamation-triangle"></i>
                 <span>Boletas Vencidas</span>
             </a>
+            <a href="{{ route('folios-sii.index') }}" class="nav-item {{ request()->routeIs('folios-sii.*') ? 'active' : '' }}">
+                <i class="fas fa-file-invoice"></i>
+                <span>Folios SII</span>
+            </a>
         </div>
 
         <!-- Pagos -->

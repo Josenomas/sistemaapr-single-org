@@ -34,6 +34,7 @@ use App\Http\Controllers\ConsultaPublicaController;
 use App\Http\Controllers\EventosController;
 use App\Http\Controllers\ActivosFijosController;
 use App\Http\Controllers\RendicionMensualController;
+use App\Http\Controllers\FolioSIIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -116,6 +117,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/boletas/{id}/recordatorio', [BoletasController::class, 'enviarRecordatorio'])->name('boletas.recordatorio');
         Route::post('/boletas/{id}/enviar-email', [BoletasController::class, 'enviarEmail'])->name('boletas.enviar-email');
         Route::post('/boletas/calcular-montos', [BoletasController::class, 'calcularMontos'])->name('boletas.calcularMontos');
+
+        // Folios SII
+        Route::resource('folios-sii', FolioSIIController::class)->names('folios-sii');
+        Route::post('/folios-sii-obtener-siguiente', [FolioSIIController::class, 'obtenerSiguiente'])->name('folios-sii.obtener-siguiente');
     });
 
     // ========================================
