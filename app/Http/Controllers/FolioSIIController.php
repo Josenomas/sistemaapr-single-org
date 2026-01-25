@@ -63,6 +63,25 @@ class FolioSIIController extends Controller
 
         DB::beginTransaction();
         try {
+            // Validar que no exista solapamiento de rangos para el mismo tipo de documento
+            $solapamiento = FolioSII::where('tipo_documento', $validated['tipo_documento'])
+                ->where('activo', true)
+                ->where(function($query) use ($validated) {
+                    $query->whereBetween('folio_desde', [$validated['folio_desde'], $validated['folio_hasta']])
+                          ->orWhereBetween('folio_hasta', [$validated['folio_desde'], $validated['folio_hasta']])
+                          ->orWhere(function($q) use ($validated) {
+                              $q->where('folio_desde', '<=', $validated['folio_desde'])
+                                ->where('folio_hasta', '>=', $validated['folio_hasta']);
+                          });
+                })
+                ->exists();
+
+            if ($solapamiento) {
+                return redirect()->back()
+                    ->with('error', 'El rango de folios ingresado se solapa con un rango existente para el mismo tipo de documento.')
+                    ->withInput();
+            }
+
             // Calcular folios disponibles
             $foliosDisponibles = $validated['folio_hasta'] - $validated['folio_desde'] + 1;
 

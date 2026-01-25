@@ -94,19 +94,16 @@ class FolioSII extends Model
         }
 
         $siguienteFolio = $this->folio_actual + 1;
+        $foliosDisponibles = $this->folio_hasta - $siguienteFolio;
+
+        // Determinar el estado basado en folios disponibles
+        $nuevoEstado = $foliosDisponibles <= 0 ? 'agotado' : 'activo';
 
         $this->update([
             'folio_actual' => $siguienteFolio,
-            'folios_disponibles' => $this->folio_hasta - $siguienteFolio
+            'folios_disponibles' => $foliosDisponibles,
+            'estado' => $nuevoEstado
         ]);
-
-        // Si se agotó, actualizar estado
-        if ($siguienteFolio >= $this->folio_hasta) {
-            $this->update([
-                'estado' => 'agotado',
-                'folios_disponibles' => 0
-            ]);
-        }
 
         return $siguienteFolio;
     }
