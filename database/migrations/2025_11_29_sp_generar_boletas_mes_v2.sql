@@ -73,11 +73,8 @@ BEGIN
 
     -- Calcular fechas de emisión y vencimiento
     SET v_fecha_emision = LAST_DAY(CONCAT(p_mes, '-01'));
-    -- Vencimiento: día 30 del mes siguiente (o 28/29 si es febrero)
-    SET v_fecha_vencimiento = LEAST(
-        CONCAT(DATE_FORMAT(DATE_ADD(v_fecha_emision, INTERVAL 1 MONTH), '%Y-%m-'), '30'),
-        LAST_DAY(DATE_ADD(v_fecha_emision, INTERVAL 1 MONTH))
-    );
+    -- Vencimiento: día 25 del mes siguiente
+    SET v_fecha_vencimiento = CONCAT(DATE_FORMAT(DATE_ADD(v_fecha_emision, INTERVAL 1 MONTH), '%Y-%m-'), '25');
 
     OPEN cur_socios;
 

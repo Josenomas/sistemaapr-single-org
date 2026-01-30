@@ -739,10 +739,10 @@
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-headset"></i>
+                    <i class="fas fa-boxes"></i>
                 </div>
-                <h3>Soporte Técnico</h3>
-                <p>Equipo de soporte disponible para ayudarte cuando lo necesites.</p>
+                <h3>Gestión de Inventario</h3>
+                <p>Control completo del inventario de materiales, herramientas y equipos. Registro de entradas, salidas, movimientos y stock disponible en tiempo real.</p>
             </div>
         </div>
     </section>
