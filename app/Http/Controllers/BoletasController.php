@@ -116,6 +116,12 @@ class BoletasController extends Controller
 
             $boleta = Boleta::create($validated);
 
+            // Intentar asignar folio SII si hay disponibles
+            $folioAsignado = $boleta->asignarFolioSII('boleta');
+            if ($folioAsignado) {
+                $boleta->save();
+            }
+
             // Registrar actividad
             $socio = Socio::find($validated['id_socio']);
             $detalles = [
@@ -331,18 +337,40 @@ class BoletasController extends Controller
             // Llamar al procedimiento almacenado
             DB::statement('CALL sp_generar_boletas_mes(?)', [$mes]);
 
-            $boletasGeneradas = Boleta::activos()->where('mes', $mes)->count();
+            // Obtener boletas recién generadas
+            $boletasGeneradas = Boleta::activos()
+                                      ->where('mes', $mes)
+                                      ->whereNull('folio_sii') // Solo las que no tienen folio
+                                      ->get();
+
+            $totalGeneradas = $boletasGeneradas->count();
+            $foliosAsignados = 0;
+
+            // Intentar asignar folios SII a cada boleta generada
+            foreach ($boletasGeneradas as $boleta) {
+                $folioAsignado = $boleta->asignarFolioSII('boleta');
+                if ($folioAsignado) {
+                    $boleta->save();
+                    $foliosAsignados++;
+                }
+            }
 
             ActividadHelper::registrar(
                 'Boletas',
-                "Generación masiva de boletas para {$mes}: {$boletasGeneradas} boletas creadas",
+                "Generación masiva de boletas para {$mes}: {$totalGeneradas} boletas creadas" .
+                ($foliosAsignados > 0 ? " | {$foliosAsignados} folios SII asignados" : ""),
                 auth()->id()
             );
 
             DB::commit();
 
+            $mensaje = "Se generaron {$totalGeneradas} boletas para el mes {$mes}";
+            if ($foliosAsignados > 0) {
+                $mensaje .= " ({$foliosAsignados} con folio SII asignado)";
+            }
+
             return redirect()->route('boletas.index')
-                           ->with('success', "Se generaron {$boletasGeneradas} boletas para el mes {$mes}");
+                           ->with('success', $mensaje);
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('boletas.generar')

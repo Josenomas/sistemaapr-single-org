@@ -389,6 +389,11 @@
                     <div class="boleta-numero-inner">
                         <div class="tipo">BOLETA Nº</div>
                         <div class="numero">{{ $boleta->numero_boleta }}</div>
+                        @if($boleta->tieneFolioSII())
+                        <div style="font-size: 9px; margin-top: 5px; padding-top: 5px; border-top: 1px solid #000;">
+                            <strong>Folio SII:</strong> {{ $boleta->folio_sii }}
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -787,6 +792,39 @@
             </div>
 
             <!-- Espacio para Timbre Electrónico SII -->
+            @if($boleta->tieneFolioSII())
+            <div style="margin-top: 15px; padding: 10px; border: 2px solid #000; text-align: center; background: #fff;">
+                <div style="font-size: 8px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">
+                    Timbre Electrónico SII
+                </div>
+                <div style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: #f9f9f9;">
+                    @if($boleta->timbre_electronico)
+                    <!-- Timbre electrónico generado -->
+                    <div style="font-size: 8px; color: #000; text-align: center; padding: 10px; font-family: monospace;">
+                        {!! nl2br(e(substr($boleta->timbre_electronico, 0, 200))) !!}
+                        @if(strlen($boleta->timbre_electronico) > 200)
+                        <div style="margin-top: 5px; font-size: 7px; color: #666;">
+                            [Timbre truncado para visualización]
+                        </div>
+                        @endif
+                    </div>
+                    @else
+                    <div style="font-size: 8px; color: #333; text-align: center; padding: 10px;">
+                        <strong>Folio SII Asignado: {{ $boleta->folio_sii }}</strong><br>
+                        <div style="margin-top: 5px; font-size: 7px; color: #666;">
+                            Timbre electrónico pendiente de generación
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                <div style="font-size: 7px; margin-top: 5px; color: #333;">
+                    Boleta Electrónica | Folio SII N° {{ $boleta->folio_sii }}
+                    @if($boleta->fecha_timbraje)
+                    | Timbrado: {{ \Carbon\Carbon::parse($boleta->fecha_timbraje)->format('d/m/Y H:i') }}
+                    @endif
+                </div>
+            </div>
+            @else
             <div style="margin-top: 15px; padding: 10px; border: 2px dashed #000; text-align: center; background: #fff;">
                 <div style="font-size: 8px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">
                     Timbre Electrónico SII
@@ -805,6 +843,7 @@
                     Boleta Electrónica | Resolución N° [Número] del [Fecha]
                 </div>
             </div>
+            @endif
 
             <div class="footer-note">
                 DOCUMENTO GENERADO ELECTRÓNICAMENTE - {{ now()->format('d/m/Y H:i:s') }}<br>

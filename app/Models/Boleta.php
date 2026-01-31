@@ -10,6 +10,10 @@ class Boleta extends Model
 
     protected $fillable = [
         'numero_boleta',
+        'id_folio_sii',
+        'folio_sii',
+        'timbre_electronico',
+        'fecha_timbraje',
         'id_socio',
         'id_lectura',
         'mes',
@@ -30,6 +34,7 @@ class Boleta extends Model
     protected $casts = [
         'fecha_emision' => 'date',
         'fecha_vencimiento' => 'date',
+        'fecha_timbraje' => 'datetime',
         'consumo_m3' => 'decimal:2',
         'cargo_fijo' => 'decimal:2',
         'cargo_consumo' => 'decimal:2',
@@ -57,6 +62,14 @@ class Boleta extends Model
     public function lectura()
     {
         return $this->belongsTo(Lectura::class, 'id_lectura');
+    }
+
+    /**
+     * Relación con folio SII
+     */
+    public function folioSII()
+    {
+        return $this->belongsTo(FolioSII::class, 'id_folio_sii');
     }
 
     /**
@@ -262,5 +275,60 @@ class Boleta extends Model
     {
         $this->total = ($this->cargo_fijo + $this->cargo_consumo + $this->otros_cargos) - $this->descuentos;
         return $this->total;
+    }
+
+    /**
+     * Asignar folio SII automáticamente si hay disponibles
+     */
+    public function asignarFolioSII($tipoDocumento = 'boleta')
+    {
+        // Buscar folio disponible
+        $folioSII = FolioSII::disponibles()
+                           ->tipoDocumento($tipoDocumento)
+                           ->orderBy('fecha_creacion', 'asc')
+                           ->first();
+
+        if (!$folioSII) {
+            // No hay folios disponibles, continuar sin folio (modo normal)
+            return false;
+        }
+
+        // Obtener siguiente folio
+        $numeroFolio = $folioSII->obtenerSiguienteFolio();
+
+        if (!$numeroFolio) {
+            // No se pudo obtener folio, continuar sin folio
+            return false;
+        }
+
+        // Asignar folio a la boleta
+        $this->id_folio_sii = $folioSII->id;
+        $this->folio_sii = $numeroFolio;
+        $this->fecha_timbraje = now();
+
+        // Generar timbre electrónico si hay CAF disponible
+        if ($folioSII->caf_xml) {
+            $this->timbre_electronico = $this->generarTimbre($folioSII->caf_xml, $numeroFolio);
+        }
+
+        return true;
+    }
+
+    /**
+     * Generar timbre electrónico (placeholder para futura implementación)
+     */
+    private function generarTimbre($cafXml, $numeroFolio)
+    {
+        // Por ahora solo guardamos el CAF
+        // En el futuro aquí se generaría el timbre PDF417 con firma digital
+        return $cafXml;
+    }
+
+    /**
+     * Verificar si tiene folio SII asignado
+     */
+    public function tieneFolioSII()
+    {
+        return !is_null($this->folio_sii);
     }
 }

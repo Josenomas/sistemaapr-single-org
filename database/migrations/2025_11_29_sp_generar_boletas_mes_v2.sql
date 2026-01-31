@@ -230,6 +230,10 @@ BEGIN
         -- 8. Generar número de boleta único
         SET v_numero_boleta = CONCAT('BOL-', p_mes, '-', LPAD(v_id_socio, 4, '0'));
 
+        -- 8.5. Intentar asignar folio SII (si hay disponibles)
+        -- NOTA: La asignación de folios se hace desde la aplicación Laravel
+        -- El procedimiento solo crea las boletas, Laravel asigna folios después si hay disponibles
+
         -- 9. Insertar la boleta en la base de datos
         INSERT INTO boletas (
             numero_boleta,

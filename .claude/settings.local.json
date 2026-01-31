@@ -12,7 +12,14 @@
       "Bash(git revert:*)",
       "Bash(ssh:*)",
       "Bash(grep:*)",
-      "Bash(mysql:*)"
+      "Bash(mysql:*)",
+      "Read(//c/c/xampp/**)",
+      "Bash(git pull:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(git restore:*)",
+      "Bash(findstr:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
