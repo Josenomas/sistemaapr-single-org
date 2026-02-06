@@ -15,7 +15,23 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Enviar notificaciones de boletas vencidas diariamente a las 9:00 AM
+        $schedule->command('notificaciones:boletas-vencidas')
+                 ->dailyAt('09:00')
+                 ->emailOutputOnFailure('admin@aprpitrelahue.cl');
+
+        // Alternativa: Enviar cada 3 días a las 9:00 AM
+        // $schedule->command('notificaciones:boletas-vencidas')
+        //          ->days([1, 4, 7, 10, 13, 16, 19, 22, 25, 28])
+        //          ->at('09:00')
+        //          ->emailOutputOnFailure('admin@aprpitrelahue.cl');
+
+        // Alternativa: Enviar los lunes a las 9:00 AM
+        // $schedule->command('notificaciones:boletas-vencidas')
+        //          ->weekly()
+        //          ->mondays()
+        //          ->at('09:00')
+        //          ->emailOutputOnFailure('admin@aprpitrelahue.cl');
     }
 
     /**
