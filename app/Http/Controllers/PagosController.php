@@ -636,6 +636,143 @@ class PagosController extends Controller
     }
 
     /**
+     * Reporte mensual completo (todos los días del mes)
+     */
+    public function reporteMensual(Request $request)
+    {
+        $mes = $request->get('mes', date('Y-m'));
+
+        // Obtener primer y último día del mes
+        $primerDia = date('Y-m-01', strtotime($mes . '-01'));
+        $ultimoDia = date('Y-m-t', strtotime($mes . '-01'));
+
+        // Generar array con todos los días del mes
+        $diasDelMes = [];
+        $fechaActual = $primerDia;
+
+        while ($fechaActual <= $ultimoDia) {
+            $diasDelMes[$fechaActual] = [
+                'fecha' => $fechaActual,
+                'fecha_formateada' => date('d/m/Y', strtotime($fechaActual)),
+                'dia_semana' => $this->getDiaSemana($fechaActual),
+                'pagos' => [],
+                'total' => 0,
+                'cantidad' => 0
+            ];
+            $fechaActual = date('Y-m-d', strtotime($fechaActual . ' +1 day'));
+        }
+
+        // Obtener todos los pagos del mes
+        $pagos = Pago::with(['boleta', 'socio'])
+                    ->whereYear('fecha_pago', date('Y', strtotime($mes . '-01')))
+                    ->whereMonth('fecha_pago', date('m', strtotime($mes . '-01')))
+                    ->orderBy('fecha_pago')
+                    ->orderBy('id')
+                    ->get();
+
+        // Agrupar pagos por fecha
+        foreach ($pagos as $pago) {
+            $fecha = $pago->fecha_pago->format('Y-m-d');
+            if (isset($diasDelMes[$fecha])) {
+                $diasDelMes[$fecha]['pagos'][] = $pago;
+                $diasDelMes[$fecha]['total'] += $pago->monto_pagado;
+                $diasDelMes[$fecha]['cantidad']++;
+            }
+        }
+
+        // Calcular totales generales
+        $totalMes = $pagos->sum('monto_pagado');
+        $totalPagos = $pagos->count();
+
+        // Totales por método de pago
+        $totalesPorMetodo = Pago::whereYear('fecha_pago', date('Y', strtotime($mes . '-01')))
+                                ->whereMonth('fecha_pago', date('m', strtotime($mes . '-01')))
+                                ->select('metodo_pago', DB::raw('COUNT(*) as cantidad'), DB::raw('SUM(monto_pagado) as total'))
+                                ->groupBy('metodo_pago')
+                                ->get();
+
+        // Registrar actividad
+        ActividadHelper::registrar(
+            'Pagos',
+            "Reporte mensual generado para: " . date('m/Y', strtotime($mes . '-01')) . " - Total: $" . number_format($totalMes, 0, ',', '.'),
+            auth()->id()
+        );
+
+        return view('pagos.reporte-mensual', compact('diasDelMes', 'mes', 'totalMes', 'totalPagos', 'totalesPorMetodo'));
+    }
+
+    /**
+     * Imprimir reporte mensual
+     */
+    public function reporteMensualImprimir(Request $request)
+    {
+        $mes = $request->get('mes', date('Y-m'));
+
+        // Obtener primer y último día del mes
+        $primerDia = date('Y-m-01', strtotime($mes . '-01'));
+        $ultimoDia = date('Y-m-t', strtotime($mes . '-01'));
+
+        // Generar array con todos los días del mes
+        $diasDelMes = [];
+        $fechaActual = $primerDia;
+
+        while ($fechaActual <= $ultimoDia) {
+            $diasDelMes[$fechaActual] = [
+                'fecha' => $fechaActual,
+                'fecha_formateada' => date('d/m/Y', strtotime($fechaActual)),
+                'dia_semana' => $this->getDiaSemana($fechaActual),
+                'pagos' => [],
+                'total' => 0,
+                'cantidad' => 0
+            ];
+            $fechaActual = date('Y-m-d', strtotime($fechaActual . ' +1 day'));
+        }
+
+        // Obtener todos los pagos del mes
+        $pagos = Pago::with(['boleta', 'socio'])
+                    ->whereYear('fecha_pago', date('Y', strtotime($mes . '-01')))
+                    ->whereMonth('fecha_pago', date('m', strtotime($mes . '-01')))
+                    ->orderBy('fecha_pago')
+                    ->orderBy('id')
+                    ->get();
+
+        // Agrupar pagos por fecha
+        foreach ($pagos as $pago) {
+            $fecha = $pago->fecha_pago->format('Y-m-d');
+            if (isset($diasDelMes[$fecha])) {
+                $diasDelMes[$fecha]['pagos'][] = $pago;
+                $diasDelMes[$fecha]['total'] += $pago->monto_pagado;
+                $diasDelMes[$fecha]['cantidad']++;
+            }
+        }
+
+        // Calcular totales generales
+        $totalMes = $pagos->sum('monto_pagado');
+        $totalPagos = $pagos->count();
+
+        // Totales por método de pago
+        $totalesPorMetodo = Pago::whereYear('fecha_pago', date('Y', strtotime($mes . '-01')))
+                                ->whereMonth('fecha_pago', date('m', strtotime($mes . '-01')))
+                                ->select('metodo_pago', DB::raw('COUNT(*) as cantidad'), DB::raw('SUM(monto_pagado) as total'))
+                                ->groupBy('metodo_pago')
+                                ->get();
+
+        $pdf = \PDF::loadView('pagos.reporte-mensual-pdf', compact('diasDelMes', 'mes', 'totalMes', 'totalPagos', 'totalesPorMetodo'));
+        $pdf->setPaper('letter', 'portrait');
+
+        return $pdf->download('Reporte-Mensual-' . date('m-Y', strtotime($mes . '-01')) . '.pdf');
+    }
+
+    /**
+     * Helper: Obtener día de la semana en español
+     */
+    private function getDiaSemana($fecha)
+    {
+        $dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        return $dias[date('w', strtotime($fecha))];
+    }
+
+    /**
      * Generar link de pago Flow
      */
     public function generarLinkFlow(Request $request)

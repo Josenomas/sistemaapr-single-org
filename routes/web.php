@@ -134,6 +134,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/api/socios/{id}/boletas-pendientes', [PagosController::class, 'boletasPendientes'])->name('pagos.boletasPendientes');
         Route::get('/reporte-caja', [PagosController::class, 'reporteCaja'])->name('pagos.reporteCaja');
         Route::get('/reporte-caja-imprimir', [PagosController::class, 'reporteCajaImprimir'])->name('pagos.reporteCaja.imprimir');
+        Route::get('/reporte-mensual', [PagosController::class, 'reporteMensual'])->name('pagos.reporteMensual');
+        Route::get('/reporte-mensual-imprimir', [PagosController::class, 'reporteMensualImprimir'])->name('pagos.reporteMensual.imprimir');
         Route::post('/pagos/generar-link-flow', [PagosController::class, 'generarLinkFlow'])->name('pagos.generarLinkFlow');
     });
 
