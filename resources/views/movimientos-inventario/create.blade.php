@@ -264,14 +264,14 @@
 @section('scripts')
 <script>
     // Datos de productos desde PHP
-    const productosData = @json($productos->map(function($p) {
+    const productosData = {!! json_encode($productos->map(function($p) {
         return [
             'id' => $p->id,
             'nombre' => $p->nombre,
             'stock' => $p->cantidad_actual,
             'unidad' => $p->unidad_medida
         ];
-    }));
+    })) !!};
 
     let productoCounter = 0;
 
