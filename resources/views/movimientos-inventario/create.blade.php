@@ -349,6 +349,12 @@
                 actualizarStockInfo(nuevoProducto);
             });
 
+            // Validación en tiempo real al escribir cantidad
+            const cantidadInput = nuevoProducto.querySelector('.cantidad-input');
+            cantidadInput.addEventListener('input', function() {
+                validarCantidad(nuevoProducto);
+            });
+
             btnEliminar.addEventListener('click', function() {
                 if (container.children.length > 1) {
                     nuevoProducto.remove();
@@ -397,6 +403,65 @@
             }
         }
 
+        function validarCantidad(productoItem) {
+            const select = productoItem.querySelector('.producto-select');
+            const cantidadInput = productoItem.querySelector('.cantidad-input');
+            const stockBox = productoItem.querySelector('.stock-info-box');
+            const tipo = tipoSelect.value;
+
+            const selectedOption = select.options[select.selectedIndex];
+
+            if (!selectedOption.value || !tipo) {
+                // Resetear estilos si no hay producto seleccionado
+                cantidadInput.style.borderColor = '#cbd5e1';
+                cantidadInput.style.background = 'white';
+                return;
+            }
+
+            const stock = parseFloat(selectedOption.dataset.stock);
+            const cantidad = parseFloat(cantidadInput.value);
+
+            // Solo validar en salidas
+            if (tipo === 'salida' && cantidad > 0) {
+                if (cantidad > stock) {
+                    // ROJO - Excede el stock
+                    cantidadInput.style.borderColor = '#ef4444';
+                    cantidadInput.style.borderWidth = '2px';
+                    cantidadInput.style.background = '#fee2e2';
+                    stockBox.style.background = '#fee2e2';
+                    stockBox.style.borderColor = '#ef4444';
+                    stockBox.style.color = '#991b1b';
+                    stockBox.textContent = `⚠️ ERROR: Excede el stock disponible (${stock} unidades)`;
+                } else {
+                    // VERDE - Cantidad válida
+                    cantidadInput.style.borderColor = '#10b981';
+                    cantidadInput.style.borderWidth = '2px';
+                    cantidadInput.style.background = '#d1fae5';
+                    stockBox.style.background = '#d1fae5';
+                    stockBox.style.borderColor = '#10b981';
+                    stockBox.style.color = '#065f46';
+                    const unidad = selectedOption.dataset.unidad;
+                    stockBox.textContent = `✓ Stock disponible: ${stock} ${unidad}`;
+                }
+            } else if (tipo === 'entrada' || tipo === 'ajuste') {
+                // AZUL - Para entradas y ajustes
+                if (cantidad > 0) {
+                    cantidadInput.style.borderColor = '#3b82f6';
+                    cantidadInput.style.borderWidth = '2px';
+                    cantidadInput.style.background = '#dbeafe';
+                } else {
+                    cantidadInput.style.borderColor = '#cbd5e1';
+                    cantidadInput.style.borderWidth = '1px';
+                    cantidadInput.style.background = 'white';
+                }
+            } else {
+                // Resetear
+                cantidadInput.style.borderColor = '#cbd5e1';
+                cantidadInput.style.borderWidth = '1px';
+                cantidadInput.style.background = 'white';
+            }
+        }
+
         function actualizarTodosLosStocks() {
             const productos = container.querySelectorAll('.producto-item');
             productos.forEach(producto => {
@@ -417,6 +482,33 @@
                 e.preventDefault();
                 alert('Debe agregar al menos un producto');
                 return false;
+            }
+
+            // Validar que ninguna salida exceda el stock
+            if (tipoSelect.value === 'salida') {
+                const productos = container.querySelectorAll('.producto-item');
+                let hayErrores = false;
+
+                productos.forEach(producto => {
+                    const select = producto.querySelector('.producto-select');
+                    const cantidadInput = producto.querySelector('.cantidad-input');
+                    const selectedOption = select.options[select.selectedIndex];
+
+                    if (selectedOption.value) {
+                        const stock = parseFloat(selectedOption.dataset.stock);
+                        const cantidad = parseFloat(cantidadInput.value);
+
+                        if (cantidad > stock) {
+                            hayErrores = true;
+                        }
+                    }
+                });
+
+                if (hayErrores) {
+                    e.preventDefault();
+                    alert('❌ ERROR: Hay productos con cantidades que exceden el stock disponible. Por favor corrija los campos marcados en rojo.');
+                    return false;
+                }
             }
         });
 
