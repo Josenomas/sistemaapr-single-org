@@ -277,6 +277,144 @@
             font-weight: 700;
         }
 
+        /* Tabla de Productos */
+        .productos-tabla {
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .tabla-productos {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tabla-productos thead {
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .tabla-productos th {
+            padding: 14px 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tabla-productos tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.2s;
+        }
+
+        .tabla-productos tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .tabla-productos tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .tabla-productos td {
+            padding: 16px 12px;
+            font-size: 13px;
+            color: #1e293b;
+        }
+
+        .tabla-numero {
+            font-weight: 700;
+            color: #2563eb;
+            text-align: center;
+            width: 50px;
+        }
+
+        .tabla-codigo {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .tabla-producto {
+            max-width: 250px;
+        }
+
+        .producto-nombre {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .producto-categoria {
+            font-size: 11px;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .tabla-cantidad {
+            text-align: center;
+        }
+
+        .cantidad-badge {
+            background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+            border: 2px solid #2563eb;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 800;
+            color: #1e40af;
+            font-size: 13px;
+            display: inline-block;
+        }
+
+        .tabla-stock {
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .tabla-stock.anterior {
+            color: #dc2626;
+        }
+
+        .tabla-stock.nueva {
+            color: #16a34a;
+        }
+
+        /* Resumen */
+        .resumen-productos {
+            background: #eff6ff;
+            border: 2px solid #2563eb;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 30px;
+        }
+
+        .resumen-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .resumen-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e40af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .resumen-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: #1e40af;
+        }
+
         /* Observaciones */
         .observaciones {
             background: #fffbeb;
@@ -501,54 +639,101 @@
                 </div>
             </div>
 
-            <!-- Información del Producto -->
+            <!-- Productos del Movimiento -->
             <div class="seccion">
                 <div class="seccion-header">
                     <span class="icon">📦</span>
-                    <h2>Información del Producto</h2>
-                </div>
-                <div class="data-grid">
-                    <div class="data-item">
-                        <span class="label">Código del Producto</span>
-                        <span class="data-value">{{ $movimiento->producto->codigo_producto }}</span>
-                    </div>
-                    <div class="data-item">
-                        <span class="label">Categoría</span>
-                        <span class="data-value">{{ $movimiento->producto->categoria_texto }}</span>
-                    </div>
-                    <div class="data-item full">
-                        <span class="label">Nombre del Producto</span>
-                        <span class="data-value">{{ $movimiento->producto->nombre }}</span>
-                    </div>
-                    <div class="data-item">
-                        <span class="label">Unidad de Medida</span>
-                        <span class="data-value">{{ $movimiento->producto->unidad_medida }}</span>
-                    </div>
+                    <h2>Productos del Movimiento</h2>
                 </div>
 
-                <!-- Cantidad Destacada -->
-                <div class="cantidad-destacada">
-                    <div class="cantidad-value">{{ $movimiento->cantidad_formateada }} {{ $movimiento->producto->unidad_medida }}</div>
-                    <div class="cantidad-label">Cantidad Movida</div>
-                </div>
-            </div>
+                @if($movimiento->detalles && $movimiento->detalles->count() > 0)
+                    <!-- Tabla de productos -->
+                    <div class="productos-tabla">
+                        <table class="tabla-productos">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Código</th>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Stock Anterior</th>
+                                    <th>Stock Nuevo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($movimiento->detalles as $index => $detalle)
+                                <tr>
+                                    <td class="tabla-numero">{{ $index + 1 }}</td>
+                                    <td class="tabla-codigo">{{ $detalle->producto->codigo_producto }}</td>
+                                    <td class="tabla-producto">
+                                        <div class="producto-nombre">{{ $detalle->producto->nombre }}</div>
+                                        <div class="producto-categoria">{{ $detalle->producto->categoria_texto }}</div>
+                                    </td>
+                                    <td class="tabla-cantidad">
+                                        <span class="cantidad-badge">{{ $detalle->cantidad_formateada }} {{ $detalle->producto->unidad_medida }}</span>
+                                    </td>
+                                    <td class="tabla-stock anterior">{{ $detalle->cantidad_anterior_formateada }}</td>
+                                    <td class="tabla-stock nueva">{{ $detalle->cantidad_nueva_formateada }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
-            <!-- Control de Stock -->
-            <div class="stock-control">
-                <div class="stock-control-header">
-                    <h3>📊 Control de Stock</h3>
-                </div>
-                <div class="stock-flow">
-                    <div class="stock-item anterior">
-                        <div class="cantidad">{{ $movimiento->cantidad_anterior_formateada }}</div>
-                        <div class="stock-label">Stock Anterior</div>
+                    <!-- Resumen -->
+                    <div class="resumen-productos">
+                        <div class="resumen-item">
+                            <span class="resumen-label">Total de Productos:</span>
+                            <span class="resumen-value">{{ $movimiento->detalles->count() }}</span>
+                        </div>
                     </div>
-                    <div class="stock-arrow">→</div>
-                    <div class="stock-item nueva">
-                        <div class="cantidad">{{ $movimiento->cantidad_nueva_formateada }}</div>
-                        <div class="stock-label">Stock Nuevo</div>
+                @else
+                    <!-- Fallback para movimientos antiguos sin detalles -->
+                    @if($movimiento->producto)
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <span class="label">Código del Producto</span>
+                            <span class="data-value">{{ $movimiento->producto->codigo_producto }}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="label">Categoría</span>
+                            <span class="data-value">{{ $movimiento->producto->categoria_texto }}</span>
+                        </div>
+                        <div class="data-item full">
+                            <span class="label">Nombre del Producto</span>
+                            <span class="data-value">{{ $movimiento->producto->nombre }}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="label">Unidad de Medida</span>
+                            <span class="data-value">{{ $movimiento->producto->unidad_medida }}</span>
+                        </div>
                     </div>
-                </div>
+
+                    <!-- Cantidad Destacada -->
+                    <div class="cantidad-destacada">
+                        <div class="cantidad-value">{{ $movimiento->cantidad_formateada }} {{ $movimiento->producto->unidad_medida }}</div>
+                        <div class="cantidad-label">Cantidad Movida</div>
+                    </div>
+
+                    <!-- Control de Stock -->
+                    <div class="stock-control">
+                        <div class="stock-control-header">
+                            <h3>📊 Control de Stock</h3>
+                        </div>
+                        <div class="stock-flow">
+                            <div class="stock-item anterior">
+                                <div class="cantidad">{{ $movimiento->cantidad_anterior_formateada }}</div>
+                                <div class="stock-label">Stock Anterior</div>
+                            </div>
+                            <div class="stock-arrow">→</div>
+                            <div class="stock-item nueva">
+                                <div class="cantidad">{{ $movimiento->cantidad_nueva_formateada }}</div>
+                                <div class="stock-label">Stock Nuevo</div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                @endif
             </div>
 
             <!-- Observaciones -->

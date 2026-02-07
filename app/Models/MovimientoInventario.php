@@ -52,6 +52,11 @@ class MovimientoInventario extends Model
         return $this->belongsTo(Funcionario::class, 'id_responsable');
     }
 
+    public function detalles()
+    {
+        return $this->hasMany(MovimientoInventarioDetalle::class, 'id_movimiento');
+    }
+
     // Scopes
     public function scopeActivos($query)
     {

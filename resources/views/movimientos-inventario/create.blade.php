@@ -16,28 +16,15 @@
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('movimientos-inventario.store') }}" method="POST">
+        <form action="{{ route('movimientos-inventario.store') }}" method="POST" id="form-movimiento">
             @csrf
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_producto">Producto: *</label>
-                    <select id="id_producto" name="id_producto" class="form-control" required>
-                        <option value="">Seleccione un producto</option>
-                        @foreach($productos as $producto)
-                            <option value="{{ $producto->id }}"
-                                    data-stock="{{ $producto->cantidad_actual }}"
-                                    data-unidad="{{ $producto->unidad_medida }}"
-                                    {{ old('id_producto') == $producto->id ? 'selected' : '' }}>
-                                {{ $producto->nombre }} - Stock: {{ $producto->cantidad_actual }} {{ $producto->unidad_medida }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('id_producto')
-                        <div class="error-message">{{ $message }}</div>
-                    @enderror
-                </div>
+            <!-- Información General del Movimiento -->
+            <div class="seccion-header">
+                <h3><i class="fas fa-info-circle"></i> Información General</h3>
+            </div>
 
+            <div class="form-row">
                 <div class="form-group">
                     <label for="tipo_movimiento">Tipo de Movimiento: *</label>
                     <select id="tipo_movimiento" name="tipo_movimiento" class="form-control" required>
@@ -49,22 +36,6 @@
                     @error('tipo_movimiento')
                         <div class="error-message">{{ $message }}</div>
                     @enderror
-                </div>
-
-                <div class="form-group">
-                    <label for="cantidad">Cantidad: *</label>
-                    <input type="number"
-                           id="cantidad"
-                           name="cantidad"
-                           class="form-control"
-                           value="{{ old('cantidad') }}"
-                           step="0.01"
-                           min="0.01"
-                           required>
-                    @error('cantidad')
-                        <div class="error-message">{{ $message }}</div>
-                    @enderror
-                    <small id="stock-info" class="form-text"></small>
                 </div>
 
                 <div class="form-group">
@@ -143,7 +114,7 @@
                     <textarea id="descripcion"
                               name="descripcion"
                               class="form-control"
-                              rows="3"
+                              rows="2"
                               placeholder="Detalles adicionales del movimiento">{{ old('descripcion') }}</textarea>
                     @error('descripcion')
                         <div class="error-message">{{ $message }}</div>
@@ -161,6 +132,18 @@
                         <div class="error-message">{{ $message }}</div>
                     @enderror
                 </div>
+            </div>
+
+            <!-- Productos -->
+            <div class="seccion-header" style="margin-top: 30px;">
+                <h3><i class="fas fa-box"></i> Productos</h3>
+                <button type="button" class="btn btn-success btn-sm" id="btn-agregar-producto">
+                    <i class="fas fa-plus"></i> Agregar Producto
+                </button>
+            </div>
+
+            <div id="productos-container">
+                <!-- Los productos se agregarán aquí dinámicamente -->
             </div>
 
             <div class="form-actions">
@@ -185,6 +168,28 @@
     .page-title i { color: var(--primary); }
     .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--gray-200); }
     .card-body { padding: 24px; }
+
+    .seccion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: linear-gradient(90deg, #f1f5f9 0%, #ffffff 100%);
+        border-left: 4px solid var(--primary);
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+    .seccion-header h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .seccion-header i { color: var(--primary); }
+
     .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
     .form-group { display: flex; flex-direction: column; }
     .form-group.full-width { grid-column: span 2; }
@@ -194,55 +199,233 @@
     .form-text { font-size: 0.75rem; color: var(--gray-600); margin-top: 4px; }
     .error-message { color: #ef4444; font-size: 0.75rem; margin-top: 4px; }
     .form-actions { margin-top: 24px; display: flex; gap: 10px; }
+
     .btn { padding: 10px 20px; border-radius: var(--radius); border: none; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
     .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .btn-secondary { background: var(--gray-500); color: white; }
     .btn-secondary:hover { background: var(--gray-600); }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-sm { padding: 8px 16px; font-size: 0.8rem; }
+
+    /* Productos */
+    .producto-item {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 15px;
+        position: relative;
+    }
+    .producto-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .producto-item-numero {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 1rem;
+    }
+    .producto-item-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 15px;
+    }
+    .stock-info-box {
+        background: #eff6ff;
+        border: 1px solid #3b82f6;
+        border-radius: 6px;
+        padding: 10px;
+        margin-top: 8px;
+        font-size: 0.85rem;
+        color: #1e40af;
+        font-weight: 600;
+    }
+
+    #productos-container:empty::before {
+        content: 'No hay productos agregados. Haga clic en "Agregar Producto" para comenzar.';
+        display: block;
+        text-align: center;
+        padding: 40px;
+        color: var(--gray-500);
+        font-style: italic;
+        background: #f8fafc;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+    }
 </style>
 @endsection
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const productoSelect = document.getElementById('id_producto');
-        const tipoSelect = document.getElementById('tipo_movimiento');
-        const cantidadInput = document.getElementById('cantidad');
-        const stockInfo = document.getElementById('stock-info');
-        const destinoGroup = document.getElementById('destino-group');
+    // Datos de productos desde PHP
+    const productosData = @json($productos->map(function($p) {
+        return [
+            'id' => $p->id,
+            'nombre' => $p->nombre,
+            'stock' => $p->cantidad_actual,
+            'unidad' => $p->unidad_medida
+        ];
+    }));
 
-        function updateStockInfo() {
-            const selectedOption = productoSelect.options[productoSelect.selectedIndex];
-            if (selectedOption.value && tipoSelect.value) {
-                const stock = selectedOption.dataset.stock;
+    let productoCounter = 0;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const tipoSelect = document.getElementById('tipo_movimiento');
+        const destinoGroup = document.getElementById('destino-group');
+        const btnAgregar = document.getElementById('btn-agregar-producto');
+        const container = document.getElementById('productos-container');
+
+        // Mostrar/ocultar destino según tipo
+        tipoSelect.addEventListener('change', function() {
+            if (this.value === 'salida') {
+                destinoGroup.style.display = 'flex';
+            } else {
+                destinoGroup.style.display = 'none';
+            }
+
+            // Actualizar info de stock en todos los productos
+            actualizarTodosLosStocks();
+        });
+
+        // Agregar primer producto al cargar
+        agregarProducto();
+
+        // Botón agregar producto
+        btnAgregar.addEventListener('click', function() {
+            agregarProducto();
+        });
+
+        function agregarProducto() {
+            productoCounter++;
+
+            const productoHTML = `
+                <div class="producto-item" data-index="${productoCounter}">
+                    <div class="producto-item-header">
+                        <span class="producto-item-numero">Producto #${productoCounter}</span>
+                        <button type="button" class="btn btn-danger btn-sm btn-eliminar-producto">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                    <div class="producto-item-grid">
+                        <div class="form-group">
+                            <label>Producto: *</label>
+                            <select name="productos[${productoCounter}][id_producto]" class="form-control producto-select" required>
+                                <option value="">Seleccione un producto</option>
+                                ${productosData.map(p => `
+                                    <option value="${p.id}" data-stock="${p.stock}" data-unidad="${p.unidad}">
+                                        ${p.nombre} - Stock: ${p.stock} ${p.unidad}
+                                    </option>
+                                `).join('')}
+                            </select>
+                            <div class="stock-info-box" style="display: none;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad: *</label>
+                            <input type="number"
+                                   name="productos[${productoCounter}][cantidad]"
+                                   class="form-control cantidad-input"
+                                   step="0.01"
+                                   min="0.01"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', productoHTML);
+
+            // Agregar eventos al nuevo producto
+            const nuevoProducto = container.lastElementChild;
+            const selectProducto = nuevoProducto.querySelector('.producto-select');
+            const btnEliminar = nuevoProducto.querySelector('.btn-eliminar-producto');
+
+            selectProducto.addEventListener('change', function() {
+                actualizarStockInfo(nuevoProducto);
+            });
+
+            btnEliminar.addEventListener('click', function() {
+                if (container.children.length > 1) {
+                    nuevoProducto.remove();
+                    renumerarProductos();
+                } else {
+                    alert('Debe haber al menos un producto');
+                }
+            });
+        }
+
+        function actualizarStockInfo(productoItem) {
+            const select = productoItem.querySelector('.producto-select');
+            const cantidadInput = productoItem.querySelector('.cantidad-input');
+            const stockBox = productoItem.querySelector('.stock-info-box');
+            const tipo = tipoSelect.value;
+
+            const selectedOption = select.options[select.selectedIndex];
+
+            if (selectedOption.value && tipo) {
+                const stock = parseFloat(selectedOption.dataset.stock);
                 const unidad = selectedOption.dataset.unidad;
 
-                if (tipoSelect.value === 'salida') {
-                    stockInfo.textContent = `Stock disponible: ${stock} ${unidad}`;
-                    stockInfo.style.color = '#059669';
+                stockBox.style.display = 'block';
+
+                if (tipo === 'salida') {
+                    stockBox.textContent = `Stock disponible: ${stock} ${unidad}`;
+                    stockBox.style.background = '#fef3c7';
+                    stockBox.style.borderColor = '#f59e0b';
+                    stockBox.style.color = '#92400e';
                     cantidadInput.max = stock;
-                    destinoGroup.style.display = 'flex';
-                } else if (tipoSelect.value === 'ajuste') {
-                    stockInfo.textContent = `Stock actual: ${stock} ${unidad}. Ingrese el nuevo stock total.`;
-                    stockInfo.style.color = '#0284c7';
+                } else if (tipo === 'ajuste') {
+                    stockBox.textContent = `Stock actual: ${stock} ${unidad}. Ingrese el nuevo stock total.`;
+                    stockBox.style.background = '#dbeafe';
+                    stockBox.style.borderColor = '#3b82f6';
+                    stockBox.style.color = '#1e40af';
                     cantidadInput.removeAttribute('max');
-                    destinoGroup.style.display = 'none';
                 } else {
-                    stockInfo.textContent = `Stock actual: ${stock} ${unidad}`;
-                    stockInfo.style.color = '#64748b';
+                    stockBox.textContent = `Stock actual: ${stock} ${unidad}`;
+                    stockBox.style.background = '#d1fae5';
+                    stockBox.style.borderColor = '#10b981';
+                    stockBox.style.color = '#065f46';
                     cantidadInput.removeAttribute('max');
-                    destinoGroup.style.display = 'none';
                 }
             } else {
-                stockInfo.textContent = '';
-                destinoGroup.style.display = 'none';
+                stockBox.style.display = 'none';
             }
         }
 
-        productoSelect.addEventListener('change', updateStockInfo);
-        tipoSelect.addEventListener('change', updateStockInfo);
+        function actualizarTodosLosStocks() {
+            const productos = container.querySelectorAll('.producto-item');
+            productos.forEach(producto => {
+                actualizarStockInfo(producto);
+            });
+        }
 
-        updateStockInfo();
+        function renumerarProductos() {
+            const productos = container.querySelectorAll('.producto-item');
+            productos.forEach((producto, index) => {
+                producto.querySelector('.producto-item-numero').textContent = `Producto #${index + 1}`;
+            });
+        }
+
+        // Validación antes de enviar
+        document.getElementById('form-movimiento').addEventListener('submit', function(e) {
+            if (container.children.length === 0) {
+                e.preventDefault();
+                alert('Debe agregar al menos un producto');
+                return false;
+            }
+        });
+
+        // Inicializar destino
+        if (tipoSelect.value === 'salida') {
+            destinoGroup.style.display = 'flex';
+        } else {
+            destinoGroup.style.display = 'none';
+        }
     });
 </script>
 @endsection
