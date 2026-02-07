@@ -13,17 +13,18 @@
 
         body {
             font-family: 'Segoe UI', 'Arial', sans-serif;
-            padding: 25px;
+            padding: 15px;
             background: #f8fafc;
             color: #1e293b;
+            font-size: 12px;
         }
 
         .documento-container {
             max-width: 850px;
             margin: 0 auto;
             background: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            border-radius: 4px;
             overflow: hidden;
             position: relative;
         }
@@ -31,7 +32,7 @@
         /* Header Superior con Logo y Tipo */
         .header-top {
             background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
-            padding: 25px 40px;
+            padding: 12px 20px;
             color: white;
             position: relative;
         }
@@ -45,22 +46,22 @@
         .logo-section {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 8px;
         }
 
         .logo-icon {
-            font-size: 52px;
+            font-size: 28px;
         }
 
         .logo-text h1 {
-            font-size: 22px;
+            font-size: 14px;
             font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+            margin-bottom: 2px;
         }
 
         .logo-text p {
-            font-size: 13px;
+            font-size: 10px;
             opacity: 0.9;
             font-weight: 400;
         }
@@ -68,22 +69,22 @@
         .tipo-badge-header {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            border-radius: 6px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             text-align: center;
         }
 
         .tipo-badge-header .tipo-label {
-            font-size: 11px;
+            font-size: 9px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             opacity: 0.8;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .tipo-badge-header .tipo-value {
-            font-size: 18px;
+            font-size: 13px;
             font-weight: 800;
             text-transform: uppercase;
         }
@@ -91,95 +92,95 @@
         /* Número de Movimiento */
         .numero-section {
             background: #0f172a;
-            padding: 20px 40px;
+            padding: 8px 20px;
             text-align: center;
-            border-bottom: 4px solid #2563eb;
+            border-bottom: 3px solid #2563eb;
         }
 
         .numero-section .label {
-            font-size: 11px;
+            font-size: 9px;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 6px;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
         }
 
         .numero-section .numero {
-            font-size: 26px;
+            font-size: 14px;
             font-weight: 800;
             color: #fff;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
 
         /* Contenido Principal */
         .contenido-principal {
-            padding: 35px 40px;
+            padding: 15px 20px;
         }
 
         /* Secciones de Información */
         .seccion {
-            margin-bottom: 30px;
+            margin-bottom: 12px;
         }
 
         .seccion-header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 18px;
+            gap: 6px;
+            padding: 6px 10px;
             background: linear-gradient(90deg, #f1f5f9 0%, #ffffff 100%);
-            border-left: 5px solid #2563eb;
-            border-radius: 6px;
-            margin-bottom: 20px;
+            border-left: 3px solid #2563eb;
+            border-radius: 4px;
+            margin-bottom: 10px;
         }
 
         .seccion-header .icon {
-            font-size: 22px;
+            font-size: 14px;
         }
 
         .seccion-header h2 {
-            font-size: 16px;
+            font-size: 11px;
             font-weight: 700;
             color: #1e293b;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         /* Grid de Información */
         .data-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
         }
 
         .data-item {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 16px;
+            border-radius: 4px;
+            padding: 6px 8px;
             transition: all 0.2s ease;
         }
 
         .data-item:hover {
             border-color: #2563eb;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 1px 4px rgba(37, 99, 235, 0.1);
         }
 
         .data-item.full {
-            grid-column: span 2;
+            grid-column: span 3;
         }
 
         .data-item .label {
-            font-size: 11px;
+            font-size: 8px;
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+            margin-bottom: 3px;
             display: block;
         }
 
         .data-item .data-value {
-            font-size: 15px;
+            font-size: 10px;
             font-weight: 600;
             color: #1e293b;
             word-wrap: break-word;
@@ -190,24 +191,24 @@
         .cantidad-destacada {
             background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             border: 2px solid #2563eb;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 10px;
+            border-radius: 6px;
             text-align: center;
-            margin: 25px 0;
+            margin: 12px 0;
         }
 
         .cantidad-destacada .cantidad-value {
-            font-size: 36px;
+            font-size: 18px;
             font-weight: 900;
             color: #1e40af;
-            margin-bottom: 6px;
+            margin-bottom: 3px;
         }
 
         .cantidad-destacada .cantidad-label {
-            font-size: 13px;
+            font-size: 9px;
             color: #1e40af;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             font-weight: 700;
         }
 
@@ -215,44 +216,44 @@
         .stock-control {
             background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
             border: 2px solid #16a34a;
-            border-radius: 12px;
-            padding: 28px;
-            margin: 25px 0;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
         }
 
         .stock-control-header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 10px;
         }
 
         .stock-control-header h3 {
-            font-size: 14px;
+            font-size: 10px;
             font-weight: 800;
             color: #166534;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 0.5px;
         }
 
         .stock-flow {
             display: flex;
             justify-content: space-around;
             align-items: center;
-            gap: 15px;
+            gap: 8px;
         }
 
         .stock-item {
             flex: 1;
             text-align: center;
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-radius: 6px;
+            padding: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .stock-item .cantidad {
-            font-size: 32px;
+            font-size: 16px;
             font-weight: 900;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .stock-item.anterior .cantidad {
@@ -264,22 +265,22 @@
         }
 
         .stock-item .stock-label {
-            font-size: 12px;
+            font-size: 8px;
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .stock-arrow {
-            font-size: 40px;
+            font-size: 20px;
             color: #16a34a;
             font-weight: 700;
         }
 
         /* Tabla de Productos */
         .productos-tabla {
-            margin: 20px 0;
+            margin: 10px 0;
             overflow-x: auto;
         }
 
@@ -297,21 +298,16 @@
         }
 
         .tabla-productos th {
-            padding: 14px 12px;
+            padding: 6px 6px;
             text-align: left;
-            font-size: 12px;
+            font-size: 9px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .tabla-productos tbody tr {
             border-bottom: 1px solid #e2e8f0;
-            transition: background-color 0.2s;
-        }
-
-        .tabla-productos tbody tr:hover {
-            background-color: #f8fafc;
         }
 
         .tabla-productos tbody tr:last-child {
@@ -319,8 +315,8 @@
         }
 
         .tabla-productos td {
-            padding: 16px 12px;
-            font-size: 13px;
+            padding: 6px 6px;
+            font-size: 10px;
             color: #1e293b;
         }
 
@@ -328,28 +324,29 @@
             font-weight: 700;
             color: #2563eb;
             text-align: center;
-            width: 50px;
+            width: 30px;
         }
 
         .tabla-codigo {
             font-family: 'Courier New', monospace;
             font-weight: 600;
             color: #64748b;
-            font-size: 12px;
+            font-size: 9px;
         }
 
         .tabla-producto {
-            max-width: 250px;
+            max-width: 200px;
         }
 
         .producto-nombre {
             font-weight: 700;
             color: #1e293b;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            font-size: 10px;
         }
 
         .producto-categoria {
-            font-size: 11px;
+            font-size: 8px;
             color: #64748b;
             font-style: italic;
         }
@@ -360,19 +357,19 @@
 
         .cantidad-badge {
             background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
-            border: 2px solid #2563eb;
-            padding: 6px 12px;
-            border-radius: 6px;
+            border: 1px solid #2563eb;
+            padding: 3px 8px;
+            border-radius: 4px;
             font-weight: 800;
             color: #1e40af;
-            font-size: 13px;
+            font-size: 10px;
             display: inline-block;
         }
 
         .tabla-stock {
             text-align: center;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 10px;
         }
 
         .tabla-stock.anterior {
@@ -386,31 +383,31 @@
         /* Resumen */
         .resumen-productos {
             background: #eff6ff;
-            border: 2px solid #2563eb;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin-top: 20px;
+            border: 1px solid #2563eb;
+            border-radius: 3px;
+            padding: 4px 8px;
+            margin-top: 5px;
             display: flex;
             justify-content: flex-end;
-            gap: 30px;
+            gap: 8px;
         }
 
         .resumen-item {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 4px;
         }
 
         .resumen-label {
-            font-size: 14px;
+            font-size: 8px;
             font-weight: 700;
             color: #1e40af;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.2px;
         }
 
         .resumen-value {
-            font-size: 20px;
+            font-size: 10px;
             font-weight: 900;
             color: #1e40af;
         }
@@ -418,52 +415,52 @@
         /* Observaciones */
         .observaciones {
             background: #fffbeb;
-            border: 2px solid #f59e0b;
-            border-left-width: 6px;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 25px 0;
+            border: 1px solid #f59e0b;
+            border-left-width: 3px;
+            border-radius: 4px;
+            padding: 8px 10px;
+            margin: 10px 0;
         }
 
         .observaciones h4 {
-            font-size: 13px;
+            font-size: 9px;
             font-weight: 800;
             color: #92400e;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
 
         .observaciones p {
-            font-size: 14px;
+            font-size: 9px;
             color: #78350f;
-            line-height: 1.7;
+            line-height: 1.4;
         }
 
         /* Firmas */
         .firmas-seccion {
-            margin-top: 50px;
-            padding-top: 35px;
-            border-top: 3px solid #e2e8f0;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
         }
 
         .firmas-titulo {
             text-align: center;
-            font-size: 16px;
+            font-size: 8px;
             font-weight: 700;
             color: #1e293b;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 45px;
+            letter-spacing: 0.3px;
+            margin-bottom: 8px;
         }
 
         .firmas-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 50px;
+            gap: 15px;
         }
 
         .firma-box {
@@ -471,63 +468,63 @@
         }
 
         .firma-espacio {
-            height: 70px;
-            border-bottom: 2px solid #1e293b;
-            margin-bottom: 12px;
-        }
-
-        .firma-rol {
-            font-size: 12px;
-            font-weight: 800;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .firma-nombre {
-            font-size: 15px;
-            font-weight: 700;
-            color: #1e293b;
+            height: 25px;
+            border-bottom: 1px solid #1e293b;
             margin-bottom: 4px;
         }
 
+        .firma-rol {
+            font-size: 7px;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 2px;
+        }
+
+        .firma-nombre {
+            font-size: 8px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1px;
+        }
+
         .firma-rut {
-            font-size: 13px;
+            font-size: 7px;
             color: #64748b;
         }
 
         /* Footer */
         .footer {
             background: #f8fafc;
-            padding: 25px 40px;
+            padding: 8px 15px;
             text-align: center;
-            border-top: 3px solid #e2e8f0;
-            margin-top: 40px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 10px;
         }
 
         .footer-title {
-            font-size: 14px;
+            font-size: 9px;
             font-weight: 800;
             color: #1e293b;
-            margin-bottom: 6px;
+            margin-bottom: 3px;
         }
 
         .footer-subtitle {
-            font-size: 12px;
+            font-size: 8px;
             color: #64748b;
-            margin-bottom: 15px;
+            margin-bottom: 6px;
         }
 
         .footer-fecha {
-            font-size: 13px;
+            font-size: 8px;
             font-weight: 700;
             color: #475569;
-            margin-bottom: 12px;
+            margin-bottom: 4px;
         }
 
         .footer-validez {
-            font-size: 11px;
+            font-size: 7px;
             color: #94a3b8;
             font-style: italic;
         }
