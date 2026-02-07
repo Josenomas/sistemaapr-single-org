@@ -166,15 +166,41 @@
                             <td><strong>{{ $movimiento->numero_movimiento }}</strong></td>
                             <td>{{ $movimiento->fecha_movimiento_formateada }}</td>
                             <td>{!! $movimiento->tipo_movimiento_badge !!}</td>
-                            <td>{{ $movimiento->producto->nombre }}</td>
                             <td>
-                                <strong>{{ $movimiento->cantidad_formateada }}</strong> {{ $movimiento->producto->unidad_medida }}
+                                @if($movimiento->detalles && $movimiento->detalles->count() > 0)
+                                    @if($movimiento->detalles->count() == 1)
+                                        {{ $movimiento->detalles->first()->producto->nombre }}
+                                    @else
+                                        <span style="color: #2563eb; font-weight: 600;">{{ $movimiento->detalles->count() }} productos</span>
+                                    @endif
+                                @elseif($movimiento->producto)
+                                    {{ $movimiento->producto->nombre }}
+                                @else
+                                    <span style="color: #94a3b8;">Sin producto</span>
+                                @endif
                             </td>
                             <td>
-                                <span style="color: #64748b; font-size: 0.85rem;">
-                                    {{ $movimiento->cantidad_anterior_formateada }} →
-                                    <strong style="color: #1e293b;">{{ $movimiento->cantidad_nueva_formateada }}</strong>
-                                </span>
+                                @if($movimiento->detalles && $movimiento->detalles->count() > 0)
+                                    @if($movimiento->detalles->count() == 1)
+                                        <strong>{{ $movimiento->detalles->first()->cantidad_formateada }}</strong> {{ $movimiento->detalles->first()->producto->unidad_medida }}
+                                    @else
+                                        <span style="color: #2563eb;">Ver detalle</span>
+                                    @endif
+                                @elseif($movimiento->cantidad)
+                                    <strong>{{ $movimiento->cantidad_formateada }}</strong> {{ optional($movimiento->producto)->unidad_medida }}
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td>
+                                @if($movimiento->detalles && $movimiento->detalles->count() > 0)
+                                    <span style="color: #2563eb;">Ver detalle</span>
+                                @else
+                                    <span style="color: #64748b; font-size: 0.85rem;">
+                                        {{ $movimiento->cantidad_anterior_formateada }} →
+                                        <strong style="color: #1e293b;">{{ $movimiento->cantidad_nueva_formateada }}</strong>
+                                    </span>
+                                @endif
                             </td>
                             <td>{{ $movimiento->motivo }}</td>
                             <td>

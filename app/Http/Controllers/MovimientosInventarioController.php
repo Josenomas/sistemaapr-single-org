@@ -13,7 +13,7 @@ class MovimientosInventarioController extends Controller
 {
     public function index(Request $request)
     {
-        $query = MovimientoInventario::activos()->with(['producto', 'responsable']);
+        $query = MovimientoInventario::activos()->with(['producto', 'responsable', 'detalles.producto']);
 
         // Filtro por búsqueda
         if ($request->filled('search')) {
