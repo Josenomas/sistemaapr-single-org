@@ -33,7 +33,7 @@
                     <i class="fas fa-info-circle"></i>
                     Información del Movimiento
                 </h3>
-                <span class="badge badge-{{ $movimiento->tipo_movimiento === 'entrada' ? 'success' : 'danger' }}">
+                <span class="badge badge-{{ $movimiento->tipo_movimiento === 'entrada' ? 'success' : ($movimiento->tipo_movimiento === 'salida' ? 'danger' : 'warning') }}">
                     {{ ucfirst($movimiento->tipo_movimiento) }}
                 </span>
             </div>
@@ -46,17 +46,7 @@
 
                     <div class="info-item">
                         <label>Tipo de Movimiento</label>
-                        <value><span class="badge badge-{{ $movimiento->tipo_movimiento === 'entrada' ? 'success' : 'danger' }}">{{ ucfirst($movimiento->tipo_movimiento) }}</span></value>
-                    </div>
-
-                    <div class="info-item">
-                        <label>Producto</label>
-                        <value><a href="{{ route('productos.show', $movimiento->id_producto) }}" style="color: var(--primary); text-decoration: none;">{{ $movimiento->producto->nombre }}</a></value>
-                    </div>
-
-                    <div class="info-item">
-                        <label>Cantidad</label>
-                        <value><strong>{{ number_format($movimiento->cantidad, 2) }}</strong></value>
+                        <value><span class="badge badge-{{ $movimiento->tipo_movimiento === 'entrada' ? 'success' : ($movimiento->tipo_movimiento === 'salida' ? 'danger' : 'warning') }}">{{ ucfirst($movimiento->tipo_movimiento) }}</span></value>
                     </div>
 
                     <div class="info-item">
@@ -69,10 +59,12 @@
                         <value>{{ $movimiento->destino ?? 'No especificado' }}</value>
                     </div>
 
+                    @if($movimiento->descripcion)
                     <div class="info-item full-width">
                         <label>Descripción</label>
-                        <value>{{ $movimiento->descripcion ?? 'No especificada' }}</value>
+                        <value>{{ $movimiento->descripcion }}</value>
                     </div>
+                    @endif
 
                     <div class="info-item">
                         <label>Documento de Referencia</label>
@@ -82,16 +74,6 @@
                     <div class="info-item">
                         <label>Fecha del Movimiento</label>
                         <value>{{ date('d/m/Y', strtotime($movimiento->fecha_movimiento)) }}</value>
-                    </div>
-
-                    <div class="info-item">
-                        <label>Cantidad Anterior</label>
-                        <value>{{ number_format($movimiento->cantidad_anterior, 2) }}</value>
-                    </div>
-
-                    <div class="info-item">
-                        <label>Cantidad Nueva</label>
-                        <value>{{ number_format($movimiento->cantidad_nueva, 2) }}</value>
                     </div>
 
                     <div class="info-item">
@@ -114,36 +96,110 @@
             </div>
         </div>
 
-        <!-- Información del Producto -->
+        <!-- Productos del Movimiento -->
         <div class="card mt-4">
             <div class="card-header">
                 <h3 class="card-title">
                     <i class="fas fa-box"></i>
-                    Información del Producto
+                    Productos del Movimiento
                 </h3>
             </div>
             <div class="card-body">
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Nombre del Producto</label>
-                        <value>{{ $movimiento->producto->nombre }}</value>
+                @if($movimiento->detalles && $movimiento->detalles->count() > 0)
+                    <!-- Múltiples productos -->
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Código</th>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Cantidad</th>
+                                    <th>Stock Anterior</th>
+                                    <th>Stock Nuevo</th>
+                                    <th>Stock Actual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($movimiento->detalles as $index => $detalle)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td><code>{{ $detalle->producto->codigo_producto }}</code></td>
+                                    <td>
+                                        <a href="{{ route('inventario.show', $detalle->producto->id) }}" style="color: var(--primary); text-decoration: none;">
+                                            {{ $detalle->producto->nombre }}
+                                        </a>
+                                    </td>
+                                    <td>{{ $detalle->producto->categoria_texto }}</td>
+                                    <td><strong>{{ $detalle->cantidad_formateada }}</strong> {{ $detalle->producto->unidad_medida }}</td>
+                                    <td style="color: #dc2626;">{{ $detalle->cantidad_anterior_formateada }}</td>
+                                    <td style="color: #16a34a;">{{ $detalle->cantidad_nueva_formateada }}</td>
+                                    <td><strong>{{ $detalle->producto->cantidad_actual_formateada }}</strong></td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr style="background: #f8fafc; font-weight: 600;">
+                                    <td colspan="4" style="text-align: right;">Total de productos:</td>
+                                    <td colspan="4">{{ $movimiento->detalles->count() }} productos</td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
+                @elseif($movimiento->producto)
+                    <!-- Producto único (backward compatibility) -->
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Nombre del Producto</label>
+                            <value>
+                                <a href="{{ route('inventario.show', $movimiento->producto->id) }}" style="color: var(--primary); text-decoration: none;">
+                                    {{ $movimiento->producto->nombre }}
+                                </a>
+                            </value>
+                        </div>
 
-                    <div class="info-item">
-                        <label>Código</label>
-                        <value>{{ $movimiento->producto->codigo ?? 'No especificado' }}</value>
-                    </div>
+                        <div class="info-item">
+                            <label>Código</label>
+                            <value><code>{{ $movimiento->producto->codigo_producto }}</code></value>
+                        </div>
 
-                    <div class="info-item">
-                        <label>Categoría</label>
-                        <value>{{ $movimiento->producto->categoria ?? 'No especificada' }}</value>
-                    </div>
+                        <div class="info-item">
+                            <label>Categoría</label>
+                            <value>{{ $movimiento->producto->categoria_texto }}</value>
+                        </div>
 
-                    <div class="info-item">
-                        <label>Stock Actual</label>
-                        <value><strong>{{ number_format($movimiento->producto->cantidad_stock, 2) }}</strong></value>
+                        <div class="info-item">
+                            <label>Unidad de Medida</label>
+                            <value>{{ $movimiento->producto->unidad_medida }}</value>
+                        </div>
+
+                        <div class="info-item">
+                            <label>Cantidad Movida</label>
+                            <value><strong>{{ $movimiento->cantidad_formateada }}</strong> {{ $movimiento->producto->unidad_medida }}</value>
+                        </div>
+
+                        <div class="info-item">
+                            <label>Stock Anterior</label>
+                            <value style="color: #dc2626;">{{ $movimiento->cantidad_anterior_formateada }}</value>
+                        </div>
+
+                        <div class="info-item">
+                            <label>Stock Nuevo</label>
+                            <value style="color: #16a34a;">{{ $movimiento->cantidad_nueva_formateada }}</value>
+                        </div>
+
+                        <div class="info-item">
+                            <label>Stock Actual</label>
+                            <value><strong>{{ $movimiento->producto->cantidad_actual_formateada }}</strong></value>
+                        </div>
                     </div>
-                </div>
+                @else
+                    <div class="text-center text-muted" style="padding: 40px;">
+                        <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+                        <p>No hay información de productos para este movimiento.</p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -160,8 +216,8 @@
             </div>
             <div class="card-body">
                 <div class="stat-box">
-                    <div class="stat-icon" style="background: {{ $movimiento->tipo_movimiento === 'entrada' ? '#10b981' : '#ef4444' }};">
-                        <i class="fas fa-{{ $movimiento->tipo_movimiento === 'entrada' ? 'arrow-down' : 'arrow-up' }}"></i>
+                    <div class="stat-icon" style="background: {{ $movimiento->tipo_movimiento === 'entrada' ? '#10b981' : ($movimiento->tipo_movimiento === 'salida' ? '#ef4444' : '#f59e0b') }};">
+                        <i class="fas fa-{{ $movimiento->tipo_movimiento === 'entrada' ? 'arrow-down' : ($movimiento->tipo_movimiento === 'salida' ? 'arrow-up' : 'sliders-h') }}"></i>
                     </div>
                     <div class="stat-info">
                         <div class="stat-value">{{ ucfirst($movimiento->tipo_movimiento) }}</div>
@@ -174,18 +230,13 @@
                         <i class="fas fa-cubes"></i>
                     </div>
                     <div class="stat-info">
-                        <div class="stat-value">{{ number_format($movimiento->cantidad, 2) }}</div>
-                        <div class="stat-label">Cantidad</div>
-                    </div>
-                </div>
-
-                <div class="stat-box">
-                    <div class="stat-icon" style="background: #f59e0b;">
-                        <i class="fas fa-warehouse"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">{{ number_format($movimiento->cantidad_nueva, 2) }}</div>
-                        <div class="stat-label">Stock Resultante</div>
+                        @if($movimiento->detalles && $movimiento->detalles->count() > 0)
+                            <div class="stat-value">{{ $movimiento->detalles->count() }}</div>
+                            <div class="stat-label">Productos</div>
+                        @else
+                            <div class="stat-value">{{ $movimiento->cantidad_formateada ?? '0,00' }}</div>
+                            <div class="stat-label">Cantidad</div>
+                        @endif
                     </div>
                 </div>
 
@@ -214,13 +265,13 @@
                     <i class="fas fa-edit"></i>
                     Editar Movimiento
                 </a>
-                <a href="{{ route('productos.show', $movimiento->id_producto) }}" class="action-btn">
-                    <i class="fas fa-box"></i>
-                    Ver Producto
-                </a>
-                <a href="{{ route('productos.index') }}" class="action-btn">
+                <a href="{{ route('inventario.index') }}" class="action-btn">
                     <i class="fas fa-warehouse"></i>
                     Ver Inventario
+                </a>
+                <a href="{{ route('movimientos-inventario.index') }}" class="action-btn">
+                    <i class="fas fa-list"></i>
+                    Todos los Movimientos
                 </a>
             </div>
         </div>
@@ -329,6 +380,15 @@
         font-size: 0.95rem;
     }
 
+    code {
+        background: #f1f5f9;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        color: #475569;
+    }
+
     .stat-box {
         display: flex;
         align-items: center;
@@ -389,12 +449,6 @@
         color: var(--primary-dark);
     }
 
-    .action-btn.danger:hover {
-        background: #fee2e2;
-        border-color: var(--danger);
-        color: var(--danger);
-    }
-
     .badge {
         padding: 6px 12px;
         border-radius: 12px;
@@ -416,11 +470,6 @@
     .badge-danger {
         background: #fee2e2;
         color: #991b1b;
-    }
-
-    .badge-info {
-        background: #dbeafe;
-        color: #1e40af;
     }
 
     .btn-group {
@@ -495,6 +544,11 @@
     .table td {
         padding: 12px;
         border-bottom: 1px solid var(--gray-200);
+    }
+
+    .table tfoot td {
+        border-top: 2px solid var(--gray-300);
+        border-bottom: none;
     }
 
     .text-center {
