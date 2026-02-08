@@ -13,10 +13,10 @@
 
         body {
             font-family: 'Segoe UI', 'Arial', sans-serif;
-            padding: 15px;
+            padding: 20px;
             background: #f8fafc;
             color: #1e293b;
-            font-size: 12px;
+            font-size: 13px;
         }
 
         .documento-container {
@@ -32,7 +32,7 @@
         /* Header Superior con Logo y Tipo */
         .header-top {
             background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
-            padding: 12px 20px;
+            padding: 15px 25px;
             color: white;
             position: relative;
         }
@@ -50,18 +50,18 @@
         }
 
         .logo-icon {
-            font-size: 28px;
+            font-size: 32px;
         }
 
         .logo-text h1 {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 800;
             letter-spacing: -0.3px;
             margin-bottom: 2px;
         }
 
         .logo-text p {
-            font-size: 10px;
+            font-size: 11px;
             opacity: 0.9;
             font-weight: 400;
         }
@@ -76,7 +76,7 @@
         }
 
         .tipo-badge-header .tipo-label {
-            font-size: 9px;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             opacity: 0.8;
@@ -84,7 +84,7 @@
         }
 
         .tipo-badge-header .tipo-value {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 800;
             text-transform: uppercase;
         }
@@ -114,31 +114,31 @@
 
         /* Contenido Principal */
         .contenido-principal {
-            padding: 15px 20px;
+            padding: 18px 25px;
         }
 
         /* Secciones de Información */
         .seccion {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
 
         .seccion-header {
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 10px;
+            gap: 8px;
+            padding: 8px 12px;
             background: linear-gradient(90deg, #f1f5f9 0%, #ffffff 100%);
             border-left: 3px solid #2563eb;
             border-radius: 4px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .seccion-header .icon {
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .seccion-header h2 {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             color: #1e293b;
             text-transform: uppercase;
@@ -170,17 +170,17 @@
         }
 
         .data-item .label {
-            font-size: 8px;
+            font-size: 9px;
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.3px;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
             display: block;
         }
 
         .data-item .data-value {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
             color: #1e293b;
             word-wrap: break-word;
@@ -298,9 +298,9 @@
         }
 
         .tabla-productos th {
-            padding: 6px 6px;
+            padding: 8px 8px;
             text-align: left;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.3px;
@@ -315,8 +315,8 @@
         }
 
         .tabla-productos td {
-            padding: 6px 6px;
-            font-size: 10px;
+            padding: 8px 8px;
+            font-size: 11px;
             color: #1e293b;
         }
 
@@ -418,26 +418,26 @@
             border: 1px solid #f59e0b;
             border-left-width: 3px;
             border-radius: 4px;
-            padding: 8px 10px;
-            margin: 10px 0;
+            padding: 10px 12px;
+            margin: 12px 0;
         }
 
         .observaciones h4 {
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 800;
             color: #92400e;
             text-transform: uppercase;
             letter-spacing: 0.3px;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
             display: flex;
             align-items: center;
             gap: 4px;
         }
 
         .observaciones p {
-            font-size: 9px;
+            font-size: 10px;
             color: #78350f;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
         /* Firmas */
@@ -468,29 +468,29 @@
         }
 
         .firma-espacio {
-            height: 25px;
+            height: 30px;
             border-bottom: 1px solid #1e293b;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
 
         .firma-rol {
-            font-size: 7px;
+            font-size: 8px;
             font-weight: 800;
             color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.3px;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .firma-nombre {
-            font-size: 8px;
+            font-size: 9px;
             font-weight: 700;
             color: #1e293b;
-            margin-bottom: 1px;
+            margin-bottom: 2px;
         }
 
         .firma-rut {
-            font-size: 7px;
+            font-size: 8px;
             color: #64748b;
         }
 
