@@ -83,7 +83,7 @@
 
                     <div class="info-item">
                         <label>Registrado Hace</label>
-                        <value>{{ $movimiento->created_at->diffForHumans() }}</value>
+                        <value>{{ $movimiento->created_at ? $movimiento->created_at->diffForHumans() : 'No disponible' }}</value>
                     </div>
 
                     @if($movimiento->observaciones)
