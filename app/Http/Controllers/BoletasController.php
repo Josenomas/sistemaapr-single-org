@@ -475,15 +475,79 @@ class BoletasController extends Controller
     /**
      * Boletas vencidas
      */
-    public function vencidas()
+    public function vencidas(Request $request)
     {
-        $boletas = Boleta::activos()
+        // Obtener todas las boletas vencidas con sus socios
+        $query = Boleta::activos()
                         ->with('socio')
-                        ->vencidas()
-                        ->orderBy('fecha_vencimiento')
-                        ->paginate(20);
+                        ->vencidas();
 
-        return view('boletas.vencidas', compact('boletas'));
+        // Filtro por socio
+        if ($request->filled('id_socio')) {
+            $query->where('id_socio', $request->id_socio);
+        }
+
+        $boletas = $query->orderBy('fecha_vencimiento')->get();
+
+        // Calcular resumen por socio
+        $resumenPorSocio = $boletas->groupBy('id_socio')->map(function ($boletasSocio) {
+            $socio = $boletasSocio->first()->socio;
+            $cantidadBoletas = $boletasSocio->count();
+            $montoTotal = $boletasSocio->sum('total');
+            $diasMaxAtraso = $boletasSocio->max('dias_atraso');
+
+            // Determinar nivel de riesgo y recomendación
+            if ($cantidadBoletas >= 4) {
+                $nivelRiesgo = 'critico';
+                $recomendacion = 'CORTE DE SUMINISTRO INMEDIATO';
+                $accionDetalle = 'Se recomienda realizar el corte de suministro por deuda acumulada superior a 4 meses.';
+            } elseif ($cantidadBoletas === 3) {
+                $nivelRiesgo = 'alto';
+                $recomendacion = 'NOTIFICACIÓN DE CORTE DE SUMINISTRO';
+                $accionDetalle = 'Enviar carta certificada notificando corte de suministro en 15 días si no regulariza.';
+            } elseif ($cantidadBoletas === 2) {
+                $nivelRiesgo = 'medio';
+                $recomendacion = 'ENVIAR CARTA DE NO PAGO';
+                $accionDetalle = 'Enviar carta formal solicitando regularización de deuda en 30 días.';
+            } else {
+                $nivelRiesgo = 'bajo';
+                $recomendacion = 'ENVIAR RECORDATORIO';
+                $accionDetalle = 'Enviar recordatorio de pago vía email o llamada telefónica.';
+            }
+
+            return [
+                'socio' => $socio,
+                'cantidad_boletas' => $cantidadBoletas,
+                'monto_total' => $montoTotal,
+                'dias_max_atraso' => $diasMaxAtraso,
+                'nivel_riesgo' => $nivelRiesgo,
+                'recomendacion' => $recomendacion,
+                'accion_detalle' => $accionDetalle,
+                'boletas' => $boletasSocio->sortByDesc('fecha_vencimiento')
+            ];
+        })->sortByDesc('cantidad_boletas');
+
+        // Estadísticas generales
+        $estadisticas = [
+            'total_vencidas' => $boletas->count(),
+            'monto_total' => $boletas->sum('total'),
+            'socios_afectados' => $boletas->unique('id_socio')->count(),
+            'criticos' => $resumenPorSocio->where('nivel_riesgo', 'critico')->count(),
+            'alto_riesgo' => $resumenPorSocio->where('nivel_riesgo', 'alto')->count(),
+            'medio_riesgo' => $resumenPorSocio->where('nivel_riesgo', 'medio')->count(),
+            'bajo_riesgo' => $resumenPorSocio->where('nivel_riesgo', 'bajo')->count(),
+        ];
+
+        // Lista de socios para el filtro
+        $socios = Socio::activos()
+                      ->whereHas('boletas', function($q) {
+                          $q->vencidas();
+                      })
+                      ->orderBy('nombre')
+                      ->orderBy('apellido_paterno')
+                      ->get();
+
+        return view('boletas.vencidas', compact('boletas', 'resumenPorSocio', 'estadisticas', 'socios'));
     }
 
     /**
