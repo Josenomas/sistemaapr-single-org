@@ -117,73 +117,44 @@ class FlowController extends Controller
                 'flow_order' => $transaccion->flow_order,
             ]);
 
-            // Confirmar estado actualizado con Flow
-            $resultado = $this->flowService->confirmarPago($token);
+            // NO confirmar aquí - solo consultar estado actual
+            // El pago solo debe crearse en el webhook confirmar() (servidor a servidor)
 
-            if ($resultado['success']) {
-                $transaccion->refresh();
-
-                Log::info('Flow - Estado confirmado', [
-                    'estado' => $transaccion->estado,
-                    'flow_order' => $transaccion->flow_order,
-                ]);
-
-                // Redirigir según estado
-                if ($transaccion->estado === 'pagado') {
-                    // Buscar el pago registrado
-                    $pago = Pago::where('numero_comprobante', 'LIKE', '%' . $transaccion->flow_order . '%')
-                               ->orderBy('id', 'desc')
-                               ->first();
-
-                    Log::info('Flow - Búsqueda de pago', [
-                        'flow_order' => $transaccion->flow_order,
-                        'pago_encontrado' => $pago ? 'SI' : 'NO',
-                        'pago_id' => $pago->id ?? null,
-                    ]);
-
-                    if ($pago) {
-                        return redirect()->route('comprobante.publico', $pago->id)
-                                       ->with('success', '¡Pago realizado exitosamente!');
-                    }
-
-                    // Si no encontró el pago, intentar crearlo ahora
-                    Log::warning('Flow - Pago no encontrado, intentando crear', [
-                        'flow_order' => $transaccion->flow_order,
-                    ]);
-
-                    try {
-                        $responseData = $resultado['response'] ?? [];
-                        $pagoCreado = $this->crearRegistroPago($transaccion, $responseData);
-
-                        if ($pagoCreado) {
-                            Log::info('Flow - Pago creado en retorno', ['pago_id' => $pagoCreado->id]);
-                            return redirect()->route('comprobante.publico', $pagoCreado->id)
-                                           ->with('success', '¡Pago realizado exitosamente!');
-                        }
-                    } catch (\Exception $e) {
-                        Log::error('Flow - Error al crear pago en retorno', [
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-                    }
-
-                    return redirect()->route('pagos.index')
-                                   ->with('success', '¡Pago realizado exitosamente! El comprobante estará disponible en unos momentos.');
-                } elseif ($transaccion->estado === 'rechazado') {
-                    return redirect()->route('pagos.create', ['boleta_id' => $transaccion->id_boleta])
-                                   ->with('error', 'El pago fue rechazado. Por favor, intente nuevamente.');
-                } else {
-                    return redirect()->route('pagos.create', ['boleta_id' => $transaccion->id_boleta])
-                                   ->with('warning', 'El pago está pendiente de confirmación.');
-                }
-            }
-
-            Log::error('Flow - Error al confirmar pago', [
-                'resultado' => $resultado,
+            Log::info('Flow - Consultando estado en retorno', [
+                'estado_actual' => $transaccion->estado,
+                'flow_order' => $transaccion->flow_order,
             ]);
 
-            return redirect()->route('pagos.index')
-                           ->with('error', 'Error al verificar el estado del pago');
+            // Redirigir según estado actual de la transacción
+            if ($transaccion->estado === 'pagado') {
+                // Buscar el pago registrado por el webhook
+                $pago = Pago::where('numero_comprobante', 'LIKE', '%' . $transaccion->flow_order . '%')
+                           ->orderBy('id', 'desc')
+                           ->first();
+
+                Log::info('Flow - Búsqueda de pago confirmado', [
+                    'flow_order' => $transaccion->flow_order,
+                    'pago_encontrado' => $pago ? 'SI' : 'NO',
+                    'pago_id' => $pago->id ?? null,
+                ]);
+
+                if ($pago) {
+                    return redirect()->route('comprobante.publico', $pago->id)
+                                   ->with('success', '¡Pago realizado exitosamente!');
+                }
+
+                // Si el webhook aún no procesó, informar espera
+                return redirect()->route('pagos.index')
+                               ->with('success', '¡Pago realizado exitosamente! El comprobante estará disponible en unos momentos.');
+
+            } elseif ($transaccion->estado === 'rechazado') {
+                return redirect()->route('pagos.create', ['boleta_id' => $transaccion->id_boleta])
+                               ->with('error', 'El pago fue rechazado. Por favor, intente nuevamente.');
+            } else {
+                // Estado pendiente o anulado
+                return redirect()->route('pagos.create', ['boleta_id' => $transaccion->id_boleta])
+                               ->with('warning', 'El pago está pendiente de confirmación. Si ya completó el pago, espere unos momentos.');
+            }
 
         } catch (\Exception $e) {
             Log::error('Flow - Error en retorno', [
