@@ -60,7 +60,7 @@
                                 <a href="{{ route('socios.show', $socio->id) }}" class="btn btn-sm btn-info" title="Ver">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{{ route('socios.edit', $socio->id) }}" class="btn btn-sm btn-warning" title="Editar">
+                                <a href="{{ route('socios.edit', $socio->id) }}?page={{ $socios->currentPage() }}" class="btn btn-sm btn-warning" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('socios.toggleExentoIva', $socio->id) }}" method="POST" style="display: inline;">

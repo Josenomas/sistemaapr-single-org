@@ -22,6 +22,7 @@
         <form action="{{ route('socios.update', $socio->id) }}" method="POST">
             @csrf
             @method('PUT')
+            <input type="hidden" name="page" value="{{ request('page', 1) }}">
 
             <div class="form-row">
                 <!-- RUT -->

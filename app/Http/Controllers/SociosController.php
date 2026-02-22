@@ -91,6 +91,7 @@ class SociosController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $page = $request->input('page', 1);
         $socio = Socio::findOrFail($id);
 
         $validated = $request->validate([
@@ -155,7 +156,7 @@ class SociosController extends Controller
             );
         }
 
-        return redirect()->route('socios.show', $id)
+        return redirect()->route('socios.index', ['page' => $page])
                         ->with('success', 'Socio actualizado exitosamente');
     }
 
