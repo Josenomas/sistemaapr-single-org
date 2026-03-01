@@ -22,6 +22,20 @@
     </div>
 @endif
 
+@if(session('warning'))
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ session('warning') }}
+    </div>
+@endif
+
+@if(session('success'))
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        {{ session('success') }}
+    </div>
+@endif
+
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Generación Masiva de Boletas</h3>
