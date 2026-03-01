@@ -345,6 +345,12 @@ class BoletasController extends Controller
                                 ->distinct('id_socio')
                                 ->count('id_socio');
 
+        \Log::info('Validación lecturas', [
+            'mes' => $mes,
+            'total_socios' => $totalSocios,
+            'total_lecturas' => $totalLecturas
+        ]);
+
         if ($totalLecturas < $totalSocios) {
             $sociosSinLectura = Socio::leftJoin('lecturas', function($join) use ($mes) {
                                         $join->on('socios.id', '=', 'lecturas.id_socio')
