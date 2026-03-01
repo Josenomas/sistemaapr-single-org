@@ -373,8 +373,16 @@ class BoletasController extends Controller
                            ->with('success', $mensaje);
         } catch (\Exception $e) {
             DB::rollBack();
+
+            // Capturar error de lecturas faltantes
+            $errorMsg = $e->getMessage();
+            if (strpos($errorMsg, 'FALTAN LECTURAS:') !== false) {
+                return redirect()->route('boletas.generar')
+                               ->with('warning', $errorMsg);
+            }
+
             return redirect()->route('boletas.generar')
-                           ->with('error', 'Error al generar boletas: ' . $e->getMessage());
+                           ->with('error', 'Error al generar boletas: ' . $errorMsg);
         }
     }
 
