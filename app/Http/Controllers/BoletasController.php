@@ -332,6 +332,39 @@ class BoletasController extends Controller
 
         $mes = $validated['mes'];
 
+        // VALIDACIÓN PREVIA: Verificar lecturas faltantes
+        $totalSocios = Socio::where('activo', 1)
+                            ->where('estado', '!=', 'desconectado')
+                            ->count();
+
+        $totalLecturas = Lectura::whereHas('socio', function($q) {
+                                    $q->where('activo', 1)
+                                      ->where('estado', '!=', 'desconectado');
+                                })
+                                ->where('mes', $mes)
+                                ->distinct('id_socio')
+                                ->count('id_socio');
+
+        if ($totalLecturas < $totalSocios) {
+            $sociosSinLectura = Socio::leftJoin('lecturas', function($join) use ($mes) {
+                                        $join->on('socios.id', '=', 'lecturas.id_socio')
+                                             ->where('lecturas.mes', '=', $mes);
+                                    })
+                                    ->whereNull('lecturas.id')
+                                    ->where('socios.activo', 1)
+                                    ->where('socios.estado', '!=', 'desconectado')
+                                    ->limit(10)
+                                    ->get(['socios.numero_socio', 'socios.nombre', 'socios.apellido_paterno'])
+                                    ->map(function($s) {
+                                        return $s->numero_socio . ' - ' . $s->nombre . ' ' . $s->apellido_paterno;
+                                    })
+                                    ->implode(', ');
+
+            $faltantes = $totalSocios - $totalLecturas;
+            return redirect()->route('boletas.generar')
+                           ->with('warning', "⚠️ FALTAN LECTURAS: {$faltantes} socios sin lectura de {$mes}. Primeros 10: {$sociosSinLectura}");
+        }
+
         DB::beginTransaction();
         try {
             // Llamar al procedimiento almacenado
