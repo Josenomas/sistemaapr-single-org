@@ -73,9 +73,9 @@ BEGIN
         LIMIT 10;
 
         -- Lanzar error con la lista de socios
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = CONCAT('FALTAN LECTURAS: ', (v_total_socios - v_total_lecturas),
-                                  ' socios sin lectura. Primeros 10: ', v_socios_sin_lectura);
+        SET @error_msg = CONCAT('FALTAN LECTURAS: ', (v_total_socios - v_total_lecturas),
+                                ' socios sin lectura. Primeros 10: ', IFNULL(v_socios_sin_lectura, 'N/A'));
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = @error_msg;
     END IF;
 
     OPEN cur_socios;
