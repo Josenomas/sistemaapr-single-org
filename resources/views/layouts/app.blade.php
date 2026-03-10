@@ -184,12 +184,53 @@
             color: #92400e;
             border: 1px solid #fde68a;
         }
+
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header-content {
+                gap: 0;
+            }
+
+            .user-menu {
+                gap: 8px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .logout-btn span {
+                display: none;
+            }
+
+            .logout-btn {
+                padding: 8px 12px;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
             <div class="header-content">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+
                 <a href="{{ route('dashboard') }}" class="logo">
                     <i class="fas fa-tint"></i>
                     <h1>Sistema APR</h1>
@@ -241,6 +282,41 @@
     </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <script>
+        // Mobile sidebar toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            // Toggle sidebar
+            function toggleSidebar() {
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+            }
+
+            // Open sidebar when clicking hamburger menu
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', toggleSidebar);
+            }
+
+            // Close sidebar when clicking overlay
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', toggleSidebar);
+            }
+
+            // Close sidebar when clicking a nav item (on mobile)
+            const navItems = document.querySelectorAll('.sidebar .nav-item');
+            navItems.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        toggleSidebar();
+                    }
+                });
+            });
+        });
+    </script>
 
     @yield('scripts')
 </body>
