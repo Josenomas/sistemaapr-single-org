@@ -8,13 +8,19 @@
         <i class="fas fa-users"></i>
         Gestión de Socios
     </h2>
-    <a href="{{ route('socios.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nuevo Socio
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('socios.create') }}" class="btn btn-primary" data-intro="Click aquí para registrar un nuevo socio en el sistema. Se abrirá un formulario donde podrás ingresar todos los datos del socio." data-step="1">
+            <i class="fas fa-plus"></i>
+            Nuevo Socio
+        </a>
+    </div>
 </div>
 
-<div class="card">
+<div class="card" data-intro="Esta tabla muestra todos los socios registrados en el sistema. Puedes ver su información básica y realizar acciones sobre cada uno." data-step="2">
     <div class="card-body">
         <div class="table-responsive">
             <table class="table">
@@ -26,8 +32,8 @@
                         <th>Dirección</th>
                         <th>Sector</th>
                         <th>Teléfono</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
+                        <th data-intro="El estado muestra la situación actual del socio: Activo, Moroso, Suspendido o Desconectado." data-step="3">Estado</th>
+                        <th data-intro="Desde aquí puedes Ver detalles, Editar información o gestionar la Exención de IVA del socio." data-step="4">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,11 +88,45 @@
             </table>
         </div>
 
-        <div class="pagination-wrapper">
+        <div class="pagination-wrapper" data-intro="Usa la paginación para navegar entre las diferentes páginas de socios. Al editar un socio, se mantendrá en la misma página." data-step="5">
             {{ $socios->links() }}
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('sociosTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('sociosTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection
 
 @section('styles')
@@ -96,6 +136,12 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 24px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
     }
 
     .page-title {
@@ -287,6 +333,61 @@
     .pagination-wrapper nav .active {
         background: var(--primary);
         color: white;
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
+
+    @media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
     }
 </style>
 @endsection

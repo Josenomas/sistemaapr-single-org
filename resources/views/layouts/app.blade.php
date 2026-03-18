@@ -8,6 +8,10 @@
     <title>@yield('title', 'Sistema APR')</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Intro.js para tours guiados -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+
     @yield('styles')
     <style>
         :root {
@@ -282,6 +286,9 @@
     </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Intro.js Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
 
     <script>
         // Mobile sidebar toggle

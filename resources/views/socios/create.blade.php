@@ -8,10 +8,16 @@
         <i class="fas fa-user-plus"></i>
         Registrar Nuevo Socio
     </h2>
-    <a href="{{ route('socios.index') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i>
-        Volver
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('socios.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Volver
+        </a>
+    </div>
 </div>
 
 <div class="card">
@@ -24,7 +30,7 @@
 
             <div class="form-row">
                 <!-- RUT -->
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-4" data-intro="Ingresa el RUT del socio con puntos y guión. Ejemplo: 12.345.678-9. Este campo es obligatorio y debe ser único." data-step="1">
                     <label for="rut" class="form-label required">RUT</label>
                     <input type="text"
                            class="form-control @error('rut') is-invalid @enderror"
@@ -39,7 +45,7 @@
                 </div>
 
                 <!-- Nombre -->
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-4" data-intro="Nombre del socio. Campo obligatorio." data-step="2">
                     <label for="nombre" class="form-label required">Nombre</label>
                     <input type="text"
                            class="form-control @error('nombre') is-invalid @enderror"
@@ -142,7 +148,7 @@
 
             <div class="form-row">
                 <!-- Tipo de Cliente -->
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-4" data-intro="Selecciona el tipo de cliente. Esto determina la tarifa que se aplicará en las boletas: Residencial, Comercial o Industrial." data-step="3">
                     <label for="tipo_cliente" class="form-label required">Tipo de Cliente</label>
                     <select class="form-control @error('tipo_cliente') is-invalid @enderror"
                             id="tipo_cliente"
@@ -200,7 +206,7 @@
                 @enderror
             </div>
 
-            <div class="form-actions">
+            <div class="form-actions" data-intro="Una vez completado el formulario, haz click en 'Guardar Socio' para registrar al nuevo socio. El sistema asignará automáticamente un número de socio único." data-step="4">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i>
                     Guardar Socio
@@ -215,6 +221,40 @@
 </div>
 @endsection
 
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('sociosCreateTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('sociosCreateTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
+@endsection
+
 @section('styles')
 <style>
     .page-header {
@@ -222,6 +262,12 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 24px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
     }
 
     .page-title {
@@ -370,6 +416,47 @@
         grid-column: span 2;
     }
 
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
+
     @media (max-width: 768px) {
         .form-row {
             grid-template-columns: 1fr;
@@ -378,6 +465,23 @@
         .col-md-4,
         .col-md-8 {
             grid-column: span 1;
+        }
+
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
         }
     }
 </style>
