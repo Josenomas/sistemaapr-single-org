@@ -9,11 +9,15 @@
         Gestión de Lecturas
     </h2>
     <div class="header-actions">
-        <a href="{{ route('lecturas.create') }}" class="btn btn-primary">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('lecturas.create') }}" class="btn btn-primary" data-intro="Registra una lectura individual para un socio específico. Debes ingresar el mes y la lectura actual del medidor." data-step="1">
             <i class="fas fa-plus"></i>
             Nueva Lectura
         </a>
-        <a href="{{ route('lecturas.masivo') }}" class="btn btn-success">
+        <a href="{{ route('lecturas.masivo') }}" class="btn btn-success" data-intro="Registra lecturas de múltiples socios a la vez. Puedes ir ingresando lecturas socio por socio en una sola pantalla." data-step="2">
             <i class="fas fa-clipboard-list"></i>
             Registro Masivo
         </a>
@@ -22,7 +26,7 @@
 
 <div class="card">
     <div class="card-body">
-        <div class="filters-section">
+        <div class="filters-section" data-intro="Usa estos filtros para buscar lecturas específicas por mes o socio. Muy útil para revisar el historial de consumo." data-step="3">
             <form method="GET" action="{{ route('lecturas.index') }}" class="filter-form">
                 <div class="filter-group">
                     <label for="mes">Mes</label>
@@ -52,7 +56,7 @@
             </form>
         </div>
 
-        <div class="table-responsive">
+        <div class="table-responsive" data-intro="Tabla con todas las lecturas registradas. Muestra el consumo calculado automáticamente (Lectura Actual - Lectura Anterior)." data-step="4">
             <table class="table">
                 <thead>
                     <tr>
@@ -61,9 +65,9 @@
                         <th>Mes</th>
                         <th>Lect. Anterior</th>
                         <th>Lect. Actual</th>
-                        <th>Consumo (m³)</th>
+                        <th data-intro="El consumo se calcula automáticamente al ingresar la lectura actual. No es necesario calcularlo manualmente." data-step="5">Consumo (m³)</th>
                         <th>Fecha Lectura</th>
-                        <th>Acciones</th>
+                        <th data-intro="Ver detalles de la lectura o Editar (solo si no se ha generado boleta para ese mes)." data-step="6">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -325,5 +329,75 @@
         display: flex;
         justify-content: center;
     }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('lecturasTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('lecturasTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection

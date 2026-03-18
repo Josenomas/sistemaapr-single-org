@@ -9,11 +9,15 @@
         Gestión de Pagos
     </h2>
     <div class="btn-group">
-        <a href="{{ route('pagos.create') }}" class="btn btn-primary">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('pagos.create') }}" class="btn btn-primary" data-intro="Registra un pago manualmente. Puedes buscar la boleta por número o seleccionar el socio para ver sus boletas pendientes." data-step="1">
             <i class="fas fa-plus"></i>
             Registrar Pago
         </a>
-        <a href="{{ route('pagos.reporteCaja') }}" class="btn btn-secondary">
+        <a href="{{ route('pagos.reporteCaja') }}" class="btn btn-secondary" data-intro="Genera un reporte de caja con todos los pagos recibidos en un período de tiempo. Útil para cuadrar la caja diaria." data-step="2">
             <i class="fas fa-cash-register"></i>
             Reporte de Caja
         </a>
@@ -21,7 +25,7 @@
 </div>
 
 <!-- Estadísticas -->
-<div class="stats-row">
+<div class="stats-row" data-intro="Panel de estadísticas financieras: Total de pagos, recaudación del día, del mes actual y desgloses por método de pago (Efectivo, Transferencia, Webpay)." data-step="3">
     <div class="stat-card">
         <div class="stat-icon bg-primary">
             <i class="fas fa-file-invoice"></i>
@@ -160,7 +164,7 @@
 </div>
 
 <!-- Tabla de Pagos -->
-<div class="card">
+<div class="card" data-intro="Listado de todos los pagos registrados. Cada pago tiene un número de recibo único generado automáticamente." data-step="4">
     <div class="card-body">
         <div class="table-responsive">
             <table class="table">
@@ -171,9 +175,9 @@
                         <th>Socio</th>
                         <th>Boleta</th>
                         <th>Monto</th>
-                        <th>Método</th>
+                        <th data-intro="Métodos de pago disponibles: Efectivo, Transferencia bancaria o Webpay (pago online)." data-step="5">Método</th>
                         <th>Comprobante</th>
-                        <th>Acciones</th>
+                        <th data-intro="Ver detalles del pago, Descargar recibo en PDF o Anular el pago (solo si es necesario corregir un error)." data-step="6">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -536,5 +540,80 @@
     .mb-3 {
         margin-bottom: 24px;
     }
+
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('pagosTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('pagosTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection

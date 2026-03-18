@@ -8,10 +8,16 @@
         <i class="fas fa-plus-circle"></i>
         Generar Boletas Masivas
     </h2>
-    <a href="{{ route('boletas.index') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i>
-        Volver
-    </a>
+    <div class="header-actions">
+        <button type="button" id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('boletas.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Volver
+        </a>
+    </div>
 </div>
 
 <!-- Alertas -->
@@ -41,7 +47,7 @@
         <h3 class="card-title">Generación Masiva de Boletas</h3>
     </div>
     <div class="card-body">
-        <div class="info-box">
+        <div class="info-box" data-intro="Lee esta información importante antes de generar boletas. El proceso es automático pero requiere que las lecturas del mes estén registradas." data-step="1">
             <i class="fas fa-info-circle"></i>
             <div>
                 <h4>Información Importante</h4>
@@ -58,7 +64,7 @@
         <form action="{{ route('boletas.storeGenerar') }}" method="POST" onsubmit="return confirm('¿Está seguro de generar las boletas para el mes seleccionado? Esta acción no se puede deshacer.');">
             @csrf
 
-            <div class="form-group">
+            <div class="form-group" data-intro="Selecciona el mes para el cual quieres generar las boletas. Asegúrate de que todas las lecturas de ese mes ya estén registradas." data-step="2">
                 <label for="mes" class="form-label required">Mes a Generar</label>
                 <input type="month"
                        class="form-control @error('mes') is-invalid @enderror"
@@ -72,14 +78,14 @@
                 <small class="text-muted">Seleccione el mes para el cual desea generar las boletas</small>
             </div>
 
-            <div class="warning-box">
+            <div class="warning-box" data-intro="⚠️ IMPORTANTE: Si faltan lecturas, el sistema te mostrará una advertencia con la lista de socios sin lectura. Debes registrarlas antes de generar." data-step="3">
                 <i class="fas fa-exclamation-triangle"></i>
                 <div>
                     <strong>Advertencia:</strong> Asegúrese de haber registrado todas las lecturas del mes antes de generar las boletas. Una vez generadas, no podrá regenerarlas automáticamente.
                 </div>
             </div>
 
-            <div class="form-actions">
+            <div class="form-actions" data-intro="Click aquí para iniciar el proceso de generación masiva. El sistema validará las lecturas y generará todas las boletas automáticamente." data-step="4">
                 <button type="submit" class="btn btn-success">
                     <i class="fas fa-cogs"></i>
                     Generar Boletas
@@ -309,5 +315,86 @@
         color: #991b1b;
         border: 1px solid #fecaca;
     }
+
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('generarBoletasTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('generarBoletasTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection

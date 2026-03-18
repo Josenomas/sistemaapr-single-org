@@ -9,11 +9,15 @@
         Gestión de Boletas
     </h2>
     <div class="header-actions">
-        <a href="{{ route('boletas.generar') }}" class="btn btn-success">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('boletas.generar') }}" class="btn btn-success" data-intro="Genera boletas masivamente para todos los socios activos del mes seleccionado. El sistema calcula automáticamente los montos según las lecturas y tarifas configuradas." data-step="1">
             <i class="fas fa-plus-circle"></i>
             Generar Boletas
         </a>
-        <a href="{{ route('boletas.create') }}" class="btn btn-primary">
+        <a href="{{ route('boletas.create') }}" class="btn btn-primary" data-intro="Crea una boleta manual individual. Útil para casos especiales o ajustes específicos." data-step="2">
             <i class="fas fa-plus"></i>
             Nueva Boleta
         </a>
@@ -36,7 +40,7 @@
 @endif
 
 <!-- Estadísticas -->
-<div class="stats-grid">
+<div class="stats-grid" data-intro="Panel de estadísticas que muestra un resumen del estado de todas las boletas: Total, Pendientes, Vencidas, Pagadas y el monto total." data-step="3">
     <div class="stat-card">
         <div class="stat-icon bg-primary">
             <i class="fas fa-file-invoice"></i>
@@ -156,7 +160,7 @@
 </div>
 
 <!-- Tabla de Boletas -->
-<div class="card">
+<div class="card" data-intro="Listado de todas las boletas generadas. Puedes filtrar por mes, socio o estado para encontrar boletas específicas." data-step="4">
     <div class="card-body">
         <div class="table-responsive">
             <table class="table">
@@ -169,8 +173,8 @@
                         <th>Vencimiento</th>
                         <th>Consumo</th>
                         <th>Total</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
+                        <th data-intro="Estados posibles: Pendiente (sin pagar), Pagada, Vencida (pasó la fecha de vencimiento sin pago)." data-step="5">Estado</th>
+                        <th data-intro="Ver detalles, Descargar PDF, Enviar por email, Registrar pago o Anular boleta según corresponda." data-step="6">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -572,5 +576,75 @@
             grid-template-columns: 1fr;
         }
     }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('boletasTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('boletasTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection
