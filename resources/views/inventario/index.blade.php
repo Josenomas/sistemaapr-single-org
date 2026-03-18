@@ -8,14 +8,20 @@
         <i class="fas fa-boxes"></i>
         Gestión de Inventario
     </h2>
-    <a href="{{ route('inventario.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nuevo Producto
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('inventario.create') }}" class="btn btn-primary" data-intro="Registra un nuevo producto en el inventario: materiales, equipos, herramientas, insumos, químicos o repuestos." data-step="1">
+            <i class="fas fa-plus"></i>
+            Nuevo Producto
+        </a>
+    </div>
 </div>
 
 <!-- Estadísticas -->
-<div class="stats-grid">
+<div class="stats-grid" data-intro="Resumen del inventario: Total de productos, productos con bajo stock (cerca del mínimo), productos agotados (stock 0) y valor total del inventario." data-step="2">
     <div class="stat-card">
         <div class="stat-icon" style="background: #3b82f6;">
             <i class="fas fa-boxes"></i>
@@ -58,7 +64,7 @@
 </div>
 
 <!-- Filtros -->
-<div class="card mb-4">
+<div class="card mb-4" data-intro="Filtra productos por nombre/código, categoría o estado de stock (todos, bajo stock, agotados)." data-step="3">
     <div class="card-body">
         <form method="GET" action="{{ route('inventario.index') }}" class="filters-form">
             <div class="form-row">
@@ -129,19 +135,19 @@
 <!-- Tabla -->
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
+        <div class="table-responsive" data-intro="Lista de todos los productos en inventario. Muestra código, nombre, categoría, stock actual, stock mínimo y valor." data-step="4">
             <table class="table">
                 <thead>
                     <tr>
                         <th>Código</th>
                         <th>Nombre</th>
                         <th>Categoría</th>
-                        <th>Cantidad</th>
+                        <th data-intro="Cantidad actual en inventario. Se actualizará automáticamente con cada entrada o salida registrada." data-step="5">Cantidad</th>
                         <th>Stock Mínimo</th>
                         <th>Precio Unit.</th>
                         <th>Valor Total</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
+                        <th data-intro="Estado: Normal (stock suficiente), Bajo Stock (cerca del mínimo), Agotado (stock 0)." data-step="6">Estado</th>
+                        <th data-intro="Ver detalles, Editar producto o Registrar movimiento de entrada/salida." data-step="7">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -473,5 +479,86 @@
         color: #991b1b;
         border: 1px solid #fecaca;
     }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('inventarioTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('inventarioTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection

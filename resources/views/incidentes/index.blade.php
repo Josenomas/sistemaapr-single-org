@@ -9,7 +9,11 @@
         Gestión de Incidentes
     </h2>
     <div class="header-actions">
-        <a href="{{ route('incidentes.create') }}" class="btn btn-primary">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('incidentes.create') }}" class="btn btn-primary" data-intro="Reporta un nuevo incidente: fugas de agua, cortes de suministro, baja presión, contaminación u otros problemas del sistema." data-step="1">
             <i class="fas fa-plus"></i>
             Reportar Incidente
         </a>
@@ -32,7 +36,7 @@
 @endif
 
 <!-- Estadísticas -->
-<div class="stats-grid">
+<div class="stats-grid" data-intro="Resumen de incidentes: Críticos (alta prioridad que requieren atención inmediata) y Activos (todos los incidentes aún no resueltos)." data-step="2">
     <div class="stat-card critical">
         <div class="stat-icon">
             <i class="fas fa-exclamation-triangle"></i>
@@ -55,7 +59,7 @@
 </div>
 
 <!-- Filtros -->
-<div class="card filters-card">
+<div class="card filters-card" data-intro="Filtra incidentes por tipo (fuga, corte, baja presión), prioridad (crítica, alta, media, baja) o estado (reportado, en proceso, resuelto)." data-step="3">
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-filter"></i>
@@ -127,17 +131,17 @@
 <div class="card">
     <div class="card-body">
         @if($incidentes->count() > 0)
-            <div class="table-responsive">
+            <div class="table-responsive" data-intro="Listado de todos los incidentes reportados. Muestra fecha, tipo, ubicación, nivel de prioridad y estado actual." data-step="4">
                 <table class="table">
                     <thead>
                         <tr>
                             <th>Fecha</th>
                             <th>Tipo</th>
                             <th>Ubicación</th>
-                            <th>Prioridad</th>
-                            <th>Estado</th>
+                            <th data-intro="Niveles de prioridad: Crítica (requiere atención inmediata), Alta, Media, Baja." data-step="5">Prioridad</th>
+                            <th data-intro="Estados: Reportado (recién ingresado), En Proceso (siendo atendido), Resuelto (completado)." data-step="6">Estado</th>
                             <th>Asignado</th>
-                            <th>Acciones</th>
+                            <th data-intro="Ver detalles completos del incidente, Editar información o Cambiar estado del incidente." data-step="7">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -554,5 +558,80 @@
             font-size: 12px;
         }
     }
+
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('incidentesTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('incidentesTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection
