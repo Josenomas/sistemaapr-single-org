@@ -8,10 +8,16 @@
         <i class="fas fa-plug"></i>
         Cortes de Suministro
     </h2>
-    <a href="{{ route('cortes.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Registrar Corte
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('cortes.create') }}" class="btn btn-primary" data-intro="Registra un nuevo corte de suministro: por morosidad, solicitud del socio, mantenimiento u otro motivo." data-step="1">
+            <i class="fas fa-plus"></i>
+            Registrar Corte
+        </a>
+    </div>
 </div>
 
 @if(session('success'))
@@ -21,7 +27,7 @@
     </div>
 @endif
 
-<div class="card">
+<div class="card" data-intro="Filtra cortes por socio, estado (pendiente, ejecutado, reconectado), motivo o rango de fechas." data-step="2">
     <div class="card-header">
         <h3 class="card-title">Filtros de Búsqueda</h3>
     </div>
@@ -100,19 +106,19 @@
     </div>
     <div class="card-body">
         @if($cortes->count() > 0)
-            <div class="table-responsive">
+            <div class="table-responsive" data-intro="Listado de todos los cortes registrados. Muestra socio, motivo, fechas, monto adeudado y estado actual." data-step="3">
                 <table class="table">
                     <thead>
                         <tr>
                             <th>N° Socio</th>
                             <th>Nombre Socio</th>
-                            <th>Motivo</th>
+                            <th data-intro="Motivos: Morosidad (falta de pago), Solicitud del socio, Mantenimiento u Otro." data-step="4">Motivo</th>
                             <th>Fecha Corte</th>
                             <th>Fecha Reconexión</th>
                             <th>Monto Adeudado</th>
-                            <th>Estado</th>
+                            <th data-intro="Estados: Pendiente (por ejecutar), Ejecutado (corte realizado), Reconectado (servicio restablecido), Cancelado." data-step="5">Estado</th>
                             <th>Ejecutor</th>
-                            <th>Acciones</th>
+                            <th data-intro="Ver detalles del corte, Editar información o Cambiar estado (ejecutar corte o reconectar)." data-step="6">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -455,5 +461,86 @@
             gap: 16px;
         }
     }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('cortesTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('cortesTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection
