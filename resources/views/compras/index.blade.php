@@ -8,14 +8,20 @@
         <i class="fas fa-shopping-cart"></i>
         Gestión de Compras
     </h2>
-    <a href="{{ route('compras.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nueva Compra
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('compras.create') }}" class="btn btn-primary" data-intro="Registra una nueva compra: proveedor, tipo (materiales, equipos, servicios), productos, cantidades y montos." data-step="1">
+            <i class="fas fa-plus"></i>
+            Nueva Compra
+        </a>
+    </div>
 </div>
 
 <!-- Filtros -->
-<div class="card mb-4">
+<div class="card mb-4" data-intro="Filtra compras por proveedor, tipo (materiales, equipos, servicios), estado (pendiente, pagada) o rango de fechas." data-step="2">
     <div class="card-body">
         <form method="GET" action="{{ route('compras.index') }}" class="filters-form">
             <div class="form-row">
@@ -88,18 +94,18 @@
 <!-- Tabla -->
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
+        <div class="table-responsive" data-intro="Listado de compras realizadas por el APR con número único, proveedor, monto total y estado de pago." data-step="3">
             <table class="table">
                 <thead>
                     <tr>
                         <th>N° Compra</th>
                         <th>Fecha</th>
                         <th>Proveedor</th>
-                        <th>Tipo</th>
+                        <th data-intro="Tipos de compra: Materiales (tuberías, válvulas), Equipos (bombas, medidores), Herramientas, Insumos, Servicios." data-step="4">Tipo</th>
                         <th>Descripción</th>
                         <th>Total</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
+                        <th data-intro="Estados: Pendiente (no pagada), Pagada (cancelada), Anulada (eliminada/rechazada)." data-step="5">Estado</th>
+                        <th data-intro="Ver detalles de la compra (productos, cantidades, factura) o Editar información." data-step="6">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -361,5 +367,121 @@
         color: #991b1b;
         border: 1px solid #fecaca;
     }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+        padding: 10px 20px;
+        border-radius: var(--radius);
+        border: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-info:hover {
+        background: #0891b2;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
+
+    @media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('comprasTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('comprasTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection
