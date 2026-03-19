@@ -359,6 +359,68 @@
         .stats-grid {
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         }
+
+        .reports-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+        padding: 10px 20px;
+        border-radius: var(--radius);
+        border: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-info:hover {
+        background: #0891b2;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
     }
 </style>
 @endsection
@@ -370,10 +432,14 @@
             <i class="fas fa-chart-bar"></i>
             Centro de Reportes
         </h2>
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
     </div>
 
     <!-- Estadísticas Generales -->
-    <div class="stats-section">
+    <div class="stats-section" data-intro="Panel de estadísticas generales del sistema: total de socios, boletas emitidas, tickets abiertos y cortes activos." data-step="1">
         <div class="section-header">
             <i class="fas fa-chart-line"></i>
             <h3>Estadísticas Generales</h3>
@@ -426,7 +492,7 @@
     </div>
 
     <!-- Estadísticas Financieras -->
-    <div class="stats-section">
+    <div class="stats-section" data-intro="Estadísticas financieras: ingresos del mes, pagos recibidos, deuda total pendiente y porcentaje de morosidad." data-step="2">
         <div class="section-header">
             <i class="fas fa-dollar-sign"></i>
             <h3>Estadísticas Financieras</h3>
@@ -479,7 +545,7 @@
     </div>
 
     <!-- Gráficos -->
-    <div class="charts-grid">
+    <div class="charts-grid" data-intro="Gráficos visuales con tendencias: ingresos mensuales, consumo de agua, tickets por estado y métodos de pago utilizados." data-step="3">
         <div class="chart-card">
             <h4 class="chart-title">
                 <i class="fas fa-chart-line"></i>
@@ -514,7 +580,7 @@
     </div>
 
     <!-- Top 10 Consumidores -->
-    <div class="table-container">
+    <div class="table-container" data-intro="Ranking de los 10 socios con mayor consumo de agua en el mes actual." data-step="4">
         <h4 class="chart-title">
             <i class="fas fa-fire"></i>
             Top 10 Consumidores del Mes
@@ -757,5 +823,31 @@
             }
         }
     });
+
+    // Tour con Intro.js
+    const intro = introJs();
+    intro.setOptions({
+        nextLabel: 'Siguiente',
+        prevLabel: 'Anterior',
+        doneLabel: 'Finalizar',
+        skipLabel: 'Salir',
+        showProgress: true,
+        showBullets: false,
+        exitOnOverlayClick: false,
+        disableInteraction: true,
+        tooltipClass: 'custom-tooltip'
+    });
+
+    document.getElementById('startTourBtn').addEventListener('click', function() {
+        intro.start();
+    });
+
+    const tourShown = localStorage.getItem('reportesTourShown');
+    if (!tourShown) {
+        setTimeout(function() {
+            intro.start();
+            localStorage.setItem('reportesTourShown', 'true');
+        }, 500);
+    }
 </script>
 @endsection

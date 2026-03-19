@@ -8,14 +8,20 @@
         <i class="fas fa-users-cog"></i>
         Gestión de Directiva
     </h2>
-    <a href="{{ route('directiva.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nuevo Miembro
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('directiva.create') }}" class="btn btn-primary" data-intro="Registra un nuevo miembro de la directiva del APR: socio, cargo (presidente, secretario, tesorero, director), período y fechas." data-step="1">
+            <i class="fas fa-plus"></i>
+            Nuevo Miembro
+        </a>
+    </div>
 </div>
 
 <!-- Estadísticas -->
-<div class="stats-row">
+<div class="stats-row" data-intro="Panel de estadísticas de la directiva: total de miembros registrados, activos actuales, períodos y presidente en ejercicio." data-step="2">
     <div class="stat-card">
         <div class="stat-icon bg-primary">
             <i class="fas fa-users"></i>
@@ -64,7 +70,7 @@
 </div>
 
 <!-- Filtros -->
-<div class="card mb-3">
+<div class="card mb-3" data-intro="Filtra miembros de directiva por cargo, estado (activo, finalizado, renunciado), período o socio." data-step="3">
     <div class="card-body">
         <h3 class="filter-title">
             <i class="fas fa-filter"></i>
@@ -146,18 +152,18 @@
 <!-- Tabla de Directiva -->
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
+        <div class="table-responsive" data-intro="Listado de miembros de la directiva con su cargo, período de mandato y estado actual." data-step="4">
             <table class="table">
                 <thead>
                     <tr>
                         <th>Socio</th>
                         <th>RUT</th>
-                        <th>Cargo</th>
+                        <th data-intro="Cargos: Presidente, Vicepresidente, Secretario, Tesorero, Director, Vocal, Suplente." data-step="5">Cargo</th>
                         <th>Período</th>
-                        <th>Estado</th>
+                        <th data-intro="Estados: Activo (en ejercicio), Finalizado (período cumplido), Renunciado (abandonó el cargo)." data-step="6">Estado</th>
                         <th>Fecha Inicio</th>
                         <th>Duración</th>
-                        <th>Acciones</th>
+                        <th data-intro="Ver detalles del mandato o Editar información del miembro." data-step="7">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -546,5 +552,92 @@
         .filter-form .form-row {
             grid-template-columns: 1fr;
         }
+
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
     }
 </style>
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('directivaTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('directivaTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
+@endsection
