@@ -495,6 +495,44 @@
             align-items: flex-start;
             gap: 16px;
         }
+
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+        padding: 10px 20px;
+        border-radius: var(--radius);
+        border: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-info:hover {
+        background: #0891b2;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
 
     /* Estilos personalizados para Intro.js */
