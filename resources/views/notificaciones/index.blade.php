@@ -8,14 +8,20 @@
         <i class="fas fa-bell"></i>
         Gestión de Notificaciones
     </h2>
-    <a href="{{ route('notificaciones.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nueva Notificación
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('notificaciones.create') }}" class="btn btn-primary" data-intro="Crea una nueva notificación: SMS, Email o WhatsApp. Define título, mensaje, destinatarios y fecha de envío." data-step="1">
+            <i class="fas fa-plus"></i>
+            Nueva Notificación
+        </a>
+    </div>
 </div>
 
 <!-- Estadísticas -->
-<div class="stats-row">
+<div class="stats-row" data-intro="Panel de estadísticas: total de notificaciones, enviadas hoy, programadas pendientes y total de destinatarios." data-step="2">
     <div class="stat-card">
         <div class="stat-icon bg-primary">
             <i class="fas fa-bell"></i>
@@ -58,7 +64,7 @@
 </div>
 
 <!-- Filtros -->
-<div class="card mb-3">
+<div class="card mb-3" data-intro="Filtra notificaciones por tipo (SMS, Email, WhatsApp), estado, destinatario o rango de fechas." data-step="3">
     <div class="card-body">
         <h3 class="filter-title">
             <i class="fas fa-filter"></i>
@@ -144,17 +150,17 @@
 <!-- Tabla de Notificaciones -->
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
+        <div class="table-responsive" data-intro="Listado de notificaciones creadas con título, tipo, destinatarios y estado de envío." data-step="4">
             <table class="table">
                 <thead>
                     <tr>
                         <th>Título</th>
-                        <th>Tipo</th>
+                        <th data-intro="Tipos de notificación: SMS (mensaje de texto), Email (correo electrónico), WhatsApp (mensaje WhatsApp)." data-step="5">Tipo</th>
                         <th>Destinatario</th>
-                        <th>Estado</th>
+                        <th data-intro="Estados: Borrador (sin enviar), Programada (pendiente), Enviada (completada), Fallida (error en envío)." data-step="6">Estado</th>
                         <th>Fecha Programada</th>
                         <th>Enviados/Total</th>
-                        <th>Acciones</th>
+                        <th data-intro="Ver detalles, Editar notificación o Eliminar." data-step="7">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -482,5 +488,100 @@
         display: flex;
         justify-content: center;
     }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
+
+    @media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('notificacionesTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('notificacionesTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection
