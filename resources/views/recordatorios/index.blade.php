@@ -8,10 +8,16 @@
         <i class="fas fa-bell"></i>
         Gestión de Recordatorios
     </h2>
-    <a href="{{ route('recordatorios.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nuevo Recordatorio
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('recordatorios.create') }}" class="btn btn-primary" data-intro="Crea un nuevo recordatorio: título, descripción, fecha/hora, prioridad (alta, media, baja) y notificaciones." data-step="1">
+            <i class="fas fa-plus"></i>
+            Nuevo Recordatorio
+        </a>
+    </div>
 </div>
 
 <!-- Alertas -->
@@ -30,7 +36,7 @@
 @endif
 
 <!-- Estadísticas -->
-<div class="stats-grid">
+<div class="stats-grid" data-intro="Panel de estadísticas: total de recordatorios, pendientes, para hoy, próximos 7 días, vencidos y completados." data-step="2">
     <div class="stat-card">
         <div class="stat-icon bg-primary">
             <i class="fas fa-bell"></i>
@@ -93,7 +99,7 @@
 </div>
 
 <!-- Filtros -->
-<div class="card mb-3">
+<div class="card mb-3" data-intro="Filtra recordatorios por estado (pendiente, completado, vencido), prioridad o rango de fechas." data-step="3">
     <div class="card-body">
         <form method="GET" action="{{ route('recordatorios.index') }}" class="filter-form">
             <div class="form-row">
@@ -169,7 +175,7 @@
 <!-- Tabla de Recordatorios -->
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
+        <div class="table-responsive" data-intro="Listado de recordatorios con fecha, hora, prioridad y días restantes. Resaltados según urgencia." data-step="4">
             <table class="table">
                 <thead>
                     <tr>
@@ -177,11 +183,11 @@
                         <th>Hora</th>
                         <th>Título</th>
                         <th>Tipo</th>
-                        <th>Prioridad</th>
-                        <th>Estado</th>
+                        <th data-intro="Prioridades: Urgente (rojo), Alta (naranja), Media (amarillo), Baja (azul). Define la importancia del recordatorio." data-step="5">Prioridad</th>
+                        <th data-intro="Estados: Pendiente (por hacer), Completado (realizado), Vencido (pasó la fecha), Cancelado." data-step="6">Estado</th>
                         <th>Asignado</th>
                         <th>Días Restantes</th>
-                        <th>Acciones</th>
+                        <th data-intro="Ver detalles completos, Marcar como completado o Editar recordatorio." data-step="7">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -593,6 +599,110 @@
         .stats-grid {
             grid-template-columns: 1fr;
         }
+
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+        padding: 10px 20px;
+        border-radius: var(--radius);
+        border: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-info:hover {
+        background: #0891b2;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
     }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        const tourShown = localStorage.getItem('recordatoriosTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('recordatoriosTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection
