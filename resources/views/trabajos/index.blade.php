@@ -8,10 +8,16 @@
         <i class="fas fa-tools"></i>
         Trabajos Realizados
     </h2>
-    <a href="{{ route('trabajos.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Registrar Trabajo
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('trabajos.create') }}" class="btn btn-primary" data-intro="Registra un nuevo trabajo: mantenimiento, reparación, instalación, inspección u otro tipo de trabajo realizado en el sistema." data-step="1">
+            <i class="fas fa-plus"></i>
+            Registrar Trabajo
+        </a>
+    </div>
 </div>
 
 @if(session('success'))
@@ -21,7 +27,7 @@
     </div>
 @endif
 
-<div class="card">
+<div class="card" data-intro="Filtra trabajos por tipo, estado (planificado, en proceso, completado), prioridad o responsable." data-step="2">
     <div class="card-header">
         <h3 class="card-title">Filtros de Búsqueda</h3>
     </div>
@@ -112,18 +118,18 @@
     </div>
     <div class="card-body">
         @if($trabajos->count() > 0)
-            <div class="table-responsive">
+            <div class="table-responsive" data-intro="Listado de todos los trabajos registrados. Muestra título, tipo, fechas, estado, prioridad y costos." data-step="3">
                 <table class="table">
                     <thead>
                         <tr>
                             <th>Título</th>
                             <th>Tipo</th>
                             <th>Fecha Inicio</th>
-                            <th>Estado</th>
-                            <th>Prioridad</th>
+                            <th data-intro="Estados: Planificado (programado), En Proceso (ejecutándose), Completado, Cancelado." data-step="4">Estado</th>
+                            <th data-intro="Prioridades: Baja, Media, Alta, Urgente (requiere atención inmediata)." data-step="5">Prioridad</th>
                             <th>Responsable</th>
                             <th>Costo Estimado</th>
-                            <th>Acciones</th>
+                            <th data-intro="Ver detalles completos, Editar información o Cambiar estado del trabajo." data-step="6">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -490,5 +496,75 @@
             gap: 16px;
         }
     }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('trabajosTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('trabajosTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection

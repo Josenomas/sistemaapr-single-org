@@ -8,10 +8,16 @@
         <i class="fas fa-users-cog"></i>
         Gestión de Usuarios
     </h2>
-    <a href="{{ route('usuarios.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nuevo Usuario
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('usuarios.create') }}" class="btn btn-primary" data-intro="Crea un nuevo usuario del sistema: nombre de usuario, contraseña, rol (admin, tesorero, operador, lecturista) y estado." data-step="1">
+            <i class="fas fa-plus"></i>
+            Nuevo Usuario
+        </a>
+    </div>
 </div>
 
 @if(session('success'))
@@ -30,7 +36,7 @@
 
 <div class="card">
     <div class="card-body">
-        <div class="filters-section">
+        <div class="filters-section" data-intro="Filtra usuarios por rol (admin, tesorero, operador, lecturista) o por estado (activo/inactivo)." data-step="2">
             <form method="GET" action="{{ route('usuarios.index') }}" class="filter-form">
                 <div class="filter-group">
                     <label for="rol">Rol</label>
@@ -63,17 +69,17 @@
             </form>
         </div>
 
-        <div class="table-responsive">
+        <div class="table-responsive" data-intro="Listado de usuarios del sistema con sus credenciales de acceso y permisos asignados." data-step="3">
             <table class="table">
                 <thead>
                     <tr>
                         <th>Usuario</th>
                         <th>Nombre Completo</th>
                         <th>Email</th>
-                        <th>Rol</th>
+                        <th data-intro="Roles del sistema: Admin (acceso total), Tesorero (finanzas), Operador (operaciones), Lecturista (solo lecturas)." data-step="4">Rol</th>
                         <th>Estado</th>
                         <th>Último Acceso</th>
-                        <th>Acciones</th>
+                        <th data-intro="Ver detalles del usuario o Editar su información y permisos." data-step="5">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -369,5 +375,100 @@
         display: flex;
         justify-content: center;
     }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
+
+    @media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('usuariosTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('usuariosTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection

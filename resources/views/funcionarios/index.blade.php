@@ -8,15 +8,21 @@
         <i class="fas fa-user-tie"></i>
         Gestión de Funcionarios
     </h2>
-    <a href="{{ route('funcionarios.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nuevo Funcionario
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('funcionarios.create') }}" class="btn btn-primary" data-intro="Registra un nuevo funcionario del APR: nombre, RUT, cargo, fecha de ingreso, contacto y estado laboral." data-step="1">
+            <i class="fas fa-plus"></i>
+            Nuevo Funcionario
+        </a>
+    </div>
 </div>
 
 <div class="card">
     <div class="card-body">
-        <div class="filters-section">
+        <div class="filters-section" data-intro="Filtra funcionarios por estado (activo, inactivo, licencia) o por cargo (director, operador, secretario, etc.)." data-step="2">
             <form method="GET" action="{{ route('funcionarios.index') }}" class="filter-form">
                 <div class="filter-group">
                     <label for="estado">Estado</label>
@@ -49,7 +55,7 @@
             </form>
         </div>
 
-        <div class="table-responsive">
+        <div class="table-responsive" data-intro="Listado de funcionarios del APR con información de contacto, cargo y estado laboral." data-step="3">
             <table class="table">
                 <thead>
                     <tr>
@@ -59,8 +65,8 @@
                         <th>Teléfono</th>
                         <th>Email</th>
                         <th>Fecha Ingreso</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
+                        <th data-intro="Estados laborales: Activo (trabajando), Licencia (con licencia médica), Inactivo (no trabaja)." data-step="4">Estado</th>
+                        <th data-intro="Ver detalles completos del funcionario o Editar su información." data-step="5">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -320,5 +326,100 @@
         display: flex;
         justify-content: center;
     }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    /* Estilos personalizados para Intro.js */
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
+
+    @media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar el tour
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        // Botón para iniciar el tour
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        // Mostrar tour automáticamente solo la primera vez
+        const tourShown = localStorage.getItem('funcionariosTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('funcionariosTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection
