@@ -8,14 +8,20 @@
         <i class="fas fa-exchange-alt"></i>
         Movimientos de Inventario
     </h2>
-    <a href="{{ route('movimientos-inventario.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nuevo Movimiento
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('movimientos-inventario.create') }}" class="btn btn-primary" data-intro="Registra un movimiento de inventario: tipo (entrada, salida, ajuste), producto, cantidad, motivo y responsable." data-step="1">
+            <i class="fas fa-plus"></i>
+            Nuevo Movimiento
+        </a>
+    </div>
 </div>
 
 <!-- Estadísticas -->
-<div class="stats-row">
+<div class="stats-row" data-intro="Panel de estadísticas de movimientos: total registrados, entradas (ingresos), salidas (egresos) y ajustes de inventario." data-step="2">
     <div class="stat-card">
         <div class="stat-icon bg-primary">
             <i class="fas fa-exchange-alt"></i>
@@ -58,7 +64,7 @@
 </div>
 
 <!-- Filtros -->
-<div class="card mb-3">
+<div class="card mb-3" data-intro="Filtra movimientos por tipo (entrada, salida, ajuste), producto o rango de fechas." data-step="3">
     <div class="card-body">
         <h3 class="filter-title">
             <i class="fas fa-filter"></i>
@@ -146,18 +152,18 @@
 <!-- Tabla de Movimientos -->
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
+        <div class="table-responsive" data-intro="Listado de movimientos de inventario con número único, tipo, producto, cantidad movida y stock resultante." data-step="4">
             <table class="table">
                 <thead>
                     <tr>
                         <th>N° Movimiento</th>
                         <th>Fecha</th>
-                        <th>Tipo</th>
+                        <th data-intro="Tipos de movimiento: Entrada (ingreso de stock), Salida (egreso/uso), Ajuste (corrección de inventario)." data-step="5">Tipo</th>
                         <th>Producto</th>
                         <th>Cantidad</th>
-                        <th>Stock</th>
+                        <th data-intro="Stock resultante después del movimiento. Permite hacer seguimiento del inventario." data-step="6">Stock</th>
                         <th>Motivo</th>
-                        <th>Acciones</th>
+                        <th data-intro="Ver detalles completos del movimiento (productos, cantidades, responsable)." data-step="7">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -485,5 +491,117 @@
         display: flex;
         justify-content: center;
     }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+        padding: 10px 20px;
+        border-radius: var(--radius);
+        border: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-info:hover {
+        background: #0891b2;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
+    }
+
+    @media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+    }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        const tourShown = localStorage.getItem('movimientosInventarioTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('movimientosInventarioTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection

@@ -8,10 +8,16 @@
         <i class="fas fa-ticket-alt"></i>
         Gestión de Tickets
     </h2>
-    <a href="{{ route('tickets.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Nuevo Ticket
-    </a>
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('tickets.create') }}" class="btn btn-primary" data-intro="Crea un nuevo ticket de soporte: socio, tipo (consulta, reclamo, solicitud), prioridad, descripción y asignado." data-step="1">
+            <i class="fas fa-plus"></i>
+            Nuevo Ticket
+        </a>
+    </div>
 </div>
 
 <!-- Alertas -->
@@ -30,7 +36,7 @@
 @endif
 
 <!-- Estadísticas -->
-<div class="stats-grid">
+<div class="stats-grid" data-intro="Panel de estadísticas: total de tickets, abiertos, cerrados, urgentes y sin asignar." data-step="2">
     <div class="stat-card">
         <div class="stat-icon bg-primary">
             <i class="fas fa-ticket-alt"></i>
@@ -83,7 +89,7 @@
 </div>
 
 <!-- Filtros -->
-<div class="card mb-3">
+<div class="card mb-3" data-intro="Filtra tickets por tipo (consulta, reclamo, solicitud), estado (abierto, en proceso, cerrado), prioridad o asignado." data-step="3">
     <div class="card-body">
         <form method="GET" action="{{ route('tickets.index') }}" class="filter-form">
             <div class="form-row">
@@ -163,7 +169,7 @@
 <!-- Tabla de Tickets -->
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
+        <div class="table-responsive" data-intro="Listado de tickets de soporte con número único, tipo, prioridad, estado y funcionario asignado. Resaltados según urgencia." data-step="4">
             <table class="table">
                 <thead>
                     <tr>
@@ -171,11 +177,11 @@
                         <th>Fecha Reporte</th>
                         <th>Título</th>
                         <th>Socio</th>
-                        <th>Tipo</th>
-                        <th>Prioridad</th>
-                        <th>Estado</th>
+                        <th data-intro="Tipos: Consulta (pregunta), Reclamo (queja), Solicitud (petición), Avería (falla técnica), Emergencia." data-step="5">Tipo</th>
+                        <th data-intro="Prioridades: Baja, Media, Alta, Urgente. Urgente se resalta en rojo para atención inmediata." data-step="6">Prioridad</th>
+                        <th data-intro="Estados: Abierto (nuevo), En Proceso (atendiendo), Resuelto (solucionado), Cerrado (finalizado), Cancelado." data-step="7">Estado</th>
                         <th>Asignado</th>
-                        <th>Acciones</th>
+                        <th data-intro="Ver detalles completos, Cambiar estado o Agregar comentarios al ticket." data-step="8">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -569,6 +575,116 @@
         .stats-grid {
             grid-template-columns: 1fr;
         }
+
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-info {
+        background: #06b6d4;
+        color: white;
+        padding: 10px 20px;
+        border-radius: var(--radius);
+        border: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-info:hover {
+        background: #0891b2;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .custom-tooltip {
+        max-width: 400px;
+    }
+
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
+    }
+
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
+    }
+
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
+    }
+
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
+    }
+
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
     }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        const tourShown = localStorage.getItem('ticketsTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('ticketsTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection

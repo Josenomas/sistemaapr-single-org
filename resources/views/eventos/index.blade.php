@@ -8,8 +8,12 @@
         <i class="fas fa-calendar-alt"></i>
         Gestión de Eventos
     </h2>
-    <div>
-        <a href="{{ route('eventos.create') }}" class="btn btn-primary">
+    <div class="header-actions">
+        <button id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('eventos.create') }}" class="btn btn-primary" data-intro="Crea un nuevo evento recurrente: título, tipo, fecha inicial, recurrencia (diaria, semanal, mensual, anual) y notificaciones." data-step="1">
             <i class="fas fa-plus"></i>
             Nuevo Evento
         </a>
@@ -18,16 +22,16 @@
 
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
+        <div class="table-responsive" data-intro="Listado de eventos recurrentes con próxima fecha programada, recurrencia configurada y días restantes." data-step="2">
             <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Evento</th>
                         <th>Tipo</th>
                         <th>Próxima Fecha</th>
-                        <th>Recurrencia</th>
-                        <th>Días Restantes</th>
-                        <th>Acciones</th>
+                        <th data-intro="Recurrencia: Diaria, Semanal, Mensual, Anual. Define cada cuánto se repite el evento automáticamente." data-step="3">Recurrencia</th>
+                        <th data-intro="Días restantes hasta la próxima ocurrencia del evento. Resaltado en rojo si es urgente." data-step="4">Días Restantes</th>
+                        <th data-intro="Editar configuración del evento recurrente." data-step="5">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -318,5 +322,117 @@
     display: flex;
     justify-content: center;
 }
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-info {
+    background: #06b6d4;
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    border: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-info:hover {
+    background: #0891b2;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.custom-tooltip {
+    max-width: 400px;
+}
+
+.introjs-tooltip {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+}
+
+.introjs-button {
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    font-weight: 600 !important;
+    text-shadow: none !important;
+}
+
+.introjs-nextbutton {
+    background: var(--primary) !important;
+    border: none !important;
+}
+
+.introjs-prevbutton {
+    background: var(--gray-500) !important;
+    border: none !important;
+}
+
+.introjs-skipbutton {
+    color: var(--gray-600) !important;
+}
+
+.introjs-donebutton {
+    background: var(--success) !important;
+    border: none !important;
+}
+
+@media (max-width: 768px) {
+    .header-actions {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .header-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+}
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const intro = introJs();
+        intro.setOptions({
+            nextLabel: 'Siguiente',
+            prevLabel: 'Anterior',
+            doneLabel: 'Finalizar',
+            skipLabel: 'Salir',
+            showProgress: true,
+            showBullets: false,
+            exitOnOverlayClick: false,
+            disableInteraction: true,
+            tooltipClass: 'custom-tooltip'
+        });
+
+        document.getElementById('startTourBtn').addEventListener('click', function() {
+            intro.start();
+        });
+
+        const tourShown = localStorage.getItem('eventosTourShown');
+        if (!tourShown) {
+            setTimeout(function() {
+                intro.start();
+                localStorage.setItem('eventosTourShown', 'true');
+            }, 500);
+        }
+    });
+</script>
 @endsection
