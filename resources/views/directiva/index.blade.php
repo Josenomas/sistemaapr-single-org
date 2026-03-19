@@ -486,12 +486,24 @@
     }
 
     .btn-info {
-        background: var(--info);
+        background: #06b6d4;
         color: white;
+        padding: 10px 20px;
+        border-radius: var(--radius);
+        border: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .btn-info:hover {
-        background: var(--info-dark);
+        background: #0891b2;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
 
     .btn-warning {
