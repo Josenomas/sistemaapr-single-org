@@ -187,13 +187,6 @@
                                    {{ in_array('whatsapp', $canales) ? 'checked' : '' }}>
                             <span>WhatsApp</span>
                         </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox"
-                                   name="canal[]"
-                                   value="sistema"
-                                   {{ in_array('sistema', $canales) ? 'checked' : '' }}>
-                            <span>Notificacion en Sistema</span>
-                        </label>
                     </div>
                     @error('canal')
                         <div class="invalid-feedback d-block">{{ $message }}</div>

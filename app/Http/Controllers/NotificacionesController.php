@@ -86,7 +86,7 @@ class NotificacionesController extends Controller
             'estado' => 'required|in:borrador,programada,enviada,cancelada',
             'fecha_programada' => 'nullable|date',
             'canal' => 'required|array|min:1',
-            'canal.*' => 'in:email,whatsapp,sistema',
+            'canal.*' => 'in:email,whatsapp',
             'observaciones' => 'nullable|string',
         ]);
 
@@ -211,7 +211,7 @@ class NotificacionesController extends Controller
             'estado' => 'required|in:borrador,programada,enviada,cancelada',
             'fecha_programada' => 'nullable|date',
             'canal' => 'required|array|min:1',
-            'canal.*' => 'in:email,whatsapp,sistema',
+            'canal.*' => 'in:email,whatsapp',
             'observaciones' => 'nullable|string',
         ]);
 

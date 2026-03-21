@@ -180,13 +180,6 @@
                                    {{ is_array(old('canal')) && in_array('whatsapp', old('canal')) ? 'checked' : '' }}>
                             <span>WhatsApp</span>
                         </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox"
-                                   name="canal[]"
-                                   value="sistema"
-                                   {{ is_array(old('canal')) && in_array('sistema', old('canal')) ? 'checked' : '' }}>
-                            <span>Notificacion en Sistema</span>
-                        </label>
                     </div>
                     @error('canal')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
