@@ -903,7 +903,7 @@
                     <li><i class="fas fa-check"></i> Hasta 500 socios</li>
                     <li><i class="fas fa-check"></i> Todos los módulos</li>
                     <li><i class="fas fa-check"></i> 5 usuarios</li>
-                    <li><i class="fas fa-check"></i> Soporte prioritario por Email</li>
+                    <li><i class="fas fa-check"></i> Soporte prioritario por email</li>
                     <li><i class="fas fa-check"></i> Notificaciones por email</li>
                     <li><i class="fas fa-check"></i> Reportes avanzados</li>
                 </ul>
