@@ -952,63 +952,6 @@
         }
     }
 
-    /* Botón de Ayuda */
-    .btn-help {
-        background: #06b6d4;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 0.875rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s;
-    }
-
-    .btn-help:hover {
-        background: #0891b2;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
-    }
-
-    /* Estilos personalizados para Intro.js */
-    .custom-tooltip {
-        max-width: 400px;
-    }
-
-    .introjs-tooltip {
-        border-radius: 12px !important;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
-    }
-
-    .introjs-button {
-        border-radius: 6px !important;
-        padding: 8px 16px !important;
-        font-weight: 600 !important;
-        text-shadow: none !important;
-    }
-
-    .introjs-nextbutton {
-        background: var(--primary) !important;
-        border: none !important;
-    }
-
-    .introjs-prevbutton {
-        background: var(--gray-500) !important;
-        border: none !important;
-    }
-
-    .introjs-skipbutton {
-        color: var(--gray-600) !important;
-    }
-
-    .introjs-donebutton {
-        background: var(--success) !important;
-        border: none !important;
-    }
 </style>
 @endsection
 
@@ -1020,15 +963,9 @@
                 <i class="fas fa-tachometer-alt"></i>
                 Panel de Control
             </h2>
-            <div style="display: flex; gap: 12px; align-items: center;">
-                <button id="startTourBtn" class="btn-help" title="Iniciar tutorial">
-                    <i class="fas fa-question-circle"></i>
-                    Ayuda
-                </button>
-                <div class="system-status online">
-                    <span class="status-dot online"></span>
-                    Sistema Operativo
-                </div>
+            <div class="system-status online">
+                <span class="status-dot online"></span>
+                Sistema Operativo
             </div>
         </div>
 
@@ -1081,7 +1018,7 @@
         </div>
     </div>
 
-    <div class="stats-grid" data-intro="Tarjetas con estadísticas clave del sistema: Total de socios activos, boletas emitidas del mes, boletas pendientes de pago y total de ingresos recaudados." data-step="1">
+    <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-header">
                 <div class="stat-title">Total Clientes</div>
@@ -1132,7 +1069,7 @@
         Accesos Directos
     </h2>
 
-    <div class="quick-actions-grid" data-intro="Accesos rápidos a las funciones más usadas del sistema. Desde aquí puedes registrar lecturas, generar boletas, registrar pagos, gestionar socios y más." data-step="2">
+    <div class="quick-actions-grid">
         <a href="{{ route('lecturas.create') }}" class="quick-action-btn primary">
             <div class="quick-action-icon primary-bg">
                 <i class="fas fa-tint"></i>
@@ -1413,33 +1350,5 @@ getWeather();
 
 // Actualizar clima cada 30 minutos
 setInterval(getWeather, 1800000);
-
-// Tour guiado con Intro.js
-const intro = introJs();
-intro.setOptions({
-    nextLabel: 'Siguiente',
-    prevLabel: 'Anterior',
-    doneLabel: 'Finalizar',
-    skipLabel: 'Salir',
-    showProgress: true,
-    showBullets: false,
-    exitOnOverlayClick: false,
-    disableInteraction: true,
-    tooltipClass: 'custom-tooltip'
-});
-
-// Botón para iniciar el tour
-document.getElementById('startTourBtn')?.addEventListener('click', function() {
-    intro.start();
-});
-
-// Mostrar tour automáticamente solo la primera vez
-const tourShown = localStorage.getItem('dashboardTourShown');
-if (!tourShown) {
-    setTimeout(function() {
-        intro.start();
-        localStorage.setItem('dashboardTourShown', 'true');
-    }, 1000);
-}
 </script>
 @endsection
