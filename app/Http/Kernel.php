@@ -64,5 +64,11 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'permission' => \App\Http\Middleware\CheckPermission::class,
+
+        // Multitenancy & Suscripciones
+        'suscripcion.activa' => \App\Http\Middleware\CheckSuscripcionActiva::class,
+        'modulo.permitido' => \App\Http\Middleware\CheckModuloPermitido::class,
+        'limite.socios' => \App\Http\Middleware\CheckLimiteSocios::class,
+        'limite.usuarios' => \App\Http\Middleware\CheckLimiteUsuarios::class,
     ];
 }
