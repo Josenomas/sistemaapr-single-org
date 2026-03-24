@@ -3,12 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Scopes\OrganizacionScope;
 
 class Socio extends Model
 {
     protected $table = 'socios';
 
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new OrganizacionScope);
+
+        // Auto-asignar id_organizacion al crear
+        static::creating(function ($socio) {
+            if (auth()->check() && !$socio->id_organizacion) {
+                $socio->id_organizacion = auth()->user()->id_organizacion;
+            }
+        });
+    }
+
     protected $fillable = [
+        'id_organizacion',
         'numero_socio',
         'rut',
         'nombre',
@@ -42,6 +59,14 @@ class Socio extends Model
 
     const CREATED_AT = 'fecha_creacion';
     const UPDATED_AT = 'fecha_actualizacion';
+
+    /**
+     * Relación: Un socio pertenece a una organización
+     */
+    public function organizacion()
+    {
+        return $this->belongsTo(Organizacion::class, 'id_organizacion');
+    }
 
     /**
      * Relación con lecturas

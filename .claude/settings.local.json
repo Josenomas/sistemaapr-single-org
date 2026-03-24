@@ -21,7 +21,9 @@
       "Bash(findstr:*)",
       "Bash(curl:*)",
       "Bash(Get-Content c:/xampp/htdocs/ssr/storage/logs/laravel.log -Tail 100)",
-      "Bash(Select-String -Pattern \"MovimientosInventario\" -Context 5)"
+      "Bash(Select-String -Pattern \"MovimientosInventario\" -Context 5)",
+      "Read(//c/xampp/htdocs/**)",
+      "Bash(dir)"
     ],
     "deny": [],
     "ask": []
