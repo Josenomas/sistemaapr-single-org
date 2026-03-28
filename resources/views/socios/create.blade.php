@@ -20,6 +20,38 @@
     </div>
 </div>
 
+@php
+    $organizacion = auth()->user()->organizacion;
+    $sociosActuales = $organizacion->socios()->count();
+    $limiteSocios = $organizacion->suscripcion->limite_socios;
+    $porcentajeUso = $limiteSocios > 0 ? ($sociosActuales / $limiteSocios) * 100 : 0;
+@endphp
+
+@if($limiteSocios > 0 && $porcentajeUso >= 80)
+<div class="alert {{ $porcentajeUso >= 100 ? 'alert-danger' : 'alert-warning' }}">
+    <i class="fas fa-exclamation-triangle"></i>
+    <div>
+        <strong>{{ $porcentajeUso >= 100 ? '¡Límite alcanzado!' : 'Atención:' }}</strong>
+        Has utilizado {{ $sociosActuales }} de {{ $limiteSocios }} socios permitidos en tu plan ({{ round($porcentajeUso) }}%).
+        @if($porcentajeUso >= 100)
+            No puedes agregar más socios.
+        @endif
+        <a href="{{ route('organizacion.upgrade') }}" class="alert-link">Actualiza tu plan aquí</a>.
+    </div>
+</div>
+@endif
+
+@if(session('upgrade_required'))
+<div class="alert alert-danger">
+    <i class="fas fa-ban"></i>
+    <div>
+        <strong>Acción bloqueada:</strong>
+        Has alcanzado el límite de tu plan.
+        <a href="{{ route('organizacion.upgrade') }}" class="alert-link"><strong>Actualiza tu plan para continuar</strong></a>.
+    </div>
+</div>
+@endif
+
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Información del Socio</h3>
@@ -282,6 +314,51 @@
 
     .page-title i {
         color: var(--primary);
+    }
+
+    .alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 20px;
+        border-radius: var(--radius);
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .alert i {
+        font-size: 1.25rem;
+        margin-top: 2px;
+    }
+
+    .alert-warning {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #f59e0b;
+    }
+
+    .alert-warning i {
+        color: #f59e0b;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #dc2626;
+    }
+
+    .alert-danger i {
+        color: #dc2626;
+    }
+
+    .alert-link {
+        color: inherit;
+        text-decoration: underline;
+        font-weight: 600;
+    }
+
+    .alert-link:hover {
+        opacity: 0.8;
     }
 
     .card {

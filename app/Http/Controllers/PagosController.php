@@ -6,11 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\Pago;
 use App\Models\Boleta;
 use App\Models\Socio;
+use App\Models\Auditoria;
 use App\Helpers\ActividadHelper;
 use App\Services\FlowPaymentService;
 use App\Mail\LinkPagoFlowMail;
+use App\Mail\ReciboPagoMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use App\Services\ExcelExportService;
 
 class PagosController extends Controller
 {
@@ -144,6 +147,8 @@ class PagosController extends Controller
             'metodo_pago' => 'required|in:efectivo,transferencia,cheque,debito,credito',
             'numero_comprobante' => 'nullable|string|max:100',
             'observaciones' => 'nullable|string',
+            'enviar_email' => 'nullable|boolean',
+            'email_destino' => 'nullable|email',
         ]);
 
         DB::beginTransaction();
@@ -211,11 +216,52 @@ class PagosController extends Controller
                 auth()->id()
             );
 
+            // Registrar en auditoría
+            Auditoria::registrar(
+                'pagos',
+                'crear',
+                "Registró pago {$pago->numero_recibo} - Boleta: {$boleta->numero_boleta} - Socio: {$boleta->socio->nombre_completo} - Monto: {$pago->monto_pagado_formateado}",
+                'pagos',
+                $pago->id,
+                null,
+                $pago->toArray()
+            );
+
+            // Enviar email con recibo si se solicitó
+            if ($request->filled('enviar_email') && $request->enviar_email) {
+                $emailDestino = $request->filled('email_destino')
+                    ? $request->email_destino
+                    : $boleta->socio->email;
+
+                if ($emailDestino) {
+                    try {
+                        Mail::to($emailDestino)->send(new ReciboPagoMail($pago));
+
+                        ActividadHelper::registrar(
+                            'Pagos',
+                            "Recibo enviado por email a: {$emailDestino} - Recibo: {$pago->numero_recibo}",
+                            auth()->id()
+                        );
+                    } catch (\Exception $e) {
+                        \Log::error('Error al enviar recibo por email', [
+                            'error' => $e->getMessage(),
+                            'pago_id' => $pago->id,
+                            'email' => $emailDestino
+                        ]);
+                    }
+                }
+            }
+
             DB::commit();
+
+            $mensaje = 'Pago registrado exitosamente';
+            if ($request->filled('enviar_email') && $request->enviar_email && isset($emailDestino)) {
+                $mensaje .= '. Recibo enviado por email a ' . $emailDestino;
+            }
 
             // Redirigir con mensaje de éxito y trigger para descarga del PDF
             return redirect()->route('pagos.create')
-                           ->with('success', 'Pago registrado exitosamente')
+                           ->with('success', $mensaje)
                            ->with('download_recibo', $pago->id);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -275,6 +321,9 @@ class PagosController extends Controller
 
         DB::beginTransaction();
         try {
+            // Capturar datos antes de actualizar para auditoría
+            $datosAnteriores = $pago->toArray();
+
             // Detectar cambios
             $cambios = [];
 
@@ -326,6 +375,17 @@ class PagosController extends Controller
                     "Pago actualizado [{$pago->numero_recibo}]: " . implode(' | ', $cambios),
                     auth()->id()
                 );
+
+                // Registrar en auditoría
+                Auditoria::registrar(
+                    'pagos',
+                    'editar',
+                    "Editó pago {$pago->numero_recibo}. Cambios: " . implode(', ', $cambios),
+                    'pagos',
+                    $pago->id,
+                    $datosAnteriores,
+                    $pago->fresh()->toArray()
+                );
             }
 
             DB::commit();
@@ -349,12 +409,24 @@ class PagosController extends Controller
         try {
             $pago = Pago::with('boleta', 'socio')->findOrFail($id);
             $boleta = $pago->boleta;
+            $datosAnteriores = $pago->toArray();
 
             // Registrar actividad antes de eliminar
             ActividadHelper::registrar(
                 'Pagos',
                 "Pago eliminado [{$pago->numero_recibo}] - Boleta: {$boleta->numero_boleta} - Socio: {$pago->socio->nombre_completo} - Monto: {$pago->monto_pagado_formateado}",
                 auth()->id()
+            );
+
+            // Registrar en auditoría
+            Auditoria::registrar(
+                'pagos',
+                'eliminar',
+                "Eliminó pago {$pago->numero_recibo} - Boleta: {$boleta->numero_boleta} - Socio: {$pago->socio->nombre_completo} - Monto: {$pago->monto_pagado_formateado}",
+                'pagos',
+                null,
+                $datosAnteriores,
+                null
             );
 
             $pago->delete();
@@ -596,20 +668,48 @@ class PagosController extends Controller
 
         // Totales por método de pago
         $totalesPorMetodo = Pago::whereDate('fecha_pago', $fecha)
-                                ->select('metodo_pago', DB::raw('SUM(monto_pagado) as total'))
+                                ->select('metodo_pago', DB::raw('COUNT(*) as cantidad'), DB::raw('SUM(monto_pagado) as total'))
                                 ->groupBy('metodo_pago')
                                 ->get();
 
         $totalDia = $pagos->sum('monto_pagado');
+        $cantidadPagos = $pagos->count();
+        $promedioMonto = $cantidadPagos > 0 ? $totalDia / $cantidadPagos : 0;
+
+        // Estadísticas adicionales
+        $estadisticas = [
+            'total_dia' => $totalDia,
+            'cantidad_pagos' => $cantidadPagos,
+            'promedio_monto' => $promedioMonto,
+            'primer_pago' => $pagos->first(),
+            'ultimo_pago' => $pagos->last(),
+            'pago_mayor' => $pagos->sortByDesc('monto_pagado')->first(),
+            'pago_menor' => $pagos->sortBy('monto_pagado')->first(),
+        ];
+
+        // Comparativa con días anteriores (últimos 7 días)
+        $comparativa = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $fechaComparativa = date('Y-m-d', strtotime("-{$i} days", strtotime($fecha)));
+            $totalDiaComparativo = Pago::whereDate('fecha_pago', $fechaComparativa)->sum('monto_pagado');
+            $cantidadComparativa = Pago::whereDate('fecha_pago', $fechaComparativa)->count();
+
+            $comparativa[] = [
+                'fecha' => $fechaComparativa,
+                'fecha_formateada' => date('d/m', strtotime($fechaComparativa)),
+                'total' => $totalDiaComparativo,
+                'cantidad' => $cantidadComparativa,
+            ];
+        }
 
         // Registrar actividad
         ActividadHelper::registrar(
             'Pagos',
-            "Reporte de caja generado para fecha: " . date('d/m/Y', strtotime($fecha)) . " - Total: $" . number_format($totalDia, 0, ',', '.'),
+            "Reporte de caja generado para fecha: " . date('d/m/Y', strtotime($fecha)) . " - Total: $" . number_format($totalDia, 0, ',', '.') . " ({$cantidadPagos} pagos)",
             auth()->id()
         );
 
-        return view('pagos.reporte-caja', compact('pagos', 'totalesPorMetodo', 'totalDia', 'fecha'));
+        return view('pagos.reporte-caja', compact('pagos', 'totalesPorMetodo', 'totalDia', 'fecha', 'estadisticas', 'comparativa'));
     }
 
     /**
@@ -773,6 +873,61 @@ class PagosController extends Controller
     }
 
     /**
+     * Dashboard de pagos con gráficos
+     */
+    public function dashboard(Request $request)
+    {
+        $mesActual = $request->get('mes', date('Y-m'));
+        $año = date('Y', strtotime($mesActual . '-01'));
+
+        // Ingresos mensuales del año (últimos 12 meses)
+        $ingresosMensuales = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $mes = date('Y-m', strtotime("-{$i} months"));
+            $total = Pago::whereYear('fecha_pago', date('Y', strtotime($mes)))
+                         ->whereMonth('fecha_pago', date('m', strtotime($mes)))
+                         ->sum('monto_pagado');
+
+            $ingresosMensuales[] = [
+                'mes' => $mes,
+                'mes_nombre' => ucfirst(strftime('%B', strtotime($mes . '-01'))),
+                'total' => $total,
+            ];
+        }
+
+        // Estadísticas generales
+        $estadisticas = [
+            'total_hoy' => Pago::whereDate('fecha_pago', today())->sum('monto_pagado'),
+            'pagos_hoy' => Pago::whereDate('fecha_pago', today())->count(),
+            'total_mes' => Pago::whereYear('fecha_pago', date('Y'))
+                               ->whereMonth('fecha_pago', date('m'))
+                               ->sum('monto_pagado'),
+            'pagos_mes' => Pago::whereYear('fecha_pago', date('Y'))
+                               ->whereMonth('fecha_pago', date('m'))
+                               ->count(),
+            'total_año' => Pago::whereYear('fecha_pago', date('Y'))->sum('monto_pagado'),
+            'pagos_año' => Pago::whereYear('fecha_pago', date('Y'))->count(),
+        ];
+
+        // Métodos de pago más usados (mes actual)
+        $metodosPago = Pago::whereYear('fecha_pago', date('Y'))
+                           ->whereMonth('fecha_pago', date('m'))
+                           ->select('metodo_pago', DB::raw('COUNT(*) as cantidad'), DB::raw('SUM(monto_pagado) as total'))
+                           ->groupBy('metodo_pago')
+                           ->orderByDesc('total')
+                           ->get();
+
+        // Pagos recientes
+        $pagosRecientes = Pago::with(['socio', 'boleta'])
+                              ->orderBy('fecha_pago', 'desc')
+                              ->orderBy('id', 'desc')
+                              ->limit(10)
+                              ->get();
+
+        return view('pagos.dashboard', compact('ingresosMensuales', 'estadisticas', 'metodosPago', 'pagosRecientes', 'mesActual'));
+    }
+
+    /**
      * Generar link de pago Flow
      */
     public function generarLinkFlow(Request $request)
@@ -851,5 +1006,28 @@ class PagosController extends Controller
                 'message' => 'Error: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Exportar pagos a Excel
+     */
+    public function exportarExcel(Request $request, ExcelExportService $excelService)
+    {
+        // Aplicar filtros si existen
+        $query = Pago::with(['boleta.socio']);
+
+        if ($request->has('fecha_desde') && $request->fecha_desde != '') {
+            $query->whereDate('fecha_pago', '>=', $request->fecha_desde);
+        }
+        if ($request->has('fecha_hasta') && $request->fecha_hasta != '') {
+            $query->whereDate('fecha_pago', '<=', $request->fecha_hasta);
+        }
+        if ($request->has('metodo_pago') && $request->metodo_pago != '') {
+            $query->where('metodo_pago', $request->metodo_pago);
+        }
+
+        $pagos = $query->orderBy('fecha_pago', 'desc')->get();
+
+        return $excelService->exportarPagos($pagos);
     }
 }

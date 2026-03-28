@@ -1,0 +1,717 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Organizacion;
+use App\Models\Usuario;
+use App\Models\Socio;
+use App\Models\Boleta;
+use App\Models\Pago;
+use App\Models\Suscripcion;
+use App\Models\TransaccionFlow;
+use App\Models\RegistroOrganizacion;
+use App\Models\RenovacionSuscripcion;
+use App\Models\Auditoria;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class SuperAdminController extends Controller
+{
+    /**
+     * Dashboard del super-admin con métricas globales
+     */
+    public function dashboard()
+    {
+        // Métricas generales
+        $totalOrganizaciones = Organizacion::count();
+        $organizacionesActivas = Organizacion::where('activo', true)->count();
+        $organizacionesSuspendidas = Organizacion::where('activo', false)->count();
+        $totalUsuarios = Usuario::whereNotNull('id_organizacion')->count();
+        $totalSocios = Socio::count();
+
+        // Métricas de suscripciones
+        $orgPorSuscripcion = Organizacion::select('suscripciones.nombre', DB::raw('count(*) as total'))
+            ->join('suscripciones', 'organizaciones.id_suscripcion', '=', 'suscripciones.id')
+            ->groupBy('suscripciones.nombre')
+            ->pluck('total', 'nombre');
+
+        // Organizaciones en período de prueba
+        $enPrueba = Organizacion::where('estado_suscripcion', 'prueba')->count();
+
+        // Registros pendientes de verificación
+        $registrosPendientes = RegistroOrganizacion::where('estado', 'pendiente')->count();
+
+        // Ingresos del mes (estimados según suscripciones activas)
+        $ingresosMesActual = Organizacion::join('suscripciones', 'organizaciones.id_suscripcion', '=', 'suscripciones.id')
+            ->where('organizaciones.estado_suscripcion', 'activa')
+            ->sum('suscripciones.precio_mensual');
+
+        // Organizaciones creadas en los últimos 30 días
+        $nuevasOrganizaciones = Organizacion::where('created_at', '>=', Carbon::now()->subDays(30))->count();
+
+        // Métricas de pagos Flow (últimos 30 días)
+        $pagosFlow30Dias = TransaccionFlow::where('fecha_creacion', '>=', Carbon::now()->subDays(30))
+            ->where('estado', 'pagado')
+            ->sum('monto');
+
+        // Últimas organizaciones registradas
+        $ultimasOrganizaciones = Organizacion::with('suscripcion')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        return view('superadmin.dashboard', compact(
+            'totalOrganizaciones',
+            'organizacionesActivas',
+            'organizacionesSuspendidas',
+            'totalUsuarios',
+            'totalSocios',
+            'orgPorSuscripcion',
+            'enPrueba',
+            'registrosPendientes',
+            'ingresosMesActual',
+            'nuevasOrganizaciones',
+            'pagosFlow30Dias',
+            'ultimasOrganizaciones'
+        ));
+    }
+
+    /**
+     * Listado de todas las organizaciones
+     */
+    public function organizaciones(Request $request)
+    {
+        $query = Organizacion::with('suscripcion');
+
+        // Filtros
+        if ($request->filled('busqueda')) {
+            $busqueda = $request->busqueda;
+            $query->where(function($q) use ($busqueda) {
+                $q->where('nombre_apr', 'LIKE', "%{$busqueda}%")
+                  ->orWhere('rut', 'LIKE', "%{$busqueda}%")
+                  ->orWhere('email_contacto', 'LIKE', "%{$busqueda}%");
+            });
+        }
+
+        if ($request->filled('estado_suscripcion')) {
+            $query->where('estado_suscripcion', $request->estado_suscripcion);
+        }
+
+        if ($request->filled('id_suscripcion')) {
+            $query->where('id_suscripcion', $request->id_suscripcion);
+        }
+
+        if ($request->filled('activo')) {
+            $query->where('activo', $request->activo === '1');
+        }
+
+        $organizaciones = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        // Para los filtros
+        $suscripciones = \App\Models\Suscripcion::all();
+
+        return view('superadmin.organizaciones.index', compact('organizaciones', 'suscripciones'));
+    }
+
+    /**
+     * Ver detalles de una organización
+     */
+    public function verOrganizacion($id)
+    {
+        $organizacion = Organizacion::with('suscripcion')
+            ->findOrFail($id);
+
+        // Estadísticas de la organización
+        $totalSocios = Socio::where('id_organizacion', $id)->count();
+        $totalUsuarios = Usuario::where('id_organizacion', $id)->count();
+        $totalBoletas = Boleta::where('id_organizacion', $id)->count();
+        $totalPagos = Pago::whereHas('boleta', function($q) use ($id) {
+            $q->where('id_organizacion', $id);
+        })->sum('monto_pagado');
+
+        // Actividad reciente
+        $usuariosRecientes = Usuario::where('id_organizacion', $id)
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        $sociosRecientes = Socio::where('id_organizacion', $id)
+            ->orderBy('fecha_creacion', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('superadmin.organizaciones.detalle', compact(
+            'organizacion',
+            'totalSocios',
+            'totalUsuarios',
+            'totalBoletas',
+            'totalPagos',
+            'usuariosRecientes',
+            'sociosRecientes'
+        ));
+    }
+
+    /**
+     * Suspender una organización
+     */
+    public function suspenderOrganizacion($id)
+    {
+        $organizacion = Organizacion::findOrFail($id);
+
+        $organizacion->update([
+            'activo' => false,
+            'estado_suscripcion' => 'suspendida',
+        ]);
+
+        return redirect()->back()
+            ->with('success', "Organización '{$organizacion->nombre_apr}' suspendida exitosamente.");
+    }
+
+    /**
+     * Activar una organización
+     */
+    public function activarOrganizacion($id)
+    {
+        $organizacion = Organizacion::findOrFail($id);
+
+        $organizacion->update([
+            'activo' => true,
+            'estado_suscripcion' => 'activa',
+        ]);
+
+        return redirect()->back()
+            ->with('success', "Organización '{$organizacion->nombre_apr}' activada exitosamente.");
+    }
+
+    /**
+     * Cambiar plan de una organización (forzado por super-admin)
+     */
+    public function cambiarPlan(Request $request, $id)
+    {
+        $request->validate([
+            'id_suscripcion' => 'required|exists:suscripciones,id',
+        ]);
+
+        $organizacion = Organizacion::findOrFail($id);
+        $suscripcionAnterior = $organizacion->suscripcion;
+        $suscripcionNueva = \App\Models\Suscripcion::findOrFail($request->id_suscripcion);
+
+        $organizacion->update([
+            'id_suscripcion' => $request->id_suscripcion,
+        ]);
+
+        return redirect()->back()
+            ->with('success', "Plan cambiado de '{$suscripcionAnterior->nombre}' a '{$suscripcionNueva->nombre}' exitosamente.");
+    }
+
+    /**
+     * Eliminar una organización (soft delete o físico según preferencia)
+     */
+    public function eliminarOrganizacion($id)
+    {
+        $organizacion = Organizacion::findOrFail($id);
+        $nombre = $organizacion->nombre_apr;
+
+        // Aquí podrías implementar soft delete o eliminación física
+        // Por seguridad, mejor solo desactivar
+        $organizacion->update([
+            'activo' => false,
+            'estado_suscripcion' => 'cancelada',
+        ]);
+
+        return redirect()->route('superadmin.organizaciones')
+            ->with('success', "Organización '{$nombre}' eliminada/cancelada exitosamente.");
+    }
+
+    /**
+     * Listado de registros pendientes de verificación
+     */
+    public function registrosPendientes()
+    {
+        $registros = RegistroOrganizacion::where('estado', 'pendiente')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('superadmin.registros.pendientes', compact('registros'));
+    }
+
+    /**
+     * Ver detalle de un registro pendiente
+     */
+    public function verRegistro($id)
+    {
+        $registro = RegistroOrganizacion::with('suscripcionDeseada')->findOrFail($id);
+
+        return view('superadmin.registros.detalle', compact('registro'));
+    }
+
+    /**
+     * Aprobar manualmente un registro (sin verificación de email)
+     */
+    public function aprobarRegistro($id)
+    {
+        $registro = RegistroOrganizacion::findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            $registro->marcarComoVerificado();
+
+            // Crear organización
+            $organizacion = Organizacion::create([
+                'nombre_apr' => $registro->nombre_apr,
+                'slug' => $registro->slug,
+                'rut' => $registro->rut,
+                'direccion' => $registro->direccion,
+                'comuna' => $registro->comuna,
+                'region' => $registro->region,
+                'telefono' => $registro->telefono,
+                'email_contacto' => $registro->email_contacto,
+                'id_suscripcion' => $registro->id_suscripcion_deseada ?? 1,
+                'estado_suscripcion' => 'prueba',
+                'dias_prueba_restantes' => 30,
+                'fecha_inicio_suscripcion' => now(),
+                'activo' => true,
+            ]);
+
+            // Crear usuario admin
+            Usuario::create([
+                'id_organizacion' => $organizacion->id,
+                'nombre_usuario' => strtolower($registro->admin_nombre . $registro->admin_apellido),
+                'password' => $registro->password,
+                'nombre' => $registro->admin_nombre,
+                'apellido' => $registro->admin_apellido,
+                'email' => $registro->admin_email,
+                'telefono' => $registro->admin_telefono,
+                'rol' => 'admin',
+                'activo' => true,
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()
+                ->with('success', "Registro aprobado y organización '{$organizacion->nombre_apr}' creada exitosamente.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Error al aprobar el registro: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Rechazar un registro
+     */
+    public function rechazarRegistro($id)
+    {
+        $registro = RegistroOrganizacion::findOrFail($id);
+
+        $registro->update(['estado' => 'rechazado']);
+
+        return redirect()->back()
+            ->with('success', 'Registro rechazado exitosamente.');
+    }
+
+    /**
+     * Reporte financiero global
+     */
+    public function reporteFinanciero(Request $request)
+    {
+        $mesActual = $request->get('mes', now()->format('Y-m'));
+        $fecha = Carbon::parse($mesActual . '-01');
+
+        // Ingresos por suscripciones (estimados)
+        $ingresosSuscripciones = Organizacion::join('suscripciones', 'organizaciones.id_suscripcion', '=', 'suscripciones.id')
+            ->where('organizaciones.estado_suscripcion', 'activa')
+            ->sum('suscripciones.precio_mensual');
+
+        // Pagos reales recibidos en el mes (Flow)
+        $pagosRecibidos = \App\Models\PagoSuscripcion::where('estado', 'pagado')
+            ->whereYear('fecha_pago', $fecha->year)
+            ->whereMonth('fecha_pago', $fecha->month)
+            ->sum('monto');
+
+        // Pagos pendientes
+        $pagosPendientes = \App\Models\PagoSuscripcion::where('estado', 'pendiente')
+            ->sum('monto');
+
+        // Ingresos por plan
+        $ingresosPorPlan = Organizacion::select('suscripciones.nombre', DB::raw('count(*) as organizaciones'), DB::raw('sum(suscripciones.precio_mensual) as ingresos'))
+            ->join('suscripciones', 'organizaciones.id_suscripcion', '=', 'suscripciones.id')
+            ->where('organizaciones.estado_suscripcion', 'activa')
+            ->groupBy('suscripciones.id', 'suscripciones.nombre')
+            ->get();
+
+        // Evolución de ingresos (últimos 6 meses)
+        $evolucionIngresos = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $mes = now()->subMonths($i);
+            $ingresos = \App\Models\PagoSuscripcion::where('estado', 'pagado')
+                ->whereYear('fecha_pago', $mes->year)
+                ->whereMonth('fecha_pago', $mes->month)
+                ->sum('monto');
+
+            $evolucionIngresos[] = [
+                'mes' => $mes->format('M Y'),
+                'ingresos' => $ingresos
+            ];
+        }
+
+        // Tasa de conversión de prueba a pago
+        $totalPrueba = Organizacion::where('estado_suscripcion', 'prueba')->count();
+        $totalActivas = Organizacion::where('estado_suscripcion', 'activa')->count();
+        $tasaConversion = $totalPrueba > 0 ? round(($totalActivas / ($totalActivas + $totalPrueba)) * 100, 2) : 0;
+
+        return view('superadmin.reportes.financiero', compact(
+            'ingresosSuscripciones',
+            'pagosRecibidos',
+            'pagosPendientes',
+            'ingresosPorPlan',
+            'evolucionIngresos',
+            'tasaConversion',
+            'mesActual'
+        ));
+    }
+
+    /**
+     * Reporte de uso del sistema
+     */
+    public function reporteUso(Request $request)
+    {
+        // Top 10 organizaciones por número de socios
+        $topPorSocios = Organizacion::with('suscripcion')
+            ->get()
+            ->map(function($org) {
+                $org->total_socios = Socio::where('id_organizacion', $org->id)->count();
+                return $org;
+            })
+            ->sortByDesc('total_socios')
+            ->take(10);
+
+        // Top 10 organizaciones por número de usuarios
+        $topPorUsuarios = Organizacion::with('suscripcion')
+            ->get()
+            ->map(function($org) {
+                $org->total_usuarios = Usuario::where('id_organizacion', $org->id)->count();
+                return $org;
+            })
+            ->sortByDesc('total_usuarios')
+            ->take(10);
+
+        // Top 10 organizaciones por actividad (boletas generadas)
+        $topPorActividad = Organizacion::with('suscripcion')
+            ->get()
+            ->map(function($org) {
+                $org->total_boletas = Boleta::where('id_organizacion', $org->id)->count();
+                return $org;
+            })
+            ->sortByDesc('total_boletas')
+            ->take(10);
+
+        // Estadísticas generales de uso
+        $promedioSociosPorOrg = round(Socio::count() / max(Organizacion::count(), 1), 2);
+        $promedioUsuariosPorOrg = round(Usuario::whereNotNull('id_organizacion')->count() / max(Organizacion::count(), 1), 2);
+        $promedioBoletasPorOrg = round(Boleta::count() / max(Organizacion::count(), 1), 2);
+
+        // Uso por plan
+        $usoPorPlan = Organizacion::select(
+                'suscripciones.nombre',
+                DB::raw('COUNT(DISTINCT organizaciones.id) as total_org'),
+                DB::raw('COUNT(DISTINCT socios.id) as total_socios'),
+                DB::raw('COUNT(DISTINCT usuarios.id) as total_usuarios')
+            )
+            ->join('suscripciones', 'organizaciones.id_suscripcion', '=', 'suscripciones.id')
+            ->leftJoin('socios', 'organizaciones.id', '=', 'socios.id_organizacion')
+            ->leftJoin('usuarios', 'organizaciones.id', '=', 'usuarios.id_organizacion')
+            ->groupBy('suscripciones.id', 'suscripciones.nombre')
+            ->get();
+
+        return view('superadmin.reportes.uso', compact(
+            'topPorSocios',
+            'topPorUsuarios',
+            'topPorActividad',
+            'promedioSociosPorOrg',
+            'promedioUsuariosPorOrg',
+            'promedioBoletasPorOrg',
+            'usoPorPlan'
+        ));
+    }
+
+    /**
+     * Reporte comparativo de organizaciones
+     */
+    public function reporteComparativo(Request $request)
+    {
+        // Obtener todos los planes disponibles
+        $planes = Suscripcion::all();
+
+        // Filtros
+        $query = Organizacion::with('suscripcion');
+
+        if ($request->filled('plan')) {
+            $query->where('id_suscripcion', $request->plan);
+        }
+
+        if ($request->filled('estado')) {
+            $query->where('estado_suscripcion', $request->estado);
+        }
+
+        $organizaciones = $query->get()->map(function($org) {
+            $org->total_socios = Socio::where('id_organizacion', $org->id)->count();
+            $org->total_usuarios = Usuario::where('id_organizacion', $org->id)->count();
+            $org->total_boletas = Boleta::where('id_organizacion', $org->id)->count();
+            return $org;
+        });
+
+        // Ordenar
+        $orden = $request->get('orden', 'socios');
+        $organizaciones = match($orden) {
+            'usuarios' => $organizaciones->sortByDesc('total_usuarios'),
+            'boletas' => $organizaciones->sortByDesc('total_boletas'),
+            'ingresos' => $organizaciones->sortByDesc(fn($o) => $o->suscripcion->precio_mensual),
+            default => $organizaciones->sortByDesc('total_socios'),
+        };
+
+        return view('superadmin.reportes.comparativo', compact('organizaciones', 'planes'));
+    }
+
+    /**
+     * Vista de renovaciones y vencimientos
+     */
+    public function renovaciones(Request $request)
+    {
+        // Filtros
+        $estado = $request->get('estado', 'todas');
+
+        $query = RenovacionSuscripcion::with('organizacion.suscripcion');
+
+        if ($estado !== 'todas') {
+            $query->where('estado', $estado);
+        }
+
+        $renovaciones = $query->orderBy('fecha_vencimiento', 'asc')->get();
+
+        // Estadísticas
+        $totalPendientes = RenovacionSuscripcion::where('estado', 'pendiente')->count();
+        $totalVencidas = RenovacionSuscripcion::where('estado', 'pendiente')
+            ->where('fecha_vencimiento', '<', now()->toDateString())
+            ->count();
+        $totalProximasVencer = RenovacionSuscripcion::where('estado', 'pendiente')
+            ->whereBetween('fecha_vencimiento', [now()->toDateString(), now()->addDays(7)->toDateString()])
+            ->count();
+        $montoTotal = RenovacionSuscripcion::where('estado', 'pendiente')->sum('monto');
+
+        return view('superadmin.renovaciones.index', compact(
+            'renovaciones',
+            'estado',
+            'totalPendientes',
+            'totalVencidas',
+            'totalProximasVencer',
+            'montoTotal'
+        ));
+    }
+
+    /**
+     * Marcar renovación como pagada manualmente
+     */
+    public function pagarRenovacion(Request $request, $id)
+    {
+        $renovacion = RenovacionSuscripcion::findOrFail($id);
+
+        $renovacion->marcarComoPagada('manual');
+
+        // Extender la suscripción de la organización
+        $org = $renovacion->organizacion;
+        $nuevaFecha = Carbon::parse($org->fecha_fin_suscripcion)->addMonth();
+        $org->update([
+            'fecha_fin_suscripcion' => $nuevaFecha,
+            'estado_suscripcion' => 'activa',
+            'activo' => true,
+        ]);
+
+        return redirect()->route('superadmin.renovaciones')
+            ->with('success', 'Renovación marcada como pagada. Suscripción extendida hasta ' . $nuevaFecha->format('d/m/Y'));
+    }
+
+    /**
+     * Vista de auditoría y logs del sistema
+     */
+    public function auditoria(Request $request)
+    {
+        // Filtros
+        $idOrganizacion = $request->get('organizacion');
+        $modulo = $request->get('modulo');
+        $accion = $request->get('accion');
+        $fechaDesde = $request->get('fecha_desde');
+        $fechaHasta = $request->get('fecha_hasta');
+
+        $query = Auditoria::with(['organizacion', 'usuario']);
+
+        if ($idOrganizacion) {
+            $query->where('id_organizacion', $idOrganizacion);
+        }
+
+        if ($modulo) {
+            $query->where('modulo', $modulo);
+        }
+
+        if ($accion) {
+            $query->where('accion', $accion);
+        }
+
+        if ($fechaDesde) {
+            $query->whereDate('created_at', '>=', $fechaDesde);
+        }
+
+        if ($fechaHasta) {
+            $query->whereDate('created_at', '<=', $fechaHasta);
+        }
+
+        $logs = $query->orderBy('created_at', 'desc')
+            ->paginate(50);
+
+        // Obtener datos para filtros
+        $organizaciones = Organizacion::orderBy('nombre_apr')->get();
+        $modulos = Auditoria::distinct()->pluck('modulo')->sort()->values();
+        $acciones = Auditoria::distinct()->pluck('accion')->sort()->values();
+
+        // Estadísticas
+        $totalAcciones = Auditoria::count();
+        $accionesHoy = Auditoria::whereDate('created_at', now())->count();
+        $usuariosActivos = Auditoria::whereDate('created_at', now())
+            ->distinct('id_usuario')
+            ->count('id_usuario');
+
+        return view('superadmin.auditoria.index', compact(
+            'logs',
+            'organizaciones',
+            'modulos',
+            'acciones',
+            'totalAcciones',
+            'accionesHoy',
+            'usuariosActivos',
+            'idOrganizacion',
+            'modulo',
+            'accion',
+            'fechaDesde',
+            'fechaHasta'
+        ));
+    }
+
+    /**
+     * Lista solicitudes de dominios personalizados
+     */
+    public function dominiosPersonalizados()
+    {
+        $dominios = Organizacion::with(['suscripcion', 'aprobador'])
+            ->whereNotNull('dominio_personalizado')
+            ->orderByRaw("FIELD(estado_dominio_personalizado, 'verificado_dns', 'pendiente_configuracion', 'activo_aprobado', 'rechazado', 'suspendido')")
+            ->orderBy('fecha_solicitud_dominio', 'desc')
+            ->paginate(20);
+
+        $stats = [
+            'total' => Organizacion::whereNotNull('dominio_personalizado')->count(),
+            'verificado_dns' => Organizacion::where('estado_dominio_personalizado', 'verificado_dns')->count(),
+            'activo_aprobado' => Organizacion::where('estado_dominio_personalizado', 'activo_aprobado')->count(),
+            'pendiente_configuracion' => Organizacion::where('estado_dominio_personalizado', 'pendiente_configuracion')->count(),
+            'rechazado' => Organizacion::where('estado_dominio_personalizado', 'rechazado')->count(),
+            'suspendido' => Organizacion::where('estado_dominio_personalizado', 'suspendido')->count(),
+        ];
+
+        return view('superadmin.dominios', compact('dominios', 'stats'));
+    }
+
+    /**
+     * Aprobar dominio personalizado
+     */
+    public function aprobarDominio($id)
+    {
+        $organizacion = Organizacion::findOrFail($id);
+
+        // Verificar que esté en estado verificado_dns
+        if (!in_array($organizacion->estado_dominio_personalizado, ['verificado_dns', 'pendiente_configuracion'])) {
+            return redirect()->back()
+                ->with('error', 'El dominio no puede ser aprobado en su estado actual.');
+        }
+
+        $organizacion->update([
+            'estado_dominio_personalizado' => 'activo_aprobado',
+            'fecha_aprobacion_dominio' => now(),
+            'aprobado_por' => auth()->id(),
+        ]);
+
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'superadmin',
+            'aprobar_dominio',
+            "Aprobó dominio personalizado: {$organizacion->dominio_personalizado} para organización: {$organizacion->nombre_apr}",
+            'organizaciones',
+            $organizacion->id
+        );
+
+        return redirect()->back()
+            ->with('success', "Dominio {$organizacion->dominio_personalizado} aprobado exitosamente.");
+    }
+
+    /**
+     * Rechazar dominio personalizado
+     */
+    public function rechazarDominio(Request $request, $id)
+    {
+        $request->validate([
+            'motivo' => 'required|string|max:500',
+        ]);
+
+        $organizacion = Organizacion::findOrFail($id);
+
+        $organizacion->update([
+            'estado_dominio_personalizado' => 'rechazado',
+            'fecha_aprobacion_dominio' => now(),
+            'aprobado_por' => auth()->id(),
+            'observaciones_dominio' => 'Rechazado por Super Admin. Motivo: ' . $request->motivo,
+        ]);
+
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'superadmin',
+            'rechazar_dominio',
+            "Rechazó dominio personalizado: {$organizacion->dominio_personalizado} para organización: {$organizacion->nombre_apr}. Motivo: {$request->motivo}",
+            'organizaciones',
+            $organizacion->id
+        );
+
+        return redirect()->back()
+            ->with('success', "Dominio {$organizacion->dominio_personalizado} rechazado.");
+    }
+
+    /**
+     * Suspender dominio personalizado
+     */
+    public function suspenderDominio(Request $request, $id)
+    {
+        $request->validate([
+            'motivo' => 'required|string|max:500',
+        ]);
+
+        $organizacion = Organizacion::findOrFail($id);
+
+        $organizacion->update([
+            'estado_dominio_personalizado' => 'suspendido',
+            'fecha_aprobacion_dominio' => now(),
+            'aprobado_por' => auth()->id(),
+            'observaciones_dominio' => 'Suspendido por Super Admin. Motivo: ' . $request->motivo,
+        ]);
+
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'superadmin',
+            'suspender_dominio',
+            "Suspendió dominio personalizado: {$organizacion->dominio_personalizado} para organización: {$organizacion->nombre_apr}. Motivo: {$request->motivo}",
+            'organizaciones',
+            $organizacion->id
+        );
+
+        return redirect()->back()
+            ->with('warning', "Dominio {$organizacion->dominio_personalizado} suspendido. El dominio dejará de funcionar inmediatamente.");
+    }
+}

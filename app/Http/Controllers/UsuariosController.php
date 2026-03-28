@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Usuario;
+use App\Models\Auditoria;
 use App\Helpers\ActividadHelper;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -45,6 +46,19 @@ class UsuariosController extends Controller
      */
     public function store(Request $request)
     {
+        // Verificar límites del plan
+        $organizacion = auth()->user()->organizacion;
+
+        if (!$organizacion->puedeAgregarUsuario()) {
+            $limiteActual = $organizacion->suscripcion->limite_usuarios;
+            $usuariosActuales = $organizacion->usuarios()->count();
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', "Has alcanzado el límite de usuarios de tu plan ({$usuariosActuales}/{$limiteActual}). Actualiza tu plan para agregar más usuarios.")
+                ->with('upgrade_required', true);
+        }
+
         $validated = $request->validate([
             'nombre_usuario' => 'required|string|max:50|unique:usuarios,nombre_usuario',
             'email' => 'nullable|email|max:100|unique:usuarios,email',
@@ -65,11 +79,41 @@ class UsuariosController extends Controller
 
         $usuario = Usuario::create($validated);
 
+        // Verificar si está cerca del límite (90%) y crear notificación
+        $usuariosActuales = $organizacion->usuarios()->count();
+        $limite = $organizacion->suscripcion->limite_usuarios;
+
+        if ($limite > 0 && $usuariosActuales >= ($limite * 0.9)) {
+            \App\Models\NotificacionSistema::create([
+                'id_organizacion' => $organizacion->id,
+                'tipo' => 'limite_usuarios',
+                'prioridad' => 'media',
+                'titulo' => 'Límite de usuarios cercano',
+                'mensaje' => "Has alcanzado {$usuariosActuales} de {$limite} usuarios permitidos en tu plan. Considera actualizar tu plan.",
+                'icono' => 'fa-users-cog',
+                'color' => 'warning',
+                'url' => route('organizacion.upgrade'),
+                'texto_accion' => 'Ver Planes',
+                'leida' => false,
+            ]);
+        }
+
         // Registrar actividad
         ActividadHelper::registrar(
             'Usuarios',
             "Nuevo usuario creado: {$usuario->nombre_usuario} - {$usuario->nombre_completo} (Rol: " . ucfirst($usuario->rol) . ")",
             auth()->id()
+        );
+
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'usuarios',
+            'crear',
+            "Creó usuario: {$usuario->nombre_usuario} - {$usuario->nombre_completo} (Rol: " . ucfirst($usuario->rol) . ")",
+            'usuarios',
+            $usuario->id,
+            null,
+            $usuario->toArray()
         );
 
         return redirect()->route('usuarios.index')
@@ -181,7 +225,13 @@ class UsuariosController extends Controller
         // Convertir permisos a JSON
         $validated['permisos'] = json_encode($request->permisos ?? []);
 
+        // Capturar datos antes de actualizar para auditoría
+        $datosAnteriores = $usuario->toArray();
+
         $usuario->update($validated);
+
+        // Capturar datos después de actualizar
+        $datosNuevos = $usuario->fresh()->toArray();
 
         // Registrar actividad con cambios
         if (!empty($cambios)) {
@@ -196,6 +246,20 @@ class UsuariosController extends Controller
                 'Usuarios',
                 "Usuario actualizado: {$usuario->nombre_usuario} - {$usuario->nombre_completo} (Rol: " . ucfirst($usuario->rol) . ")",
                 auth()->id()
+            );
+        }
+
+        // Registrar en auditoría
+        if (!empty($cambios)) {
+            $descripcionCambios = implode(', ', $cambios);
+            Auditoria::registrar(
+                'usuarios',
+                'editar',
+                "Editó usuario: {$usuario->nombre_usuario} - {$usuario->nombre_completo}. Cambios: {$descripcionCambios}",
+                'usuarios',
+                $usuario->id,
+                $datosAnteriores,
+                $datosNuevos
             );
         }
 
@@ -219,6 +283,7 @@ class UsuariosController extends Controller
         // Guardar información antes de eliminar
         $nombreUsuario = $usuario->nombre_usuario;
         $nombreCompleto = $usuario->nombre_completo;
+        $datosAnteriores = $usuario->toArray();
 
         $usuario->delete();
 
@@ -227,6 +292,17 @@ class UsuariosController extends Controller
             'Usuarios',
             "Usuario eliminado: {$nombreUsuario} - {$nombreCompleto}",
             auth()->id()
+        );
+
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'usuarios',
+            'eliminar',
+            "Eliminó usuario: {$nombreUsuario} - {$nombreCompleto}",
+            'usuarios',
+            null,
+            $datosAnteriores,
+            null
         );
 
         return redirect()->route('usuarios.index')

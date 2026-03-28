@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventario;
+use App\Models\Auditoria;
 use App\Helpers\ActividadHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -98,6 +99,17 @@ class InventarioController extends Controller
                 auth()->id()
             );
 
+            // Registrar en auditoría
+            Auditoria::registrar(
+                'inventario',
+                'crear',
+                "Creó producto: {$producto->codigo_producto} - {$producto->nombre} - Cantidad: {$producto->cantidad_actual_formateada}",
+                'inventario',
+                $producto->id,
+                null,
+                $producto->toArray()
+            );
+
             DB::commit();
             return redirect()->route('inventario.index')->with('success', 'Producto registrado exitosamente');
         } catch (\Exception $e) {
@@ -141,9 +153,11 @@ class InventarioController extends Controller
 
         DB::beginTransaction();
         try {
+            // Capturar datos antes de actualizar para auditoría
+            $datosAnteriores = $producto->toArray();
+
             // Capturar cambios para auditoría
             $cambios = [];
-            $valoresAnteriores = $producto->toArray();
 
             // Mapeo de nombres de campos
             $nombresCampos = [
@@ -164,7 +178,7 @@ class InventarioController extends Controller
             ];
 
             // Detectar si hubo cambio en cantidad
-            $cantidadAnterior = $valoresAnteriores['cantidad_actual'];
+            $cantidadAnterior = $datosAnteriores['cantidad_actual'];
             $cantidadNueva = $validated['cantidad_actual'];
 
             if ($cantidadAnterior != $cantidadNueva) {
@@ -172,7 +186,7 @@ class InventarioController extends Controller
             }
 
             foreach ($validated as $campo => $valorNuevo) {
-                $valorAnterior = $valoresAnteriores[$campo] ?? null;
+                $valorAnterior = $datosAnteriores[$campo] ?? null;
 
                 // Convertir null a string vacío para comparación
                 $valorAnterior = $valorAnterior ?? '';
@@ -229,6 +243,17 @@ class InventarioController extends Controller
                     "Producto actualizado: {$producto->codigo_producto} - {$producto->nombre}. Cambios: {$descripcionCambios}",
                     auth()->id()
                 );
+
+                // Registrar en auditoría
+                Auditoria::registrar(
+                    'inventario',
+                    'editar',
+                    "Editó producto: {$producto->codigo_producto} - {$producto->nombre}. Cambios: {$descripcionCambios}",
+                    'inventario',
+                    $producto->id,
+                    $datosAnteriores,
+                    $producto->fresh()->toArray()
+                );
             }
 
             DB::commit();
@@ -247,6 +272,7 @@ class InventarioController extends Controller
         try {
             $codigoProducto = $producto->codigo_producto;
             $nombre = $producto->nombre;
+            $datosAnteriores = $producto->toArray();
 
             $producto->update(['activo' => 0]);
 
@@ -254,6 +280,17 @@ class InventarioController extends Controller
                 'Inventario',
                 "Producto eliminado: {$codigoProducto} - {$nombre}",
                 auth()->id()
+            );
+
+            // Registrar en auditoría
+            Auditoria::registrar(
+                'inventario',
+                'eliminar',
+                "Eliminó producto: {$codigoProducto} - {$nombre}",
+                'inventario',
+                null,
+                $datosAnteriores,
+                null
             );
 
             DB::commit();

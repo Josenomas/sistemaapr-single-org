@@ -84,18 +84,37 @@
             color: var(--primary);
         }
 
-        .btn-login {
-            background: var(--primary);
+        .btn-registro {
+            background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .btn-registro:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-login {
+            background: transparent;
+            color: var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid var(--primary);
         }
 
         .btn-login:hover {
-            background: var(--primary-dark);
+            background: var(--primary);
+            color: white;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
@@ -666,30 +685,36 @@
                 <li><a href="#pricing">Precios</a></li>
                 <li><a href="#contact">Contacto</a></li>
             </ul>
-            <a href="{{ route('login') }}" class="btn-login">
-                <i class="fas fa-sign-in-alt"></i>
-                Iniciar Sesión
-            </a>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a href="{{ route('registro.formulario') }}" class="btn-registro">
+                    <i class="fas fa-user-plus"></i>
+                    Registrarse Gratis
+                </a>
+                <a href="{{ route('login') }}" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Iniciar Sesión
+                </a>
+            </div>
         </nav>
     </header>
 
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h1>💧 Gestión Integral para tu SSR
+            <h1>💧 Gestión Integral para tu SSR</h1>
             <p>Sistema completo de administración para Agua Potable Rural. Controla socios, lecturas, boletas, pagos y más en una sola plataforma moderna y fácil de usar.</p>
             <div class="cta-buttons">
-                <a href="{{ route('consulta.pago') }}" class="btn-primary">
+                <a href="{{ route('registro.formulario') }}" class="btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-size: 1.1rem; padding: 1rem 2rem;">
+                    <i class="fas fa-rocket"></i>
+                    Empieza Gratis - 30 Días
+                </a>
+                <a href="{{ route('consulta.pago') }}" class="btn-secondary">
                     <i class="fas fa-credit-card"></i>
                     Pagar mi Cuenta
                 </a>
                 <a href="{{ route('conoce.boleta') }}" class="btn-secondary">
                     <i class="fas fa-file-invoice"></i>
                     Conoce tu Boleta
-                </a>
-                <a href="#contact" class="btn-secondary">
-                    <i class="fas fa-rocket"></i>
-                    Contáctanos
                 </a>
             </div>
         </div>
@@ -743,6 +768,80 @@
                 </div>
                 <h3>Gestión de Inventario</h3>
                 <p>Control completo del inventario de materiales, herramientas y equipos. Registro de entradas, salidas, movimientos y stock disponible en tiempo real.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modules Section -->
+    <section style="padding: 100px 2rem; background: white;">
+        <div class="section-title">
+            <h2>Módulos Principales</h2>
+            <p>Todo lo que necesitas para administrar tu APR</p>
+        </div>
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+            <!-- Módulo 1: Gestión de Socios -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 16px; color: white; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-8px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Gestión de Socios</h3>
+                <p style="opacity: 0.9; font-size: 0.95rem;">Administra socios, medidores, sectores y toda la información de tus usuarios</p>
+            </div>
+
+            <!-- Módulo 2: Lecturas y Boletas -->
+            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 2rem; border-radius: 16px; color: white; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-8px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Lecturas y Boletas</h3>
+                <p style="opacity: 0.9; font-size: 0.95rem;">Registra lecturas y genera boletas automáticamente con cálculos precisos</p>
+            </div>
+
+            <!-- Módulo 3: Pagos y Finanzas -->
+            <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 2rem; border-radius: 16px; color: white; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-8px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">💰</div>
+                <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Pagos y Finanzas</h3>
+                <p style="opacity: 0.9; font-size: 0.95rem;">Control total de pagos, morosidad, reportes financieros y rendiciones</p>
+            </div>
+
+            <!-- Módulo 4: Personal y RRHH -->
+            <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); padding: 2rem; border-radius: 16px; color: white; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-8px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">👷</div>
+                <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Personal y RRHH</h3>
+                <p style="opacity: 0.9; font-size: 0.95rem;">Gestiona funcionarios, sueldos, vacaciones y liquidaciones del personal</p>
+            </div>
+
+            <!-- Módulo 5: Operaciones -->
+            <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 2rem; border-radius: 16px; color: white; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-8px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔧</div>
+                <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Operaciones</h3>
+                <p style="opacity: 0.9; font-size: 0.95rem;">Incidentes, cortes, trabajos realizados y renovaciones de medidores</p>
+            </div>
+
+            <!-- Módulo 6: Inventario y Activos -->
+            <div style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); padding: 2rem; border-radius: 16px; color: white; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-8px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+                <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Inventario y Activos</h3>
+                <p style="opacity: 0.9; font-size: 0.95rem;">Control de inventario, compras, activos fijos y movimientos de stock</p>
+            </div>
+        </div>
+
+        <!-- Lista adicional de funcionalidades -->
+        <div style="max-width: 900px; margin: 4rem auto 0; text-align: center;">
+            <h3 style="font-size: 1.5rem; margin-bottom: 2rem; color: var(--dark);">Y mucho más...</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.95rem; color: var(--gray-600);">
+                <div style="padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                    <i class="fas fa-chart-line" style="color: var(--primary); margin-right: 8px;"></i>
+                    Reportes y Estadísticas
+                </div>
+                <div style="padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                    <i class="fas fa-bell" style="color: var(--primary); margin-right: 8px;"></i>
+                    Notificaciones Automáticas
+                </div>
+                <div style="padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                    <i class="fas fa-clipboard-list" style="color: var(--primary); margin-right: 8px;"></i>
+                    Auditoría y Logs
+                </div>
+                <div style="padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                    <i class="fas fa-users-cog" style="color: var(--primary); margin-right: 8px;"></i>
+                    Gestión de Usuarios
+                </div>
             </div>
         </div>
     </section>
@@ -876,6 +975,91 @@
         </div>
     </section>
 
+    <!-- Testimonials Section -->
+    <section style="padding: 100px 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <div class="section-title" style="color: white;">
+            <h2>Lo que dicen nuestros clientes</h2>
+            <p style="color: rgba(255, 255, 255, 0.9);">APRs que ya confían en nuestra plataforma</p>
+        </div>
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+            <!-- Testimonio 1 -->
+            <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;">
+                        MG
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; font-size: 1.2rem;">María González</h4>
+                        <p style="margin: 0; opacity: 0.8; font-size: 0.9rem;">Presidenta APR Los Aromos</p>
+                    </div>
+                </div>
+                <div style="font-size: 2rem; opacity: 0.3; margin-bottom: 1rem;">"</div>
+                <p style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 1rem;">
+                    Antes gastábamos horas haciendo cálculos manuales y buscando información en cuadernos.
+                    Ahora con el sistema todo es automático y podemos generar todas las boletas del mes en minutos.
+                    ¡Ha sido un cambio increíble!
+                </p>
+                <div style="display: flex; gap: 0.25rem;">
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                </div>
+            </div>
+
+            <!-- Testimonio 2 -->
+            <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;">
+                        JR
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; font-size: 1.2rem;">Juan Rojas</h4>
+                        <p style="margin: 0; opacity: 0.8; font-size: 0.9rem;">Tesorero APR El Valle</p>
+                    </div>
+                </div>
+                <div style="font-size: 2rem; opacity: 0.3; margin-bottom: 1rem;">"</div>
+                <p style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 1rem;">
+                    La gestión financiera ahora es mucho más transparente y ordenada. Los reportes se generan al instante
+                    y puedo ver el estado de pagos en tiempo real. Excelente herramienta para la administración.
+                </p>
+                <div style="display: flex; gap: 0.25rem;">
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                </div>
+            </div>
+
+            <!-- Testimonio 3 -->
+            <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;">
+                        CS
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; font-size: 1.2rem;">Carmen Silva</h4>
+                        <p style="margin: 0; opacity: 0.8; font-size: 0.9rem;">Administradora APR Agua Clara</p>
+                    </div>
+                </div>
+                <div style="font-size: 2rem; opacity: 0.3; margin-bottom: 1rem;">"</div>
+                <p style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 1rem;">
+                    Lo mejor es que no necesitas ser experto en computación para usarlo. Todo es muy intuitivo
+                    y cuando tenemos dudas, el soporte responde rápido. Totalmente recomendado para cualquier APR.
+                </p>
+                <div style="display: flex; gap: 0.25rem;">
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                    <i class="fas fa-star" style="color: #fbbf24;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Pricing Section -->
     <section id="pricing" class="pricing">
         <div class="section-title">
@@ -922,6 +1106,124 @@
                     <li><i class="fas fa-check"></i> Integración API</li>
                 </ul>
                 <a href="#contact" class="btn-primary">Contactar</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQs Section -->
+    <section style="padding: 100px 2rem; background: var(--gray-50);">
+        <div class="section-title">
+            <h2>Preguntas Frecuentes</h2>
+            <p>Respuestas a las dudas más comunes</p>
+        </div>
+        <div style="max-width: 900px; margin: 0 auto;">
+            <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <!-- FAQ 1 -->
+                <details style="border-bottom: 1px solid var(--gray-200); padding: 1.5rem 2rem;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; cursor: pointer; color: var(--dark); display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        ¿Necesito conocimientos técnicos para usar el sistema?
+                    </summary>
+                    <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
+                        No, el sistema está diseñado para ser muy intuitivo y fácil de usar. No necesitas ser experto en computación.
+                        Incluimos tutoriales y videos explicativos, además de soporte técnico para ayudarte en cualquier duda.
+                    </p>
+                </details>
+
+                <!-- FAQ 2 -->
+                <details style="border-bottom: 1px solid var(--gray-200); padding: 1.5rem 2rem;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; cursor: pointer; color: var(--dark); display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        ¿Cómo funciona el período de prueba gratuito?
+                    </summary>
+                    <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
+                        Al registrarte, tienes 30 días de acceso completo a todas las funcionalidades del sistema sin costo alguno.
+                        No necesitas tarjeta de crédito para comenzar. Al finalizar el período, puedes elegir el plan que más te convenga.
+                    </p>
+                </details>
+
+                <!-- FAQ 3 -->
+                <details style="border-bottom: 1px solid var(--gray-200); padding: 1.5rem 2rem;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; cursor: pointer; color: var(--dark); display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        ¿Mis datos están seguros?
+                    </summary>
+                    <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
+                        Absolutamente. Utilizamos tecnología de encriptación de última generación y realizamos backups automáticos diarios.
+                        Tus datos están protegidos y solo tu organización tiene acceso a ellos.
+                    </p>
+                </details>
+
+                <!-- FAQ 4 -->
+                <details style="border-bottom: 1px solid var(--gray-200); padding: 1.5rem 2rem;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; cursor: pointer; color: var(--dark); display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        ¿Puedo cambiar de plan después?
+                    </summary>
+                    <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
+                        Sí, puedes cambiar tu plan en cualquier momento. Si necesitas más capacidad puedes actualizar,
+                        y si necesitas reducir gastos, puedes cambiar a un plan menor. Los cambios se aplican inmediatamente.
+                    </p>
+                </details>
+
+                <!-- FAQ 5 -->
+                <details style="border-bottom: 1px solid var(--gray-200); padding: 1.5rem 2rem;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; cursor: pointer; color: var(--dark); display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        ¿Puedo acceder desde mi celular o tablet?
+                    </summary>
+                    <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
+                        Sí, el sistema tiene diseño responsive y funciona perfectamente en computadores, tablets y celulares.
+                        Puedes acceder desde cualquier dispositivo con conexión a internet.
+                    </p>
+                </details>
+
+                <!-- FAQ 6 -->
+                <details style="border-bottom: 1px solid var(--gray-200); padding: 1.5rem 2rem;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; cursor: pointer; color: var(--dark); display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        ¿Qué tipo de soporte ofrecen?
+                    </summary>
+                    <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
+                        Ofrecemos soporte por email en todos los planes. El plan Profesional incluye soporte prioritario,
+                        y el plan Enterprise tiene soporte 24/7. Además, contamos con documentación completa y videos tutoriales.
+                    </p>
+                </details>
+
+                <!-- FAQ 7 -->
+                <details style="border-bottom: 1px solid var(--gray-200); padding: 1.5rem 2rem;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; cursor: pointer; color: var(--dark); display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        ¿Puedo importar mis datos actuales?
+                    </summary>
+                    <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
+                        Sí, el sistema permite importar datos desde archivos Excel o CSV. Te ayudamos en el proceso de migración
+                        para que puedas comenzar a usar el sistema con toda tu información histórica.
+                    </p>
+                </details>
+
+                <!-- FAQ 8 -->
+                <details style="padding: 1.5rem 2rem;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; cursor: pointer; color: var(--dark); display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                        ¿Qué pasa si cancelo mi suscripción?
+                    </summary>
+                    <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
+                        Puedes cancelar en cualquier momento sin penalización. Antes de que finalice tu suscripción,
+                        podrás exportar todos tus datos. No perdemos tu información por 30 días adicionales por si cambias de opinión.
+                    </p>
+                </details>
+            </div>
+
+            <!-- CTA adicional -->
+            <div style="text-align: center; margin-top: 3rem;">
+                <p style="font-size: 1.1rem; color: var(--gray-600); margin-bottom: 1.5rem;">
+                    ¿Tienes más preguntas? Estamos aquí para ayudarte
+                </p>
+                <a href="#contact" class="btn-primary">
+                    <i class="fas fa-comments"></i>
+                    Contáctanos
+                </a>
             </div>
         </div>
     </section>

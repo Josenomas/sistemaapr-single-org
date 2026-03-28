@@ -21,6 +21,13 @@ class Organizacion extends Model
         'email_contacto',
         'slug',
         'dominio_personalizado',
+        'estado_dominio_personalizado',
+        'fecha_solicitud_dominio',
+        'fecha_verificacion_dns',
+        'fecha_aprobacion_dominio',
+        'aprobado_por',
+        'observaciones_dominio',
+        'detalles_verificacion_dns',
         'id_suscripcion',
         'fecha_inicio_suscripcion',
         'fecha_fin_suscripcion',
@@ -38,6 +45,9 @@ class Organizacion extends Model
         'fecha_inicio_suscripcion' => 'date',
         'fecha_fin_suscripcion' => 'date',
         'proximo_pago' => 'date',
+        'fecha_solicitud_dominio' => 'datetime',
+        'fecha_verificacion_dns' => 'datetime',
+        'fecha_aprobacion_dominio' => 'datetime',
         'dias_prueba_restantes' => 'integer',
         'activo' => 'boolean',
     ];
@@ -72,6 +82,14 @@ class Organizacion extends Model
     public function noticias()
     {
         return $this->hasMany(Noticia::class, 'id_organizacion');
+    }
+
+    /**
+     * Relación: Una organización tiene muchos pagos de suscripción
+     */
+    public function pagosSuscripcion()
+    {
+        return $this->hasMany(PagoSuscripcion::class, 'id_organizacion');
     }
 
     /**
@@ -140,11 +158,61 @@ class Organizacion extends Model
      */
     public function getUrlAttribute()
     {
-        if ($this->dominio_personalizado) {
+        // Solo usar dominio personalizado si está verificado o activo
+        if ($this->dominio_personalizado && $this->dominioPersonalizadoActivo()) {
             return 'https://' . $this->dominio_personalizado;
         }
 
         return 'https://' . $this->slug . '.sistemaapr.cl';
+    }
+
+    /**
+     * Verifica si el dominio personalizado está activo (verificado o aprobado)
+     */
+    public function dominioPersonalizadoActivo(): bool
+    {
+        return in_array($this->estado_dominio_personalizado, ['verificado_dns', 'activo_aprobado']);
+    }
+
+    /**
+     * Verifica si el dominio está pendiente de configuración DNS
+     */
+    public function dominioPendienteConfiguracion(): bool
+    {
+        return $this->estado_dominio_personalizado === 'pendiente_configuracion';
+    }
+
+    /**
+     * Verifica si el dominio fue rechazado o suspendido
+     */
+    public function dominioRechazadoOSuspendido(): bool
+    {
+        return in_array($this->estado_dominio_personalizado, ['rechazado', 'suspendido']);
+    }
+
+    /**
+     * Relación: Usuario que aprobó el dominio
+     */
+    public function aprobador()
+    {
+        return $this->belongsTo(Usuario::class, 'aprobado_por');
+    }
+
+    /**
+     * Obtiene el badge de estado del dominio personalizado
+     */
+    public function getBadgeEstadoDominioAttribute(): string
+    {
+        $badges = [
+            'sin_configurar' => '<span class="badge badge-secondary">Sin configurar</span>',
+            'pendiente_configuracion' => '<span class="badge badge-warning">Pendiente DNS</span>',
+            'verificado_dns' => '<span class="badge badge-success">✓ Verificado</span>',
+            'activo_aprobado' => '<span class="badge badge-success">✓ Activo Aprobado</span>',
+            'rechazado' => '<span class="badge badge-danger">✗ Rechazado</span>',
+            'suspendido' => '<span class="badge badge-danger">✗ Suspendido</span>',
+        ];
+
+        return $badges[$this->estado_dominio_personalizado] ?? '';
     }
 
     /**

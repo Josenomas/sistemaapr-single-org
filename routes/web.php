@@ -35,6 +35,8 @@ use App\Http\Controllers\EventosController;
 use App\Http\Controllers\ActivosFijosController;
 use App\Http\Controllers\RendicionMensualController;
 use App\Http\Controllers\FolioSIIController;
+use App\Http\Controllers\NotificacionesSistemaController;
+use App\Http\Controllers\PagosSuscripcionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +54,11 @@ Route::get('/conoce-tu-boleta', function () {
     return view('conoce-boleta');
 })->name('conoce.boleta');
 
+// Términos y Condiciones
+Route::get('/terminos-y-condiciones', function () {
+    return view('terminos-condiciones');
+})->name('terminos.condiciones');
+
 // Consulta Pública de Pagos
 Route::get('/consultar-cuenta', [ConsultaPublicaController::class, 'mostrarFormulario'])->name('consulta.pago');
 Route::post('/consultar-cuenta/buscar', [ConsultaPublicaController::class, 'buscarPorRut'])->name('consulta.buscar');
@@ -60,10 +67,26 @@ Route::post('/consultar-cuenta/generar-pago', [ConsultaPublicaController::class,
 // Formulario de contacto
 Route::post('/contacto', [ContactoController::class, 'enviar'])->name('contacto.enviar');
 
+// Rutas de registro público
+Route::middleware('guest')->group(function () {
+    Route::get('/registro', [App\Http\Controllers\RegistroController::class, 'mostrarFormulario'])->name('registro.formulario');
+    Route::post('/registro', [App\Http\Controllers\RegistroController::class, 'registrar'])->name('registro.procesar');
+    Route::get('/registro/confirmacion', [App\Http\Controllers\RegistroController::class, 'confirmacion'])->name('registro.confirmacion');
+});
+
+// Ruta de verificación de email (sin middleware guest porque el usuario ya está registrando)
+Route::get('/registro/verificar/{token}', [App\Http\Controllers\RegistroController::class, 'verificarEmail'])->name('registro.verificar');
+
 // Rutas públicas (sin autenticación)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
+
+    // Recuperación de contraseña
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 
 // Rutas públicas de Flow (callbacks sin autenticación)
@@ -72,11 +95,14 @@ Route::match(['get', 'post'], '/flow/retorno', [FlowController::class, 'retorno'
 Route::get('/comprobante-pago/{id}', [PagosController::class, 'comprobante'])->name('comprobante.publico');
 Route::get('/comprobante-pago/{id}/descargar', [PagosController::class, 'descargarComprobante'])->name('comprobante.descargar');
 
-// Rutas protegidas (requieren autenticación)
-Route::middleware('auth')->group(function () {
+// Rutas protegidas (requieren autenticación y suscripción activa)
+Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Onboarding
+    Route::get('/bienvenida', [App\Http\Controllers\OnboardingController::class, 'bienvenida'])->name('onboarding.bienvenida');
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -85,8 +111,18 @@ Route::middleware('auth')->group(function () {
     // GESTIÓN DE SOCIOS
     // ========================================
     Route::middleware('permission:socios')->group(function () {
-        Route::resource('socios', SociosController::class);
+        Route::get('/socios', [SociosController::class, 'index'])->name('socios.index');
+        Route::get('/socios/create', [SociosController::class, 'create'])->name('socios.create');
+        Route::post('/socios', [SociosController::class, 'store'])->name('socios.store')->middleware('limite.socios');
+        Route::get('/socios/{socio}', [SociosController::class, 'show'])->name('socios.show');
+        Route::get('/socios/{socio}/edit', [SociosController::class, 'edit'])->name('socios.edit');
+        Route::put('/socios/{socio}', [SociosController::class, 'update'])->name('socios.update');
+        Route::delete('/socios/{socio}', [SociosController::class, 'destroy'])->name('socios.destroy');
         Route::post('/socios/{id}/toggle-exento-iva', [SociosController::class, 'toggleExentoIva'])->name('socios.toggleExentoIva');
+
+        // Exportaciones
+        Route::get('/socios-exportar-pdf', [SociosController::class, 'exportarPDF'])->name('socios.exportar-pdf');
+        Route::get('/socios-exportar-excel', [SociosController::class, 'exportarExcel'])->name('socios.exportar-excel');
     });
 
     // ========================================
@@ -102,6 +138,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/lecturas-importar', [ImportarLecturasController::class, 'importar'])->name('lecturas.importar.procesar');
         Route::post('/lecturas-importar-confirmar', [ImportarLecturasController::class, 'confirmar'])->name('lecturas.importar.confirmar');
         Route::get('/lecturas-importar-plantilla', [ImportarLecturasController::class, 'descargarPlantilla'])->name('lecturas.importar.plantilla');
+
+        // Exportaciones
+        Route::get('/lecturas-exportar-excel', [LecturasController::class, 'exportarExcel'])->name('lecturas.exportar-excel');
     });
 
     // ========================================
@@ -118,6 +157,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/boletas/{id}/enviar-email', [BoletasController::class, 'enviarEmail'])->name('boletas.enviar-email');
         Route::post('/boletas/calcular-montos', [BoletasController::class, 'calcularMontos'])->name('boletas.calcularMontos');
 
+        // Exportaciones
+        Route::get('/boletas-exportar-pdf', [BoletasController::class, 'exportarPDF'])->name('boletas.exportar-pdf');
+        Route::get('/boletas-exportar-excel', [BoletasController::class, 'exportarExcel'])->name('boletas.exportar-excel');
+
         // Folios SII
         Route::resource('folios-sii', FolioSIIController::class)->names('folios-sii');
         Route::post('/folios-sii-obtener-siguiente', [FolioSIIController::class, 'obtenerSiguiente'])->name('folios-sii.obtener-siguiente');
@@ -127,6 +170,7 @@ Route::middleware('auth')->group(function () {
     // GESTIÓN DE PAGOS
     // ========================================
     Route::middleware('permission:pagos')->group(function () {
+        Route::get('/pagos-dashboard', [PagosController::class, 'dashboard'])->name('pagos.dashboard');
         Route::resource('pagos', PagosController::class);
         Route::get('/pagos/{id}/imprimir', [PagosController::class, 'imprimir'])->name('pagos.imprimir');
         Route::get('/pagos/{id}/descargar-recibo', [PagosController::class, 'descargarRecibo'])->name('pagos.descargar-recibo');
@@ -137,6 +181,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/reporte-mensual', [PagosController::class, 'reporteMensual'])->name('pagos.reporteMensual');
         Route::get('/reporte-mensual-imprimir', [PagosController::class, 'reporteMensualImprimir'])->name('pagos.reporteMensual.imprimir');
         Route::post('/pagos/generar-link-flow', [PagosController::class, 'generarLinkFlow'])->name('pagos.generarLinkFlow');
+
+        // Exportaciones
+        Route::get('/pagos-exportar-excel', [PagosController::class, 'exportarExcel'])->name('pagos.exportar-excel');
     });
 
     // ========================================
@@ -159,7 +206,8 @@ Route::middleware('auth')->group(function () {
     // GESTIÓN DE USUARIOS
     // ========================================
     Route::middleware('permission:usuarios')->group(function () {
-        Route::resource('usuarios', UsuariosController::class);
+        Route::resource('usuarios', UsuariosController::class)->except(['store']);
+        Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store')->middleware('limite.usuarios');
     });
 
     // ========================================
@@ -329,4 +377,84 @@ Route::middleware('auth')->group(function () {
         Route::resource('eventos', EventosController::class);
     });
 
+    // ========================================
+    // GESTIÓN DE ORGANIZACIÓN Y SUSCRIPCIÓN
+    // ========================================
+    Route::prefix('organizacion')->name('organizacion.')->group(function () {
+        Route::get('/', [App\Http\Controllers\OrganizacionController::class, 'index'])->name('index');
+        Route::get('/editar', [App\Http\Controllers\OrganizacionController::class, 'edit'])->name('edit');
+        Route::put('/actualizar', [App\Http\Controllers\OrganizacionController::class, 'update'])->name('update');
+        Route::delete('/logo', [App\Http\Controllers\OrganizacionController::class, 'deleteLogo'])->name('deleteLogo');
+        Route::post('/reverificar-dns', [App\Http\Controllers\OrganizacionController::class, 'reverificarDNS'])->name('reverificar-dns');
+        Route::get('/upgrade', [App\Http\Controllers\OrganizacionController::class, 'upgrade'])->name('upgrade');
+        Route::post('/cambiar-plan/{idSuscripcionNueva}', [App\Http\Controllers\OrganizacionController::class, 'iniciarCambioPlan'])->name('cambiar-plan');
+        Route::get('/confirmar-cambio-plan/{idCambioPlan}', [App\Http\Controllers\OrganizacionController::class, 'confirmarCambioPlan'])->name('confirmar-cambio-plan');
+
+        // Historial de pagos de suscripción
+        Route::get('/pagos-suscripcion', [PagosSuscripcionController::class, 'index'])->name('pagos-suscripcion');
+        Route::post('/pagos-suscripcion/{id}/pagar', [PagosSuscripcionController::class, 'pagar'])->name('pagos-suscripcion.pagar');
+    });
+
+    // ========================================
+    // NOTIFICACIONES DEL SISTEMA
+    // ========================================
+    Route::prefix('notificaciones-sistema')->name('notificaciones-sistema.')->group(function () {
+        Route::get('/', [NotificacionesSistemaController::class, 'index'])->name('index');
+        Route::post('/{id}/marcar-leida', [NotificacionesSistemaController::class, 'marcarLeida'])->name('marcar-leida');
+        Route::post('/marcar-todas-leidas', [NotificacionesSistemaController::class, 'marcarTodasLeidas'])->name('marcar-todas-leidas');
+        Route::get('/no-leidas', [NotificacionesSistemaController::class, 'noLeidas'])->name('no-leidas');
+        Route::delete('/{id}', [NotificacionesSistemaController::class, 'eliminar'])->name('eliminar');
+    });
+
+    // ========================================
+    // MÓDULO DE NOTICIAS (Solo plan Enterprise)
+    // ========================================
+    Route::middleware('modulo.permitido:noticias')->group(function () {
+        Route::resource('noticias', App\Http\Controllers\NoticiasController::class);
+    });
+
+});
+
+// Rutas públicas de noticias (sin autenticación)
+Route::get('/noticias-publicas', [App\Http\Controllers\NoticiasController::class, 'publicas'])->name('noticias.publicas');
+Route::get('/noticia/{slug}', [App\Http\Controllers\NoticiasController::class, 'verPublica'])->name('noticia.publica');
+
+// ========================================
+// PANEL SUPER-ADMIN
+// ========================================
+Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+    // Dashboard principal
+    Route::get('/', [App\Http\Controllers\SuperAdminController::class, 'dashboard'])->name('dashboard');
+
+    // Gestión de organizaciones
+    Route::get('/organizaciones', [App\Http\Controllers\SuperAdminController::class, 'organizaciones'])->name('organizaciones');
+    Route::get('/organizaciones/{id}', [App\Http\Controllers\SuperAdminController::class, 'verOrganizacion'])->name('organizacion.ver');
+    Route::post('/organizaciones/{id}/suspender', [App\Http\Controllers\SuperAdminController::class, 'suspenderOrganizacion'])->name('organizacion.suspender');
+    Route::post('/organizaciones/{id}/activar', [App\Http\Controllers\SuperAdminController::class, 'activarOrganizacion'])->name('organizacion.activar');
+    Route::post('/organizaciones/{id}/cambiar-plan', [App\Http\Controllers\SuperAdminController::class, 'cambiarPlan'])->name('organizacion.cambiar-plan');
+    Route::delete('/organizaciones/{id}', [App\Http\Controllers\SuperAdminController::class, 'eliminarOrganizacion'])->name('organizacion.eliminar');
+
+    // Gestión de registros pendientes
+    Route::get('/registros-pendientes', [App\Http\Controllers\SuperAdminController::class, 'registrosPendientes'])->name('registros.pendientes');
+    Route::get('/registros/{id}', [App\Http\Controllers\SuperAdminController::class, 'verRegistro'])->name('registros.ver');
+    Route::post('/registros/{id}/aprobar', [App\Http\Controllers\SuperAdminController::class, 'aprobarRegistro'])->name('registros.aprobar');
+    Route::post('/registros/{id}/rechazar', [App\Http\Controllers\SuperAdminController::class, 'rechazarRegistro'])->name('registros.rechazar');
+
+    // Reportes avanzados
+    Route::get('/reportes/financiero', [App\Http\Controllers\SuperAdminController::class, 'reporteFinanciero'])->name('reportes.financiero');
+    Route::get('/reportes/uso', [App\Http\Controllers\SuperAdminController::class, 'reporteUso'])->name('reportes.uso');
+    Route::get('/reportes/comparativo', [App\Http\Controllers\SuperAdminController::class, 'reporteComparativo'])->name('reportes.comparativo');
+
+    // Renovaciones y vencimientos
+    Route::get('/renovaciones', [App\Http\Controllers\SuperAdminController::class, 'renovaciones'])->name('renovaciones');
+    Route::post('/renovaciones/{id}/pagar', [App\Http\Controllers\SuperAdminController::class, 'pagarRenovacion'])->name('renovaciones.pagar');
+
+    // Auditoría y logs
+    Route::get('/auditoria', [App\Http\Controllers\SuperAdminController::class, 'auditoria'])->name('auditoria');
+
+    // Gestión de dominios personalizados
+    Route::get('/dominios-personalizados', [App\Http\Controllers\SuperAdminController::class, 'dominiosPersonalizados'])->name('dominios.index');
+    Route::post('/dominios/{id}/aprobar', [App\Http\Controllers\SuperAdminController::class, 'aprobarDominio'])->name('dominios.aprobar');
+    Route::post('/dominios/{id}/rechazar', [App\Http\Controllers\SuperAdminController::class, 'rechazarDominio'])->name('dominios.rechazar');
+    Route::post('/dominios/{id}/suspender', [App\Http\Controllers\SuperAdminController::class, 'suspenderDominio'])->name('dominios.suspender');
 });

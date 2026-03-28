@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Socio;
+use App\Models\Auditoria;
 use App\Helpers\ActividadHelper;
+use App\Services\PdfExportService;
+use App\Services\ExcelExportService;
 
 class SociosController extends Controller
 {
@@ -33,6 +36,19 @@ class SociosController extends Controller
      */
     public function store(Request $request)
     {
+        // Verificar límites del plan
+        $organizacion = auth()->user()->organizacion;
+
+        if (!$organizacion->puedeAgregarSocio()) {
+            $limiteActual = $organizacion->suscripcion->limite_socios;
+            $sociosActuales = $organizacion->socios()->count();
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', "Has alcanzado el límite de socios de tu plan ({$sociosActuales}/{$limiteActual}). Actualiza tu plan para agregar más socios.")
+                ->with('upgrade_required', true);
+        }
+
         $validated = $request->validate([
             'rut' => 'required|unique:socios,rut',
             'nombre' => 'required|string|max:100',
@@ -56,10 +72,40 @@ class SociosController extends Controller
 
         $socio = Socio::create($validated);
 
+        // Verificar si está cerca del límite (90%) y crear notificación
+        $sociosActuales = $organizacion->socios()->count();
+        $limite = $organizacion->suscripcion->limite_socios;
+
+        if ($limite > 0 && $sociosActuales >= ($limite * 0.9)) {
+            \App\Models\NotificacionSistema::create([
+                'id_organizacion' => $organizacion->id,
+                'tipo' => 'limite_socios',
+                'prioridad' => 'media',
+                'titulo' => 'Límite de socios cercano',
+                'mensaje' => "Has alcanzado {$sociosActuales} de {$limite} socios permitidos en tu plan. Considera actualizar tu plan.",
+                'icono' => 'fa-users',
+                'color' => 'warning',
+                'url' => route('organizacion.upgrade'),
+                'texto_accion' => 'Ver Planes',
+                'leida' => false,
+            ]);
+        }
+
         // Registrar actividad
         ActividadHelper::registrar(
             'Socios',
             "Nuevo socio registrado: {$numeroSocio} - {$validated['nombre']} {$validated['apellido_paterno']}"
+        );
+
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'socios',
+            'crear',
+            "Creó socio: {$socio->numero_socio} - {$socio->nombre} {$socio->apellido_paterno}",
+            'socios',
+            $socio->id,
+            null,
+            $socio->toArray()
         );
 
         return redirect()->route('socios.index')
@@ -111,6 +157,9 @@ class SociosController extends Controller
             'observaciones_subsidio' => 'nullable|string|max:255',
         ]);
 
+        // Capturar datos anteriores para auditoría
+        $datosAnteriores = $socio->toArray();
+
         // Capturar cambios antes de actualizar
         $cambios = [];
         $camposTraducidos = [
@@ -148,6 +197,17 @@ class SociosController extends Controller
                 "Socio actualizado: {$socio->numero_socio} - {$socio->nombre_completo}. Cambios: {$descripcionCambios}",
                 auth()->id()
             );
+
+            // Registrar en auditoría con datos anteriores y nuevos
+            Auditoria::registrar(
+                'socios',
+                'editar',
+                "Editó socio #{$socio->id}: {$socio->nombre} {$socio->apellido_paterno}. Cambios: {$descripcionCambios}",
+                'socios',
+                $socio->id,
+                $datosAnteriores,
+                $socio->fresh()->toArray()
+            );
         } else {
             ActividadHelper::registrar(
                 'Socios',
@@ -168,6 +228,7 @@ class SociosController extends Controller
         $socio = Socio::findOrFail($id);
         $numeroSocio = $socio->numero_socio;
         $nombreCompleto = $socio->nombre_completo;
+        $datosAnteriores = $socio->toArray();
 
         $socio->update(['activo' => 0]);
 
@@ -175,6 +236,17 @@ class SociosController extends Controller
         ActividadHelper::registrar(
             'Socios',
             "Socio eliminado: {$numeroSocio} - {$nombreCompleto}"
+        );
+
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'socios',
+            'eliminar',
+            "Eliminó socio #{$id}: {$numeroSocio} - {$nombreCompleto}",
+            'socios',
+            $id,
+            $datosAnteriores,
+            null
         );
 
         return redirect()->route('socios.index')
@@ -205,5 +277,57 @@ class SociosController extends Controller
             : 'Exención de IVA removida del socio';
 
         return redirect()->back()->with('success', $mensaje);
+    }
+
+    /**
+     * Exportar socios a PDF
+     */
+    public function exportarPDF(Request $request, PdfExportService $pdfService)
+    {
+        $organizacion = auth()->user()->organizacion;
+
+        // Aplicar filtros si existen
+        $query = Socio::where('activo', 1);
+
+        $filtros = [];
+        if ($request->has('estado') && $request->estado != '') {
+            $query->where('estado', $request->estado);
+            $filtros['estado'] = $request->estado;
+        }
+        if ($request->has('tipo_cliente') && $request->tipo_cliente != '') {
+            $query->where('tipo_cliente', $request->tipo_cliente);
+            $filtros['tipo_cliente'] = $request->tipo_cliente;
+        }
+        if ($request->has('sector') && $request->sector != '') {
+            $query->where('sector', $request->sector);
+            $filtros['sector'] = $request->sector;
+        }
+
+        $socios = $query->orderBy('numero_socio')->get();
+
+        return $pdfService->reporteSocios($socios, $organizacion, $filtros)->download('socios_' . date('Y-m-d') . '.pdf');
+    }
+
+    /**
+     * Exportar socios a Excel
+     */
+    public function exportarExcel(Request $request, ExcelExportService $excelService)
+    {
+        // Aplicar filtros si existen
+        $query = Socio::where('activo', 1);
+
+        if ($request->has('estado') && $request->estado != '') {
+            $query->where('estado', $request->estado);
+        }
+        if ($request->has('tipo_cliente') && $request->tipo_cliente != '') {
+            $query->where('tipo_cliente', $request->tipo_cliente);
+        }
+        if ($request->has('sector') && $request->sector != '') {
+            $query->where('sector', $request->sector);
+        }
+
+        $socios = $query->orderBy('numero_socio')->get();
+
+        return $excelService->exportarSocios($socios);
     }
 }

@@ -39,8 +39,9 @@ return new class extends Migration
             $table->index('id_responsable');
             $table->index('activo');
 
-            $table->foreign('id_producto')->references('id')->on('inventario')->onDelete('cascade');
-            $table->foreign('id_responsable')->references('id')->on('funcionarios')->onDelete('set null');
+            // Relaciones - Comentadas temporalmente para evitar errores de orden de migración
+            // $table->foreign('id_producto')->references('id')->on('inventario')->onDelete('cascade');
+            // $table->foreign('id_responsable')->references('id')->on('funcionarios')->onDelete('set null');
         });
     }
 

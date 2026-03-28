@@ -14,6 +14,38 @@
     </a>
 </div>
 
+@php
+    $organizacion = auth()->user()->organizacion;
+    $usuariosActuales = $organizacion->usuarios()->count();
+    $limiteUsuarios = $organizacion->suscripcion->limite_usuarios;
+    $porcentajeUso = $limiteUsuarios > 0 ? ($usuariosActuales / $limiteUsuarios) * 100 : 0;
+@endphp
+
+@if($limiteUsuarios > 0 && $porcentajeUso >= 80)
+<div class="alert {{ $porcentajeUso >= 100 ? 'alert-danger' : 'alert-warning' }}">
+    <i class="fas fa-exclamation-triangle"></i>
+    <div>
+        <strong>{{ $porcentajeUso >= 100 ? '¡Límite alcanzado!' : 'Atención:' }}</strong>
+        Has utilizado {{ $usuariosActuales }} de {{ $limiteUsuarios }} usuarios permitidos en tu plan ({{ round($porcentajeUso) }}%).
+        @if($porcentajeUso >= 100)
+            No puedes agregar más usuarios.
+        @endif
+        <a href="{{ route('organizacion.upgrade') }}" class="alert-link">Actualiza tu plan aquí</a>.
+    </div>
+</div>
+@endif
+
+@if(session('upgrade_required'))
+<div class="alert alert-danger">
+    <i class="fas fa-ban"></i>
+    <div>
+        <strong>Acción bloqueada:</strong>
+        Has alcanzado el límite de tu plan.
+        <a href="{{ route('organizacion.upgrade') }}" class="alert-link"><strong>Actualiza tu plan para continuar</strong></a>.
+    </div>
+</div>
+@endif
+
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Información del Usuario</h3>

@@ -7,8 +7,11 @@ use App\Models\Boleta;
 use App\Models\Socio;
 use App\Models\Lectura;
 use App\Models\ConfiguracionTarifa;
+use App\Models\Auditoria;
 use App\Helpers\ActividadHelper;
 use Illuminate\Support\Facades\DB;
+use App\Services\PdfExportService;
+use App\Services\ExcelExportService;
 
 class BoletasController extends Controller
 {
@@ -135,6 +138,17 @@ class BoletasController extends Controller
                 'Boletas',
                 'Nueva boleta creada: ' . implode(' | ', $detalles),
                 auth()->id()
+            );
+
+            // Registrar en auditoría
+            Auditoria::registrar(
+                'boletas',
+                'crear',
+                "Generó boleta #{$boleta->numero_boleta} para {$socio->nombre_completo} - Mes: {$boleta->mes_texto} - Total: {$boleta->total_formateado}",
+                'boletas',
+                $boleta->id,
+                null,
+                $boleta->toArray()
             );
 
             return redirect()->route('boletas.show', $boleta->id)
@@ -440,12 +454,25 @@ class BoletasController extends Controller
 
         try {
             $estadoAnterior = $boleta->estado_texto;
+            $datosAnteriores = $boleta->toArray();
+
             $boleta->update(['estado' => 'anulada']);
 
             ActividadHelper::registrar(
                 'Boletas',
                 "Boleta anulada [{$boleta->numero_boleta}]: Estado: '{$estadoAnterior}' → 'Anulada'",
                 auth()->id()
+            );
+
+            // Registrar en auditoría
+            Auditoria::registrar(
+                'boletas',
+                'anular',
+                "Anuló boleta #{$boleta->numero_boleta} - Socio: {$boleta->socio->nombre_completo}",
+                'boletas',
+                $boleta->id,
+                $datosAnteriores,
+                ['estado' => 'anulada']
             );
 
             return redirect()->route('boletas.index')
@@ -749,5 +776,54 @@ class BoletasController extends Controller
                 'message' => 'Error al calcular montos: ' . $e->getMessage()
             ], 400);
         }
+    }
+
+    /**
+     * Exportar boletas a PDF
+     */
+    public function exportarPDF(Request $request, PdfExportService $pdfService)
+    {
+        $organizacion = auth()->user()->organizacion;
+
+        // Aplicar filtros si existen
+        $query = Boleta::with('socio');
+
+        if ($request->has('estado') && $request->estado != '') {
+            $query->where('estado', $request->estado);
+        }
+        if ($request->has('periodo') && $request->periodo != '') {
+            $query->where('periodo', $request->periodo);
+        }
+        if ($request->has('numero_boleta') && $request->numero_boleta != '') {
+            $query->where('numero_boleta', 'like', '%' . $request->numero_boleta . '%');
+        }
+
+        $boletas = $query->orderBy('fecha_emision', 'desc')->get();
+        $periodo = $request->periodo ?? 'Todos';
+
+        return $pdfService->listadoBoletas($boletas, $organizacion, compact('periodo'))->download('boletas_' . date('Y-m-d') . '.pdf');
+    }
+
+    /**
+     * Exportar boletas a Excel
+     */
+    public function exportarExcel(Request $request, ExcelExportService $excelService)
+    {
+        // Aplicar filtros si existen
+        $query = Boleta::with('socio');
+
+        if ($request->has('estado') && $request->estado != '') {
+            $query->where('estado', $request->estado);
+        }
+        if ($request->has('periodo') && $request->periodo != '') {
+            $query->where('periodo', $request->periodo);
+        }
+        if ($request->has('numero_boleta') && $request->numero_boleta != '') {
+            $query->where('numero_boleta', 'like', '%' . $request->numero_boleta . '%');
+        }
+
+        $boletas = $query->orderBy('fecha_emision', 'desc')->get();
+
+        return $excelService->exportarBoletas($boletas);
     }
 }

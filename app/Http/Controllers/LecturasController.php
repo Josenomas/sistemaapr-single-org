@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Lectura;
 use App\Models\Socio;
+use App\Models\Auditoria;
 use App\Helpers\ActividadHelper;
+use App\Services\ExcelExportService;
 
 class LecturasController extends Controller
 {
@@ -79,6 +81,17 @@ class LecturasController extends Controller
             auth()->id()
         );
 
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'lecturas',
+            'crear',
+            "Registró lectura: {$socio->numero_socio} - {$socio->nombre_completo} ({$mesTexto}) - Consumo: {$validated['consumo_m3']} m³",
+            'lecturas',
+            $lectura->id,
+            null,
+            $lectura->toArray()
+        );
+
         return redirect()->route('lecturas.index')
                         ->with('success', 'Lectura registrada exitosamente');
     }
@@ -117,6 +130,9 @@ class LecturasController extends Controller
 
         $validated['consumo_m3'] = $validated['lectura_actual'] - $lectura->lectura_anterior;
 
+        // Capturar datos antes de actualizar para auditoría
+        $datosAnteriores = $lectura->toArray();
+
         // Capturar cambios antes de actualizar
         $cambios = [];
         $camposTraducidos = [
@@ -146,6 +162,9 @@ class LecturasController extends Controller
 
         $lectura->update($validated);
 
+        // Capturar datos después de actualizar
+        $datosNuevos = $lectura->fresh()->toArray();
+
         // Registrar actividad con cambios
         $socio = $lectura->socio;
         $meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -159,6 +178,17 @@ class LecturasController extends Controller
                 'Lecturas',
                 "Lectura actualizada: {$socio->numero_socio} - {$socio->nombre_completo} ({$mesTexto}). Cambios: {$descripcionCambios}",
                 auth()->id()
+            );
+
+            // Registrar en auditoría
+            Auditoria::registrar(
+                'lecturas',
+                'editar',
+                "Editó lectura: {$socio->numero_socio} - {$socio->nombre_completo} ({$mesTexto}). Cambios: {$descripcionCambios}",
+                'lecturas',
+                $lectura->id,
+                $datosAnteriores,
+                $datosNuevos
             );
         } else {
             ActividadHelper::registrar(
@@ -192,6 +222,7 @@ class LecturasController extends Controller
         $fecha = explode('-', $lectura->mes);
         $mesTexto = $meses[(int)$fecha[1]] . ' ' . $fecha[0];
         $consumo = $lectura->consumo;
+        $datosAnteriores = $lectura->toArray();
 
         $lectura->delete();
 
@@ -199,6 +230,17 @@ class LecturasController extends Controller
             'Lecturas',
             "Lectura eliminada: {$socio->numero_socio} - {$socio->nombre_completo} ({$mesTexto}) - Consumo: {$consumo} m³",
             auth()->id()
+        );
+
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'lecturas',
+            'eliminar',
+            "Eliminó lectura: {$socio->numero_socio} - {$socio->nombre_completo} ({$mesTexto}) - Consumo: {$consumo} m³",
+            'lecturas',
+            null,
+            $datosAnteriores,
+            null
         );
 
         return redirect()->route('lecturas.index')
@@ -283,7 +325,41 @@ class LecturasController extends Controller
             auth()->id()
         );
 
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'lecturas',
+            'importar',
+            "Importó {$registradas} lecturas masivas para {$mesTexto}",
+            'lecturas',
+            null,
+            null,
+            ['mes' => $validated['mes'], 'total_registradas' => $registradas]
+        );
+
         return redirect()->route('lecturas.index')
                         ->with('success', "Se registraron {$registradas} lecturas exitosamente");
+    }
+
+    /**
+     * Exportar lecturas a Excel
+     */
+    public function exportarExcel(Request $request, ExcelExportService $excelService)
+    {
+        // Aplicar filtros si existen
+        $query = Lectura::with('socio');
+
+        if ($request->has('periodo') && $request->periodo != '') {
+            $query->where('periodo', $request->periodo);
+        }
+        if ($request->has('fecha_desde') && $request->fecha_desde != '') {
+            $query->whereDate('fecha_lectura', '>=', $request->fecha_desde);
+        }
+        if ($request->has('fecha_hasta') && $request->fecha_hasta != '') {
+            $query->whereDate('fecha_lectura', '<=', $request->fecha_hasta);
+        }
+
+        $lecturas = $query->orderBy('fecha_lectura', 'desc')->get();
+
+        return $excelService->exportarLecturas($lecturas);
     }
 }

@@ -326,6 +326,28 @@
             </a>
         </div>
 
+        <!-- Noticias (Solo Enterprise) -->
+        @if(auth()->user()->organizacion && auth()->user()->organizacion->puedeAccederModulo('noticias'))
+        <div class="nav-section">
+            <div class="nav-section-title">
+                <i class="fas fa-newspaper"></i>
+                <span>Noticias</span>
+            </div>
+            <a href="{{ route('noticias.index') }}" class="nav-item {{ request()->routeIs('noticias.index') ? 'active' : '' }}">
+                <i class="fas fa-list"></i>
+                <span>Ver Noticias</span>
+            </a>
+            <a href="{{ route('noticias.create') }}" class="nav-item {{ request()->routeIs('noticias.create') ? 'active' : '' }}">
+                <i class="fas fa-plus"></i>
+                <span>Nueva Noticia</span>
+            </a>
+            <a href="{{ route('noticias.publicas') }}" class="nav-item" target="_blank">
+                <i class="fas fa-eye"></i>
+                <span>Vista Pública</span>
+            </a>
+        </div>
+        @endif
+
         <!-- Reportes -->
         <div class="nav-section">
             <div class="nav-section-title">
@@ -351,6 +373,30 @@
             <a href="{{ route('reportes.operacional') }}" class="nav-item {{ request()->routeIs('reportes.operacional') ? 'active' : '' }}">
                 <i class="fas fa-cogs"></i>
                 <span>Reporte Operacional</span>
+            </a>
+        </div>
+
+        <!-- Mi Organización -->
+        <div class="nav-section">
+            <div class="nav-section-title">
+                <i class="fas fa-building"></i>
+                <span>Organización</span>
+            </div>
+            <a href="{{ route('organizacion.index') }}" class="nav-item {{ request()->routeIs('organizacion.index') ? 'active' : '' }}">
+                <i class="fas fa-info-circle"></i>
+                <span>Mi Organización</span>
+            </a>
+            <a href="{{ route('organizacion.edit') }}" class="nav-item {{ request()->routeIs('organizacion.edit') ? 'active' : '' }}">
+                <i class="fas fa-edit"></i>
+                <span>Editar Organización</span>
+            </a>
+            <a href="{{ route('organizacion.upgrade') }}" class="nav-item {{ request()->routeIs('organizacion.upgrade') ? 'active' : '' }}">
+                <i class="fas fa-arrow-up"></i>
+                <span>Cambiar Plan</span>
+            </a>
+            <a href="{{ route('organizacion.pagos-suscripcion') }}" class="nav-item {{ request()->routeIs('organizacion.pagos-suscripcion') ? 'active' : '' }}">
+                <i class="fas fa-credit-card"></i>
+                <span>Historial de Pagos</span>
             </a>
         </div>
     </nav>

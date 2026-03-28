@@ -21,6 +21,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \App\Http\Middleware\IdentifyTenant::class, // Identificar organización por dominio/subdominio
     ];
 
     /**
@@ -70,5 +71,8 @@ class Kernel extends HttpKernel
         'modulo.permitido' => \App\Http\Middleware\CheckModuloPermitido::class,
         'limite.socios' => \App\Http\Middleware\CheckLimiteSocios::class,
         'limite.usuarios' => \App\Http\Middleware\CheckLimiteUsuarios::class,
+
+        // Super-Admin
+        'superadmin' => \App\Http\Middleware\CheckSuperAdmin::class,
     ];
 }

@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\BelongsToOrganizacion;
 
 class RenovacionMedidor extends Model
 {
+    use BelongsToOrganizacion;
+
     protected $table = 'renovaciones_medidores';
 
     protected $fillable = [

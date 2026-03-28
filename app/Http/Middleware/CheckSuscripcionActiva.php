@@ -23,6 +23,11 @@ class CheckSuscripcionActiva
 
         $user = auth()->user();
 
+        // Si es super-admin, permitir acceso sin restricciones
+        if ($user->esSuperAdmin()) {
+            return $next($request);
+        }
+
         // Si el usuario no tiene organización, redirigir a una página de configuración
         if (!$user->id_organizacion) {
             return redirect()->route('organizacion.setup')

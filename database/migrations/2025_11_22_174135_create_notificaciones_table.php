@@ -56,9 +56,9 @@ return new class extends Migration
             $table->index('fecha_programada');
             $table->index('activo');
 
-            // Relaciones
-            $table->foreign('id_socio')->references('id')->on('socios')->onDelete('cascade');
-            $table->foreign('id_usuario_creador')->references('id')->on('usuarios')->onDelete('restrict');
+            // Relaciones - Comentadas temporalmente (se agregan después cuando existan las tablas)
+            // $table->foreign('id_socio')->references('id')->on('socios')->onDelete('cascade');
+            // $table->foreign('id_usuario_creador')->references('id')->on('usuarios')->onDelete('restrict');
         });
     }
 

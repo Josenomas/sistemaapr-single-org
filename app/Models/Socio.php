@@ -3,26 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Scopes\OrganizacionScope;
+use App\Models\Traits\BelongsToOrganizacion;
 
 class Socio extends Model
 {
+    use BelongsToOrganizacion;
+
     protected $table = 'socios';
-
-    /**
-     * The "booted" method of the model.
-     */
-    protected static function booted(): void
-    {
-        static::addGlobalScope(new OrganizacionScope);
-
-        // Auto-asignar id_organizacion al crear
-        static::creating(function ($socio) {
-            if (auth()->check() && !$socio->id_organizacion) {
-                $socio->id_organizacion = auth()->user()->id_organizacion;
-            }
-        });
-    }
 
     protected $fillable = [
         'id_organizacion',

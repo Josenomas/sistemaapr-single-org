@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\BelongsToOrganizacion;
 
 class Notificacion extends Model
 {
+    use BelongsToOrganizacion;
+
     protected $table = 'notificaciones';
 
     const CREATED_AT = 'fecha_creacion';

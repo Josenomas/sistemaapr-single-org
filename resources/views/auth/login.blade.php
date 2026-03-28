@@ -237,6 +237,13 @@
             <span class="system-badge">APR v1.0</span>
         </div>
 
+        @if(session('success'))
+            <div class="alert" style="background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0;">
+                <i class="fas fa-check-circle"></i>
+                {{ session('success') }}
+            </div>
+        @endif
+
         @if($errors->any())
             <div class="alert alert-danger">
                 <i class="fas fa-exclamation-circle"></i>
@@ -292,6 +299,13 @@
                 Iniciar Sesión
             </button>
         </form>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{{ route('password.request') }}" style="color: var(--gray); font-size: 0.875rem; text-decoration: none; transition: color 0.3s;">
+                <i class="fas fa-key" style="margin-right: 6px;"></i>
+                ¿Olvidaste tu contraseña?
+            </a>
+        </div>
 
         <div class="login-footer">
             <p>&copy; {{ date('Y') }} Sistema APR - Agua Potable Rural</p>

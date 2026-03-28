@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\BelongsToOrganizacion;
 
 class Ticket extends Model
 {
+    use BelongsToOrganizacion;
+
     protected $table = 'tickets';
 
     const CREATED_AT = 'fecha_creacion';

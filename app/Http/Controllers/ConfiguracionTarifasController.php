@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ConfiguracionTarifa;
+use App\Models\Auditoria;
 use App\Helpers\ActividadHelper;
 use Illuminate\Support\Facades\DB;
 
@@ -88,6 +89,17 @@ class ConfiguracionTarifasController extends Controller
                 auth()->id()
             );
 
+            // Registrar en auditoría
+            Auditoria::registrar(
+                'configuraciones_tarifas',
+                'crear',
+                "Creó tarifa: {$tarifa->nombre_tarifa} - {$tarifa->nombre} ({$tarifa->tipo_cliente}) - Monto: $" . number_format($tarifa->monto, 0, ',', '.'),
+                'configuracion_tarifas',
+                $tarifa->id,
+                null,
+                $tarifa->toArray()
+            );
+
             DB::commit();
 
             return redirect()->route('configuraciones-tarifas.index')
@@ -133,12 +145,26 @@ class ConfiguracionTarifasController extends Controller
 
         DB::beginTransaction();
         try {
+            // Capturar datos antes de actualizar
+            $datosAnteriores = $tarifa->toArray();
+
             $tarifa->update($validated);
 
             ActividadHelper::registrar(
                 'Configuraciones Tarifarias',
                 "Configuración tarifaria actualizada: {$tarifa->nombre_tarifa} - {$tarifa->nombre} ({$tarifa->tipo_cliente})",
                 auth()->id()
+            );
+
+            // Registrar en auditoría
+            Auditoria::registrar(
+                'configuraciones_tarifas',
+                'editar',
+                "Editó tarifa: {$tarifa->nombre_tarifa} - {$tarifa->nombre} ({$tarifa->tipo_cliente})",
+                'configuracion_tarifas',
+                $tarifa->id,
+                $datosAnteriores,
+                $tarifa->fresh()->toArray()
             );
 
             DB::commit();
@@ -162,12 +188,25 @@ class ConfiguracionTarifasController extends Controller
 
         DB::beginTransaction();
         try {
+            $datosAnteriores = $tarifa->toArray();
+
             $tarifa->update(['activo' => 0]);
 
             ActividadHelper::registrar(
                 'Configuraciones Tarifarias',
                 "Configuración tarifaria eliminada: {$tarifa->nombre}",
                 auth()->id()
+            );
+
+            // Registrar en auditoría
+            Auditoria::registrar(
+                'configuraciones_tarifas',
+                'eliminar',
+                "Eliminó tarifa: {$tarifa->nombre_tarifa} - {$tarifa->nombre} ({$tarifa->tipo_cliente})",
+                'configuracion_tarifas',
+                null,
+                $datosAnteriores,
+                null
             );
 
             DB::commit();

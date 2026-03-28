@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use App\Models\Scopes\OrganizacionScope;
+use App\Models\Traits\BelongsToOrganizacion;
 
 class Noticia extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToOrganizacion;
 
     protected $table = 'noticias';
 
@@ -36,23 +36,16 @@ class Noticia extends Model
     ];
 
     /**
-     * Boot del modelo para generar slug automático y agregar scope
+     * Boot del modelo para generar slug automático
      */
     protected static function boot()
     {
         parent::boot();
 
-        static::addGlobalScope(new OrganizacionScope);
-
         static::creating(function ($noticia) {
             // Auto-generar slug
             if (empty($noticia->slug)) {
                 $noticia->slug = Str::slug($noticia->titulo) . '-' . time();
-            }
-
-            // Auto-asignar id_organizacion
-            if (auth()->check() && !$noticia->id_organizacion) {
-                $noticia->id_organizacion = auth()->user()->id_organizacion;
             }
 
             // Auto-asignar creador
@@ -63,19 +56,11 @@ class Noticia extends Model
     }
 
     /**
-     * Relación: Una noticia pertenece a una organización
-     */
-    public function organizacion()
-    {
-        return $this->belongsTo(Organizacion::class, 'id_organizacion');
-    }
-
-    /**
      * Relación: Una noticia tiene un creador (usuario)
      */
     public function creador()
     {
-        return $this->belongsTo(User::class, 'id_usuario_creador');
+        return $this->belongsTo(Usuario::class, 'id_usuario_creador');
     }
 
     /**

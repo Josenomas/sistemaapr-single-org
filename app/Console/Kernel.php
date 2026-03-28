@@ -20,6 +20,16 @@ class Kernel extends ConsoleKernel
                  ->dailyAt('09:00')
                  ->emailOutputOnFailure('admin@aprpitrelahue.cl');
 
+        // Procesar renovaciones de suscripciones diariamente a las 8:00 AM
+        $schedule->command('renovaciones:procesar')
+                 ->dailyAt('08:00')
+                 ->emailOutputOnFailure('admin@aprpitrelahue.cl');
+
+        // Enviar resumen mensual el primer día de cada mes a las 10:00 AM
+        $schedule->command('resumen:mensual')
+                 ->monthlyOn(1, '10:00')
+                 ->emailOutputOnFailure('admin@aprpitrelahue.cl');
+
         // Alternativa: Enviar cada 3 días a las 9:00 AM
         // $schedule->command('notificaciones:boletas-vencidas')
         //          ->days([1, 4, 7, 10, 13, 16, 19, 22, 25, 28])

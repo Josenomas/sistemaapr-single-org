@@ -15,10 +15,11 @@
     @yield('styles')
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #dbeafe;
-            --secondary: #06b6d4;
+            /* Colores personalizados de la organización */
+            --primary: {{ $coloresTema['primario'] ?? '#2563eb' }};
+            --primary-dark: {{ $coloresTema['primario_dark'] ?? '#1d4ed8' }};
+            --primary-light: {{ $coloresTema['primario_light'] ?? '#dbeafe' }};
+            --secondary: {{ $coloresTema['secundario'] ?? '#10b981' }};
             --info: #06b6d4;
             --light: #f8fafc;
             --dark: #1e293b;
@@ -87,6 +88,15 @@
         .logo i {
             font-size: 1.75rem;
             color: #60a5fa;
+        }
+
+        .logo-img {
+            height: 45px;
+            max-width: 150px;
+            object-fit: contain;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 6px;
         }
 
         .logo h1 {
@@ -200,6 +210,56 @@
             margin-right: 12px;
         }
 
+        /* Campana de notificaciones */
+        .notificaciones-dropdown {
+            position: relative;
+        }
+
+        .notif-bell {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            color: white;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .notif-bell:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.625rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            animation: pulseNotif 2s infinite;
+        }
+
+        @keyframes pulseNotif {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
         @media (max-width: 768px) {
             .mobile-menu-btn {
                 display: block;
@@ -236,11 +296,50 @@
                 </button>
 
                 <a href="{{ route('dashboard') }}" class="logo">
-                    <i class="fas fa-tint"></i>
-                    <h1>Sistema APR</h1>
+                    @php
+                        $organizacion = null;
+                        if (auth()->check() && auth()->user()->id_organizacion) {
+                            $organizacion = \App\Models\Organizacion::find(auth()->user()->id_organizacion);
+                        }
+                    @endphp
+
+                    @if($organizacion && $organizacion->logo)
+                        <img src="{{ asset('storage/' . $organizacion->logo) }}"
+                             alt="Logo {{ $organizacion->nombre_apr }}"
+                             class="logo-img">
+                    @else
+                        <i class="fas fa-tint"></i>
+                    @endif
+
+                    <h1>{{ $organizacion ? $organizacion->nombre_apr : 'Sistema APR' }}</h1>
                 </a>
 
                 <div class="user-menu">
+                    <!-- Campana de notificaciones -->
+                    @php
+                        $contadorNotificaciones = \App\Models\NotificacionSistema::query()
+                            ->where(function ($q) use ($organizacion) {
+                                if ($organizacion) {
+                                    $q->where('id_organizacion', $organizacion->id)
+                                      ->whereNull('id_usuario')
+                                      ->orWhere('id_usuario', auth()->id());
+                                } else {
+                                    $q->where('id_usuario', auth()->id());
+                                }
+                            })
+                            ->noLeidas()
+                            ->count();
+                    @endphp
+
+                    <div class="notificaciones-dropdown">
+                        <a href="{{ route('notificaciones-sistema.index') }}" class="notif-bell" id="notifBell">
+                            <i class="fas fa-bell"></i>
+                            @if($contadorNotificaciones > 0)
+                                <span class="notif-badge">{{ $contadorNotificaciones > 9 ? '9+' : $contadorNotificaciones }}</span>
+                            @endif
+                        </a>
+                    </div>
+
                     <div class="user-info">
                         <div class="user-avatar">
                             {{ auth()->user()->iniciales }}

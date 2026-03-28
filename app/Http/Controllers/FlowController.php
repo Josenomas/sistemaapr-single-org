@@ -47,14 +47,29 @@ class FlowController extends Controller
                     'transaccion_id' => $transaccion->id ?? null,
                 ]);
 
-                // Si el pago fue exitoso, crear registro de pago
+                // Si el pago fue exitoso, procesar según tipo de transacción
                 if ($transaccion->estado === 'pagado') {
                     try {
-                        $this->crearRegistroPago($transaccion, $responseData);
-                        Log::info('Flow - Pago registrado correctamente', ['token' => $token]);
+                        // Verificar si es un cambio de plan
+                        $cambioPlan = \App\Models\CambioPlan::where('token_flow', $token)->first();
+
+                        if ($cambioPlan) {
+                            // Es un cambio de plan - aplicar el cambio
+                            if ($cambioPlan->aplicar()) {
+                                Log::info('Flow - Cambio de plan aplicado', [
+                                    'token' => $token,
+                                    'cambio_plan_id' => $cambioPlan->id,
+                                    'organizacion_id' => $cambioPlan->id_organizacion,
+                                ]);
+                            }
+                        } else {
+                            // Es un pago de boleta normal
+                            $this->crearRegistroPago($transaccion, $responseData);
+                            Log::info('Flow - Pago registrado correctamente', ['token' => $token]);
+                        }
                     } catch (\Exception $e) {
                         // Aunque falle el registro, respondemos 200 a Flow
-                        Log::error('Flow - Error al crear pago pero transacción confirmada', [
+                        Log::error('Flow - Error al procesar pero transacción confirmada', [
                             'token' => $token,
                             'error' => $e->getMessage(),
                         ]);
@@ -125,9 +140,18 @@ class FlowController extends Controller
                 'flow_order' => $transaccion->flow_order,
             ]);
 
+            // Verificar si es un cambio de plan
+            $cambioPlan = \App\Models\CambioPlan::where('token_flow', $token)->first();
+
             // Redirigir según estado actual de la transacción
             if ($transaccion->estado === 'pagado') {
-                // Buscar el pago registrado por el webhook
+                if ($cambioPlan) {
+                    // Es un cambio de plan
+                    return redirect()->route('organizacion.index')
+                                   ->with('success', '¡Cambio de plan realizado exitosamente! Tu plan ha sido actualizado.');
+                }
+
+                // Es un pago de boleta - buscar el pago registrado por el webhook
                 $pago = Pago::where('numero_comprobante', 'LIKE', '%' . $transaccion->flow_order . '%')
                            ->orderBy('id', 'desc')
                            ->first();
@@ -148,10 +172,21 @@ class FlowController extends Controller
                                ->with('success', '¡Pago realizado exitosamente! El comprobante estará disponible en unos momentos.');
 
             } elseif ($transaccion->estado === 'rechazado') {
+                if ($cambioPlan) {
+                    // Cambio de plan rechazado
+                    return redirect()->route('organizacion.upgrade')
+                                   ->with('error', 'El pago fue rechazado. Por favor, intente nuevamente.');
+                }
+
                 return redirect()->route('pagos.create', ['boleta_id' => $transaccion->id_boleta])
                                ->with('error', 'El pago fue rechazado. Por favor, intente nuevamente.');
             } else {
                 // Estado pendiente o anulado
+                if ($cambioPlan) {
+                    return redirect()->route('organizacion.upgrade')
+                                   ->with('warning', 'El pago está pendiente de confirmación. Si ya completó el pago, espere unos momentos.');
+                }
+
                 return redirect()->route('pagos.create', ['boleta_id' => $transaccion->id_boleta])
                                ->with('warning', 'El pago está pendiente de confirmación. Si ya completó el pago, espere unos momentos.');
             }

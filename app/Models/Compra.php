@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\BelongsToOrganizacion;
 
 class Compra extends Model
 {
+    use BelongsToOrganizacion;
+
     protected $table = 'compras';
 
     protected $fillable = [

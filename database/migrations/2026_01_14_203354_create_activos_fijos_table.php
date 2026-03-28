@@ -59,8 +59,8 @@ return new class extends Migration
             $table->index('id_responsable');
             $table->index('activo');
 
-            // Llave foránea
-            $table->foreign('id_responsable')->references('id')->on('usuarios')->onDelete('set null');
+            // Llave foránea - Comentada temporalmente
+            // $table->foreign('id_responsable')->references('id')->on('usuarios')->onDelete('set null');
         });
     }
 

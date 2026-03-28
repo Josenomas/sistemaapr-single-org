@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Funcionario;
+use App\Models\Auditoria;
 use App\Helpers\ActividadHelper;
 
 class FuncionariosController extends Controller
@@ -73,6 +74,17 @@ class FuncionariosController extends Controller
             auth()->id()
         );
 
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'funcionarios',
+            'crear',
+            "Creó funcionario: {$funcionario->nombre_completo} - Cargo: {$funcionario->cargo}",
+            'funcionarios',
+            $funcionario->id,
+            null,
+            $funcionario->toArray()
+        );
+
         return redirect()->route('funcionarios.index')
                         ->with('success', 'Funcionario creado exitosamente');
     }
@@ -116,6 +128,9 @@ class FuncionariosController extends Controller
             'estado' => 'required|in:activo,inactivo,licencia',
             'observaciones' => 'nullable|string',
         ]);
+
+        // Capturar datos antes de actualizar para auditoría
+        $datosAnteriores = $funcionario->toArray();
 
         // Capturar cambios antes de actualizar
         $cambios = [];
@@ -166,6 +181,17 @@ class FuncionariosController extends Controller
                 "Funcionario actualizado: {$funcionario->nombre_completo}. Cambios: {$descripcionCambios}",
                 auth()->id()
             );
+
+            // Registrar en auditoría
+            Auditoria::registrar(
+                'funcionarios',
+                'editar',
+                "Editó funcionario: {$funcionario->nombre_completo}. Cambios: {$descripcionCambios}",
+                'funcionarios',
+                $funcionario->id,
+                $datosAnteriores,
+                $funcionario->fresh()->toArray()
+            );
         } else {
             ActividadHelper::registrar(
                 'Funcionarios',
@@ -186,6 +212,7 @@ class FuncionariosController extends Controller
         $funcionario = Funcionario::findOrFail($id);
         $nombreCompleto = $funcionario->nombre_completo;
         $cargo = $funcionario->cargo;
+        $datosAnteriores = $funcionario->toArray();
 
         $funcionario->update(['activo' => 0]);
 
@@ -194,6 +221,17 @@ class FuncionariosController extends Controller
             'Funcionarios',
             "Funcionario eliminado: {$nombreCompleto} - Cargo: {$cargo}",
             auth()->id()
+        );
+
+        // Registrar en auditoría
+        Auditoria::registrar(
+            'funcionarios',
+            'eliminar',
+            "Eliminó funcionario: {$nombreCompleto} - Cargo: {$cargo}",
+            'funcionarios',
+            null,
+            $datosAnteriores,
+            null
         );
 
         return redirect()->route('funcionarios.index')

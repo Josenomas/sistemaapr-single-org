@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\BelongsToOrganizacion;
 
 class Inventario extends Model
 {
+    use BelongsToOrganizacion;
+
     protected $table = 'inventario';
 
     // Especificar los nombres de las columnas de timestamp personalizadas

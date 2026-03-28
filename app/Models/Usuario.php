@@ -12,6 +12,7 @@ class Usuario extends Authenticatable
     protected $table = 'usuarios';
 
     protected $fillable = [
+        'id_organizacion',
         'nombre_usuario',
         'password',
         'nombre',
@@ -30,21 +31,28 @@ class Usuario extends Authenticatable
 
     protected $casts = [
         'activo' => 'boolean',
-        'fecha_creacion' => 'datetime',
-        'fecha_actualizacion' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
-    // Deshabilitar timestamps de Laravel (usamos los nuestros)
-    const CREATED_AT = 'fecha_creacion';
-    const UPDATED_AT = 'fecha_actualizacion';
+    // Usar timestamps estándar de Laravel
+    public $timestamps = true;
+
+    /**
+     * Relación: Un usuario pertenece a una organización
+     */
+    public function organizacion()
+    {
+        return $this->belongsTo(Organizacion::class, 'id_organizacion');
+    }
 
     /**
      * Verificar si el usuario tiene un permiso específico
      */
     public function tienePermiso($permiso)
     {
-        // El administrador tiene todos los permisos
-        if ($this->rol === 'Administrador') {
+        // El super-admin y admin tienen todos los permisos
+        if ($this->esSuperAdmin() || $this->esAdministrador()) {
             return true;
         }
 
@@ -94,11 +102,27 @@ class Usuario extends Authenticatable
     }
 
     /**
+     * Verificar si es super-administrador
+     */
+    public function esSuperAdmin()
+    {
+        return $this->rol === 'superadmin';
+    }
+
+    /**
      * Verificar si es administrador
      */
     public function esAdministrador()
     {
-        return $this->rol === 'Administrador';
+        return $this->rol === 'admin';
+    }
+
+    /**
+     * Verificar si es administrador (admin o superadmin)
+     */
+    public function esAdminOSuperAdmin()
+    {
+        return in_array($this->rol, ['admin', 'superadmin']);
     }
 
     /**

@@ -6,9 +6,10 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Organizacion;
 use App\Models\Suscripcion;
-use App\Models\User;
+use App\Models\Usuario;
 use App\Models\Socio;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 class OrganizacionPruebaSeeder extends Seeder
 {
@@ -55,34 +56,50 @@ class OrganizacionPruebaSeeder extends Seeder
         }
 
         // Asignar el primer usuario existente a esta organización, o crear uno nuevo
-        $primerUsuario = User::first();
+        $primerUsuario = Usuario::first();
 
         if (!$primerUsuario) {
             // Crear usuario de prueba
-            $primerUsuario = User::create([
-                'name' => 'Admin APR',
+            $primerUsuario = Usuario::create([
+                'nombre_usuario' => 'admin',
+                'nombre' => 'Admin',
+                'apellido' => 'APR',
                 'email' => 'admin@aprprueba.cl',
-                'password' => bcrypt('password123'),
+                'password' => Hash::make('admin123'),
                 'id_organizacion' => $organizacion->id,
-                'rol' => 'admin'
+                'rol' => 'admin',
+                'activo' => true
             ]);
-            $this->command->info("✓ Usuario de prueba creado: {$primerUsuario->email} (password: password123)");
+            $this->command->info("✓ Usuario de prueba creado: {$primerUsuario->nombre_usuario} (password: admin123)");
         } else {
             $primerUsuario->update([
                 'id_organizacion' => $organizacion->id,
                 'rol' => 'admin'
             ]);
-            $this->command->info("✓ Usuario '{$primerUsuario->name}' asignado como admin");
+            $this->command->info("✓ Usuario '{$primerUsuario->nombre} {$primerUsuario->apellido}' asignado como admin");
         }
 
-        // Asignar todos los socios existentes a esta organización
-        $socios = Socio::whereNull('id_organizacion')->get();
+        // Asignar todos los datos existentes a esta organización
+        $tablasAsignar = [
+            'socios', 'boletas', 'pagos', 'lecturas', 'historial_consumo',
+            'incidentes', 'cortes_suministro', 'renovaciones_medidores',
+            'funcionarios', 'sueldos', 'vacaciones', 'directiva',
+            'inventario', 'movimientos_inventario', 'movimientos_inventario_detalle',
+            'compras', 'giros_bancarios', 'configuraciones_tarifas', 'tarifas',
+            'notificaciones', 'recordatorios', 'eventos', 'tickets', 'ticket_respuestas',
+            'activos_fijos', 'rendiciones_mensuales',
+            'trabajos_realizados', 'transacciones_flow'
+        ];
 
-        foreach ($socios as $socio) {
-            $socio->update(['id_organizacion' => $organizacion->id]);
+        $totalAsignados = 0;
+        foreach ($tablasAsignar as $tabla) {
+            $count = \DB::table($tabla)
+                ->whereNull('id_organizacion')
+                ->update(['id_organizacion' => $organizacion->id]);
+            $totalAsignados += $count;
         }
 
-        $this->command->info("✓ {$socios->count()} socios asignados a la organización");
+        $this->command->info("✓ {$totalAsignados} registros asignados a la organización en todas las tablas");
 
         // Crear o buscar organización Enterprise de prueba
         $planEnterprise = Suscripcion::where('nombre', 'enterprise')->first();
@@ -123,8 +140,8 @@ class OrganizacionPruebaSeeder extends Seeder
         $this->command->info("===========================================");
         $this->command->info("Organización: APR Prueba Desarrollo");
         $this->command->info("Plan: Profesional");
-        $this->command->info("Usuario admin: {$primerUsuario->email}");
-        $this->command->info("Socios asignados: {$socios->count()}");
+        $this->command->info("Usuario: {$primerUsuario->nombre_usuario} (password: admin123)");
+        $this->command->info("Registros asignados: {$totalAsignados}");
         $this->command->info("===========================================\n");
     }
 }

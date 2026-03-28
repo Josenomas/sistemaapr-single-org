@@ -37,9 +37,13 @@ class FlowPaymentService
     public function crearPago($socioId, $boletaId, $monto, $email, $subject)
     {
         try {
-            // Validar datos
-            $socio = Socio::findOrFail($socioId);
-            $boleta = Boleta::findOrFail($boletaId);
+            // Validar datos solo si no son null (para cambios de plan pueden ser null)
+            if ($socioId !== null) {
+                $socio = Socio::findOrFail($socioId);
+            }
+            if ($boletaId !== null) {
+                $boleta = Boleta::findOrFail($boletaId);
+            }
 
             // Generar número de orden único
             $flowOrder = $this->generarNumeroOrden();

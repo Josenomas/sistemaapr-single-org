@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\BelongsToOrganizacion;
 use Carbon\Carbon;
 
 class Evento extends Model
 {
+    use BelongsToOrganizacion;
+
     protected $table = 'eventos';
 
     protected $fillable = [
