@@ -7,8 +7,8 @@
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-        <h1 style="margin: 0;">=ß Bienvenido a Sistema APR</h1>
-        <p style="margin: 10px 0 0 0;">Confirma tu direcciÛn de correo electrÛnico</p>
+        <h1 style="margin: 0;">üíß Bienvenido a Sistema APR</h1>
+        <p style="margin: 10px 0 0 0;">Confirma tu direcci√≥n de correo electr√≥nico</p>
     </div>
 
     <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
@@ -16,16 +16,16 @@
 
         <p>Gracias por registrar <strong>{{ $registro->nombre_apr }}</strong> en nuestro Sistema APR.</p>
 
-        <p>Para activar tu cuenta y comenzar tu perÌodo de prueba de <strong>30 dÌas gratis</strong>, necesitamos que verifiques tu direcciÛn de correo electrÛnico.</p>
+        <p>Para activar tu cuenta y comenzar tu per√≠odo de prueba de <strong>30 d√≠as gratis</strong>, necesitamos que verifiques tu direcci√≥n de correo electr√≥nico.</p>
 
         <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2563eb;">
-            <p style="margin: 10px 0;"><strong style="color: #2563eb;">OrganizaciÛn:</strong> {{ $registro->nombre_apr }}</p>
+            <p style="margin: 10px 0;"><strong style="color: #2563eb;">Organizaci√≥n:</strong> {{ $registro->nombre_apr }}</p>
             <p style="margin: 10px 0;"><strong style="color: #2563eb;">RUT:</strong> {{ $registro->rut }}</p>
             <p style="margin: 10px 0;"><strong style="color: #2563eb;">Email:</strong> {{ $registro->email_contacto }}</p>
         </div>
 
         <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <strong> Importante:</strong> Este enlace de verificaciÛn expirar· en <strong>48 horas</strong>.
+            <strong>‚ö†Ô∏è Importante:</strong> Este enlace de verificaci√≥n expirar√° en <strong>48 horas</strong>.
         </div>
 
         <center>
@@ -36,7 +36,7 @@
         </center>
 
         <p style="margin-top: 30px; font-size: 14px; color: #666;">
-            Si el botÛn no funciona, copia y pega este enlace en tu navegador:
+            Si el bot√≥n no funciona, copia y pega este enlace en tu navegador:
             <br><br>
             <a href="{{ url('/registro/verificar/' . $registro->token_verificacion) }}" style="color: #2563eb; word-break: break-all;">
                 {{ url('/registro/verificar/' . $registro->token_verificacion) }}
@@ -49,7 +49,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px;">
-        <p>Este es un correo autom·tico, por favor no responder.</p>
+        <p>Este es un correo automÔøΩtico, por favor no responder.</p>
         <p>&copy; {{ date('Y') }} Sistema APR. Todos los derechos reservados.</p>
     </div>
 </body>
