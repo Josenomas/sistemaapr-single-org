@@ -90,7 +90,7 @@ class RegistroController extends Controller
                 'estado' => 'pendiente',
                 'expira_en' => now()->addHours(48), // Expira en 48 horas
                 'ip_registro' => $request->ip(),
-                'id_suscripcion_deseada' => $validated['id_suscripcion'] ?? Suscripcion::where('nombre', 'basico')->first()->id,
+                'id_suscripcion_deseada' => $validated['id_suscripcion'] ?? Suscripcion::where('nombre', 'enterprise')->first()->id,
             ]);
 
             // Enviar email de verificación
