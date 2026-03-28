@@ -26,6 +26,12 @@
     </div>
 @endif
 
+<!-- Formulario oculto para eliminar logo (DEBE estar fuera del formulario principal) -->
+<form id="deleteLogoForm" action="{{ route('organizacion.deleteLogo') }}" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Información de la Organización</h3>
@@ -138,12 +144,6 @@
                     @enderror
                 </div>
             </div>
-
-            <!-- Formulario oculto para eliminar logo -->
-            <form id="deleteLogoForm" action="{{ route('organizacion.deleteLogo') }}" method="POST" style="display: none;">
-                @csrf
-                @method('DELETE')
-            </form>
 
             <!-- Dominio Personalizado (solo Enterprise) -->
             @if($organizacion->suscripcion && $organizacion->suscripcion->permite_dominio_personalizado)
