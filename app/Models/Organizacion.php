@@ -113,6 +113,11 @@ class Organizacion extends Model
      */
     public function suscripcionVencida()
     {
+        // Si está en prueba y se acabaron los días, está vencida
+        if ($this->enPrueba() && $this->dias_prueba_restantes <= 0) {
+            return true;
+        }
+
         return $this->estado_suscripcion === 'vencida' ||
                ($this->fecha_fin_suscripcion && Carbon::parse($this->fecha_fin_suscripcion)->isPast());
     }

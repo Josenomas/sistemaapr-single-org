@@ -15,6 +15,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        // Actualizar días de prueba restantes diariamente a las 00:00 (medianoche)
+        $schedule->command('suscripciones:actualizar-dias-prueba')
+                 ->daily()
+                 ->emailOutputOnFailure('admin@aprpitrelahue.cl');
+
         // Enviar notificaciones de boletas vencidas diariamente a las 9:00 AM
         $schedule->command('notificaciones:boletas-vencidas')
                  ->dailyAt('09:00')
