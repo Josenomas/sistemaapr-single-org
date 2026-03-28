@@ -160,27 +160,35 @@ class NoticiasController extends Controller
     /**
      * Vista pública de noticias (para mostrar en landing)
      */
-    public function publicas()
+    public function publicas($slug)
     {
+        // Buscar la organización por su slug
+        $organizacion = \App\Models\Organizacion::where('slug', $slug)->firstOrFail();
+
         $noticias = Noticia::publicadas()
+            ->where('id_organizacion', $organizacion->id)
             ->orderBy('fecha_publicacion', 'desc')
             ->paginate(12);
 
-        return view('noticias.publicas', compact('noticias'));
+        return view('noticias.publicas', compact('noticias', 'organizacion'));
     }
 
     /**
      * Vista pública de una noticia específica
      */
-    public function verPublica($slug)
+    public function verPublica($slugOrganizacion, $slugNoticia)
     {
-        $noticia = Noticia::where('slug', $slug)
+        // Buscar la organización por su slug
+        $organizacion = \App\Models\Organizacion::where('slug', $slugOrganizacion)->firstOrFail();
+
+        $noticia = Noticia::where('slug', $slugNoticia)
             ->where('estado', 'publicada')
+            ->where('id_organizacion', $organizacion->id)
             ->firstOrFail();
 
         // Incrementar vistas
         $noticia->increment('vistas');
 
-        return view('noticias.publica-detalle', compact('noticia'));
+        return view('noticias.publica-detalle', compact('noticia', 'organizacion'));
     }
 }

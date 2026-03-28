@@ -416,8 +416,8 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
 });
 
 // Rutas públicas de noticias (sin autenticación)
-Route::get('/noticias-publicas', [App\Http\Controllers\NoticiasController::class, 'publicas'])->name('noticias.publicas');
-Route::get('/noticia/{slug}', [App\Http\Controllers\NoticiasController::class, 'verPublica'])->name('noticia.publica');
+Route::get('/noticias-publicas/{slug}', [App\Http\Controllers\NoticiasController::class, 'publicas'])->name('noticias.publicas');
+Route::get('/noticia/{slugOrganizacion}/{slugNoticia}', [App\Http\Controllers\NoticiasController::class, 'verPublica'])->name('noticia.publica');
 
 // ========================================
 // PANEL SUPER-ADMIN

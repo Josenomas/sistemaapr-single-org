@@ -341,7 +341,7 @@
                 <i class="fas fa-plus"></i>
                 <span>Nueva Noticia</span>
             </a>
-            <a href="{{ route('noticias.publicas') }}" class="nav-item" target="_blank">
+            <a href="{{ route('noticias.publicas', auth()->user()->organizacion->slug) }}" class="nav-item" target="_blank">
                 <i class="fas fa-eye"></i>
                 <span>Vista Pública</span>
             </a>

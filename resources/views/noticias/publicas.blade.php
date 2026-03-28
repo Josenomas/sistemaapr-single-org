@@ -78,7 +78,7 @@
                     </div>
 
                     <div class="card-footer bg-white">
-                        <a href="{{ route('noticia.publica', $noticia->slug) }}"
+                        <a href="{{ route('noticia.publica', [$organizacion->slug, $noticia->slug]) }}"
                            class="btn btn-primary btn-sm w-100">
                             Leer más <i class="fas fa-arrow-right"></i>
                         </a>

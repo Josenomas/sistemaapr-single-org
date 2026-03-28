@@ -9,7 +9,7 @@
         Gestión de Noticias
     </h2>
     <div class="header-actions">
-        <a href="{{ route('noticias.publicas') }}" class="btn btn-info" target="_blank" title="Ver portal público">
+        <a href="{{ route('noticias.publicas', auth()->user()->organizacion->slug) }}" class="btn btn-info" target="_blank" title="Ver portal público">
             <i class="fas fa-eye"></i>
             Vista Pública
         </a>

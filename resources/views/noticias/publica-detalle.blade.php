@@ -28,7 +28,7 @@
 <body>
     <div class="container">
         <div class="mb-4">
-            <a href="{{ route('noticias.publicas') }}" class="btn btn-light">
+            <a href="{{ route('noticias.publicas', $organizacion->slug) }}" class="btn btn-light">
                 <i class="fas fa-arrow-left"></i> Volver a Noticias
             </a>
         </div>
@@ -101,7 +101,7 @@
                 </article>
 
                 <div class="text-center mt-4">
-                    <a href="{{ route('noticias.publicas') }}" class="btn btn-light">
+                    <a href="{{ route('noticias.publicas', $organizacion->slug) }}" class="btn btn-light">
                         <i class="fas fa-newspaper"></i> Ver más noticias
                     </a>
                     <a href="{{ route('landing') }}" class="btn btn-light">
