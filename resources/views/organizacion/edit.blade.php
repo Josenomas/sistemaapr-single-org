@@ -246,11 +246,11 @@
                                    class="color-input @error('color_primario') is-invalid @enderror"
                                    id="color_primario"
                                    name="color_primario"
-                                   value="{{ old('color_primario', $organizacion->color_primario ?? '#2563eb') }}">
+                                   value="{{ old('color_primario', $organizacion->color_primario ?? '#5e0a85') }}">
                             <input type="text"
                                    class="form-control color-text"
                                    id="color_primario_text"
-                                   value="{{ old('color_primario', $organizacion->color_primario ?? '#2563eb') }}"
+                                   value="{{ old('color_primario', $organizacion->color_primario ?? '#5e0a85') }}"
                                    readonly>
                         </div>
                         @error('color_primario')
