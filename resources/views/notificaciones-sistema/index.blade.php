@@ -82,8 +82,9 @@
 
                     <div class="notificacion-acciones">
                         @if($notificacion->url)
-                            <a href="{{ route('notificaciones-sistema.marcar-leida', $notificacion->id) }}"
-                               class="btn btn-sm btn-{{ $notificacion->color ?? 'primary' }}">
+                            <a href="{{ $notificacion->url }}"
+                               class="btn btn-sm btn-{{ $notificacion->color ?? 'primary' }}"
+                               onclick="marcarLeida({{ $notificacion->id }})">
                                 {{ $notificacion->texto_accion ?? 'Ver más' }}
                             </a>
                         @endif
