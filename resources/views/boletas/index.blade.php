@@ -213,7 +213,7 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     @endif
-                                    <a href="{{ route('boletas.imprimir', $boleta->id) }}"
+                                    <a href="{{ url('/pdf-boleta/' . $boleta->id) }}"
                                        class="btn btn-sm btn-secondary"
                                        title="Imprimir"
                                        target="_blank">

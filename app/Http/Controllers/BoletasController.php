@@ -484,11 +484,14 @@ class BoletasController extends Controller
     }
 
     /**
-     * Imprimir boleta (PDF)
+     * Imprimir boleta (PDF) - NUEVA VERSION CON WKHTMLTOPDF
      */
-    public function imprimir($id)
+    public function imprimirV2($id)
     {
-        $boleta = Boleta::activos()->with(['socio', 'lectura'])->findOrFail($id);
+        // LOG DE DEBUG - CONFIRMAR QUE ESTE METODO SE EJECUTA
+        \Log::info('===== EJECUTANDO imprimirV2() - NUEVO CODIGO =====', ['boleta_id' => $id]);
+
+        $boleta = Boleta::activos()->with(['socio.organizacion', 'lectura'])->findOrFail($id);
 
         // Obtener historial de consumo de los últimos 12 meses
         $historialConsumo = Boleta::activos()
@@ -529,11 +532,33 @@ class BoletasController extends Controller
         }
         $mesesAdeudados = $boletasPendientes->count();
 
-        // Generar PDF
-        $pdf = \PDF::loadView('boletas.pdf', compact('boleta', 'historialConsumo', 'ultimoPago', 'boletasPendientes', 'totalAdeudado', 'mesesAdeudados'));
+        // Generar PDF con wkhtmltopdf
+        $html = view('boletas.pdf_new', compact('boleta', 'historialConsumo', 'ultimoPago', 'boletasPendientes', 'totalAdeudado', 'mesesAdeudados'))->render();
 
-        // Configurar orientación y tamaño
-        $pdf->setPaper('letter', 'portrait');
+        // Guardar HTML temporal
+        $tempHtmlPath = public_path('temp_boleta_' . $boleta->id . '.html');
+        file_put_contents($tempHtmlPath, $html);
+
+        // Generar PDF
+        $pdfPath = storage_path('app/temp_boleta_' . $boleta->id . '.pdf');
+        $wkhtmltopdfPath = '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"';
+
+        // Convertir path a formato file:// con forward slashes
+        $fileUrl = 'file:///' . str_replace('\\', '/', $tempHtmlPath);
+
+        $command = $wkhtmltopdfPath . ' --enable-local-file-access --page-size Letter "' . $fileUrl . '" "' . $pdfPath . '" 2>&1';
+        exec($command, $output, $returnCode);
+
+        // Leer el PDF generado
+        if (!file_exists($pdfPath)) {
+            throw new \Exception('Error al generar PDF: ' . implode("\n", $output));
+        }
+
+        $pdfContent = file_get_contents($pdfPath);
+
+        // Eliminar archivos temporales
+        @unlink($tempHtmlPath);
+        @unlink($pdfPath);
 
         // Registrar actividad
         ActividadHelper::registrar(
@@ -542,8 +567,15 @@ class BoletasController extends Controller
             auth()->id()
         );
 
-        // Retornar PDF para descarga
-        return $pdf->download('Boleta-' . $boleta->numero_boleta . '.pdf');
+        // Retornar PDF para descarga SIN CACHÉ
+        $nombreArchivo = 'Boleta-' . $boleta->numero_boleta . '-' . time() . '.pdf';
+        return response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $nombreArchivo . '"',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => '0'
+        ]);
     }
 
     /**

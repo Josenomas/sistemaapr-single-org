@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Boleta;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 
 class BoletaMail extends Mailable
 {
@@ -45,7 +45,7 @@ class BoletaMail extends Mailable
                                                         });
 
         // Obtener último pago realizado
-        $ultimoPago = \DB::table('pagos')
+        $ultimoPago = DB::table('pagos')
             ->where('id_socio', $this->boleta->id_socio)
             ->orderBy('fecha_pago', 'desc')
             ->first();
@@ -54,21 +54,47 @@ class BoletaMail extends Mailable
         $boletasPendientes = \App\Models\Boleta::activos()
             ->where('id_socio', $this->boleta->id_socio)
             ->whereIn('estado', ['pendiente', 'vencida'])
+            ->with('pagos')
             ->orderBy('mes', 'asc')
             ->get();
 
-        $totalAdeudado = $boletasPendientes->sum('total');
+        // Calcular total adeudado considerando pagos parciales
+        $totalAdeudado = 0;
+        foreach ($boletasPendientes as $boletaPendiente) {
+            $totalPagado = $boletaPendiente->pagos->sum('monto_pagado');
+            $saldoPendiente = $boletaPendiente->total - $totalPagado;
+            $totalAdeudado += $saldoPendiente;
+        }
         $mesesAdeudados = $boletasPendientes->count();
 
-        // Generar PDF de la boleta
-        $pdf = PDF::loadView('boletas.pdf', [
-            'boleta' => $this->boleta,
-            'historialConsumo' => $historialConsumo,
-            'ultimoPago' => $ultimoPago,
-            'boletasPendientes' => $boletasPendientes,
-            'totalAdeudado' => $totalAdeudado,
-            'mesesAdeudados' => $mesesAdeudados
-        ]);
+        // Generar PDF con wkhtmltopdf
+        $boleta = $this->boleta;
+        $html = view('boletas.pdf_new', compact('boleta', 'historialConsumo', 'ultimoPago', 'boletasPendientes', 'totalAdeudado', 'mesesAdeudados'))->render();
+
+        // Guardar HTML temporal
+        $tempHtmlPath = public_path('temp_boleta_email_' . $this->boleta->id . '_' . time() . '.html');
+        file_put_contents($tempHtmlPath, $html);
+
+        // Generar PDF
+        $pdfPath = storage_path('app/temp_boleta_email_' . $this->boleta->id . '_' . time() . '.pdf');
+        $wkhtmltopdfPath = '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"';
+
+        // Convertir path a formato file://
+        $fileUrl = 'file:///' . str_replace('\\', '/', $tempHtmlPath);
+
+        $command = $wkhtmltopdfPath . ' --enable-local-file-access --page-size Letter "' . $fileUrl . '" "' . $pdfPath . '" 2>&1';
+        exec($command, $output, $returnCode);
+
+        // Leer el PDF generado
+        if (!file_exists($pdfPath)) {
+            throw new \Exception('Error al generar PDF para email: ' . implode("\n", $output));
+        }
+
+        $pdfContent = file_get_contents($pdfPath);
+
+        // Eliminar archivos temporales
+        @unlink($tempHtmlPath);
+        @unlink($pdfPath);
 
         return $this->subject('Boleta de Agua N° ' . $this->boleta->numero_boleta . ' - ' . $this->boleta->mes_texto)
                     ->view('emails.boleta')
@@ -76,7 +102,7 @@ class BoletaMail extends Mailable
                         'boleta' => $this->boleta,
                         'socio' => $this->boleta->socio
                     ])
-                    ->attachData($pdf->output(), 'boleta_' . $this->boleta->numero_boleta . '.pdf', [
+                    ->attachData($pdfContent, 'boleta_' . $this->boleta->numero_boleta . '.pdf', [
                         'mime' => 'application/pdf',
                     ]);
     }

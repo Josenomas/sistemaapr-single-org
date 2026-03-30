@@ -253,7 +253,7 @@
                                                            onclick="event.stopPropagation()">
                                                             <i class="fas fa-eye"></i>
                                                         </a>
-                                                        <a href="{{ route('boletas.imprimir', $boleta->id) }}"
+                                                        <a href="{{ url('/pdf-boleta/' . $boleta->id) }}"
                                                            class="btn-action btn-secondary"
                                                            target="_blank"
                                                            title="Imprimir"

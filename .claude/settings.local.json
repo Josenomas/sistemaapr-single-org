@@ -1,35 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php:*)",
-      "Bash(composer require:*)",
-      "Bash(composer remove:*)",
-      "Bash(composer:*)",
-      "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nAdd: Importador masivo de lecturas vía CSV\n\n- Nuevo controlador ImportarLecturasController\n- Vista de carga de archivo CSV con validaciones\n- Vista de confirmación antes de importar\n- Descarga de plantilla CSV de ejemplo\n- Validaciones: socio existe, formato mes, lectura numérica\n- Calcula automáticamente lectura anterior y consumo\n- Omite lecturas duplicadas (mismo socio y mes)\n- Transacciones seguras con rollback en caso de error\n- Solo para usuarios con permiso de lecturas\n\nFormato CSV:\nnumero_socio,mes,lectura_actual,fecha_lectura\nSOC-0001,2025-01,120.50,15/01/2025\n\nRuta: /lecturas-importar\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git push:*)",
-      "Bash(git commit:*)",
-      "Bash(git revert:*)",
-      "Bash(ssh:*)",
-      "Bash(grep:*)",
-      "Bash(mysql:*)",
-      "Read(//c/c/xampp/**)",
-      "Bash(git pull:*)",
-      "Bash(find:*)",
-      "Bash(cat:*)",
-      "Bash(git restore:*)",
-      "Bash(findstr:*)",
-      "Bash(curl:*)",
-      "Bash(Get-Content c:/xampp/htdocs/ssr/storage/logs/laravel.log -Tail 100)",
-      "Bash(Select-String -Pattern \"MovimientosInventario\" -Context 5)",
-      "Read(//c/xampp/htdocs/**)",
-      "Bash(dir)",
-      "Bash(for tabla in socios boletas lecturas pagos funcionarios inventario compras incidentes cortes_suministro renovaciones_medidores historial_consumo recordatorios sueldos vacaciones trabajos_realizados tickets configuraciones_tarifas transacciones_flow)",
-      "Bash(do if ! find database/migrations -name \"*create_$tabla_table.php\")",
-      "Bash(then echo \"FALTA: $tabla\")",
-      "Bash(fi)",
-      "Bash(done)",
-      "Bash(git rev-parse HEAD)"
+      "Bash(del boleta_temp_8_1774831417.html)",
+      "Bash(git add .)"
     ],
     "deny": [],
     "ask": []

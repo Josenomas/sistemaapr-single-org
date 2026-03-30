@@ -124,8 +124,29 @@ class Pago extends Model
      */
     public static function generarNumeroRecibo()
     {
-        $ultimo = self::orderBy('id', 'desc')->first();
-        $numero = $ultimo ? intval(substr($ultimo->numero_recibo, 4)) + 1 : 1;
-        return 'REC-' . str_pad($numero, 6, '0', STR_PAD_LEFT);
+        $organizacionId = auth()->user()->id_organizacion;
+        $prefijo = 'REC' . $organizacionId . '-';
+
+        // Buscar el último número de recibo de esta organización con este prefijo
+        $ultimo = self::where('numero_recibo', 'LIKE', $prefijo . '%')
+            ->orderBy('numero_recibo', 'desc')
+            ->lockForUpdate()
+            ->first();
+
+        $numero = 1;
+        if ($ultimo && preg_match('/' . preg_quote($prefijo) . '(\d+)/', $ultimo->numero_recibo, $matches)) {
+            $numero = intval($matches[1]) + 1;
+        }
+
+        // Verificar que no exista ya ese número
+        do {
+            $numeroRecibo = $prefijo . str_pad($numero, 6, '0', STR_PAD_LEFT);
+            $existe = self::where('numero_recibo', $numeroRecibo)->exists();
+            if ($existe) {
+                $numero++;
+            }
+        } while ($existe);
+
+        return $numeroRecibo;
     }
 }

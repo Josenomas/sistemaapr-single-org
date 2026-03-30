@@ -107,6 +107,91 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+    // RUTA ALTERNATIVA PARA GENERAR PDFs (sin OPcache)
+    Route::get('/pdf-boleta/{id}', function($id) {
+        \Log::info('===== INICIANDO GENERACION PDF RUTA DIRECTA =====', ['boleta_id' => $id]);
+
+        $boleta = App\Models\Boleta::with(['socio.organizacion', 'lectura'])->findOrFail($id);
+
+        if (!$boleta) {
+            return 'Boleta no encontrada';
+        }
+
+        \Log::info('Boleta encontrada', ['numero' => $boleta->numero_boleta]);
+
+        $historialConsumo = App\Models\Boleta::where('id_socio', $boleta->id_socio)
+            ->where('mes', '<=', $boleta->mes)
+            ->orderBy('mes', 'desc')
+            ->limit(12)
+            ->get()
+            ->reverse()
+            ->map(function($b) {
+                return [
+                    'mes' => $b->mes,
+                    'mes_texto' => $b->mes_texto,
+                    'consumo' => $b->consumo_m3
+                ];
+            });
+
+        $ultimoPago = DB::table('pagos')
+            ->where('id_socio', $boleta->id_socio)
+            ->orderBy('fecha_pago', 'desc')
+            ->first();
+
+        $boletasPendientes = App\Models\Boleta::where('id_socio', $boleta->id_socio)
+            ->whereIn('estado', ['pendiente', 'vencida'])
+            ->with('pagos')
+            ->orderBy('mes', 'asc')
+            ->get();
+
+        $totalAdeudado = 0;
+        foreach ($boletasPendientes as $boletaPendiente) {
+            $totalPagado = $boletaPendiente->pagos->sum('monto_pagado');
+            $saldoPendiente = $boletaPendiente->total - $totalPagado;
+            $totalAdeudado += $saldoPendiente;
+        }
+        $mesesAdeudados = $boletasPendientes->count();
+
+        // Generar HTML y guardarlo
+        \Log::info('Generando HTML con vista boletas.pdf_new');
+        $html = view('boletas.pdf_new', compact('boleta', 'historialConsumo', 'ultimoPago', 'boletasPendientes', 'totalAdeudado', 'mesesAdeudados'))->render();
+
+        $tempHtmlPath = public_path('boleta_temp_' . $boleta->id . '_' . time() . '.html');
+        file_put_contents($tempHtmlPath, $html);
+        \Log::info('HTML guardado', ['path' => $tempHtmlPath, 'size' => strlen($html)]);
+
+        // Generar PDF con wkhtmltopdf directamente
+        $pdfPath = storage_path('app/boleta_temp_' . $boleta->id . '_' . time() . '.pdf');
+        $wkhtmltopdfPath = '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"';
+        $fileUrl = 'file:///' . str_replace('\\', '/', $tempHtmlPath);
+
+        $command = $wkhtmltopdfPath . ' --enable-local-file-access --page-size Letter "' . $fileUrl . '" "' . $pdfPath . '" 2>&1';
+        \Log::info('Ejecutando wkhtmltopdf', ['command' => $command]);
+        exec($command, $output, $returnCode);
+        \Log::info('wkhtmltopdf ejecutado', ['returnCode' => $returnCode, 'output' => implode("\n", $output)]);
+
+        if (!file_exists($pdfPath)) {
+            \Log::error('PDF no generado', ['output' => $output]);
+            return '<h1>Error al generar PDF</h1><pre>' . implode("\n", $output) . '</pre>';
+        }
+
+        \Log::info('PDF generado exitosamente', ['path' => $pdfPath]);
+
+        $pdfContent = file_get_contents($pdfPath);
+
+        // Eliminar archivos temporales
+        @unlink($tempHtmlPath);
+        @unlink($pdfPath);
+
+        $nombreArchivo = 'Boleta-' . $boleta->numero_boleta . '.pdf';
+        return response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $nombreArchivo . '"',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate',
+            'Pragma' => 'no-cache'
+        ]);
+    });
+
     // ========================================
     // GESTIÓN DE SOCIOS
     // ========================================
@@ -151,7 +236,8 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
         Route::get('/boletas-generar', [BoletasController::class, 'generar'])->name('boletas.generar');
         Route::post('/boletas-generar', [BoletasController::class, 'storeGenerar'])->name('boletas.storeGenerar');
         Route::post('/boletas/{id}/anular', [BoletasController::class, 'anular'])->name('boletas.anular');
-        Route::get('/boletas/{id}/imprimir', [BoletasController::class, 'imprimir'])->name('boletas.imprimir');
+        Route::get('/boletas/{id}/imprimir', [BoletasController::class, 'imprimirV2'])->name('boletas.imprimir');
+        Route::get('/boletas/{id}/imprimir-v2', [BoletasController::class, 'imprimirV2'])->name('boletas.imprimir.v2');
         Route::get('/boletas-vencidas', [BoletasController::class, 'vencidas'])->name('boletas.vencidas');
         Route::post('/boletas/{id}/recordatorio', [BoletasController::class, 'enviarRecordatorio'])->name('boletas.recordatorio');
         Route::post('/boletas/{id}/enviar-email', [BoletasController::class, 'enviarEmail'])->name('boletas.enviar-email');

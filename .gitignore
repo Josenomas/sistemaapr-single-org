@@ -16,3 +16,12 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Archivos temporales de prueba
+/public/temp_*.html
+/public/test_*.html
+/public/debug_*.html
+/public/*.pdf
+/storage/app/temp_*.pdf
+nul
+public/nul

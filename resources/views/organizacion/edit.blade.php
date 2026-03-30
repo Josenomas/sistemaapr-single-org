@@ -213,13 +213,10 @@
 
                 @if($organizacion->dominio_personalizado && in_array($organizacion->estado_dominio_personalizado, ['pendiente_configuracion', 'verificado_dns']))
                     <div style="margin-top: 16px;">
-                        <form action="{{ route('organizacion.reverificar-dns') }}" method="POST" style="display: inline;">
-                            @csrf
-                            <button type="submit" class="btn btn-info btn-sm">
-                                <i class="fas fa-sync-alt"></i>
-                                Re-verificar DNS
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-info btn-sm" onclick="reverificarDNS()">
+                            <i class="fas fa-sync-alt"></i>
+                            Re-verificar DNS
+                        </button>
                         <small class="form-text">
                             Si ya configuraste el DNS, haz clic para verificar nuevamente.
                         </small>
@@ -273,6 +270,133 @@
                                    readonly>
                         </div>
                         @error('color_secundario')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pago Presencial -->
+            <div class="payment-section">
+                <h4 class="section-title">
+                    <i class="fas fa-money-bill-wave"></i>
+                    Información de Pago Presencial
+                </h4>
+                <p class="section-description">
+                    Configura la información que aparecerá en las boletas para pagos presenciales.
+                    Esta información se mostrará en los PDFs generados.
+                </p>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="pago_presencial_lugar" class="form-label">Lugar de Pago</label>
+                        <input type="text"
+                               class="form-control @error('pago_presencial_lugar') is-invalid @enderror"
+                               id="pago_presencial_lugar"
+                               name="pago_presencial_lugar"
+                               value="{{ old('pago_presencial_lugar', $organizacion->pago_presencial_lugar ?? 'Oficina APR') }}"
+                               placeholder="Oficina APR">
+                        <small class="form-text">Ejemplo: Oficina APR, Casa del Presidente</small>
+                        @error('pago_presencial_lugar')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label for="pago_presencial_dias" class="form-label">Días de Atención</label>
+                        <input type="text"
+                               class="form-control @error('pago_presencial_dias') is-invalid @enderror"
+                               id="pago_presencial_dias"
+                               name="pago_presencial_dias"
+                               value="{{ old('pago_presencial_dias', $organizacion->pago_presencial_dias ?? 'Lunes a Viernes') }}"
+                               placeholder="Lunes a Viernes">
+                        <small class="form-text">Ejemplo: Lunes a Viernes, Sábado y Domingo</small>
+                        @error('pago_presencial_dias')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label for="pago_presencial_horario" class="form-label">Horario de Atención</label>
+                        <input type="text"
+                               class="form-control @error('pago_presencial_horario') is-invalid @enderror"
+                               id="pago_presencial_horario"
+                               name="pago_presencial_horario"
+                               value="{{ old('pago_presencial_horario', $organizacion->pago_presencial_horario ?? '09:00 a 17:00 hrs') }}"
+                               placeholder="09:00 a 17:00 hrs">
+                        <small class="form-text">Ejemplo: 09:00 a 17:00 hrs, 08:00 a 14:00 hrs</small>
+                        @error('pago_presencial_horario')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transferencia Bancaria -->
+            <div class="bank-section">
+                <h4 class="section-title">
+                    <i class="fas fa-university"></i>
+                    Información de Transferencia Bancaria
+                </h4>
+                <p class="section-description">
+                    Configura los datos bancarios que aparecerán en las boletas para transferencias.
+                    Esta información se mostrará en los PDFs generados.
+                </p>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="banco" class="form-label">Banco</label>
+                        <input type="text"
+                               class="form-control @error('banco') is-invalid @enderror"
+                               id="banco"
+                               name="banco"
+                               value="{{ old('banco', $organizacion->banco) }}"
+                               placeholder="Banco Estado">
+                        <small class="form-text">Ejemplo: Banco Estado, Banco de Chile</small>
+                        @error('banco')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label for="tipo_cuenta" class="form-label">Tipo de Cuenta</label>
+                        <select class="form-control @error('tipo_cuenta') is-invalid @enderror"
+                                id="tipo_cuenta"
+                                name="tipo_cuenta">
+                            <option value="">Seleccione un tipo</option>
+                            <option value="Cuenta Corriente" {{ old('tipo_cuenta', $organizacion->tipo_cuenta) == 'Cuenta Corriente' ? 'selected' : '' }}>Cuenta Corriente</option>
+                            <option value="Cuenta Vista" {{ old('tipo_cuenta', $organizacion->tipo_cuenta) == 'Cuenta Vista' ? 'selected' : '' }}>Cuenta Vista</option>
+                            <option value="Cuenta de Ahorro" {{ old('tipo_cuenta', $organizacion->tipo_cuenta) == 'Cuenta de Ahorro' ? 'selected' : '' }}>Cuenta de Ahorro</option>
+                        </select>
+                        @error('tipo_cuenta')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="numero_cuenta" class="form-label">Número de Cuenta</label>
+                        <input type="text"
+                               class="form-control @error('numero_cuenta') is-invalid @enderror"
+                               id="numero_cuenta"
+                               name="numero_cuenta"
+                               value="{{ old('numero_cuenta', $organizacion->numero_cuenta) }}"
+                               placeholder="1234567890">
+                        <small class="form-text">Solo números, sin guiones ni espacios</small>
+                        @error('numero_cuenta')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label for="titular_cuenta" class="form-label">Titular de la Cuenta</label>
+                        <input type="text"
+                               class="form-control @error('titular_cuenta') is-invalid @enderror"
+                               id="titular_cuenta"
+                               name="titular_cuenta"
+                               value="{{ old('titular_cuenta', $organizacion->titular_cuenta ?? $organizacion->nombre_apr) }}"
+                               placeholder="{{ $organizacion->nombre_apr }}">
+                        <small class="form-text">Por defecto: {{ $organizacion->nombre_apr }}</small>
+                        @error('titular_cuenta')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -539,6 +663,30 @@
         margin-bottom: 20px;
     }
 
+    .payment-section {
+        background: #fef3c7;
+        border: 2px solid #f59e0b;
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .payment-section .section-title {
+        color: #92400e;
+    }
+
+    .bank-section {
+        background: #dbeafe;
+        border: 2px solid #3b82f6;
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .bank-section .section-title {
+        color: #1e40af;
+    }
+
     .section-title {
         color: #1e40af;
         font-size: 1rem;
@@ -650,6 +798,11 @@
         border: 1px solid #ef4444;
     }
 
+    .col-md-4 {
+        flex: 1;
+        min-width: 200px;
+    }
+
     .col-md-6 {
         grid-column: span 1;
     }
@@ -678,17 +831,21 @@
         const colorPrimario = document.getElementById('color_primario');
         const colorPrimarioText = document.getElementById('color_primario_text');
 
-        colorPrimario.addEventListener('input', function() {
-            colorPrimarioText.value = this.value;
-        });
+        if (colorPrimario && colorPrimarioText) {
+            colorPrimario.addEventListener('input', function() {
+                colorPrimarioText.value = this.value;
+            });
+        }
 
         // Sincronizar color picker secundario con input de texto
         const colorSecundario = document.getElementById('color_secundario');
         const colorSecundarioText = document.getElementById('color_secundario_text');
 
-        colorSecundario.addEventListener('input', function() {
-            colorSecundarioText.value = this.value;
-        });
+        if (colorSecundario && colorSecundarioText) {
+            colorSecundario.addEventListener('input', function() {
+                colorSecundarioText.value = this.value;
+            });
+        }
     });
 
     // Función para previsualizar colores
@@ -779,6 +936,22 @@
         `;
 
         alert(mensaje);
+    }
+
+    // Función para reverificar DNS sin interferir con el formulario principal
+    function reverificarDNS() {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("organizacion.reverificar-dns") }}';
+
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+
+        form.appendChild(csrfInput);
+        document.body.appendChild(form);
+        form.submit();
     }
 </script>
 @endsection

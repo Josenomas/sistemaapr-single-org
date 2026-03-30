@@ -39,6 +39,13 @@ class Organizacion extends Model
         'color_primario',
         'color_secundario',
         'activo',
+        'pago_presencial_dias',
+        'pago_presencial_horario',
+        'pago_presencial_lugar',
+        'banco',
+        'tipo_cuenta',
+        'numero_cuenta',
+        'titular_cuenta',
     ];
 
     protected $casts = [

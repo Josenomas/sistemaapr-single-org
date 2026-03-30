@@ -123,6 +123,13 @@ class OrganizacionController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,jpg,png,svg|max:2048', // Max 2MB
             'color_primario' => 'nullable|string|max:7|regex:/^#[0-9A-Fa-f]{6}$/',
             'color_secundario' => 'nullable|string|max:7|regex:/^#[0-9A-Fa-f]{6}$/',
+            'pago_presencial_dias' => 'nullable|string|max:100',
+            'pago_presencial_horario' => 'nullable|string|max:100',
+            'pago_presencial_lugar' => 'nullable|string|max:100',
+            'banco' => 'nullable|string|max:100',
+            'tipo_cuenta' => 'nullable|in:Cuenta Corriente,Cuenta Vista,Cuenta de Ahorro',
+            'numero_cuenta' => 'nullable|string|max:50',
+            'titular_cuenta' => 'nullable|string|max:200',
         ];
 
         // Si la suscripción permite dominio personalizado, agregar validación
