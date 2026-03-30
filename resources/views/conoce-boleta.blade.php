@@ -14,13 +14,13 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #28023D 0%, #100119 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
@@ -28,20 +28,22 @@
             text-align: center;
             color: white;
             margin-bottom: 30px;
-            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             padding: 40px 20px;
             border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
 
         .header h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .header p {
             font-size: 1.1rem;
-            opacity: 0.9;
+            opacity: 0.95;
         }
 
         .back-btn {
@@ -66,20 +68,34 @@
         .boleta-wrapper {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
             position: relative;
+        }
+
+        /* Estilos copiados de pdf_new.blade.php */
+        .boleta-content {
+            width: 21cm;
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            padding: 0.8cm;
+            font-family: 'Arial', sans-serif;
+            font-size: 9pt;
+            line-height: 1.3;
+            color: #000;
         }
 
         .info-section {
             position: relative;
-            cursor: help;
             transition: all 0.3s;
+            cursor: help;
         }
 
         .info-section:hover {
-            background: rgba(59, 130, 246, 0.05);
-            transform: scale(1.02);
+            background: rgba(103, 126, 234, 0.05);
+            box-shadow: 0 0 0 2px rgba(103, 126, 234, 0.3);
+            z-index: 10;
         }
 
         .tooltip {
@@ -88,13 +104,17 @@
             color: white;
             padding: 12px 16px;
             border-radius: 8px;
-            font-size: 0.875rem;
+            font-size: 13px;
             z-index: 1000;
-            width: 250px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            width: 280px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
+            line-height: 1.5;
+            top: 50%;
+            left: calc(100% + 15px);
+            transform: translateY(-50%);
         }
 
         .info-section:hover .tooltip {
@@ -104,142 +124,197 @@
         .tooltip::before {
             content: '';
             position: absolute;
-            top: -8px;
-            left: 20px;
+            top: 50%;
+            left: -8px;
+            transform: translateY(-50%);
             width: 0;
             height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-bottom: 8px solid #1f2937;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 8px solid #1f2937;
         }
 
-        /* Estilos de la boleta */
-        .boleta-header {
-            border: 3px solid #000;
-            padding: 20px;
-            margin-bottom: 20px;
+        /* Estilos de la boleta PDF */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #5e0a85;
         }
 
-        .boleta-title {
-            background: #000;
-            color: white;
-            padding: 10px;
-            text-align: center;
+        .logo-section h1 {
+            font-size: 18pt;
             font-weight: bold;
-            margin: -20px -20px 15px -20px;
+            color: #5e0a85;
+            margin: 0 0 2px 0;
         }
 
-        .boleta-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 15px;
+        .logo-section .subtitle {
+            font-size: 8pt;
+            color: #666;
         }
 
-        .info-block {
-            padding: 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            background: #f9fafb;
-            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.08);
+        .numero-boleta {
+            text-align: right;
         }
 
-        .info-block h3 {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-bottom: 8px;
+        .numero-boleta .label {
+            font-size: 7pt;
+            color: #666;
             text-transform: uppercase;
         }
 
-        .info-block .value {
-            font-size: 1.25rem;
+        .numero-boleta .numero {
+            font-size: 14pt;
             font-weight: bold;
-            color: #1f2937;
+            color: #5e0a85;
+            border: 2px solid #5e0a85;
+            padding: 4px 12px;
+            display: inline-block;
+            margin-top: 2px;
         }
 
-        .consumo-section {
-            border: 2px solid #000;
-            padding: 20px;
-            margin: 20px 0;
-            background: #f9fafb;
-            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.1);
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
         }
 
-        .consumo-title {
-            background: #000;
-            color: white;
+        .info-box {
+            background: #f5f5f5;
             padding: 8px;
-            text-align: center;
+            border-left: 3px solid #5e0a85;
+        }
+
+        .info-box .label {
+            font-size: 7pt;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .info-box .value {
+            font-size: 10pt;
             font-weight: bold;
-            margin: -20px -20px 15px -20px;
+            color: #000;
+        }
+
+        .consumo-bar {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 8px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .bar-container {
+            height: 30px;
+            background: #e8e8e8;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            transition: width 0.3s;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 7pt;
+            margin-top: 4px;
+            color: #666;
+        }
+
+        .chart-container {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 12px;
+            margin: 12px 0;
+            height: 120px;
         }
 
         .detalle-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin: 12px 0;
+            font-size: 8pt;
         }
 
         .detalle-table th,
         .detalle-table td {
-            border: 1px solid #000;
-            padding: 10px;
+            padding: 6px 8px;
             text-align: left;
+            border-bottom: 1px solid #ddd;
         }
 
         .detalle-table th {
-            background: #f3f4f6;
+            background: #f5f5f5;
             font-weight: bold;
+            font-size: 7pt;
+            text-transform: uppercase;
+            color: #666;
         }
 
         .total-section {
-            background: #000;
+            background: #5e0a85;
             color: white;
-            padding: 20px;
-            margin: 20px 0;
+            padding: 12px;
             text-align: center;
+            margin: 12px 0;
+            border-radius: 4px;
         }
 
         .total-section .label {
-            font-size: 1rem;
-            margin-bottom: 8px;
+            font-size: 8pt;
+            margin-bottom: 4px;
         }
 
         .total-section .amount {
-            font-size: 2rem;
+            font-size: 20pt;
             font-weight: bold;
         }
 
-        .instrucciones {
-            background: #e0f2fe;
-            border: 2px solid #0ea5e9;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 12px 0;
         }
 
-        .instrucciones h3 {
-            color: #0c4a6e;
-            margin-bottom: 10px;
+        .payment-box {
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #f8f8f8;
+            border-radius: 4px;
         }
 
-        .instrucciones ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .instrucciones li {
-            padding: 8px 0;
-            padding-left: 24px;
-            position: relative;
-        }
-
-        .instrucciones li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #0ea5e9;
+        .payment-box h4 {
+            font-size: 9pt;
+            color: #5e0a85;
+            margin-bottom: 6px;
             font-weight: bold;
+        }
+
+        .payment-box p {
+            font-size: 7pt;
+            color: #666;
+            margin: 2px 0;
+        }
+
+        .footer {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid #ddd;
+            font-size: 7pt;
+            color: #666;
+            text-align: center;
         }
 
         .legend {
@@ -247,7 +322,7 @@
             border: 2px solid #f59e0b;
             padding: 20px;
             border-radius: 8px;
-            margin-top: 30px;
+            margin: 30px 20px 20px 20px;
         }
 
         .legend h3 {
@@ -256,24 +331,40 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 14px;
         }
 
         .legend p {
             color: #78350f;
             line-height: 1.6;
+            font-size: 13px;
         }
 
         @media (max-width: 768px) {
-            .boleta-info-grid {
+            .tooltip {
+                position: fixed;
+                top: auto !important;
+                bottom: 20px;
+                left: 20px !important;
+                right: 20px;
+                width: auto;
+                transform: none;
+            }
+
+            .tooltip::before {
+                display: none;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .payment-methods {
                 grid-template-columns: 1fr;
             }
 
             .header h1 {
                 font-size: 1.8rem;
-            }
-
-            .boleta-wrapper {
-                padding: 20px;
             }
         }
     </style>
@@ -291,153 +382,211 @@
         </div>
 
         <div class="boleta-wrapper">
-            <!-- Header de la boleta -->
-            <div class="boleta-header info-section">
-                <div class="tooltip">
-                    <strong>Encabezado de la Boleta:</strong> Contiene los datos básicos de identificación del APR y el número de boleta único que identifica este documento.
-                </div>
-                <div class="boleta-title">
-                    BOLETA DE CONSUMO - AGUA POTABLE RURAL
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h2 style="margin-bottom: 5px;">TU APR</h2>
-                        <p style="color: #6b7280; font-size: 0.875rem;">AGUA POTABLE RURAL</p>
-                        <p style="color: #6b7280; font-size: 0.75rem;">Dirección | Teléfono | Email</p>
-                    </div>
-                    <div style="border: 3px double #000; padding: 15px; text-align: center;">
-                        <div style="font-size: 0.875rem; font-weight: bold;">BOLETA Nº</div>
-                        <div style="font-size: 1.5rem; font-weight: bold;">12345</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Fechas Importantes -->
-            <div class="boleta-info-grid">
-                <div class="info-block info-section">
+            <div class="boleta-content">
+                <!-- Header -->
+                <div class="header-section info-section">
                     <div class="tooltip">
-                        <strong>Período Facturado:</strong> Mes al que corresponde el consumo de agua que se está cobrando en esta boleta.
+                        <strong>Encabezado:</strong> Contiene el nombre de tu APR y el número único de boleta para identificación y control.
                     </div>
-                    <h3>📅 Período Facturado</h3>
-                    <div class="value">Diciembre 2025</div>
+                    <div class="logo-section">
+                        <h1>APR El Valle</h1>
+                        <div class="subtitle">AGUA POTABLE RURAL</div>
+                        <div class="subtitle" style="margin-top: 2px;">RUT: 22.334.567-3 | Pasaje 1 #64</div>
+                    </div>
+                    <div class="numero-boleta">
+                        <div class="label">Boleta Electrónica N°</div>
+                        <div class="numero">BOL-00000001</div>
+                    </div>
                 </div>
-                <div class="info-block info-section">
+
+                <!-- Info Grid -->
+                <div class="info-grid">
+                    <div class="info-box info-section">
+                        <div class="tooltip">
+                            <strong>Período Facturado:</strong> Mes al que corresponde el consumo de agua cobrado.
+                        </div>
+                        <div class="label">Período Facturado</div>
+                        <div class="value">Marzo 2026</div>
+                    </div>
+                    <div class="info-box info-section">
+                        <div class="tooltip">
+                            <strong>Fecha Emisión:</strong> Día en que se generó la boleta.
+                        </div>
+                        <div class="label">Fecha Emisión</div>
+                        <div class="value">30/03/2026</div>
+                    </div>
+                    <div class="info-box info-section">
+                        <div class="tooltip">
+                            <strong>Fecha Vencimiento:</strong> Fecha límite para pagar sin recargos por mora.
+                        </div>
+                        <div class="label">Fecha Vencimiento</div>
+                        <div class="value" style="color: #dc2626;">14/04/2026</div>
+                    </div>
+                    <div class="info-box info-section">
+                        <div class="tooltip">
+                            <strong>Estado:</strong> Indica si la boleta está pendiente de pago, pagada o vencida.
+                        </div>
+                        <div class="label">Estado</div>
+                        <div class="value" style="color: #f59e0b;">Pendiente</div>
+                    </div>
+                </div>
+
+                <!-- Datos del Socio -->
+                <div class="info-box info-section" style="grid-column: 1 / -1; margin-bottom: 12px;">
                     <div class="tooltip">
-                        <strong>Fecha de Vencimiento:</strong> Fecha límite para realizar el pago. Después de esta fecha se aplicarán recargos por mora.
+                        <strong>Información del Socio:</strong> Tus datos personales como usuario del servicio de agua potable.
                     </div>
-                    <h3>⏰ Fecha Vencimiento</h3>
-                    <div class="value" style="color: #dc2626;">13/12/2025</div>
+                    <div class="label">Información del Socio</div>
+                    <div class="value" style="margin-top: 4px;">
+                        N° Socio: SOC-0001 | RUT: 18762343-2 | Jose Roble dn<br>
+                        <span style="font-weight: normal; font-size: 8pt; color: #666;">Dirección: Pasaje 1 #64 | Teléfono: +56918412133</span>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Datos del Cliente -->
-            <div class="info-block info-section" style="margin: 20px 0;">
-                <div class="tooltip">
-                    <strong>Datos del Cliente:</strong> Información personal del socio que recibe el servicio de agua potable, incluyendo número de socio, RUT, nombre completo y dirección.
-                </div>
-                <h3>👤 Datos del Cliente</h3>
-                <div style="margin-top: 10px;">
-                    <p><strong>N° Socio:</strong> 001 | <strong>RUT:</strong> 12.345.678-9</p>
-                    <p><strong>Nombre:</strong> Juan Pérez González</p>
-                    <p><strong>Dirección:</strong> Calle Ejemplo #123</p>
-                </div>
-            </div>
-
-            <!-- Historial de Consumo -->
-            <div class="consumo-section info-section">
-                <div class="tooltip">
-                    <strong>Historial de Consumo:</strong> Gráfico que muestra tu consumo de agua de los últimos 12 meses. Te permite comparar y detectar variaciones inusuales en tu consumo.
-                </div>
-                <div class="consumo-title">
-                    HISTORIAL DE CONSUMO (ÚLTIMOS 12 MESES)
-                </div>
-                <div style="text-align: center; padding: 20px;">
-                    <p style="color: #6b7280;">Gráfico de barras mostrando consumo mensual</p>
-                    <p style="color: #6b7280; font-size: 0.875rem; margin-top: 10px;">
-                        * La barra negra indica el período actual
-                    </p>
-                </div>
-            </div>
-
-            <!-- Detalle de Consumo -->
-            <div class="consumo-section info-section">
-                <div class="tooltip">
-                    <strong>Detalle de Consumo y Cargos:</strong> Desglose completo de los cobros: consumo de agua en metros cúbicos (m³), cargo fijo mensual, y otros cargos adicionales si los hubiera.
-                </div>
-                <div class="consumo-title">
-                    DETALLE DE CONSUMO Y CARGOS
-                </div>
-                <table class="detalle-table">
-                    <thead>
-                        <tr>
-                            <th>DESCRIPCIÓN</th>
-                            <th>CANTIDAD</th>
-                            <th>UNIDAD</th>
-                            <th>MONTO</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>CONSUMO DE AGUA POTABLE</td>
-                            <td>10,00</td>
-                            <td>m³</td>
-                            <td><strong>$870</strong></td>
-                        </tr>
-                        <tr>
-                            <td>CARGO FIJO MENSUAL</td>
-                            <td>1</td>
-                            <td>mes</td>
-                            <td><strong>$8.850</strong></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Total a Pagar -->
-            <div class="total-section info-section">
-                <div class="tooltip">
-                    <strong>Total a Pagar:</strong> Monto total que debes pagar antes de la fecha de vencimiento. Incluye consumo, cargo fijo y otros cargos, menos descuentos si los hubiera.
-                </div>
-                <div class="label">TOTAL A PAGAR</div>
-                <div class="amount">$11.563</div>
-            </div>
-
-            <!-- Información de Último Pago -->
-            <div class="boleta-info-grid">
-                <div class="info-block info-section" style="background: #e8f5e9;">
+                <!-- Lectura del Medidor -->
+                <div class="info-box info-section" style="grid-column: 1 / -1; margin-bottom: 12px;">
                     <div class="tooltip">
-                        <strong>Último Pago Registrado:</strong> Información del último pago que realizaste, incluyendo fecha, monto y método de pago utilizado.
+                        <strong>Lectura del Medidor:</strong> Registro de las lecturas anterior y actual del medidor para calcular tu consumo real.
                     </div>
-                    <h3>💰 Último Pago</h3>
-                    <div style="font-size: 0.875rem; margin-top: 8px;">
-                        <p><strong>Fecha:</strong> 15/11/2025</p>
-                        <p><strong>Monto:</strong> $11.000</p>
-                        <p><strong>Método:</strong> Efectivo</p>
+                    <div class="label">Lectura del Medidor</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 6px;">
+                        <div>
+                            <div style="font-size: 7pt; color: #666;">Lectura anterior</div>
+                            <div style="font-size: 11pt; font-weight: bold;">0,00 m³</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 7pt; color: #666;">Lectura actual</div>
+                            <div style="font-size: 11pt; font-weight: bold;">0,00 m³</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 7pt; color: #666;">Consumo período</div>
+                            <div style="font-size: 11pt; font-weight: bold; color: #10b981;">10,00 m³</div>
+                        </div>
                     </div>
                 </div>
-                <div class="info-block info-section" style="background: #f1f8e9;">
-                    <div class="tooltip">
-                        <strong>Estado de Cuenta:</strong> Muestra si tienes deudas pendientes de meses anteriores o si tus pagos están al día.
-                    </div>
-                    <h3>✓ Estado de Cuenta</h3>
-                    <div style="font-size: 0.875rem; margin-top: 8px; color: #2e7d32; font-weight: bold;">
-                        ✓ No presenta deudas pendientes
-                    </div>
-                </div>
-            </div>
 
-            <!-- Instrucciones de Pago -->
-            <div class="instrucciones info-section">
-                <div class="tooltip">
-                    <strong>Instrucciones de Pago:</strong> Información sobre cómo y dónde puedes realizar el pago de tu boleta, incluyendo horarios de atención y datos bancarios para transferencias.
+                <!-- Barra de Consumo -->
+                <div class="consumo-bar info-section">
+                    <div class="tooltip">
+                        <strong>Barra de Consumo:</strong> Visualización gráfica de tu consumo actual respecto al máximo histórico. Te ayuda a identificar si estás consumiendo más o menos de lo habitual.
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 55%;"></div>
+                    </div>
+                    <div class="bar-label">
+                        <span>0 m³</span>
+                        <span style="font-weight: bold; color: #000;">10 m³ actuales</span>
+                        <span>18 m³ máx.</span>
+                    </div>
                 </div>
-                <h3>📍 Instrucciones de Pago</h3>
-                <ul>
-                    <li>Pague antes de la fecha de vencimiento para evitar recargos por mora.</li>
-                    <li>Conserve este documento como comprobante de pago.</li>
-                    <li>Puede pagar en oficina presencial o mediante transferencia bancaria.</li>
-                    <li>Ante cualquier consulta, comuníquese con nosotros.</li>
-                </ul>
+
+                <!-- Historial de Consumo -->
+                <div class="info-section">
+                    <div class="tooltip">
+                        <strong>Historial de Consumo:</strong> Gráfico de barras que muestra tu consumo de los últimos 12 meses. La barra negra representa el mes actual. Te permite identificar patrones y detectar fugas.
+                    </div>
+                    <div style="background: #f8f8f8; border: 1px solid #ddd; padding: 8px; margin: 12px 0;">
+                        <div style="font-size: 8pt; font-weight: bold; color: #5e0a85; margin-bottom: 6px;">HISTORIAL DE CONSUMO — ÚLTIMOS 12 MESES (M³)</div>
+                        <div class="chart-container">
+                            <div style="text-align: center; padding-top: 40px; color: #999; font-size: 8pt;">
+                                <i class="fas fa-chart-bar" style="font-size: 24px; margin-bottom: 8px;"></i><br>
+                                Gráfico de consumo mensual
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalle de Consumo -->
+                <div class="info-section">
+                    <div class="tooltip">
+                        <strong>Detalle de Consumo:</strong> Desglose de todos los cobros: consumo de agua, cargo fijo mensual, y otros cargos adicionales.
+                    </div>
+                    <div style="background: #f8f8f8; border: 1px solid #ddd; padding: 8px; margin: 12px 0;">
+                        <div style="font-size: 8pt; font-weight: bold; color: #5e0a85; margin-bottom: 6px;">DETALLE DE CONSUMO Y CARGOS</div>
+                        <table class="detalle-table">
+                            <thead>
+                                <tr>
+                                    <th>Concepto</th>
+                                    <th style="text-align: center;">Cantidad</th>
+                                    <th style="text-align: center;">Unidad</th>
+                                    <th style="text-align: right;">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="color: #666;">Consumo de agua</td>
+                                    <td style="text-align: center;">10,00</td>
+                                    <td style="text-align: center;">m³</td>
+                                    <td style="text-align: right; font-weight: bold;">$870</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #666;">Cargo fijo</td>
+                                    <td style="text-align: center;">1</td>
+                                    <td style="text-align: center;">mes</td>
+                                    <td style="text-align: right; font-weight: bold;">$8.850</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Total a Pagar -->
+                <div class="total-section info-section">
+                    <div class="tooltip">
+                        <strong>Total a Pagar:</strong> Monto total que debes cancelar antes de la fecha de vencimiento para evitar recargos.
+                    </div>
+                    <div class="label">TOTAL A PAGAR</div>
+                    <div class="amount">$11.563</div>
+                </div>
+
+                <!-- Estado de Cuenta -->
+                <div class="info-section">
+                    <div class="tooltip">
+                        <strong>Estado de Cuenta:</strong> Resumen de tu situación financiera, incluyendo el último pago realizado y deudas pendientes de meses anteriores.
+                    </div>
+                    <div style="background: #f8f8f8; border: 1px solid #ddd; padding: 12px; margin: 12px 0;">
+                        <div style="font-size: 8pt; font-weight: bold; color: #5e0a85; margin-bottom: 8px;">ESTADO DE CUENTA</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 8pt;">
+                            <div>
+                                <div style="color: #666; margin-bottom: 2px;">Último pago</div>
+                                <div style="font-weight: bold;">15/02/2026 — $10.500 — Efectivo</div>
+                            </div>
+                            <div>
+                                <div style="color: #666; margin-bottom: 2px;">Deuda pendiente</div>
+                                <div style="font-weight: bold; color: #10b981;">$0 (Sin deudas)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Métodos de Pago -->
+                <div class="payment-methods">
+                    <div class="payment-box info-section">
+                        <div class="tooltip">
+                            <strong>Pago Presencial:</strong> Información sobre dónde y cuándo puedes pagar en efectivo directamente en la oficina del APR.
+                        </div>
+                        <h4><i class="fas fa-money-bill-wave" style="color: #10b981;"></i> Pago Presencial</h4>
+                        <p><strong>Lugar:</strong> Oficina APR</p>
+                        <p><strong>Días:</strong> Lunes a Viernes</p>
+                        <p><strong>Horario:</strong> 09:00 a 17:00 hrs</p>
+                    </div>
+                    <div class="payment-box info-section">
+                        <div class="tooltip">
+                            <strong>Transferencia Bancaria:</strong> Datos bancarios para realizar transferencias electrónicas. Recuerda usar el número de boleta como referencia.
+                        </div>
+                        <h4><i class="fas fa-university" style="color: #3b82f6;"></i> Transferencia Bancaria</h4>
+                        <p><strong>Banco:</strong> [Nombre del Banco]</p>
+                        <p><strong>Cuenta:</strong> Cta. Cte. [N° cuenta]</p>
+                        <p><strong>RUT:</strong> 22.334.567-3</p>
+                        <p><strong>Ref.:</strong> BOL-00000001</p>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="footer">
+                    <p>Boleta generada electrónicamente el 30/03/2026 15:47:00 | Sistema APR El Valle</p>
+                    <p style="margin-top: 4px; font-size: 6pt;">Este documento es solo una guía educativa. No corresponde a una boleta real.</p>
+                </div>
             </div>
 
             <!-- Leyenda -->
@@ -447,8 +596,10 @@
                     ¿Cómo usar esta guía?
                 </h3>
                 <p>
-                    <strong>Pasa el cursor sobre cualquier sección</strong> de la boleta para ver una descripción detallada de lo que significa.
-                    Cada elemento tiene información específica que te ayudará a entender mejor tu consumo y los cargos aplicados.
+                    <strong>Pasa el cursor sobre cualquier sección</strong> de la boleta para ver una explicación detallada.
+                    Cada elemento resaltado tiene información específica que te ayudará a entender mejor tu consumo y los cargos aplicados.
+                    <br><br>
+                    <strong>Esta es una representación exacta de cómo se ve tu boleta real.</strong> Los datos mostrados son solo ejemplos educativos.
                 </p>
             </div>
         </div>
