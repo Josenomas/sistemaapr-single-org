@@ -95,6 +95,12 @@ Route::match(['get', 'post'], '/flow/retorno', [FlowController::class, 'retorno'
 Route::get('/comprobante-pago/{id}', [PagosController::class, 'comprobante'])->name('comprobante.publico');
 Route::get('/comprobante-pago/{id}/descargar', [PagosController::class, 'descargarComprobante'])->name('comprobante.descargar');
 
+// Rutas de suscripción (requieren autenticación pero NO suscripción activa, para renovación)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/suscripcion/renovar', [App\Http\Controllers\SuscripcionController::class, 'renovar'])->name('suscripcion.renovar');
+    Route::get('/suscripcion/estado', [App\Http\Controllers\SuscripcionController::class, 'estado'])->name('suscripcion.estado');
+});
+
 // Rutas protegidas (requieren autenticación y suscripción activa)
 Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
 
