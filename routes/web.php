@@ -162,7 +162,12 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
 
         // Generar PDF con wkhtmltopdf directamente
         $pdfPath = storage_path('app/boleta_temp_' . $boleta->id . '_' . time() . '.pdf');
-        $wkhtmltopdfPath = '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"';
+
+        // Detectar sistema operativo y usar ruta correcta
+        $wkhtmltopdfPath = PHP_OS_FAMILY === 'Windows'
+            ? '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"'
+            : '/usr/bin/wkhtmltopdf';
+
         $fileUrl = 'file:///' . str_replace('\\', '/', $tempHtmlPath);
 
         $command = $wkhtmltopdfPath . ' --enable-local-file-access --page-size Letter "' . $fileUrl . '" "' . $pdfPath . '" 2>&1';

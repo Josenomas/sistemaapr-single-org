@@ -541,7 +541,11 @@ class BoletasController extends Controller
 
         // Generar PDF
         $pdfPath = storage_path('app/temp_boleta_' . $boleta->id . '.pdf');
-        $wkhtmltopdfPath = '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"';
+
+        // Detectar sistema operativo y usar ruta correcta
+        $wkhtmltopdfPath = PHP_OS_FAMILY === 'Windows'
+            ? '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"'
+            : '/usr/bin/wkhtmltopdf';
 
         // Convertir path a formato file:// con forward slashes
         $fileUrl = 'file:///' . str_replace('\\', '/', $tempHtmlPath);

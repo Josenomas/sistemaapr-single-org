@@ -77,7 +77,11 @@ class BoletaMail extends Mailable
 
         // Generar PDF
         $pdfPath = storage_path('app/temp_boleta_email_' . $this->boleta->id . '_' . time() . '.pdf');
-        $wkhtmltopdfPath = '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"';
+
+        // Detectar sistema operativo y usar ruta correcta
+        $wkhtmltopdfPath = PHP_OS_FAMILY === 'Windows'
+            ? '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"'
+            : '/usr/bin/wkhtmltopdf';
 
         // Convertir path a formato file://
         $fileUrl = 'file:///' . str_replace('\\', '/', $tempHtmlPath);
