@@ -16,7 +16,8 @@ class UsuariosController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Usuario::query();
+        // Filtrar solo usuarios de la organización actual
+        $query = Usuario::where('id_organizacion', auth()->user()->id_organizacion);
 
         // Filtrar por rol si se proporciona
         if ($request->has('rol') && $request->rol) {
@@ -77,6 +78,9 @@ class UsuariosController extends Controller
         // Convertir permisos a JSON
         $validated['permisos'] = json_encode($request->permisos ?? []);
 
+        // Asignar organización del usuario autenticado
+        $validated['id_organizacion'] = auth()->user()->id_organizacion;
+
         $usuario = Usuario::create($validated);
 
         // Verificar si está cerca del límite (90%) y crear notificación
@@ -125,7 +129,8 @@ class UsuariosController extends Controller
      */
     public function show($id)
     {
-        $usuario = Usuario::findOrFail($id);
+        $usuario = Usuario::where('id_organizacion', auth()->user()->id_organizacion)
+                         ->findOrFail($id);
         return view('usuarios.show', compact('usuario'));
     }
 
@@ -134,7 +139,8 @@ class UsuariosController extends Controller
      */
     public function edit($id)
     {
-        $usuario = Usuario::findOrFail($id);
+        $usuario = Usuario::where('id_organizacion', auth()->user()->id_organizacion)
+                         ->findOrFail($id);
         return view('usuarios.edit', compact('usuario'));
     }
 
@@ -143,7 +149,8 @@ class UsuariosController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $usuario = Usuario::findOrFail($id);
+        $usuario = Usuario::where('id_organizacion', auth()->user()->id_organizacion)
+                         ->findOrFail($id);
 
         $validated = $request->validate([
             'nombre_usuario' => [
@@ -272,7 +279,8 @@ class UsuariosController extends Controller
      */
     public function destroy($id)
     {
-        $usuario = Usuario::findOrFail($id);
+        $usuario = Usuario::where('id_organizacion', auth()->user()->id_organizacion)
+                         ->findOrFail($id);
 
         // No permitir eliminar el propio usuario
         if ($usuario->id == auth()->id()) {
