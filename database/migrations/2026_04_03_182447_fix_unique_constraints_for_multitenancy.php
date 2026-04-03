@@ -66,6 +66,12 @@ return new class extends Migration
             $table->dropUnique('numero_ticket');
             $table->unique(['id_organizacion', 'numero_ticket'], 'unique_numero_ticket_org');
         });
+
+        // 10. FOLIOS_SII - Agregar id_organizacion y crear índice compuesto
+        Schema::table('folios_sii', function (Blueprint $table) {
+            // Agregar columna id_organizacion después de id
+            $table->unsignedBigInteger('id_organizacion')->nullable()->after('id')->index();
+        });
     }
 
     /**
@@ -119,6 +125,11 @@ return new class extends Migration
         Schema::table('tickets', function (Blueprint $table) {
             $table->dropUnique('unique_numero_ticket_org');
             $table->unique(['numero_ticket'], 'numero_ticket');
+        });
+
+        // Revertir folios_sii
+        Schema::table('folios_sii', function (Blueprint $table) {
+            $table->dropColumn('id_organizacion');
         });
     }
 };

@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Usuario;
+use App\Models\Organizacion;
 
 class FolioSII extends Model
 {
     protected $table = 'folios_sii';
 
     protected $fillable = [
+        'id_organizacion',
         'tipo_documento',
         'folio_desde',
         'folio_hasta',
@@ -36,6 +38,14 @@ class FolioSII extends Model
 
     const CREATED_AT = 'fecha_creacion';
     const UPDATED_AT = 'fecha_actualizacion';
+
+    /**
+     * Relación con la organización
+     */
+    public function organizacion()
+    {
+        return $this->belongsTo(Organizacion::class, 'id_organizacion');
+    }
 
     /**
      * Relación con el usuario que cargó el folio

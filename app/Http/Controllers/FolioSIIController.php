@@ -14,7 +14,9 @@ class FolioSIIController extends Controller
      */
     public function index(Request $request)
     {
-        $query = FolioSII::with('usuarioCarga');
+        $idOrganizacion = auth()->user()->id_organizacion;
+        $query = FolioSII::with('usuarioCarga')
+                         ->where('id_organizacion', $idOrganizacion);
 
         // Filtros
         if ($request->filled('tipo_documento')) {
@@ -27,10 +29,10 @@ class FolioSIIController extends Controller
 
         // Estadísticas
         $estadisticas = [
-            'total_folios' => FolioSII::activos()->count(),
-            'folios_activos' => FolioSII::where('estado', 'activo')->count(),
-            'folios_disponibles' => FolioSII::where('estado', 'activo')->sum('folios_disponibles'),
-            'folios_vencidos' => FolioSII::where('estado', 'vencido')->count(),
+            'total_folios' => FolioSII::where('id_organizacion', $idOrganizacion)->activos()->count(),
+            'folios_activos' => FolioSII::where('id_organizacion', $idOrganizacion)->where('estado', 'activo')->count(),
+            'folios_disponibles' => FolioSII::where('id_organizacion', $idOrganizacion)->where('estado', 'activo')->sum('folios_disponibles'),
+            'folios_vencidos' => FolioSII::where('id_organizacion', $idOrganizacion)->where('estado', 'vencido')->count(),
         ];
 
         $folios = $query->orderBy('fecha_creacion', 'desc')->paginate(20);
@@ -63,8 +65,11 @@ class FolioSIIController extends Controller
 
         DB::beginTransaction();
         try {
-            // Validar que no exista solapamiento de rangos para el mismo tipo de documento
-            $solapamiento = FolioSII::where('tipo_documento', $validated['tipo_documento'])
+            $idOrganizacion = auth()->user()->id_organizacion;
+
+            // Validar que no exista solapamiento de rangos para el mismo tipo de documento EN LA MISMA ORGANIZACIÓN
+            $solapamiento = FolioSII::where('id_organizacion', $idOrganizacion)
+                ->where('tipo_documento', $validated['tipo_documento'])
                 ->where('activo', true)
                 ->where(function($query) use ($validated) {
                     $query->whereBetween('folio_desde', [$validated['folio_desde'], $validated['folio_hasta']])
@@ -86,6 +91,7 @@ class FolioSIIController extends Controller
             $foliosDisponibles = $validated['folio_hasta'] - $validated['folio_desde'] + 1;
 
             $folio = FolioSII::create([
+                'id_organizacion' => $idOrganizacion,
                 'tipo_documento' => $validated['tipo_documento'],
                 'folio_desde' => $validated['folio_desde'],
                 'folio_hasta' => $validated['folio_hasta'],
@@ -123,7 +129,9 @@ class FolioSIIController extends Controller
      */
     public function show($id)
     {
-        $folio = FolioSII::with('usuarioCarga')->findOrFail($id);
+        $folio = FolioSII::where('id_organizacion', auth()->user()->id_organizacion)
+                         ->with('usuarioCarga')
+                         ->findOrFail($id);
 
         return view('folios-sii.show', compact('folio'));
     }
@@ -133,7 +141,8 @@ class FolioSIIController extends Controller
      */
     public function edit($id)
     {
-        $folio = FolioSII::findOrFail($id);
+        $folio = FolioSII::where('id_organizacion', auth()->user()->id_organizacion)
+                         ->findOrFail($id);
 
         return view('folios-sii.edit', compact('folio'));
     }
@@ -143,7 +152,8 @@ class FolioSIIController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $folio = FolioSII::findOrFail($id);
+        $folio = FolioSII::where('id_organizacion', auth()->user()->id_organizacion)
+                         ->findOrFail($id);
 
         $validated = $request->validate([
             'fecha_vencimiento' => 'required|date',
@@ -195,7 +205,8 @@ class FolioSIIController extends Controller
     {
         DB::beginTransaction();
         try {
-            $folio = FolioSII::findOrFail($id);
+            $folio = FolioSII::where('id_organizacion', auth()->user()->id_organizacion)
+                             ->findOrFail($id);
 
             // Solo permitir eliminar si no se han usado folios
             if ($folio->folio_actual >= $folio->folio_desde) {
@@ -227,8 +238,10 @@ class FolioSIIController extends Controller
     public function obtenerSiguiente(Request $request)
     {
         $tipoDocumento = $request->input('tipo_documento', 'boleta');
+        $idOrganizacion = auth()->user()->id_organizacion;
 
-        $folio = FolioSII::disponibles()
+        $folio = FolioSII::where('id_organizacion', $idOrganizacion)
+                         ->disponibles()
                          ->tipoDocumento($tipoDocumento)
                          ->orderBy('fecha_creacion', 'asc')
                          ->first();
