@@ -194,7 +194,7 @@ class MovimientosInventarioController extends Controller
 
             DB::commit();
 
-            return redirect()->route('movimientos-inventario.imprimir', $movimiento->id)
+            return redirect()->route('movimientos-inventario.show', $movimiento->id)
                            ->with('success', 'Movimiento con ' . count($validated['productos']) . ' producto(s) registrado exitosamente.');
         } catch (\Exception $e) {
             DB::rollBack();
