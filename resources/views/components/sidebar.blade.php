@@ -91,6 +91,7 @@
             <div class="nav-section-title">
                 <i class="fas fa-file-invoice-dollar"></i>
                 <span>Rendición Mensual</span>
+                <span class="badge-beta">BETA</span>
             </div>
             <a href="{{ route('rendiciones-mensuales.index') }}" class="nav-item {{ request()->routeIs('rendiciones-mensuales.*') ? 'active' : '' }}">
                 <i class="fas fa-list"></i>
@@ -434,6 +435,20 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        position: relative;
+    }
+
+    .badge-beta {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        margin-left: auto;
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
     }
 
     .nav-item {
