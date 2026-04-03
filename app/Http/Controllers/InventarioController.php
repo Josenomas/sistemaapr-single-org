@@ -6,6 +6,7 @@ use App\Models\Inventario;
 use App\Models\Auditoria;
 use App\Helpers\ActividadHelper;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
 class InventarioController extends Controller
@@ -58,7 +59,12 @@ class InventarioController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'codigo_producto' => 'required|string|max:50|unique:inventario,codigo_producto',
+            'codigo_producto' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('inventario', 'codigo_producto')->where('id_organizacion', auth()->user()->id_organizacion)
+            ],
             'nombre' => 'required|string|max:200',
             'categoria' => 'required|in:materiales,equipos,herramientas,insumos,quimicos,repuestos,otro',
             'descripcion' => 'nullable|string',
@@ -135,7 +141,14 @@ class InventarioController extends Controller
         $producto = Inventario::where('activo', 1)->findOrFail($id);
 
         $validated = $request->validate([
-            'codigo_producto' => 'required|string|max:50|unique:inventario,codigo_producto,' . $id,
+            'codigo_producto' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('inventario', 'codigo_producto')
+                    ->where('id_organizacion', auth()->user()->id_organizacion)
+                    ->ignore($id)
+            ],
             'nombre' => 'required|string|max:200',
             'categoria' => 'required|in:materiales,equipos,herramientas,insumos,quimicos,repuestos,otro',
             'descripcion' => 'nullable|string',

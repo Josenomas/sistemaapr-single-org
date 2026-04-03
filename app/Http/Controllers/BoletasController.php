@@ -387,8 +387,10 @@ class BoletasController extends Controller
 
         DB::beginTransaction();
         try {
-            // Llamar al procedimiento almacenado
-            DB::statement('CALL sp_generar_boletas_mes(?)', [$mes]);
+            $idOrganizacion = auth()->user()->id_organizacion;
+
+            // Llamar al procedimiento almacenado con filtro de organización
+            DB::statement('CALL sp_generar_boletas_mes(?, ?)', [$mes, $idOrganizacion]);
 
             // Obtener boletas recién generadas
             $boletasGeneradas = Boleta::activos()

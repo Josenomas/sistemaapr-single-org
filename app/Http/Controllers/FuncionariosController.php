@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Funcionario;
 use App\Models\Auditoria;
 use App\Helpers\ActividadHelper;
@@ -53,7 +54,12 @@ class FuncionariosController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'rut' => 'required|string|max:12|unique:funcionarios,rut',
+            'rut' => [
+                'required',
+                'string',
+                'max:12',
+                Rule::unique('funcionarios', 'rut')->where('id_organizacion', auth()->user()->id_organizacion)
+            ],
             'nombre' => 'required|string|max:100',
             'apellido_paterno' => 'required|string|max:100',
             'apellido_materno' => 'nullable|string|max:100',
@@ -115,7 +121,14 @@ class FuncionariosController extends Controller
         $funcionario = Funcionario::findOrFail($id);
 
         $validated = $request->validate([
-            'rut' => 'required|string|max:12|unique:funcionarios,rut,' . $id,
+            'rut' => [
+                'required',
+                'string',
+                'max:12',
+                Rule::unique('funcionarios', 'rut')
+                    ->where('id_organizacion', auth()->user()->id_organizacion)
+                    ->ignore($id)
+            ],
             'nombre' => 'required|string|max:100',
             'apellido_paterno' => 'required|string|max:100',
             'apellido_materno' => 'nullable|string|max:100',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\ActivoFijo;
 use App\Models\Usuario;
 use App\Helpers\ActividadHelper;
@@ -65,7 +66,12 @@ class ActivosFijosController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'codigo_activo' => 'required|string|max:50|unique:activos_fijos,codigo_activo',
+            'codigo_activo' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('activos_fijos', 'codigo_activo')->where('id_organizacion', auth()->user()->id_organizacion)
+            ],
             'nombre' => 'required|string|max:150',
             'categoria' => 'required|in:mobiliario,equipos_computo,equipos_oficina,herramientas,vehiculos,equipamiento_tecnico,otros',
             'descripcion' => 'nullable|string',
@@ -144,7 +150,14 @@ class ActivosFijosController extends Controller
         $activo = ActivoFijo::findOrFail($id);
 
         $validated = $request->validate([
-            'codigo_activo' => 'required|string|max:50|unique:activos_fijos,codigo_activo,' . $id,
+            'codigo_activo' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('activos_fijos', 'codigo_activo')
+                    ->where('id_organizacion', auth()->user()->id_organizacion)
+                    ->ignore($id)
+            ],
             'nombre' => 'required|string|max:150',
             'categoria' => 'required|in:mobiliario,equipos_computo,equipos_oficina,herramientas,vehiculos,equipamiento_tecnico,otros',
             'descripcion' => 'nullable|string',

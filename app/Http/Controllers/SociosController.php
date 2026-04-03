@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Socio;
 use App\Models\Auditoria;
 use App\Helpers\ActividadHelper;
@@ -50,7 +51,10 @@ class SociosController extends Controller
         }
 
         $validated = $request->validate([
-            'rut' => 'required|unique:socios,rut',
+            'rut' => [
+                'required',
+                Rule::unique('socios', 'rut')->where('id_organizacion', auth()->user()->id_organizacion)
+            ],
             'nombre' => 'required|string|max:100',
             'apellido_paterno' => 'required|string|max:100',
             'apellido_materno' => 'nullable|string|max:100',
@@ -141,7 +145,12 @@ class SociosController extends Controller
         $socio = Socio::findOrFail($id);
 
         $validated = $request->validate([
-            'rut' => 'required|unique:socios,rut,' . $id,
+            'rut' => [
+                'required',
+                Rule::unique('socios', 'rut')
+                    ->where('id_organizacion', auth()->user()->id_organizacion)
+                    ->ignore($id)
+            ],
             'nombre' => 'required|string|max:100',
             'apellido_paterno' => 'required|string|max:100',
             'apellido_materno' => 'nullable|string|max:100',
