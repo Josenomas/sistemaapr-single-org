@@ -13,10 +13,6 @@
             <i class="fas fa-print"></i>
             Imprimir Manifiesto
         </a>
-        <a href="{{ route('movimientos-inventario.edit', $movimiento->id) }}" class="btn btn-warning">
-            <i class="fas fa-edit"></i>
-            Editar
-        </a>
         <a href="{{ route('movimientos-inventario.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i>
             Volver
@@ -261,10 +257,6 @@
                 </h3>
             </div>
             <div class="card-body">
-                <a href="{{ route('movimientos-inventario.edit', $movimiento->id) }}" class="action-btn">
-                    <i class="fas fa-edit"></i>
-                    Editar Movimiento
-                </a>
                 <a href="{{ route('inventario.index') }}" class="action-btn">
                     <i class="fas fa-warehouse"></i>
                     Ver Inventario
