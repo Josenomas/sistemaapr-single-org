@@ -61,9 +61,47 @@ class PagosSuscripcionController extends Controller
                 ->with('error', 'Este pago ya fue procesado');
         }
 
-        // Aquí integraríamos con Flow para procesar el pago
-        // Por ahora redirigimos al upgrade que ya tiene Flow integrado
-        return redirect()->route('organizacion.upgrade')
-            ->with('info', 'Contacta al administrador para procesar el pago de suscripción');
+        try {
+            // Crear pago con Flow
+            $flowService = app(\App\Services\FlowPaymentService::class);
+
+            $resultado = $flowService->crearPago(
+                null, // No es pago de socio
+                null, // No es pago de boleta
+                $pago->monto,
+                auth()->user()->email,
+                "Renovación suscripción - {$pago->organizacion->nombre_apr}"
+            );
+
+            if ($resultado['success']) {
+                // Guardar token de Flow en el pago
+                $pago->update([
+                    'token_flow' => $resultado['token'],
+                    'orden_compra' => $resultado['transaccion']->flow_order,
+                ]);
+
+                // Marcar transacción como pago de suscripción
+                $resultado['transaccion']->update([
+                    'id_organizacion' => $pago->id_organizacion,
+                    'tipo_pago' => 'suscripcion',
+                    'referencia_id' => $pago->id,
+                ]);
+
+                // Redirigir a Flow
+                return redirect($resultado['url']);
+            }
+
+            return redirect()->route('organizacion.pagos-suscripcion')
+                ->with('error', $resultado['message'] ?? 'Error al iniciar el pago');
+
+        } catch (\Exception $e) {
+            \Log::error('Error al crear pago de suscripción', [
+                'pago_id' => $pago->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('organizacion.pagos-suscripcion')
+                ->with('error', 'Error al procesar el pago. Por favor, intenta nuevamente.');
+        }
     }
 }

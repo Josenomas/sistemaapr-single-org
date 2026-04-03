@@ -52,7 +52,67 @@
                 <div class="mb-8">
                     <h2 class="text-2xl font-semibold text-gray-800 mb-4">Opciones de renovación</h2>
 
-                    <!-- Opción 1: Contactar administrador -->
+                    <!-- Opción 1: Pagar en línea con Flow -->
+                    @php
+                        $pagoPendiente = \App\Models\PagoSuscripcion::where('id_organizacion', $organizacion->id)
+                            ->where('estado', 'pendiente')
+                            ->orderBy('created_at', 'desc')
+                            ->first();
+
+                        if (!$pagoPendiente && $organizacion->suscripcion) {
+                            // Crear pago pendiente si no existe
+                            $pagoPendiente = \App\Models\PagoSuscripcion::create([
+                                'id_organizacion' => $organizacion->id,
+                                'id_suscripcion' => $organizacion->id_suscripcion,
+                                'monto' => $organizacion->suscripcion->precio_mensual,
+                                'estado' => 'pendiente',
+                                'fecha_vencimiento' => now()->addDays(7),
+                            ]);
+                        }
+                    @endphp
+
+                    @if($pagoPendiente)
+                    <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-4">
+                        <div class="flex items-start">
+                            <svg class="w-8 h-8 text-green-600 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                            </svg>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Pagar en línea (Recomendado)</h3>
+                                <p class="text-gray-700 mb-3">
+                                    Renueva tu suscripción de forma inmediata usando WebPay, tarjetas de crédito o débito a través de Flow.
+                                </p>
+                                <div class="bg-white border border-green-200 rounded-lg p-4 mb-4">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <p class="text-sm text-gray-600">Plan actual:</p>
+                                            <p class="text-xl font-bold text-gray-900">{{ $organizacion->suscripcion->nombre }}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-sm text-gray-600">Monto a pagar:</p>
+                                            <p class="text-2xl font-bold text-green-600">${{ number_format($pagoPendiente->monto, 0, ',', '.') }}</p>
+                                            <p class="text-xs text-gray-500">Por 1 mes</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <form action="{{ route('organizacion.pagos-suscripcion.pagar', $pagoPendiente->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-4 rounded-lg transition shadow-lg hover:shadow-xl transform hover:scale-105">
+                                        <span class="flex items-center">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            Pagar ahora con Flow
+                                        </span>
+                                    </button>
+                                </form>
+                                <p class="text-xs text-gray-500 mt-2">Pago seguro procesado por Flow. Tu acceso será reactivado inmediatamente.</p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Opción 2: Contactar administrador -->
                     <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 mb-4">
                         <div class="flex items-start">
                             <svg class="w-8 h-8 text-purple-600 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

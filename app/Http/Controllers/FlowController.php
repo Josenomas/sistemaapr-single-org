@@ -50,12 +50,15 @@ class FlowController extends Controller
                 // Si el pago fue exitoso, procesar según tipo de transacción
                 if ($transaccion->estado === 'pagado') {
                     try {
-                        // Verificar si es un cambio de plan
-                        $cambioPlan = \App\Models\CambioPlan::where('token_flow', $token)->first();
-
-                        if ($cambioPlan) {
-                            // Es un cambio de plan - aplicar el cambio
-                            if ($cambioPlan->aplicar()) {
+                        // Verificar tipo de pago
+                        if ($transaccion->tipo_pago === 'suscripcion') {
+                            // Es un pago de suscripción
+                            $this->procesarPagoSuscripcion($transaccion, $responseData);
+                            Log::info('Flow - Pago de suscripción procesado', ['token' => $token]);
+                        } elseif ($transaccion->tipo_pago === 'cambio_plan') {
+                            // Es un cambio de plan
+                            $cambioPlan = \App\Models\CambioPlan::find($transaccion->referencia_id);
+                            if ($cambioPlan && $cambioPlan->aplicar()) {
                                 Log::info('Flow - Cambio de plan aplicado', [
                                     'token' => $token,
                                     'cambio_plan_id' => $cambioPlan->id,
@@ -140,55 +143,63 @@ class FlowController extends Controller
                 'flow_order' => $transaccion->flow_order,
             ]);
 
-            // Verificar si es un cambio de plan
-            $cambioPlan = \App\Models\CambioPlan::where('token_flow', $token)->first();
-
-            // Redirigir según estado actual de la transacción
+            // Redirigir según estado actual de la transacción y tipo de pago
             if ($transaccion->estado === 'pagado') {
-                if ($cambioPlan) {
+                // Pago exitoso - redirigir según tipo
+                if ($transaccion->tipo_pago === 'suscripcion') {
+                    // Es un pago de suscripción
+                    return redirect()->route('dashboard')
+                                   ->with('success', '¡Suscripción renovada exitosamente! Tu acceso ha sido extendido por un mes más.');
+                } elseif ($transaccion->tipo_pago === 'cambio_plan') {
                     // Es un cambio de plan
                     return redirect()->route('organizacion.index')
                                    ->with('success', '¡Cambio de plan realizado exitosamente! Tu plan ha sido actualizado.');
+                } else {
+                    // Es un pago de boleta - buscar el pago registrado por el webhook
+                    $pago = Pago::where('numero_comprobante', 'LIKE', '%' . $transaccion->flow_order . '%')
+                               ->orderBy('id', 'desc')
+                               ->first();
+
+                    Log::info('Flow - Búsqueda de pago confirmado', [
+                        'flow_order' => $transaccion->flow_order,
+                        'pago_encontrado' => $pago ? 'SI' : 'NO',
+                        'pago_id' => $pago->id ?? null,
+                    ]);
+
+                    if ($pago) {
+                        return redirect()->route('comprobante.publico', $pago->id)
+                                       ->with('success', '¡Pago realizado exitosamente!');
+                    }
+
+                    // Si el webhook aún no procesó, informar espera
+                    return redirect()->route('pagos.index')
+                                   ->with('success', '¡Pago realizado exitosamente! El comprobante estará disponible en unos momentos.');
                 }
-
-                // Es un pago de boleta - buscar el pago registrado por el webhook
-                $pago = Pago::where('numero_comprobante', 'LIKE', '%' . $transaccion->flow_order . '%')
-                           ->orderBy('id', 'desc')
-                           ->first();
-
-                Log::info('Flow - Búsqueda de pago confirmado', [
-                    'flow_order' => $transaccion->flow_order,
-                    'pago_encontrado' => $pago ? 'SI' : 'NO',
-                    'pago_id' => $pago->id ?? null,
-                ]);
-
-                if ($pago) {
-                    return redirect()->route('comprobante.publico', $pago->id)
-                                   ->with('success', '¡Pago realizado exitosamente!');
-                }
-
-                // Si el webhook aún no procesó, informar espera
-                return redirect()->route('pagos.index')
-                               ->with('success', '¡Pago realizado exitosamente! El comprobante estará disponible en unos momentos.');
 
             } elseif ($transaccion->estado === 'rechazado') {
-                if ($cambioPlan) {
-                    // Cambio de plan rechazado
+                // Pago rechazado
+                if ($transaccion->tipo_pago === 'suscripcion') {
+                    return redirect()->route('suscripcion.renovar')
+                                   ->with('error', 'El pago fue rechazado. Por favor, intente nuevamente.');
+                } elseif ($transaccion->tipo_pago === 'cambio_plan') {
                     return redirect()->route('organizacion.upgrade')
                                    ->with('error', 'El pago fue rechazado. Por favor, intente nuevamente.');
+                } else {
+                    return redirect()->route('pagos.create', ['boleta_id' => $transaccion->id_boleta])
+                                   ->with('error', 'El pago fue rechazado. Por favor, intente nuevamente.');
                 }
-
-                return redirect()->route('pagos.create', ['boleta_id' => $transaccion->id_boleta])
-                               ->with('error', 'El pago fue rechazado. Por favor, intente nuevamente.');
             } else {
                 // Estado pendiente o anulado
-                if ($cambioPlan) {
+                if ($transaccion->tipo_pago === 'suscripcion') {
+                    return redirect()->route('suscripcion.renovar')
+                                   ->with('warning', 'El pago está pendiente de confirmación. Si ya completó el pago, espere unos momentos.');
+                } elseif ($transaccion->tipo_pago === 'cambio_plan') {
                     return redirect()->route('organizacion.upgrade')
                                    ->with('warning', 'El pago está pendiente de confirmación. Si ya completó el pago, espere unos momentos.');
+                } else {
+                    return redirect()->route('pagos.create', ['boleta_id' => $transaccion->id_boleta])
+                                   ->with('warning', 'El pago está pendiente de confirmación. Si ya completó el pago, espere unos momentos.');
                 }
-
-                return redirect()->route('pagos.create', ['boleta_id' => $transaccion->id_boleta])
-                               ->with('warning', 'El pago está pendiente de confirmación. Si ya completó el pago, espere unos momentos.');
             }
 
         } catch (\Exception $e) {
@@ -373,5 +384,92 @@ class FlowController extends Controller
                                      ->findOrFail($id);
 
         return view('flow.transaccion', compact('transaccion'));
+    }
+
+    /**
+     * Procesar pago de suscripción confirmado
+     */
+    private function procesarPagoSuscripcion($transaccion, $responseData)
+    {
+        try {
+            // Buscar el pago de suscripción
+            $pagoSuscripcion = \App\Models\PagoSuscripcion::find($transaccion->referencia_id);
+
+            if (!$pagoSuscripcion) {
+                Log::error('Flow - PagoSuscripcion no encontrado', [
+                    'referencia_id' => $transaccion->referencia_id,
+                    'transaccion_id' => $transaccion->id,
+                ]);
+                return;
+            }
+
+            // Verificar que no esté ya procesado
+            if ($pagoSuscripcion->estado === 'pagado') {
+                Log::info('Flow - PagoSuscripcion ya procesado', [
+                    'pago_id' => $pagoSuscripcion->id,
+                ]);
+                return;
+            }
+
+            DB::beginTransaction();
+
+            // Marcar pago como pagado
+            $pagoSuscripcion->marcarComoPagado(
+                $transaccion->token,
+                $transaccion->flow_order
+            );
+
+            // Extender suscripción de la organización
+            $organizacion = $pagoSuscripcion->organizacion;
+
+            if ($organizacion->estado_suscripcion === 'vencida' || $organizacion->estado_suscripcion === 'suspendida') {
+                // Reactivar desde vencida/suspendida
+                $nuevaFechaInicio = now();
+                $nuevaFechaFin = now()->addMonth();
+            } else {
+                // Extender desde activa
+                $fechaActualFin = $organizacion->fecha_fin_suscripcion ?? now();
+                $nuevaFechaInicio = $fechaActualFin->isPast() ? now() : $fechaActualFin;
+                $nuevaFechaFin = $nuevaFechaInicio->copy()->addMonth();
+            }
+
+            $organizacion->update([
+                'estado_suscripcion' => 'activa',
+                'fecha_inicio_suscripcion' => $nuevaFechaInicio,
+                'fecha_fin_suscripcion' => $nuevaFechaFin,
+                'activo' => true,
+                'dias_prueba_restantes' => 0,
+            ]);
+
+            // Registrar en auditoría
+            \App\Models\Auditoria::registrar(
+                'suscripciones',
+                'pago_procesado',
+                "Pago de suscripción procesado vía Flow. Monto: $" . number_format($pagoSuscripcion->monto, 0, ',', '.') . ". Suscripción extendida hasta " . $nuevaFechaFin->format('d/m/Y'),
+                'pagos_suscripcion',
+                $pagoSuscripcion->id,
+                $organizacion->id
+            );
+
+            DB::commit();
+
+            Log::info('Flow - Suscripción extendida exitosamente', [
+                'organizacion_id' => $organizacion->id,
+                'nueva_fecha_fin' => $nuevaFechaFin->toDateString(),
+                'pago_id' => $pagoSuscripcion->id,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Flow - Error al procesar pago de suscripción', [
+                'transaccion_id' => $transaccion->id,
+                'referencia_id' => $transaccion->referencia_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
+        }
     }
 }
