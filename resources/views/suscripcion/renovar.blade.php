@@ -113,37 +113,94 @@
                         </div>
                     </div>
 
-                    <!-- Opción 2: Ver planes disponibles -->
+                    <!-- Opción 2: Cambiar de plan -->
                     <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
-                        <div class="flex items-start">
+                        <div class="flex items-start mb-4">
                             <svg class="w-8 h-8 text-blue-600 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                             <div class="flex-1">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Planes disponibles</h3>
-                                <p class="text-gray-700 mb-4">Revisa nuestros planes y contacta al administrador para activar el que mejor se ajuste a tus necesidades.</p>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                    @foreach($planes as $plan)
-                                    <div class="bg-white border border-gray-200 rounded-lg p-4">
-                                        <h4 class="font-semibold text-gray-900 mb-1">{{ $plan->nombre }}</h4>
-                                        <p class="text-2xl font-bold text-blue-600 mb-2">${{ number_format($plan->precio_mensual, 0, ',', '.') }}/mes</p>
-                                        <ul class="text-sm text-gray-600 space-y-1">
-                                            @if($plan->socios_ilimitados)
-                                            <li>✓ Socios ilimitados</li>
-                                            @else
-                                            <li>✓ Hasta {{ $plan->max_socios }} socios</li>
-                                            @endif
-                                            @if($plan->usuarios_ilimitados)
-                                            <li>✓ Usuarios ilimitados</li>
-                                            @else
-                                            <li>✓ Hasta {{ $plan->max_usuarios }} usuarios</li>
-                                            @endif
-                                        </ul>
-                                    </div>
-                                    @endforeach
-                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Renovar o cambiar de plan</h3>
+                                <p class="text-gray-700 mb-4">Selecciona el plan que mejor se ajuste a tus necesidades. Puedes renovar tu plan actual o hacer upgrade/downgrade.</p>
                             </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            @foreach($planes as $plan)
+                            <div class="bg-white border-2 {{ $plan->id == $organizacion->id_suscripcion ? 'border-green-500' : 'border-gray-200' }} rounded-lg p-5 relative">
+                                @if($plan->id == $organizacion->id_suscripcion)
+                                <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-bl-lg rounded-tr-lg">
+                                    Plan Actual
+                                </div>
+                                @endif
+
+                                <h4 class="font-bold text-gray-900 mb-1 mt-2">{{ $plan->nombre }}</h4>
+                                <p class="text-3xl font-bold text-blue-600 mb-3">${{ number_format($plan->precio_mensual, 0, ',', '.') }}<span class="text-sm text-gray-500">/mes</span></p>
+
+                                <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                                    @if($plan->socios_ilimitados)
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                                        </svg>
+                                        Socios ilimitados
+                                    </li>
+                                    @else
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                                        </svg>
+                                        Hasta {{ $plan->max_socios }} socios
+                                    </li>
+                                    @endif
+
+                                    @if($plan->usuarios_ilimitados)
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                                        </svg>
+                                        Usuarios ilimitados
+                                    </li>
+                                    @else
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                                        </svg>
+                                        Hasta {{ $plan->max_usuarios }} usuarios
+                                    </li>
+                                    @endif
+
+                                    @if($plan->permite_dominio_personalizado)
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                                        </svg>
+                                        Dominio personalizado
+                                    </li>
+                                    @endif
+                                </ul>
+
+                                @if($plan->id == $organizacion->id_suscripcion)
+                                <form action="{{ route('organizacion.pagos-suscripcion.pagar', $pagoPendiente->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition">
+                                        Renovar este plan
+                                    </button>
+                                </form>
+                                @else
+                                <form action="{{ route('organizacion.cambiar-plan', $plan->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition">
+                                        @if($plan->precio_mensual > $organizacion->suscripcion->precio_mensual)
+                                        Hacer Upgrade
+                                        @else
+                                        Cambiar a este plan
+                                        @endif
+                                    </button>
+                                </form>
+                                @endif
+                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
