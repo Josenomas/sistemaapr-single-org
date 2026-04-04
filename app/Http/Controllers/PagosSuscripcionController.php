@@ -71,7 +71,7 @@ class PagosSuscripcionController extends Controller
             // Si ya existe un token de Flow y no ha expirado, redirigir a ese pago
             if ($pago->token_flow) {
                 // Verificar si la transacción existe y está pendiente
-                $transaccion = \App\Models\TransaccionFlow::where('flow_token', $pago->token_flow)
+                $transaccion = \App\Models\TransaccionFlow::where('token', $pago->token_flow)
                     ->where('status', 'pending')
                     ->first();
 
