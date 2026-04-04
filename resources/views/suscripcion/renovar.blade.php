@@ -66,6 +66,8 @@
                                 'id_suscripcion' => $organizacion->id_suscripcion,
                                 'monto' => $organizacion->suscripcion->precio_mensual,
                                 'estado' => 'pendiente',
+                                'periodo_inicio' => now(),
+                                'periodo_fin' => now()->addMonth(),
                                 'fecha_vencimiento' => now()->addDays(7),
                             ]);
                         }
