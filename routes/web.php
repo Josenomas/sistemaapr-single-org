@@ -99,6 +99,12 @@ Route::get('/comprobante-pago/{id}/descargar', [PagosController::class, 'descarg
 Route::middleware(['auth'])->group(function () {
     Route::get('/suscripcion/renovar', [App\Http\Controllers\SuscripcionController::class, 'renovar'])->name('suscripcion.renovar');
     Route::get('/suscripcion/estado', [App\Http\Controllers\SuscripcionController::class, 'estado'])->name('suscripcion.estado');
+
+    // Pagos de suscripción (deben estar FUERA del middleware suscripcion.activa para permitir renovación)
+    Route::prefix('organizacion')->name('organizacion.')->group(function () {
+        Route::get('/pagos-suscripcion', [PagosSuscripcionController::class, 'index'])->name('pagos-suscripcion');
+        Route::post('/pagos-suscripcion/{id}/pagar', [PagosSuscripcionController::class, 'pagar'])->name('pagos-suscripcion.pagar');
+    });
 });
 
 // Rutas protegidas (requieren autenticación y suscripción activa)
@@ -486,10 +492,6 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
         Route::get('/upgrade', [App\Http\Controllers\OrganizacionController::class, 'upgrade'])->name('upgrade');
         Route::post('/cambiar-plan/{idSuscripcionNueva}', [App\Http\Controllers\OrganizacionController::class, 'iniciarCambioPlan'])->name('cambiar-plan');
         Route::get('/confirmar-cambio-plan/{idCambioPlan}', [App\Http\Controllers\OrganizacionController::class, 'confirmarCambioPlan'])->name('confirmar-cambio-plan');
-
-        // Historial de pagos de suscripción
-        Route::get('/pagos-suscripcion', [PagosSuscripcionController::class, 'index'])->name('pagos-suscripcion');
-        Route::post('/pagos-suscripcion/{id}/pagar', [PagosSuscripcionController::class, 'pagar'])->name('pagos-suscripcion.pagar');
     });
 
     // ========================================
