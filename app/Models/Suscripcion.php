@@ -74,4 +74,20 @@ class Suscripcion extends Model
     {
         return $query->where('activo', true);
     }
+
+    /**
+     * Accessor para compatibilidad: limite_socios -> max_socios
+     */
+    public function getLimiteSociosAttribute()
+    {
+        return $this->max_socios;
+    }
+
+    /**
+     * Accessor para compatibilidad: limite_usuarios -> max_usuarios
+     */
+    public function getLimiteUsuariosAttribute()
+    {
+        return $this->max_usuarios;
+    }
 }
