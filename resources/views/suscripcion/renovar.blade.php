@@ -53,26 +53,6 @@
                     <h2 class="text-2xl font-semibold text-gray-800 mb-4">Opciones de renovación</h2>
 
                     <!-- Opción 1: Pagar en línea con Flow -->
-                    @php
-                        $pagoPendiente = \App\Models\PagoSuscripcion::where('id_organizacion', $organizacion->id)
-                            ->where('estado', 'pendiente')
-                            ->orderBy('created_at', 'desc')
-                            ->first();
-
-                        if (!$pagoPendiente && $organizacion->suscripcion) {
-                            // Crear pago pendiente si no existe
-                            $pagoPendiente = \App\Models\PagoSuscripcion::create([
-                                'id_organizacion' => $organizacion->id,
-                                'id_suscripcion' => $organizacion->id_suscripcion,
-                                'monto' => $organizacion->suscripcion->precio_mensual,
-                                'estado' => 'pendiente',
-                                'periodo_inicio' => now(),
-                                'periodo_fin' => now()->addMonth(),
-                                'fecha_vencimiento' => now()->addDays(7),
-                            ]);
-                        }
-                    @endphp
-
                     @if($pagoPendiente)
                     <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-4">
                         <div class="flex items-start">
