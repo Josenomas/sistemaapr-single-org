@@ -489,6 +489,30 @@ class OrganizacionController extends Controller
 
         // Si es upgrade, generar pago con Flow
         if ($tipo === 'upgrade' && $montoDiferencia > 0) {
+            // Verificar si ya existe un cambio de plan pendiente con token
+            $cambioPlanPendiente = \App\Models\CambioPlan::where('id_organizacion', $organizacion->id)
+                ->where('id_suscripcion_nueva', $idSuscripcionNueva)
+                ->where('estado', 'procesando')
+                ->whereNotNull('token_flow')
+                ->first();
+
+            if ($cambioPlanPendiente) {
+                // Verificar si la transacción existe y está pendiente
+                $transaccion = \App\Models\TransaccionFlow::where('token', $cambioPlanPendiente->token_flow)
+                    ->where('estado', 'pendiente')
+                    ->first();
+
+                if ($transaccion) {
+                    \Log::info('Redirigiendo a cambio de plan existente', ['token' => $cambioPlanPendiente->token_flow]);
+                    $urlPago = 'https://www.flow.cl/app/web/pay.php?token=' . $cambioPlanPendiente->token_flow;
+
+                    // Eliminar el nuevo cambio de plan creado y usar el existente
+                    $cambioPlan->delete();
+
+                    return redirect($urlPago);
+                }
+            }
+
             $flowService = new \App\Services\FlowPaymentService();
 
             $emailOrganizacion = $organizacion->email_contacto ?? $user->email;
