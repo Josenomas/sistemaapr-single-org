@@ -97,7 +97,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <form action="{{ route('pagos-suscripcion.pagar', $pagoPendiente->id) }}" method="POST" class="inline">
+                                <form action="{{ route('organizacion.pagos-suscripcion.pagar', $pagoPendiente->id) }}" method="POST" class="inline">
                                     @csrf
                                     <button type="submit" class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-4 rounded-lg transition shadow-lg hover:shadow-xl transform hover:scale-105">
                                         <span class="flex items-center">
