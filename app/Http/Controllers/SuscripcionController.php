@@ -12,7 +12,7 @@ class SuscripcionController extends Controller
      */
     public function renovar()
     {
-        $organizacion = auth()->user()->organizacion;
+        $organizacion = auth()->user()->organizacion->load('suscripcion');
 
         // Obtener planes disponibles
         $planes = Suscripcion::orderBy('precio_mensual')->get();
@@ -35,6 +35,14 @@ class SuscripcionController extends Controller
                 'fecha_vencimiento' => now()->addDays(7),
             ]);
         }
+
+        // Debug temporal
+        \Log::info('Renovar - PagoPendiente:', [
+            'existe' => $pagoPendiente ? 'SI' : 'NO',
+            'id' => $pagoPendiente?->id,
+            'organizacion_id' => $organizacion->id,
+            'tiene_suscripcion' => $organizacion->suscripcion ? 'SI' : 'NO'
+        ]);
 
         return view('suscripcion.renovar', compact('organizacion', 'planes', 'pagoPendiente'));
     }
