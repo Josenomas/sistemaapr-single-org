@@ -72,7 +72,7 @@ class Organizacion extends Model
      */
     public function usuarios()
     {
-        return $this->hasMany(User::class, 'id_organizacion');
+        return $this->hasMany(Usuario::class, 'id_organizacion');
     }
 
     /**
