@@ -523,6 +523,11 @@ class OrganizacionController extends Controller
         // Calcular monto prorrateado
         $montoDiferencia = $diferenciaDiaria * $diasRestantes;
 
+        // Flow requiere mínimo 350 CLP, si es menor cobrar el monto completo de la diferencia
+        if ($montoDiferencia > 0 && $montoDiferencia < 350) {
+            return abs($planNuevo->precio_mensual - $planAnterior->precio_mensual);
+        }
+
         // Si es upgrade, debe ser positivo; si es downgrade, puede ser 0 (se aplicará al siguiente período)
         return max(0, $montoDiferencia);
     }
