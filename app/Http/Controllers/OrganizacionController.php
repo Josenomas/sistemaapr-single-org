@@ -498,6 +498,11 @@ class OrganizacionController extends Controller
             return abs($planNuevo->precio_mensual - $planAnterior->precio_mensual);
         }
 
+        // Si la suscripción está vencida, cobrar precio completo del nuevo plan (no prorratear)
+        if ($organizacion->suscripcionVencida()) {
+            return $planNuevo->precio_mensual;
+        }
+
         // Calcular días transcurridos del mes actual
         $fechaInicio = \Carbon\Carbon::parse($organizacion->fecha_inicio_suscripcion);
         $hoy = \Carbon\Carbon::now();
