@@ -104,6 +104,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('organizacion')->name('organizacion.')->group(function () {
         Route::get('/pagos-suscripcion', [PagosSuscripcionController::class, 'index'])->name('pagos-suscripcion');
         Route::post('/pagos-suscripcion/{id}/pagar', [PagosSuscripcionController::class, 'pagar'])->name('pagos-suscripcion.pagar');
+        Route::post('/cambiar-plan/{idSuscripcionNueva}', [App\Http\Controllers\OrganizacionController::class, 'iniciarCambioPlan'])->name('cambiar-plan');
     });
 });
 
@@ -490,7 +491,6 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
         Route::delete('/logo', [App\Http\Controllers\OrganizacionController::class, 'deleteLogo'])->name('deleteLogo');
         Route::post('/reverificar-dns', [App\Http\Controllers\OrganizacionController::class, 'reverificarDNS'])->name('reverificar-dns');
         Route::get('/upgrade', [App\Http\Controllers\OrganizacionController::class, 'upgrade'])->name('upgrade');
-        Route::post('/cambiar-plan/{idSuscripcionNueva}', [App\Http\Controllers\OrganizacionController::class, 'iniciarCambioPlan'])->name('cambiar-plan');
         Route::get('/confirmar-cambio-plan/{idCambioPlan}', [App\Http\Controllers\OrganizacionController::class, 'confirmarCambioPlan'])->name('confirmar-cambio-plan');
     });
 
