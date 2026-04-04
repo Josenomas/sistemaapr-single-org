@@ -48,18 +48,24 @@ class PagosSuscripcionController extends Controller
      */
     public function pagar($id)
     {
+        \Log::info('PagosSuscripcionController@pagar - Iniciando', ['pago_id' => $id]);
+
         $pago = PagoSuscripcion::findOrFail($id);
 
         // Verificar que pertenece a la organización del usuario
         if ($pago->id_organizacion !== auth()->user()->id_organizacion) {
+            \Log::warning('Pago no autorizado', ['pago_org' => $pago->id_organizacion, 'user_org' => auth()->user()->id_organizacion]);
             abort(403, 'No autorizado');
         }
 
         // Verificar que esté pendiente
         if ($pago->estado !== 'pendiente') {
+            \Log::warning('Pago ya procesado', ['estado' => $pago->estado]);
             return redirect()->route('organizacion.pagos-suscripcion')
                 ->with('error', 'Este pago ya fue procesado');
         }
+
+        \Log::info('Pago válido, creando con Flow', ['monto' => $pago->monto]);
 
         try {
             // Crear pago con Flow
@@ -74,6 +80,8 @@ class PagosSuscripcionController extends Controller
             );
 
             if ($resultado['success']) {
+                \Log::info('Flow pago creado exitosamente', ['url' => $resultado['url']]);
+
                 // Guardar token de Flow en el pago
                 $pago->update([
                     'token_flow' => $resultado['token'],
@@ -90,6 +98,8 @@ class PagosSuscripcionController extends Controller
                 // Redirigir a Flow
                 return redirect($resultado['url']);
             }
+
+            \Log::error('Flow pago falló', ['message' => $resultado['message'] ?? 'Sin mensaje']);
 
             return redirect()->route('organizacion.pagos-suscripcion')
                 ->with('error', $resultado['message'] ?? 'Error al iniciar el pago');
