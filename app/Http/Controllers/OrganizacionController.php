@@ -383,6 +383,61 @@ class OrganizacionController extends Controller
     }
 
     /**
+     * Mostrar página de confirmación antes de cambiar de plan
+     */
+    public function mostrarConfirmacionCambioPlan($idSuscripcionNueva)
+    {
+        $user = auth()->user();
+
+        if (!$user->id_organizacion) {
+            return redirect()->route('dashboard')
+                ->with('error', 'No tienes una organización asignada.');
+        }
+
+        $organizacion = Organizacion::with('suscripcion')->find($user->id_organizacion);
+
+        if (!$organizacion || !$organizacion->suscripcion) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Organización o suscripción no encontrada.');
+        }
+
+        // Validar que la suscripción nueva sea diferente
+        if ($organizacion->id_suscripcion == $idSuscripcionNueva) {
+            return redirect()->back()
+                ->with('error', 'Ya estás en este plan.');
+        }
+
+        $planActual = $organizacion->suscripcion;
+        $planNuevo = \App\Models\Suscripcion::findOrFail($idSuscripcionNueva);
+
+        // Determinar tipo de cambio
+        $tipo = $planNuevo->precio_mensual > $planActual->precio_mensual ? 'upgrade' : 'downgrade';
+
+        // Calcular monto a pagar
+        $montoPagar = $this->calcularDiferenciaPlan(
+            $organizacion,
+            $planActual,
+            $planNuevo,
+            $tipo
+        );
+
+        // Calcular días restantes (solo si suscripción activa)
+        $diasRestantes = null;
+        if (!$organizacion->suscripcionVencida() && $organizacion->fecha_fin_suscripcion) {
+            $diasRestantes = \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($organizacion->fecha_fin_suscripcion));
+        }
+
+        return view('organizacion.confirmar-cambio-plan', compact(
+            'organizacion',
+            'planActual',
+            'planNuevo',
+            'tipo',
+            'montoPagar',
+            'diasRestantes'
+        ));
+    }
+
+    /**
      * Iniciar proceso de cambio de plan (upgrade o downgrade)
      */
     public function iniciarCambioPlan(Request $request, $idSuscripcionNueva)
