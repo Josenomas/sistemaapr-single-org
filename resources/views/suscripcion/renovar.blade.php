@@ -188,16 +188,13 @@
                                     </button>
                                 </form>
                                 @else
-                                <form action="{{ route('organizacion.cambiar-plan', $plan->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition">
-                                        @if($plan->precio_mensual > $organizacion->suscripcion->precio_mensual)
-                                        Hacer Upgrade
-                                        @else
-                                        Cambiar a este plan
-                                        @endif
-                                    </button>
-                                </form>
+                                <a href="{{ route('organizacion.confirmar-cambio-plan', $plan->id) }}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
+                                    @if($plan->precio_mensual > $organizacion->suscripcion->precio_mensual)
+                                    Hacer Upgrade
+                                    @else
+                                    Cambiar a este plan
+                                    @endif
+                                </a>
                                 @endif
                             </div>
                             @endforeach

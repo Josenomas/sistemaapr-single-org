@@ -104,6 +104,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('organizacion')->name('organizacion.')->group(function () {
         Route::get('/pagos-suscripcion', [PagosSuscripcionController::class, 'index'])->name('pagos-suscripcion');
         Route::post('/pagos-suscripcion/{id}/pagar', [PagosSuscripcionController::class, 'pagar'])->name('pagos-suscripcion.pagar');
+        Route::get('/cambiar-plan/{idSuscripcionNueva}/confirmar', [App\Http\Controllers\OrganizacionController::class, 'mostrarConfirmacionCambioPlan'])->name('confirmar-cambio-plan');
         Route::post('/cambiar-plan/{idSuscripcionNueva}', [App\Http\Controllers\OrganizacionController::class, 'iniciarCambioPlan'])->name('cambiar-plan');
     });
 });
