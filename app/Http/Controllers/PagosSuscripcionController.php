@@ -72,7 +72,7 @@ class PagosSuscripcionController extends Controller
             if ($pago->token_flow) {
                 // Verificar si la transacción existe y está pendiente
                 $transaccion = \App\Models\TransaccionFlow::where('token', $pago->token_flow)
-                    ->where('status', 'pending')
+                    ->where('estado', 'pendiente')
                     ->first();
 
                 if ($transaccion) {
