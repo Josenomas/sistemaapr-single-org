@@ -68,6 +68,20 @@ class PagosSuscripcionController extends Controller
         \Log::info('Pago válido, creando con Flow', ['monto' => $pago->monto]);
 
         try {
+            // Si ya existe un token de Flow y no ha expirado, redirigir a ese pago
+            if ($pago->token_flow) {
+                // Verificar si la transacción existe y está pendiente
+                $transaccion = \App\Models\TransaccionFlow::where('flow_token', $pago->token_flow)
+                    ->where('status', 'pending')
+                    ->first();
+
+                if ($transaccion) {
+                    \Log::info('Redirigiendo a pago existente', ['token' => $pago->token_flow]);
+                    $urlPago = 'https://www.flow.cl/app/web/pay.php?token=' . $pago->token_flow;
+                    return redirect($urlPago);
+                }
+            }
+
             // Crear pago con Flow
             $flowService = app(\App\Services\FlowPaymentService::class);
 
