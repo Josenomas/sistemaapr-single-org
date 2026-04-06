@@ -59,11 +59,6 @@ Route::get('/terminos-y-condiciones', function () {
     return view('terminos-condiciones');
 })->name('terminos.condiciones');
 
-// Consulta Pública de Pagos
-Route::get('/consultar-cuenta', [ConsultaPublicaController::class, 'mostrarFormulario'])->name('consulta.pago');
-Route::post('/consultar-cuenta/buscar', [ConsultaPublicaController::class, 'buscarPorRut'])->name('consulta.buscar');
-Route::post('/consultar-cuenta/generar-pago', [ConsultaPublicaController::class, 'generarPago'])->name('consulta.generar.pago');
-
 // Formulario de contacto
 Route::post('/contacto', [ContactoController::class, 'enviar'])->name('contacto.enviar');
 
