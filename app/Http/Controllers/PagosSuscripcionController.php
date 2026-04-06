@@ -19,9 +19,10 @@ class PagosSuscripcionController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        // Pago pendiente actual
+        // Pago pendiente actual (solo mostrar si faltan 7 días o menos, o ya venció)
         $pagoPendiente = PagoSuscripcion::where('id_organizacion', $organizacion->id)
             ->where('estado', 'pendiente')
+            ->where('fecha_vencimiento', '<=', now()->addDays(7))
             ->orderBy('fecha_vencimiento', 'asc')
             ->first();
 
