@@ -63,6 +63,7 @@
             <a href="{{ route('folios-sii.index') }}" class="nav-item {{ request()->routeIs('folios-sii.*') ? 'active' : '' }}">
                 <i class="fas fa-file-invoice"></i>
                 <span>Folios SII</span>
+                <span class="badge-beta">BETA</span>
             </a>
         </div>
 
@@ -449,6 +450,11 @@
         letter-spacing: 0.05em;
         margin-left: auto;
         box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    }
+
+    .nav-item .badge-beta {
+        font-size: 0.6rem;
+        padding: 2px 5px;
     }
 
     .nav-item {
