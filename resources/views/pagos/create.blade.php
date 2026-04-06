@@ -218,8 +218,6 @@
                         <option value="efectivo" {{ old('metodo_pago') == 'efectivo' ? 'selected' : '' }}>Efectivo</option>
                         <option value="transferencia" {{ old('metodo_pago') == 'transferencia' ? 'selected' : '' }}>Transferencia</option>
                         <option value="cheque" {{ old('metodo_pago') == 'cheque' ? 'selected' : '' }}>Cheque</option>
-                        <option value="debito" {{ old('metodo_pago') == 'debito' ? 'selected' : '' }}>Débito</option>
-                        <option value="credito" {{ old('metodo_pago') == 'credito' ? 'selected' : '' }}>Crédito</option>
                     </select>
                     @error('metodo_pago')
                         <div class="invalid-feedback">{{ $message }}</div>
