@@ -681,7 +681,6 @@
             <ul class="nav-links" id="navLinks">
                 <li><a href="#features">Características</a></li>
                 <li><a href="{{ route('conoce.boleta') }}">Conoce tu Boleta</a></li>
-                <li><a href="{{ route('consulta.pago') }}">Pagar Cuenta</a></li>
                 <li><a href="#pricing">Precios</a></li>
                 <li><a href="#contact">Contacto</a></li>
             </ul>
@@ -707,10 +706,6 @@
                 <a href="{{ route('registro.formulario') }}" class="btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-size: 1.1rem; padding: 1rem 2rem;">
                     <i class="fas fa-rocket"></i>
                     Empieza Gratis - 30 Días
-                </a>
-                <a href="{{ route('consulta.pago') }}" class="btn-secondary">
-                    <i class="fas fa-credit-card"></i>
-                    Pagar mi Cuenta
                 </a>
                 <a href="{{ route('conoce.boleta') }}" class="btn-secondary">
                     <i class="fas fa-file-invoice"></i>
