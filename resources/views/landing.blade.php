@@ -1186,18 +1186,6 @@
                 </details>
 
                 <!-- FAQ 7 -->
-                <details style="border-bottom: 1px solid var(--gray-200); padding: 1.5rem 2rem;">
-                    <summary style="font-weight: 600; font-size: 1.1rem; cursor: pointer; color: var(--dark); display: flex; align-items: center; gap: 1rem;">
-                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
-                        ¿Puedo importar mis datos actuales?
-                    </summary>
-                    <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
-                        Sí, el sistema permite importar datos desde archivos Excel o CSV. Te ayudamos en el proceso de migración
-                        para que puedas comenzar a usar el sistema con toda tu información histórica.
-                    </p>
-                </details>
-
-                <!-- FAQ 8 -->
                 <details style="padding: 1.5rem 2rem;">
                     <summary style="font-weight: 600; font-size: 1.1rem; cursor: pointer; color: var(--dark); display: flex; align-items: center; gap: 1rem;">
                         <i class="fas fa-question-circle" style="color: var(--primary);"></i>
