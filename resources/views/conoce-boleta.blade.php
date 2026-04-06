@@ -236,14 +236,14 @@
   <table style="width: 100%; border-collapse: collapse;">
     <tr>
       <td style="vertical-align: top; width: 65%;">
-        <h1>APR PITRELAHUE — Boleta de Consumo Agua Potable Rural</h1>
-        <p>RUT: 65.552.000-7 &nbsp;|&nbsp; sistemaapr@gmail.com &nbsp;|&nbsp; Captación, tratamiento y distribución de agua</p>
+        <h1>APR EJEMPLO — Boleta de Consumo Agua Potable Rural</h1>
+        <p>RUT: 12.345.678-9 &nbsp;|&nbsp; contacto@aprejemplo.cl &nbsp;|&nbsp; Captación, tratamiento y distribución de agua</p>
       </td>
       <td style="vertical-align: top; width: 35%; text-align: right;">
         <div class="folio-box" style="display: inline-block;">
-          <div class="folio-label">RUT: 65.552.000-7</div>
+          <div class="folio-label">RUT: 12.345.678-9</div>
           <div class="folio-label">BOLETA ELECTRÓNICA N°</div>
-          <div class="folio-num">BOL-2026-03-0084</div>
+          <div class="folio-num">BOL-2026-03-0001</div>
         </div>
       </td>
     </tr>
@@ -303,15 +303,15 @@
       </tr>
       <tr>
         <td style="color:#666; padding:4px 0;">RUT</td>
-        <td style="text-align:right; padding:4px 0;">17.707.851-7</td>
+        <td style="text-align:right; padding:4px 0;">11.222.333-4</td>
       </tr>
       <tr>
         <td style="color:#666; padding:4px 0;">Nombre</td>
-        <td style="text-align:right; padding:4px 0;">Karina Ester Lincheo Raiman</td>
+        <td style="text-align:right; padding:4px 0;">Juan Pérez González</td>
       </tr>
       <tr>
         <td style="color:#666; padding:4px 0;">Dirección</td>
-        <td style="text-align:right; padding:4px 0;">Pitrelahue</td>
+        <td style="text-align:right; padding:4px 0;">Calle Principal 123</td>
       </tr>
       <tr>
         <td style="color:#666; padding:10px 0 4px 0;">Estado</td>
@@ -519,8 +519,8 @@
         <div class="pago-icon">Transferencia bancaria</div>
         <p>
           Banco: [Nombre del Banco] &nbsp;|&nbsp; Cta. Cte.: [N° cuenta]<br>
-          RUT: 65.552.000-7 &nbsp;|&nbsp; sistemaapr@gmail.com<br>
-          Ref.: <strong>BOL-2026-03-0084</strong>
+          RUT: 12.345.678-9 &nbsp;|&nbsp; contacto@aprejemplo.cl<br>
+          Ref.: <strong>BOL-2026-03-0001</strong>
         </p>
       </div>
     </td>
