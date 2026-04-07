@@ -1181,7 +1181,7 @@
                     </summary>
                     <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
                         Ofrecemos soporte por email en todos los planes. El plan Profesional incluye soporte prioritario,
-                        y el plan Enterprise tiene soporte 24/7. Además, contamos con documentación completa y videos tutoriales.
+                        y el plan Enterprise tiene soporte 24/7. Además, cada módulo del sistema cuenta con una guía completa integrada en la aplicación.
                     </p>
                 </details>
             </div>
