@@ -1157,7 +1157,7 @@
                     </summary>
                     <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
                         Sí, puedes cambiar tu plan en cualquier momento. Si necesitas más capacidad puedes actualizar,
-                        y si necesitas reducir gastos, puedes cambiar a un plan menor. Los cambios se aplican inmediatamente.
+                        y si necesitas reducir gastos, puedes cambiar a un plan menor. Los cambios se aplican una vez finalizado el período mensual ya pagado.
                     </p>
                 </details>
 
