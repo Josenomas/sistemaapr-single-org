@@ -538,6 +538,8 @@ class OrganizacionController extends Controller
                 $resultado['transaccion']->update([
                     'subject' => $subject,
                     'observaciones' => "Cambio de plan de {$organizacion->suscripcion->nombre_mostrar} a {$suscripcionNueva->nombre_mostrar}",
+                    'tipo_pago' => 'cambio_plan',
+                    'referencia_id' => $cambioPlan->id,
                 ]);
 
                 // Redirigir al pago de Flow
