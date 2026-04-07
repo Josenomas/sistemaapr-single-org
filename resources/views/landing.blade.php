@@ -1184,18 +1184,6 @@
                         y el plan Enterprise tiene soporte 24/7. Además, contamos con documentación completa y videos tutoriales.
                     </p>
                 </details>
-
-                <!-- FAQ 7 -->
-                <details style="padding: 1.5rem 2rem;">
-                    <summary style="font-weight: 600; font-size: 1.1rem; cursor: pointer; color: var(--dark); display: flex; align-items: center; gap: 1rem;">
-                        <i class="fas fa-question-circle" style="color: var(--primary);"></i>
-                        ¿Qué pasa si cancelo mi suscripción?
-                    </summary>
-                    <p style="margin-top: 1rem; color: var(--gray-600); line-height: 1.8; padding-left: 2.5rem;">
-                        Puedes cancelar en cualquier momento sin penalización. Antes de que finalice tu suscripción,
-                        podrás exportar todos tus datos. No perdemos tu información por 30 días adicionales por si cambias de opinión.
-                    </p>
-                </details>
             </div>
 
             <!-- CTA adicional -->
