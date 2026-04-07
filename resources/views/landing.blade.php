@@ -981,10 +981,10 @@
             <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
                 <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
                     <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;">
-                        KL
+                        SQ
                     </div>
                     <div>
-                        <h4 style="margin: 0; font-size: 1.2rem;">Karina Lincheo</h4>
+                        <h4 style="margin: 0; font-size: 1.2rem;">Sonia Quintremil</h4>
                         <p style="margin: 0; opacity: 0.8; font-size: 0.9rem;">Presidenta APR Pitrelahue</p>
                     </div>
                 </div>
