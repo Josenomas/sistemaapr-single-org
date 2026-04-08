@@ -32,7 +32,14 @@
       "Bash(find c:/xampp/htdocs/ssr-v2 -name \"*.php\" -not -path \"*/vendor/*\" -not -path \"*/node_modules/*\" -type f -exec grep -l \"auth\\.php\" {})",
       "Bash(find c:/xampp/htdocs/ssr-v2 -name \"*.php\" -not -path \"*/vendor/*\" -not -path \"*/node_modules/*\" -type f -exec grep -l \"conexion\\.php\" {})",
       "Bash(find c:/xampp/htdocs/ssr-v2 -name \"*.php\" -not -path \"*/vendor/*\" -not -path \"*/node_modules/*\" -not -path \"*/app/*\" -type f -exec grep -l \"$_SESSION\" {} ;)",
-      "Bash(git add -A)"
+      "Bash(git add -A)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nSecurity: Eliminar sistema de autenticación legacy\n\nVULNERABILIDADES CORREGIDAS:\n- SQL Injection en index.php (consultas sin prepared statements)\n- Sin protección CSRF en formularios legacy\n- Sesiones PHP sin cifrado\n- Doble superficie de ataque (legacy + Laravel)\n\nARCHIVOS ELIMINADOS:\n- login.php (reemplazado por AuthController Laravel)\n- logout.php (reemplazado por AuthController Laravel)\n- auth.php (reemplazado por middlewares Laravel)\n- index.php (reemplazado por DashboardController Laravel)\n- conexion.php (reemplazado por Eloquent ORM Laravel)\n\nSISTEMA ACTUAL (100% Laravel):\n✅ Landing: routes/web.php → view(''landing'')\n✅ Login: AuthController::showLogin\n✅ Dashboard: DashboardController::index\n✅ Logout: AuthController::logout\n✅ Protección CSRF automática\n✅ SQL Injection protegido con Eloquent ORM\n✅ Sesiones cifradas\n\nBACKUP: Archivos respaldados en ../ssr-v2-legacy-backup/\n\n🤖 Generated with Claude Code (https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git add public/sitemap.xml)",
+      "Bash(git commit -m \"Update: Actualizar sitemap.xml con rutas Laravel\n\n- Agregar rutas de autenticación (/login, /registro)\n- Agregar páginas públicas (conoce-boleta, términos, contacto)\n- Actualizar lastmod a 2026-04-07\n- Eliminar referencias a archivos legacy\")",
+      "Bash(composer require spatie/laravel-backup --with-all-dependencies)",
+      "Bash(php artisan vendor:publish --provider=\"Spatie\\Backup\\BackupServiceProvider\")",
+      "Bash(php artisan vendor:publish --tag=backup-config)",
+      "Bash(php artisan backup:run --only-db)"
     ],
     "deny": [],
     "ask": []

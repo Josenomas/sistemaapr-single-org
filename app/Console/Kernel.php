@@ -40,6 +40,22 @@ class Kernel extends ConsoleKernel
                  ->monthlyOn(1, '10:00')
                  ->emailOutputOnFailure('admin@aprpitrelahue.cl');
 
+        // ========================================
+        // BACKUPS AUTOMÁTICOS
+        // ========================================
+
+        // Backup completo de base de datos diariamente a las 2:00 AM
+        $schedule->command('backup:run --only-db')
+                 ->dailyAt('02:00')
+                 ->emailOutputOnFailure('admin@aprpitrelahue.cl');
+
+        // Limpiar backups antiguos (más de 30 días) semanalmente
+        $schedule->command('backup:clean')
+                 ->weekly()
+                 ->sundays()
+                 ->at('03:00')
+                 ->emailOutputOnFailure('admin@aprpitrelahue.cl');
+
         // Alternativa: Enviar cada 3 días a las 9:00 AM
         // $schedule->command('notificaciones:boletas-vencidas')
         //          ->days([1, 4, 7, 10, 13, 16, 19, 22, 25, 28])
