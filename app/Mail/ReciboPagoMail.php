@@ -59,13 +59,15 @@ class ReciboPagoMail extends Mailable
         @unlink($tempHtmlPath);
         @unlink($pdfPath);
 
-        $nombreOrg = $this->pago->socio->organizacion->nombre_apr ?? 'Sistema APR';
+        $organizacion = $this->pago->socio->organizacion ?? null;
+        $nombreOrg = $organizacion ? $organizacion->nombre_apr : 'Sistema APR';
 
         return $this->subject("Comprobante de Pago #{$this->pago->numero_recibo} - {$nombreOrg}")
                     ->view('emails.recibo-pago')
                     ->with([
                         'pago' => $this->pago,
-                        'socio' => $this->pago->socio
+                        'socio' => $this->pago->socio,
+                        'organizacion' => $organizacion
                     ])
                     ->attachData($pdfContent, 'Comprobante-' . $this->pago->numero_recibo . '.pdf', [
                         'mime' => 'application/pdf',
