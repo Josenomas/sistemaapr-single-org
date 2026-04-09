@@ -281,6 +281,7 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
         Route::get('/reporte-mensual', [PagosController::class, 'reporteMensual'])->name('pagos.reporteMensual');
         Route::get('/reporte-mensual-imprimir', [PagosController::class, 'reporteMensualImprimir'])->name('pagos.reporteMensual.imprimir');
         Route::post('/pagos/generar-link-flow', [PagosController::class, 'generarLinkFlow'])->name('pagos.generarLinkFlow');
+        Route::post('/pagos/{id}/enviar-email', [PagosController::class, 'enviarEmail'])->name('pagos.enviar-email');
 
         // Exportaciones
         Route::get('/pagos-exportar-excel', [PagosController::class, 'exportarExcel'])->name('pagos.exportar-excel');

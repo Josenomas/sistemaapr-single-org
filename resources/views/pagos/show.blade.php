@@ -17,6 +17,13 @@
             <i class="fas fa-print"></i>
             Imprimir
         </a>
+        <form action="{{ route('pagos.enviar-email', $pago->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Enviar este comprobante por correo electrónico a {{ $pago->socio->email }}?');">
+            @csrf
+            <button type="submit" class="btn btn-info" {{ !$pago->socio->email ? 'disabled' : '' }}>
+                <i class="fas fa-envelope"></i>
+                Enviar por Email
+            </button>
+        </form>
         <form action="{{ route('pagos.destroy', $pago->id) }}"
               method="POST"
               style="display: inline;"
@@ -251,6 +258,13 @@
                     <i class="fas fa-print"></i>
                     Imprimir Recibo
                 </a>
+                <form action="{{ route('pagos.enviar-email', $pago->id) }}" method="POST" style="display: inline; width: 100%;" onsubmit="return confirm('¿Enviar este comprobante por correo electrónico a {{ $pago->socio->email }}?');">
+                    @csrf
+                    <button type="submit" class="action-btn" style="border: none; cursor: {{ $pago->socio->email ? 'pointer' : 'not-allowed' }};" {{ !$pago->socio->email ? 'disabled' : '' }}>
+                        <i class="fas fa-envelope"></i>
+                        Enviar por Email
+                    </button>
+                </form>
                 <a href="{{ route('pagos.edit', $pago->id) }}" class="action-btn">
                     <i class="fas fa-edit"></i>
                     Editar Pago
@@ -537,6 +551,11 @@
     .btn-info {
         background: #06b6d4;
         color: white;
+    }
+
+    button.action-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed !important;
     }
 
     .badge {

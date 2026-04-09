@@ -1030,4 +1030,41 @@ class PagosController extends Controller
 
         return $excelService->exportarPagos($pagos);
     }
+
+    /**
+     * Enviar comprobante de pago por email
+     */
+    public function enviarEmail($id)
+    {
+        DB::beginTransaction();
+        try {
+            $pago = Pago::with(['socio', 'boleta'])->findOrFail($id);
+
+            // Verificar que el socio tenga email
+            if (!$pago->socio || !$pago->socio->email) {
+                return redirect()->back()
+                    ->with('error', 'El socio no tiene un email registrado.');
+            }
+
+            // Enviar el email directamente (sync mode)
+            Mail::to($pago->socio->email)->send(new ReciboPagoMail($pago));
+
+            // Registrar actividad
+            ActividadHelper::registrar(
+                'Pagos',
+                "Comprobante enviado por email [{$pago->numero_recibo}] - Socio: {$pago->socio->nombre_completo} - Email: {$pago->socio->email}",
+                auth()->id()
+            );
+
+            DB::commit();
+
+            return redirect()->back()
+                ->with('success', 'Comprobante de pago enviado por correo electrónico a ' . $pago->socio->email);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Error al enviar el comprobante: ' . $e->getMessage());
+        }
+    }
 }
