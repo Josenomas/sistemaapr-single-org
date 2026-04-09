@@ -3,10 +3,7 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Pago;
 
@@ -15,52 +12,63 @@ class ReciboPagoMail extends Mailable
     use Queueable, SerializesModels;
 
     public $pago;
-    public $organizacion;
 
     /**
      * Create a new message instance.
-     *
-     * @return void
      */
     public function __construct(Pago $pago)
     {
         $this->pago = $pago;
-        $this->organizacion = auth()->user()->organizacion ?? null;
     }
 
     /**
-     * Get the message envelope.
-     *
-     * @return \Illuminate\Mail\Mailables\Envelope
+     * Build the message.
      */
-    public function envelope()
+    public function build()
     {
-        $nombreOrg = $this->organizacion ? $this->organizacion->nombre_apr : 'Sistema APR';
+        // Generar PDF del recibo
+        $pago = $this->pago;
+        $html = view('pagos.imprimir', compact('pago'))->render();
 
-        return new Envelope(
-            subject: "Recibo de Pago #{$this->pago->numero_recibo} - {$nombreOrg}",
-        );
-    }
+        // Guardar HTML temporal
+        $tempHtmlPath = public_path('temp_recibo_email_' . $this->pago->id . '_' . time() . '.html');
+        file_put_contents($tempHtmlPath, $html);
 
-    /**
-     * Get the message content definition.
-     *
-     * @return \Illuminate\Mail\Mailables\Content
-     */
-    public function content()
-    {
-        return new Content(
-            view: 'emails.recibo-pago',
-        );
-    }
+        // Generar PDF
+        $pdfPath = storage_path('app/temp_recibo_email_' . $this->pago->id . '_' . time() . '.pdf');
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array
-     */
-    public function attachments()
-    {
-        return [];
+        // Detectar sistema operativo y usar ruta correcta
+        $wkhtmltopdfPath = PHP_OS_FAMILY === 'Windows'
+            ? '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"'
+            : '/usr/bin/wkhtmltopdf';
+
+        // Convertir path a formato file://
+        $fileUrl = 'file:///' . str_replace('\\', '/', $tempHtmlPath);
+
+        $command = $wkhtmltopdfPath . ' --enable-local-file-access --page-size Letter "' . $fileUrl . '" "' . $pdfPath . '" 2>&1';
+        exec($command, $output, $returnCode);
+
+        // Leer el PDF generado
+        if (!file_exists($pdfPath)) {
+            throw new \Exception('Error al generar PDF para email: ' . implode("\n", $output));
+        }
+
+        $pdfContent = file_get_contents($pdfPath);
+
+        // Eliminar archivos temporales
+        @unlink($tempHtmlPath);
+        @unlink($pdfPath);
+
+        $nombreOrg = $this->pago->socio->organizacion->nombre_apr ?? 'Sistema APR';
+
+        return $this->subject("Comprobante de Pago #{$this->pago->numero_recibo} - {$nombreOrg}")
+                    ->view('emails.recibo-pago')
+                    ->with([
+                        'pago' => $this->pago,
+                        'socio' => $this->pago->socio
+                    ])
+                    ->attachData($pdfContent, 'Comprobante-' . $this->pago->numero_recibo . '.pdf', [
+                        'mime' => 'application/pdf',
+                    ]);
     }
 }
