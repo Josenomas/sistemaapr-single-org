@@ -122,21 +122,23 @@ class SuperAdminController extends Controller
         $organizacion = Organizacion::with('suscripcion')
             ->findOrFail($id);
 
-        // Estadísticas de la organización
-        $totalSocios = Socio::where('id_organizacion', $id)->count();
-        $totalUsuarios = Usuario::where('id_organizacion', $id)->count();
-        $totalBoletas = Boleta::where('id_organizacion', $id)->count();
-        $totalPagos = Pago::whereHas('boleta', function($q) use ($id) {
-            $q->where('id_organizacion', $id);
+        // Estadísticas de la organización (sin global scopes para super admin)
+        $totalSocios = Socio::withoutGlobalScopes()->where('id_organizacion', $id)->count();
+        $totalUsuarios = Usuario::withoutGlobalScopes()->where('id_organizacion', $id)->count();
+        $totalBoletas = Boleta::withoutGlobalScopes()->where('id_organizacion', $id)->count();
+        $totalPagos = Pago::withoutGlobalScopes()->whereHas('boleta', function($q) use ($id) {
+            $q->withoutGlobalScopes()->where('id_organizacion', $id);
         })->sum('monto_pagado');
 
-        // Actividad reciente
-        $usuariosRecientes = Usuario::where('id_organizacion', $id)
+        // Actividad reciente (sin global scopes para super admin)
+        $usuariosRecientes = Usuario::withoutGlobalScopes()
+            ->where('id_organizacion', $id)
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
 
-        $sociosRecientes = Socio::where('id_organizacion', $id)
+        $sociosRecientes = Socio::withoutGlobalScopes()
+            ->where('id_organizacion', $id)
             ->orderBy('fecha_creacion', 'desc')
             ->limit(5)
             ->get();
