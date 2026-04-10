@@ -103,7 +103,6 @@
                             name="estado"
                             required>
                         <option value="">Seleccione</option>
-                        <option value="borrador" {{ old('estado') == 'borrador' ? 'selected' : '' }}>Borrador</option>
                         <option value="programada" {{ old('estado') == 'programada' ? 'selected' : '' }}>Programada</option>
                         <option value="enviada" {{ old('estado') == 'enviada' ? 'selected' : '' }}>Enviar Ahora</option>
                     </select>
