@@ -352,9 +352,6 @@
                     <select name="tipo_documento" class="form-select">
                         <option value="">Todos</option>
                         <option value="boleta" {{ request('tipo_documento') == 'boleta' ? 'selected' : '' }}>Boleta</option>
-                        <option value="factura" {{ request('tipo_documento') == 'factura' ? 'selected' : '' }}>Factura</option>
-                        <option value="nota_credito" {{ request('tipo_documento') == 'nota_credito' ? 'selected' : '' }}>Nota de Crédito</option>
-                        <option value="nota_debito" {{ request('tipo_documento') == 'nota_debito' ? 'selected' : '' }}>Nota de Débito</option>
                     </select>
                 </div>
 
