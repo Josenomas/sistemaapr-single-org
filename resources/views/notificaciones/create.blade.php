@@ -174,13 +174,14 @@
                                    {{ is_array(old('canal')) && in_array('email', old('canal')) ? 'checked' : '' }}>
                             <span>Email</span>
                         </label>
-                        <label class="checkbox-label">
+                        {{-- WhatsApp deshabilitado temporalmente - Requiere configuración de Twilio --}}
+                        {{-- <label class="checkbox-label">
                             <input type="checkbox"
                                    name="canal[]"
                                    value="whatsapp"
                                    {{ is_array(old('canal')) && in_array('whatsapp', old('canal')) ? 'checked' : '' }}>
                             <span>WhatsApp</span>
-                        </label>
+                        </label> --}}
                     </div>
                     @error('canal')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
