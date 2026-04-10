@@ -37,21 +37,39 @@
                         @csrf
                         @method('PUT')
 
-                        <!-- Nombre -->
-                        <div class="mb-3">
-                            <label for="name" class="form-label">
-                                <i class="fas fa-user text-primary me-2"></i>
-                                Nombre Completo
-                            </label>
-                            <input type="text"
-                                   class="form-control @error('name') is-invalid @enderror"
-                                   id="name"
-                                   name="name"
-                                   value="{{ old('name', $usuario->name) }}"
-                                   required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <!-- Nombre y Apellido -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nombre" class="form-label">
+                                    <i class="fas fa-user text-primary me-2"></i>
+                                    Nombre
+                                </label>
+                                <input type="text"
+                                       class="form-control @error('nombre') is-invalid @enderror"
+                                       id="nombre"
+                                       name="nombre"
+                                       value="{{ old('nombre', $usuario->nombre) }}"
+                                       required>
+                                @error('nombre')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="apellido" class="form-label">
+                                    <i class="fas fa-user text-primary me-2"></i>
+                                    Apellido
+                                </label>
+                                <input type="text"
+                                       class="form-control @error('apellido') is-invalid @enderror"
+                                       id="apellido"
+                                       name="apellido"
+                                       value="{{ old('apellido', $usuario->apellido) }}"
+                                       required>
+                                @error('apellido')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
 
                         <!-- Email -->

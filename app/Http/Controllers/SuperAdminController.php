@@ -734,7 +734,8 @@ class SuperAdminController extends Controller
         $usuario = auth()->user();
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:usuarios,email,' . $usuario->id,
             'password' => 'nullable|min:8|confirmed',
         ]);
@@ -742,7 +743,8 @@ class SuperAdminController extends Controller
         DB::beginTransaction();
         try {
             // Actualizar datos básicos
-            $usuario->name = $validated['name'];
+            $usuario->nombre = $validated['nombre'];
+            $usuario->apellido = $validated['apellido'];
             $usuario->email = $validated['email'];
 
             // Actualizar contraseña si se proporcionó
