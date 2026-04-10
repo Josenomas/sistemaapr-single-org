@@ -54,7 +54,7 @@ class FolioSIIController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'tipo_documento' => 'required|in:boleta,factura,nota_credito,nota_debito',
+            'tipo_documento' => 'required|in:boleta',
             'folio_desde' => 'required|integer|min:1',
             'folio_hasta' => 'required|integer|min:1|gte:folio_desde',
             'fecha_autorizacion' => 'required|date',

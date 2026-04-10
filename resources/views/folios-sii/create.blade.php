@@ -230,9 +230,6 @@
                         <select name="tipo_documento" class="form-select @error('tipo_documento') is-invalid @enderror" required>
                             <option value="">Seleccionar...</option>
                             <option value="boleta" {{ old('tipo_documento') == 'boleta' ? 'selected' : '' }}>Boleta Electrónica</option>
-                            <option value="factura" {{ old('tipo_documento') == 'factura' ? 'selected' : '' }}>Factura Electrónica</option>
-                            <option value="nota_credito" {{ old('tipo_documento') == 'nota_credito' ? 'selected' : '' }}>Nota de Crédito</option>
-                            <option value="nota_debito" {{ old('tipo_documento') == 'nota_debito' ? 'selected' : '' }}>Nota de Débito</option>
                         </select>
                         @error('tipo_documento')
                             <div class="invalid-feedback">{{ $message }}</div>
