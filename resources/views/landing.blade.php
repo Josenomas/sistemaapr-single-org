@@ -1082,7 +1082,7 @@
                     <li><i class="fas fa-check"></i> Hasta 500 socios</li>
                     <li><i class="fas fa-check"></i> Todos los módulos</li>
                     <li><i class="fas fa-check"></i> 5 usuarios</li>
-                    <li><i class="fas fa-check"></i> Soporte prioritario por email</li>
+                    <li><i class="fas fa-check"></i> Soporte prioritario</li>
                     <li><i class="fas fa-check"></i> Notificaciones por email</li>
                     <li><i class="fas fa-check"></i> Reportes avanzados</li>
                 </ul>
@@ -1091,12 +1091,12 @@
 
             <div class="pricing-card">
                 <h3>Enterprise</h3>
-                <div class="price">Consultar</div>
+                <div class="price">$50.000<span>/mes</span></div>
                 <ul class="features-list">
                     <li><i class="fas fa-check"></i> Socios ilimitados</li>
                     <li><i class="fas fa-check"></i> Todos los módulos</li>
                     <li><i class="fas fa-check"></i> Usuarios ilimitados</li>
-                    <li><i class="fas fa-check"></i> Soporte 24/7</li>
+                    <li><i class="fas fa-check"></i> Soporte prioritario</li>
                     <li><i class="fas fa-check"></i> Personalización</li>
                     <li><i class="fas fa-check"></i> Integración API</li>
                 </ul>
