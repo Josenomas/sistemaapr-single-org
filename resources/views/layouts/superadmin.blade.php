@@ -815,6 +815,14 @@
                     <i class="fas fa-external-link-alt" style="margin-left: auto; font-size: 0.75rem;"></i>
                 </a>
             </div>
+
+            <div class="menu-section">
+                <div class="menu-section-title">Configuración</div>
+                <a href="{{ route('superadmin.perfil') }}" class="menu-item {{ request()->routeIs('superadmin.perfil') ? 'active' : '' }}">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Mi Perfil</span>
+                </a>
+            </div>
         </nav>
     </aside>
 

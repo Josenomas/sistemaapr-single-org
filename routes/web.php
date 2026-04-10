@@ -552,4 +552,8 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->name('superadmi
     Route::post('/dominios/{id}/aprobar', [App\Http\Controllers\SuperAdminController::class, 'aprobarDominio'])->name('dominios.aprobar');
     Route::post('/dominios/{id}/rechazar', [App\Http\Controllers\SuperAdminController::class, 'rechazarDominio'])->name('dominios.rechazar');
     Route::post('/dominios/{id}/suspender', [App\Http\Controllers\SuperAdminController::class, 'suspenderDominio'])->name('dominios.suspender');
+
+    // Perfil del super admin
+    Route::get('/perfil', [App\Http\Controllers\SuperAdminController::class, 'perfil'])->name('perfil');
+    Route::put('/perfil', [App\Http\Controllers\SuperAdminController::class, 'actualizarPerfil'])->name('perfil.actualizar');
 });

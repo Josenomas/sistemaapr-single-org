@@ -716,4 +716,61 @@ class SuperAdminController extends Controller
         return redirect()->back()
             ->with('warning', "Dominio {$organizacion->dominio_personalizado} suspendido. El dominio dejará de funcionar inmediatamente.");
     }
+
+    /**
+     * Mostrar formulario de edición del perfil del super admin
+     */
+    public function perfil()
+    {
+        $usuario = auth()->user();
+        return view('superadmin.perfil', compact('usuario'));
+    }
+
+    /**
+     * Actualizar perfil del super admin
+     */
+    public function actualizarPerfil(Request $request)
+    {
+        $usuario = auth()->user();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:usuarios,email,' . $usuario->id,
+            'password' => 'nullable|min:8|confirmed',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Actualizar datos básicos
+            $usuario->name = $validated['name'];
+            $usuario->email = $validated['email'];
+
+            // Actualizar contraseña si se proporcionó
+            if ($request->filled('password')) {
+                $usuario->password = bcrypt($validated['password']);
+            }
+
+            $usuario->save();
+
+            // Registrar en auditoría
+            Auditoria::registrar(
+                $usuario->id,
+                'actualizar_perfil_superadmin',
+                'Actualizó su perfil de Super Admin',
+                'usuarios',
+                $usuario->id
+            );
+
+            DB::commit();
+
+            return redirect()->back()
+                ->with('success', 'Perfil actualizado exitosamente.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Error al actualizar el perfil: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
 }
