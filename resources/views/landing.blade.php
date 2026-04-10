@@ -1101,7 +1101,6 @@
                     <li><i class="fas fa-check"></i> Gestión de inventario</li>
                     <li><i class="fas fa-check"></i> Gestión de personal y RRHH</li>
                     <li><i class="fas fa-check"></i> Personalización de marca</li>
-                    <li><i class="fas fa-check"></i> Integración API</li>
                 </ul>
                 <a href="#contact" class="btn-primary">Contactar</a>
             </div>
