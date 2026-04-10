@@ -50,10 +50,11 @@
                             required>
                         <option value="">Seleccione</option>
                         <option value="informativa" {{ old('tipo') == 'informativa' ? 'selected' : '' }}>Informativa</option>
-                        <option value="recordatorio" {{ old('tipo') == 'recordatorio' ? 'selected' : '' }}>Recordatorio</option>
+                        <option value="importante" {{ old('tipo') == 'importante' ? 'selected' : '' }}>Importante</option>
                         <option value="urgente" {{ old('tipo') == 'urgente' ? 'selected' : '' }}>Urgente</option>
-                        <option value="corte" {{ old('tipo') == 'corte' ? 'selected' : '' }}>Corte de Servicio</option>
-                        <option value="reunion" {{ old('tipo') == 'reunion' ? 'selected' : '' }}>Reunión</option>
+                        <option value="recordatorio" {{ old('tipo') == 'recordatorio' ? 'selected' : '' }}>Recordatorio</option>
+                        <option value="aviso_pago" {{ old('tipo') == 'aviso_pago' ? 'selected' : '' }}>Aviso de Pago</option>
+                        <option value="corte_servicio" {{ old('tipo') == 'corte_servicio' ? 'selected' : '' }}>Corte de Servicio</option>
                     </select>
                     @error('tipo')
                         <div class="invalid-feedback">{{ $message }}</div>
