@@ -253,6 +253,22 @@
         background: #d97706;
     }
 
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        border-radius: 6px;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+    }
+
     @media (max-width: 768px) {
         .info-cards {
             grid-template-columns: 1fr;
@@ -419,11 +435,19 @@
                                     </td>
                                     <td>
                                         @if($pago->estado === 'pendiente')
-                                            <a href="{{ route('organizacion.solicitud-pago-manual.create', $pago->id) }}"
-                                               class="btn btn-sm btn-success"
-                                               title="Pagar con Transferencia">
-                                                <i class="fas fa-money-bill"></i> Pago Manual
-                                            </a>
+                                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                                <form action="{{ route('organizacion.pagos-suscripcion.pagar', $pago->id) }}" method="POST" style="margin: 0;">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-primary" title="Pagar con Tarjeta (Webpay)">
+                                                        <i class="fas fa-credit-card"></i> Pagar con Flow
+                                                    </button>
+                                                </form>
+                                                <a href="{{ route('organizacion.solicitud-pago-manual.create', $pago->id) }}"
+                                                   class="btn btn-sm btn-success"
+                                                   title="Pagar con Transferencia">
+                                                    <i class="fas fa-money-bill"></i> Pago Manual
+                                                </a>
+                                            </div>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
