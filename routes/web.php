@@ -532,6 +532,11 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->name('superadmi
     Route::post('/organizaciones/{id}/suspender', [App\Http\Controllers\SuperAdminController::class, 'suspenderOrganizacion'])->name('organizacion.suspender');
     Route::post('/organizaciones/{id}/activar', [App\Http\Controllers\SuperAdminController::class, 'activarOrganizacion'])->name('organizacion.activar');
     Route::post('/organizaciones/{id}/cambiar-plan', [App\Http\Controllers\SuperAdminController::class, 'cambiarPlan'])->name('organizacion.cambiar-plan');
+
+    // Importación masiva de socios
+    Route::get('/organizaciones/{id}/importar-socios', [App\Http\Controllers\ImportarSociosController::class, 'mostrarFormulario'])->name('importar-socios.formulario');
+    Route::post('/organizaciones/{id}/importar-socios', [App\Http\Controllers\ImportarSociosController::class, 'importar'])->name('importar-socios.procesar');
+    Route::get('/plantilla-socios', [App\Http\Controllers\ImportarSociosController::class, 'descargarPlantilla'])->name('importar-socios.plantilla');
     Route::delete('/organizaciones/{id}', [App\Http\Controllers\SuperAdminController::class, 'eliminarOrganizacion'])->name('organizacion.eliminar');
 
     // Gestión de registros pendientes
