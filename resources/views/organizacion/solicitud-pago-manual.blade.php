@@ -286,11 +286,47 @@
     </div>
 </div>
 
+<div class="card" style="background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%); color: white; border: none; margin-bottom: 24px;">
+    <div class="card-body">
+        <h3 style="color: white; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-university"></i> Datos Bancarios para Transferencia
+        </h3>
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; backdrop-filter: blur(10px);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                <div>
+                    <div style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px;">Banco</div>
+                    <div style="font-size: 1.125rem; font-weight: 600;">Banco Estado</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px;">Tipo de Cuenta</div>
+                    <div style="font-size: 1.125rem; font-weight: 600;">Cuenta Corriente</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px;">Número de Cuenta</div>
+                    <div style="font-size: 1.125rem; font-weight: 600;">12345678-9</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px;">RUT Titular</div>
+                    <div style="font-size: 1.125rem; font-weight: 600;">76.123.456-7</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px;">Titular</div>
+                    <div style="font-size: 1.125rem; font-weight: 600;">Sistema APR SpA</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px;">Email</div>
+                    <div style="font-size: 1.125rem; font-weight: 600;">sistemaapr@gmail.com</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="info-box">
     <h4><i class="fas fa-info-circle"></i> Instrucciones</h4>
     <p>Para registrar un pago manual por transferencia o depósito, sigue estos pasos:</p>
     <ul>
-        <li>Realiza la transferencia a la cuenta bancaria de Sistema APR</li>
+        <li>Realiza la transferencia a la cuenta bancaria mostrada arriba</li>
         <li>Guarda el comprobante de transferencia (foto o PDF)</li>
         <li>Completa el formulario con los datos de la transferencia</li>
         <li>Adjunta el comprobante</li>
