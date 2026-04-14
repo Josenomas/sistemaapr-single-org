@@ -34,7 +34,14 @@ class ImportarLecturasController extends Controller
         ]);
 
         try {
-            $idOrganizacion = session('id_organizacion');
+            // Obtener organización desde sesión o usuario autenticado
+            $idOrganizacion = session('tenant_id') ?? session('id_organizacion') ?? auth()->user()->id_organizacion ?? null;
+
+            if (!$idOrganizacion) {
+                return redirect()->back()
+                    ->with('error', 'No se pudo identificar la organización.');
+            }
+
             $mes = $request->mes;
             $fechaLectura = $request->fecha_lectura;
 
@@ -232,7 +239,8 @@ class ImportarLecturasController extends Controller
      */
     public function descargarPlantilla()
     {
-        $idOrganizacion = session('id_organizacion');
+        // Obtener organización desde sesión o usuario autenticado
+        $idOrganizacion = session('tenant_id') ?? session('id_organizacion') ?? auth()->user()->id_organizacion ?? null;
 
         // Validar que existe organización en sesión
         if (!$idOrganizacion) {
