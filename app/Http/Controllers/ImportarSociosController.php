@@ -103,6 +103,7 @@ class ImportarSociosController extends Controller
                         'rol_avaluo' => $data['rol_avaluo'] ?? $data['rol'] ?? null,
                         'estado' => $data['estado'] ?? 'activo',
                         'exento_iva' => isset($data['exento_iva']) ? (strtolower($data['exento_iva']) === 'si' || $data['exento_iva'] == '1') : false,
+                        'fecha_ingreso' => now(),
                         'fecha_creacion' => now(),
                     ]);
 
