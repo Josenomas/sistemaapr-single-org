@@ -270,6 +270,22 @@
                 </div>
             </div>
 
+            <!-- Gestión de Socios -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> Gestión de Socios</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{{ route('superadmin.importar-socios.formulario', $organizacion->id) }}"
+                       class="btn btn-primary w-100">
+                        <i class="fas fa-file-excel"></i> Importar Socios Masivamente
+                    </a>
+                    <small class="text-muted d-block mt-2">
+                        Importa múltiples socios desde un archivo Excel
+                    </small>
+                </div>
+            </div>
+
             <!-- Acciones -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white">
