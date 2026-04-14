@@ -79,9 +79,16 @@ class ImportarSociosController extends Controller
                         continue;
                     }
 
+                    // Generar número de socio automáticamente
+                    $ultimoSocio = Socio::where('id_organizacion', $idOrganizacion)
+                        ->orderBy('id', 'desc')
+                        ->first();
+                    $numeroSocio = 'SOC-' . str_pad(($ultimoSocio ? $ultimoSocio->id + 1 : 1), 4, '0', STR_PAD_LEFT);
+
                     // Crear socio
                     Socio::create([
                         'id_organizacion' => $idOrganizacion,
+                        'numero_socio' => $numeroSocio,
                         'rut' => $data['rut'] ?? null,
                         'nombre' => $data['nombre'] ?? null,
                         'apellido' => $data['apellido'] ?? null,
