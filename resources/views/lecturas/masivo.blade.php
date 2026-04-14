@@ -8,10 +8,16 @@
         <i class="fas fa-tachometer-alt"></i>
         Registro Masivo de Lecturas
     </h2>
-    <a href="{{ route('lecturas.index') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i>
-        Volver
-    </a>
+    <div class="header-actions">
+        <button type="button" id="startTourBtn" class="btn btn-info" title="Iniciar tutorial">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('lecturas.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Volver
+        </a>
+    </div>
 </div>
 
 <!-- Formulario completo -->
@@ -20,7 +26,9 @@
 
     <!-- Filtros -->
     <!-- Botón Importar Excel -->
-    <div class="alert alert-info mb-4" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; border: none;">
+    <div class="alert alert-info mb-4" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; border: none;"
+         data-intro="Si ya tienes las lecturas en un archivo Excel, puedes importarlas masivamente. La plantilla incluye todos tus socios con sus lecturas anteriores prellenadas."
+         data-step="1">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <h5 style="margin: 0 0 8px 0; color: white;"><i class="fas fa-file-excel"></i> ¿Tienes las lecturas en Excel?</h5>
@@ -32,7 +40,9 @@
         </div>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4"
+         data-intro="Configura el mes y fecha de las lecturas que vas a registrar. También puedes filtrar por sector si tu APR está dividida en zonas."
+         data-step="2">
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fas fa-filter"></i>
@@ -89,7 +99,9 @@
     </div>
 
     <!-- Tabla de Lecturas -->
-    <div class="card">
+    <div class="card"
+         data-intro="Aquí aparecen todos tus socios. La columna 'Lect. Anterior' muestra la última lectura registrada (en gris). Ingresa la nueva lectura en 'Lect. Actual' y el consumo se calculará automáticamente."
+         data-step="3">
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-list"></i>
@@ -167,7 +179,9 @@
             </table>
         </div>
 
-        <div class="form-actions mt-4">
+        <div class="form-actions mt-4"
+             data-intro="Una vez ingresadas todas las lecturas, haz clic en 'Guardar Todas las Lecturas'. El sistema registrará todas las lecturas y podrás generar las boletas correspondientes."
+             data-step="4">
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i>
                 Guardar Todas las Lecturas
@@ -203,6 +217,12 @@
 
     .page-title i {
         color: var(--primary);
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
     }
 
     .card {
@@ -499,5 +519,33 @@ document.getElementById('formMasivo').addEventListener('submit', function(e) {
 
     return confirm('¿Está seguro de guardar todas las lecturas ingresadas?');
 });
+
+// Tutorial interactivo con Intro.js
+const intro = introJs();
+intro.setOptions({
+    nextLabel: 'Siguiente',
+    prevLabel: 'Anterior',
+    doneLabel: 'Finalizar',
+    skipLabel: 'Salir',
+    showProgress: true,
+    showBullets: false,
+    exitOnOverlayClick: false,
+    disableInteraction: true,
+    tooltipClass: 'custom-tooltip'
+});
+
+// Botón para iniciar el tour
+document.getElementById('startTourBtn').addEventListener('click', function() {
+    intro.start();
+});
+
+// Mostrar tour automáticamente solo la primera vez
+const tourShown = localStorage.getItem('lecturasMasivoTourShown');
+if (!tourShown) {
+    setTimeout(function() {
+        intro.start();
+        localStorage.setItem('lecturasMasivoTourShown', 'true');
+    }, 500);
+}
 </script>
 @endsection
