@@ -9,11 +9,22 @@
         Historial de Consumo de Agua
     </h2>
     <div class="btn-group">
-        <a href="{{ route('historial-consumo.sincronizar') }}" class="btn btn-primary" onclick="return confirm('¿Desea sincronizar el historial desde las lecturas registradas?')">
+        <button type="button" id="startTourBtn" class="btn btn-warning" title="Ayuda sobre sincronización">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('historial-consumo.sincronizar') }}"
+           class="btn btn-primary"
+           onclick="return confirm('¿Desea sincronizar el historial desde las lecturas registradas?')"
+           data-intro="¿No ves tus datos ingresados? Presiona 'Sincronizar' para actualizar el historial desde las lecturas registradas. Esto crea automáticamente los registros de consumo basados en tus lecturas mensuales."
+           data-step="2">
             <i class="fas fa-sync"></i>
             Sincronizar
         </a>
-        <a href="{{ route('historial-consumo.comparar') }}" class="btn btn-info">
+        <a href="{{ route('historial-consumo.comparar') }}"
+           class="btn btn-info"
+           data-intro="Usa 'Comparar' para analizar el consumo entre diferentes periodos o socios."
+           data-step="3">
             <i class="fas fa-exchange-alt"></i>
             Comparar
         </a>
@@ -21,7 +32,9 @@
 </div>
 
 <!-- Estadísticas -->
-<div class="stats-row">
+<div class="stats-row"
+     data-intro="Estas estadísticas muestran el resumen de consumos sincronizados desde las lecturas registradas."
+     data-step="1">
     <div class="stat-card">
         <div class="stat-icon bg-primary">
             <i class="fas fa-database"></i>
@@ -571,5 +584,87 @@
             grid-template-columns: 1fr;
         }
     }
+
+    /* Estilos para Intro.js */
+    .introjs-tooltip {
+        min-width: 300px;
+        max-width: 500px;
+    }
+
+    .custom-tooltip {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .custom-tooltip .introjs-tooltiptext {
+        padding: 20px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .custom-tooltip .introjs-tooltipbuttons {
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding-top: 15px;
+    }
+
+    .custom-tooltip .introjs-button {
+        border: 2px solid white;
+        background: transparent;
+        color: white;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .custom-tooltip .introjs-button:hover {
+        background: white;
+        color: #667eea;
+    }
+
+    .custom-tooltip .introjs-skipbutton {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .custom-tooltip .introjs-skipbutton:hover {
+        color: white;
+    }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tutorial interactivo con Intro.js
+    const intro = introJs();
+    intro.setOptions({
+        nextLabel: 'Siguiente',
+        prevLabel: 'Anterior',
+        doneLabel: 'Finalizar',
+        skipLabel: 'Salir',
+        showProgress: true,
+        showBullets: false,
+        exitOnOverlayClick: false,
+        disableInteraction: true,
+        tooltipClass: 'custom-tooltip'
+    });
+
+    // Evento del botón Ayuda
+    const startTourBtn = document.getElementById('startTourBtn');
+    if (startTourBtn) {
+        startTourBtn.addEventListener('click', function() {
+            intro.start();
+        });
+    }
+
+    // Auto-mostrar tour en primera visita
+    const tourShown = localStorage.getItem('historialConsumoTourShown');
+    if (!tourShown) {
+        setTimeout(function() {
+            intro.start();
+            localStorage.setItem('historialConsumoTourShown', 'true');
+        }, 500);
+    }
+});
+</script>
 @endsection
