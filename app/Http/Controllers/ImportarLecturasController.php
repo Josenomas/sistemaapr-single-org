@@ -234,6 +234,12 @@ class ImportarLecturasController extends Controller
     {
         $idOrganizacion = session('id_organizacion');
 
+        // Validar que existe organización en sesión
+        if (!$idOrganizacion) {
+            return redirect()->back()
+                ->with('error', 'No se pudo identificar la organización. Por favor, inicie sesión nuevamente.');
+        }
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -265,6 +271,9 @@ class ImportarLecturasController extends Controller
             ->where('estado', 'activo')
             ->orderBy('numero_socio')
             ->get();
+
+        // Log para debug
+        \Log::info("Plantilla lecturas - Org: {$idOrganizacion}, Socios encontrados: " . $socios->count());
 
         $row = 2;
         foreach ($socios as $socio) {
