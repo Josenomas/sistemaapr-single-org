@@ -585,51 +585,40 @@
         }
     }
 
-    /* Estilos para Intro.js */
-    .introjs-tooltip {
-        min-width: 300px;
-        max-width: 500px;
-    }
-
+    /* Estilos personalizados para Intro.js */
     .custom-tooltip {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
     }
 
-    .custom-tooltip .introjs-tooltiptext {
-        padding: 20px;
-        font-size: 0.95rem;
-        line-height: 1.6;
+    .introjs-tooltip {
+        border-radius: 12px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
     }
 
-    .custom-tooltip .introjs-tooltipbuttons {
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-        padding-top: 15px;
+    .introjs-button {
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        font-weight: 600 !important;
+        text-shadow: none !important;
     }
 
-    .custom-tooltip .introjs-button {
-        border: 2px solid white;
-        background: transparent;
-        color: white;
-        font-weight: 600;
-        padding: 8px 16px;
-        border-radius: 6px;
-        transition: all 0.2s;
+    .introjs-nextbutton {
+        background: var(--primary) !important;
+        border: none !important;
     }
 
-    .custom-tooltip .introjs-button:hover {
-        background: white;
-        color: #667eea;
+    .introjs-prevbutton {
+        background: var(--gray-500) !important;
+        border: none !important;
     }
 
-    .custom-tooltip .introjs-skipbutton {
-        color: rgba(255, 255, 255, 0.8);
+    .introjs-skipbutton {
+        color: var(--gray-600) !important;
     }
 
-    .custom-tooltip .introjs-skipbutton:hover {
-        color: white;
+    .introjs-donebutton {
+        background: var(--success) !important;
+        border: none !important;
     }
 </style>
 
