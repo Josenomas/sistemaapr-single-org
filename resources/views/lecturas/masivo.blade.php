@@ -19,6 +19,19 @@
     @csrf
 
     <!-- Filtros -->
+    <!-- Botón Importar Excel -->
+    <div class="alert alert-info mb-4" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; border: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h5 style="margin: 0 0 8px 0; color: white;"><i class="fas fa-file-excel"></i> ¿Tienes las lecturas en Excel?</h5>
+                <p style="margin: 0; opacity: 0.9;">Ahorra tiempo importando lecturas masivamente desde un archivo Excel</p>
+            </div>
+            <a href="{{ route('lecturas.importar.index') }}" class="btn" style="background: white; color: #0284c7; font-weight: 600;">
+                <i class="fas fa-upload"></i> Importar desde Excel
+            </a>
+        </div>
+    </div>
+
     <div class="card mb-4">
         <div class="card-header">
             <h3 class="card-title">

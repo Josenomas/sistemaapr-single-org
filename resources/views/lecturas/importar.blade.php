@@ -16,7 +16,7 @@
 
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Cargar archivo CSV</h3>
+        <h3 class="card-title">Cargar archivo Excel/CSV</h3>
     </div>
     <div class="card-body">
         @if(session('error'))
@@ -38,17 +38,19 @@
             <div>
                 <h4>Instrucciones:</h4>
                 <ol>
-                    <li>Descarga la plantilla CSV haciendo clic en el botón de abajo</li>
-                    <li>Completa el archivo con tus datos (puedes usar Excel o Google Sheets)</li>
-                    <li>Guarda el archivo como CSV (separado por comas)</li>
+                    <li>Descarga la plantilla Excel haciendo clic en el botón de abajo</li>
+                    <li>La plantilla incluye TODOS tus socios con su lectura anterior</li>
+                    <li>Solo completa la columna "lectura_actual" (en azul)</li>
                     <li>Sube el archivo aquí</li>
                 </ol>
-                <p><strong>Formato del archivo:</strong></p>
+                <p><strong>Columnas del archivo:</strong></p>
                 <ul>
-                    <li><strong>numero_socio:</strong> Número del socio (ej: SOC-0001)</li>
-                    <li><strong>mes:</strong> Formato YYYY-MM (ej: 2025-01)</li>
-                    <li><strong>lectura_actual:</strong> Lectura en m³ (ej: 120.50)</li>
-                    <li><strong>fecha_lectura:</strong> Formato DD/MM/YYYY (ej: 15/01/2025)</li>
+                    <li><strong>numero_socio:</strong> Ya viene pre-llenado</li>
+                    <li><strong>nombre_completo:</strong> Ya viene pre-llenado</li>
+                    <li><strong>numero_medidor:</strong> Ya viene pre-llenado</li>
+                    <li><strong>lectura_anterior:</strong> Ya viene pre-llenado (gris)</li>
+                    <li><strong>lectura_actual:</strong> ⭐ LLENA ESTA COLUMNA (azul)</li>
+                    <li><strong>observaciones:</strong> Opcional</li>
                 </ul>
             </div>
         </div>
@@ -56,25 +58,53 @@
         <div class="download-template">
             <a href="{{ route('lecturas.importar.plantilla') }}" class="btn btn-success">
                 <i class="fas fa-download"></i>
-                Descargar Plantilla CSV
+                Descargar Plantilla Excel
             </a>
         </div>
 
         <form action="{{ route('lecturas.importar.procesar') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="mes" class="form-label required">Mes/Año</label>
+                    <input type="month"
+                           name="mes"
+                           id="mes"
+                           class="form-control @error('mes') is-invalid @enderror"
+                           value="{{ old('mes', date('Y-m')) }}"
+                           required>
+                    @error('mes')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="fecha_lectura" class="form-label required">Fecha de Lectura</label>
+                    <input type="date"
+                           name="fecha_lectura"
+                           id="fecha_lectura"
+                           class="form-control @error('fecha_lectura') is-invalid @enderror"
+                           value="{{ old('fecha_lectura', date('Y-m-d')) }}"
+                           required>
+                    @error('fecha_lectura')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
             <div class="form-group">
-                <label for="archivo" class="form-label required">Archivo CSV</label>
+                <label for="archivo" class="form-label required">Archivo Excel/CSV</label>
                 <input type="file"
                        class="form-control @error('archivo') is-invalid @enderror"
                        id="archivo"
                        name="archivo"
-                       accept=".csv,.txt"
+                       accept=".xlsx,.xls,.csv,.txt"
                        required>
                 @error('archivo')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
-                <small class="form-text">Tamaño máximo: 2MB. Formatos permitidos: .csv, .txt</small>
+                <small class="form-text">Tamaño máximo: 10MB. Formatos permitidos: .xlsx, .xls, .csv, .txt</small>
             </div>
 
             <div class="form-actions">
