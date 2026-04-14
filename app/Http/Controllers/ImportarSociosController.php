@@ -41,7 +41,7 @@ class ImportarSociosController extends Controller
 
             // Validar encabezados
             $headers = array_map('strtolower', array_map('trim', $rows[0]));
-            $requiredHeaders = ['rut', 'nombre', 'apellido'];
+            $requiredHeaders = ['rut', 'nombre', 'apellido_paterno'];
 
             foreach ($requiredHeaders as $required) {
                 if (!in_array($required, $headers)) {
@@ -91,7 +91,8 @@ class ImportarSociosController extends Controller
                         'numero_socio' => $numeroSocio,
                         'rut' => $data['rut'] ?? null,
                         'nombre' => $data['nombre'] ?? null,
-                        'apellido' => $data['apellido'] ?? null,
+                        'apellido_paterno' => $data['apellido_paterno'] ?? $data['apellido'] ?? null,
+                        'apellido_materno' => $data['apellido_materno'] ?? null,
                         'email' => $data['email'] ?? null,
                         'telefono' => $data['telefono'] ?? $data['teléfono'] ?? null,
                         'direccion' => $data['direccion'] ?? $data['dirección'] ?? null,
@@ -152,7 +153,8 @@ class ImportarSociosController extends Controller
         $headers = [
             'rut',
             'nombre',
-            'apellido',
+            'apellido_paterno',
+            'apellido_materno',
             'email',
             'telefono',
             'direccion',
@@ -176,8 +178,8 @@ class ImportarSociosController extends Controller
 
         // Ejemplos de datos
         $ejemplos = [
-            ['12345678-9', 'Juan', 'Pérez', 'juan.perez@email.com', '+56912345678', 'Av. Principal 123', 'Santiago', 'Región Metropolitana', 'MED-001', 'Sector A', '12345-001', 'activo', 'no'],
-            ['98765432-1', 'María', 'González', 'maria.gonzalez@email.com', '+56987654321', 'Calle Secundaria 456', 'Providencia', 'Región Metropolitana', 'MED-002', 'Sector B', '12345-002', 'activo', 'si'],
+            ['12345678-9', 'Juan', 'Pérez', 'González', 'juan.perez@email.com', '+56912345678', 'Av. Principal 123', 'Santiago', 'Región Metropolitana', 'MED-001', 'Sector A', '12345-001', 'activo', 'no'],
+            ['98765432-1', 'María', 'González', 'López', 'maria.gonzalez@email.com', '+56987654321', 'Calle Secundaria 456', 'Providencia', 'Región Metropolitana', 'MED-002', 'Sector B', '12345-002', 'activo', 'si'],
         ];
 
         $row = 2;

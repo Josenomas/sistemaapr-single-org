@@ -84,7 +84,7 @@
             </li>
             <li>
                 <strong>Llena la plantilla con los datos de los socios</strong>
-                <p>Completa todas las filas con la información de cada socio. Los campos obligatorios son: RUT, Nombre y Apellido.</p>
+                <p>Completa todas las filas con la información de cada socio. Los campos obligatorios son: RUT, Nombre y Apellido Paterno.</p>
             </li>
             <li>
                 <strong>Sube el archivo Excel</strong>
@@ -104,8 +104,12 @@
                     <small>Ej: Juan</small>
                 </div>
                 <div class="campo">
-                    <strong>apellido</strong> <span class="required">*</span>
+                    <strong>apellido_paterno</strong> <span class="required">*</span>
                     <small>Ej: Pérez</small>
+                </div>
+                <div class="campo">
+                    <strong>apellido_materno</strong>
+                    <small>Ej: González</small>
                 </div>
                 <div class="campo">
                     <strong>email</strong>
