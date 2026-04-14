@@ -356,6 +356,7 @@
                                 <th>Método</th>
                                 <th>Fecha Pago</th>
                                 <th>Vencimiento</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -412,6 +413,17 @@
                                             @if($pago->estaVencido())
                                                 <br><span class="badge bg-danger">Vencido</span>
                                             @endif
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($pago->estado === 'pendiente')
+                                            <a href="{{ route('organizacion.solicitud-pago-manual.create', $pago->id) }}"
+                                               class="btn btn-sm btn-success"
+                                               title="Pagar con Transferencia">
+                                                <i class="fas fa-money-bill"></i> Pago Manual
+                                            </a>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif

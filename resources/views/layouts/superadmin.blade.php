@@ -785,6 +785,16 @@
                     <i class="fas fa-sync-alt"></i>
                     <span>Renovaciones</span>
                 </a>
+                <a href="{{ route('superadmin.solicitudes-pago.index') }}" class="menu-item {{ request()->routeIs('superadmin.solicitudes-pago.*') ? 'active' : '' }}">
+                    <i class="fas fa-money-check-alt"></i>
+                    <span>Pagos Manuales</span>
+                    @php
+                        $solicitudesPendientes = \App\Models\SolicitudPagoManual::where('estado', 'pendiente')->count();
+                    @endphp
+                    @if($solicitudesPendientes > 0)
+                        <span class="badge bg-warning ms-auto">{{ $solicitudesPendientes }}</span>
+                    @endif
+                </a>
             </div>
 
             <div class="menu-section">

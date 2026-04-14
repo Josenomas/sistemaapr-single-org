@@ -101,6 +101,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/pagos-suscripcion/{id}/pagar', [PagosSuscripcionController::class, 'pagar'])->name('pagos-suscripcion.pagar');
         Route::get('/cambiar-plan/{idSuscripcionNueva}/confirmar', [App\Http\Controllers\OrganizacionController::class, 'mostrarConfirmacionCambioPlan'])->name('confirmar-cambio-plan');
         Route::post('/cambiar-plan/{idSuscripcionNueva}', [App\Http\Controllers\OrganizacionController::class, 'iniciarCambioPlan'])->name('cambiar-plan');
+
+        // Solicitudes de pago manual
+        Route::get('/solicitud-pago-manual/{idPago}', [App\Http\Controllers\SolicitudPagoManualController::class, 'create'])->name('solicitud-pago-manual.create');
+        Route::post('/solicitud-pago-manual/{idPago}', [App\Http\Controllers\SolicitudPagoManualController::class, 'store'])->name('solicitud-pago-manual.store');
+        Route::get('/solicitud-pago-manual/{id}/ver', [App\Http\Controllers\SolicitudPagoManualController::class, 'show'])->name('solicitud-pago-manual.show');
     });
 });
 
@@ -543,6 +548,12 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->name('superadmi
     // Renovaciones y vencimientos
     Route::get('/renovaciones', [App\Http\Controllers\SuperAdminController::class, 'renovaciones'])->name('renovaciones');
     Route::post('/renovaciones/{id}/pagar', [App\Http\Controllers\SuperAdminController::class, 'pagarRenovacion'])->name('renovaciones.pagar');
+
+    // Solicitudes de pago manual
+    Route::get('/solicitudes-pago', [App\Http\Controllers\SolicitudPagoManualController::class, 'index'])->name('solicitudes-pago.index');
+    Route::get('/solicitudes-pago/{id}', [App\Http\Controllers\SolicitudPagoManualController::class, 'showSuperAdmin'])->name('solicitudes-pago.show');
+    Route::post('/solicitudes-pago/{id}/aprobar', [App\Http\Controllers\SolicitudPagoManualController::class, 'aprobar'])->name('solicitudes-pago.aprobar');
+    Route::post('/solicitudes-pago/{id}/rechazar', [App\Http\Controllers\SolicitudPagoManualController::class, 'rechazar'])->name('solicitudes-pago.rechazar');
 
     // Auditoría y logs
     Route::get('/auditoria', [App\Http\Controllers\SuperAdminController::class, 'auditoria'])->name('auditoria');
