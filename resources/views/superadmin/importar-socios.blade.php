@@ -132,7 +132,7 @@
                     <small>Ej: Metropolitana</small>
                 </div>
                 <div class="campo">
-                    <strong>medidor</strong>
+                    <strong>numero_medidor</strong>
                     <small>Ej: MED-001</small>
                 </div>
                 <div class="campo">
