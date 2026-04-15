@@ -239,8 +239,12 @@ class ImportarInventarioController extends Controller
                 }
 
                 try {
-                    // Generar código automático
-                    $codigoProducto = Inventario::generarCodigoProducto();
+                    // Generar código automático por organización
+                    $ultimoProducto = Inventario::where('id_organizacion', $idOrganizacion)
+                        ->orderBy('id', 'desc')
+                        ->first();
+                    $numero = $ultimoProducto ? intval(substr($ultimoProducto->codigo_producto, 5)) + 1 : 1;
+                    $codigoProducto = 'PROD-' . str_pad($numero, 6, '0', STR_PAD_LEFT);
 
                     // Determinar estado automático
                     $cantActual = floatval($cantidadActual);
