@@ -241,9 +241,17 @@ class ImportarInventarioController extends Controller
                 try {
                     // Generar código automático por organización
                     $ultimoProducto = Inventario::where('id_organizacion', $idOrganizacion)
-                        ->orderBy('id', 'desc')
+                        ->orderBy('codigo_producto', 'desc')
                         ->first();
-                    $numero = $ultimoProducto ? intval(substr($ultimoProducto->codigo_producto, 5)) + 1 : 1;
+
+                    if ($ultimoProducto && $ultimoProducto->codigo_producto) {
+                        // Extraer número del último código (PROD-000001 -> 1, PROD-000002 -> 2)
+                        $partes = explode('-', $ultimoProducto->codigo_producto);
+                        $numero = isset($partes[1]) ? (int)$partes[1] + 1 : 1;
+                    } else {
+                        $numero = 1;
+                    }
+
                     $codigoProducto = 'PROD-' . str_pad($numero, 6, '0', STR_PAD_LEFT);
 
                     // Determinar estado automático
