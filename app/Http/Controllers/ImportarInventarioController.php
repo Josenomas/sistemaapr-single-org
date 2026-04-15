@@ -178,7 +178,12 @@ class ImportarInventarioController extends Controller
             $worksheet = $spreadsheet->getActiveSheet();
             $rows = $worksheet->toArray();
 
-            // Comenzar desde la fila 10 (después de encabezados en fila 9)
+            Log::info("Total filas en Excel: " . count($rows));
+            Log::info("Fila 9 (encabezados): " . json_encode($rows[8] ?? []));
+            Log::info("Fila 10 (primera data): " . json_encode($rows[9] ?? []));
+
+            // Comenzar desde la fila 10 (índice 9 del array)
+            // Los encabezados están en fila 9 (índice 8)
             $errores = [];
             $importados = 0;
             $omitidos = 0;
@@ -186,6 +191,8 @@ class ImportarInventarioController extends Controller
             for ($i = 9; $i < count($rows); $i++) {
                 $row = $rows[$i];
                 $numeroFila = $i + 1;
+
+                Log::info("Procesando fila $numeroFila, Nombre: {$row[0]}, Categoría: {$row[1]}, Unidad: {$row[3]}");
 
                 // Saltar filas vacías
                 if (empty(trim($row[0] ?? ''))) {
