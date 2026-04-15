@@ -13,6 +13,10 @@
             <i class="fas fa-question-circle"></i>
             Ayuda
         </button>
+        <a href="{{ route('inventario.importar.index') }}" class="btn btn-success">
+            <i class="fas fa-file-excel"></i>
+            Importar Excel
+        </a>
         <a href="{{ route('inventario.create') }}" class="btn btn-primary" data-intro="Registra un nuevo producto en el inventario: materiales, equipos, herramientas, insumos, químicos o repuestos." data-step="1">
             <i class="fas fa-plus"></i>
             Nuevo Producto

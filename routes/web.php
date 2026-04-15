@@ -29,6 +29,7 @@ use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\ConfiguracionTarifasController;
 use App\Http\Controllers\FlowController;
 use App\Http\Controllers\ImportarLecturasController;
+use App\Http\Controllers\ImportarInventarioController;
 use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\ConsultaPublicaController;
 use App\Http\Controllers\EventosController;
@@ -382,6 +383,11 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
     // ========================================
     Route::middleware('permission:inventario')->group(function () {
         Route::resource('inventario', InventarioController::class);
+
+        // Importación masiva de inventario
+        Route::get('/inventario-importar', [ImportarInventarioController::class, 'index'])->name('inventario.importar.index');
+        Route::post('/inventario-importar', [ImportarInventarioController::class, 'importar'])->name('inventario.importar.procesar');
+        Route::get('/inventario-importar-plantilla', [ImportarInventarioController::class, 'descargarPlantilla'])->name('inventario.importar.plantilla');
     });
 
     // ========================================
