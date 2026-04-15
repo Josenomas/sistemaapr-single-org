@@ -34,10 +34,13 @@ class DashboardController extends Controller
         $incidentesAbiertos = Incidente::whereIn('estado', ['reportado', 'en_atencion'])
                                        ->count();
 
-        // Actividad Reciente con información del usuario
+        // Actividad Reciente con información del usuario (filtrada por organización)
+        $idOrganizacion = auth()->user()->id_organizacion;
+
         $actividad = DB::table('actividad_reciente')
                        ->leftJoin('usuarios', 'actividad_reciente.id_usuario', '=', 'usuarios.id')
                        ->select('actividad_reciente.*', 'usuarios.nombre', 'usuarios.apellido', 'usuarios.nombre_usuario')
+                       ->where('actividad_reciente.id_organizacion', $idOrganizacion)
                        ->where('actividad_reciente.activo', 1)
                        ->orderBy('actividad_reciente.fecha_creacion', 'desc')
                        ->limit(5)
