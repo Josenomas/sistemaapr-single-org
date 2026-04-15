@@ -40,10 +40,11 @@ class DashboardController extends Controller
         $actividad = collect(); // Colección vacía por defecto
 
         if ($idOrganizacion) {
+            // Filtrar actividad por usuarios de la organización
             $actividad = DB::table('actividad_reciente')
                            ->leftJoin('usuarios', 'actividad_reciente.id_usuario', '=', 'usuarios.id')
                            ->select('actividad_reciente.*', 'usuarios.nombre', 'usuarios.apellido', 'usuarios.nombre_usuario')
-                           ->where('actividad_reciente.id_organizacion', $idOrganizacion)
+                           ->where('usuarios.id_organizacion', $idOrganizacion)
                            ->where('actividad_reciente.activo', 1)
                            ->orderBy('actividad_reciente.fecha_creacion', 'desc')
                            ->limit(5)
