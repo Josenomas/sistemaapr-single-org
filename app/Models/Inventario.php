@@ -209,10 +209,30 @@ class Inventario extends Model
     }
 
     // Métodos auxiliares
-    public static function generarCodigoProducto()
+    public static function generarCodigoProducto($idOrganizacion = null)
     {
-        $ultimoProducto = self::orderBy('id', 'desc')->first();
-        $numero = $ultimoProducto ? intval(substr($ultimoProducto->codigo_producto, 4)) + 1 : 1;
+        // Si no se proporciona organización, intentar obtenerla de la sesión
+        if (!$idOrganizacion) {
+            $idOrganizacion = session('tenant_id') ?? session('id_organizacion') ?? auth()->user()->id_organizacion ?? null;
+        }
+
+        // Buscar el último producto de la organización
+        $query = self::orderBy('codigo_producto', 'desc');
+
+        if ($idOrganizacion) {
+            $query->where('id_organizacion', $idOrganizacion);
+        }
+
+        $ultimoProducto = $query->first();
+
+        if ($ultimoProducto && $ultimoProducto->codigo_producto) {
+            // Extraer número del último código (PROD-000001 -> 1, PROD-000002 -> 2)
+            $partes = explode('-', $ultimoProducto->codigo_producto);
+            $numero = isset($partes[1]) ? (int)$partes[1] + 1 : 1;
+        } else {
+            $numero = 1;
+        }
+
         return 'PROD-' . str_pad($numero, 6, '0', STR_PAD_LEFT);
     }
 
