@@ -70,7 +70,7 @@ class VerificarSuscripciones extends Command
                     'estado' => 'pendiente',
                     'periodo_inicio' => $inicioPeriodoNuevo,
                     'periodo_fin' => $finPeriodoNuevo,
-                    'fecha_vencimiento' => $inicioPeriodoNuevo->copy()->addDays(5), // 5 días para pagar
+                    'fecha_vencimiento' => $inicioPeriodoNuevo, // Vence el mismo día de inicio del período
                 ]);
 
                 $generados++;

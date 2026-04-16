@@ -474,7 +474,6 @@
             <h4><i class="fas fa-info-circle"></i> ¿Cómo funcionan los pagos?</h4>
             <ul>
                 <li>Los pagos se generan automáticamente cada mes</li>
-                <li>Tienes 5 días para realizar el pago desde el inicio del período</li>
                 <li>Recibirás notificaciones 7, 3 y 1 día antes del vencimiento</li>
                 <li>Si no pagas a tiempo, tu cuenta será suspendida automáticamente</li>
             </ul>
