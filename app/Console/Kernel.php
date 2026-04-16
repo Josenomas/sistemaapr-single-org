@@ -30,6 +30,11 @@ class Kernel extends ConsoleKernel
                  ->dailyAt('08:00')
                  ->emailOutputOnFailure('sistemaapr@gmail.com');
 
+        // Aplicar cambios de plan pendientes (downgrades) diariamente a las 8:30 AM
+        $schedule->command('cambios-plan:aplicar')
+                 ->dailyAt('08:30')
+                 ->emailOutputOnFailure('sistemaapr@gmail.com');
+
         // Enviar notificaciones de boletas vencidas diariamente a las 9:00 AM
         $schedule->command('notificaciones:boletas-vencidas')
                  ->dailyAt('09:00')
