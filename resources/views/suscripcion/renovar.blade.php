@@ -114,7 +114,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ route('solicitud-pago-manual.create', $pagoPendiente->id) }}"
+                                <a href="{{ route('organizacion.solicitud-pago-manual.create', $pagoPendiente->id) }}"
                                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition">
                                     <span class="flex items-center">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
