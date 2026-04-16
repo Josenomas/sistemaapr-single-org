@@ -94,7 +94,42 @@
                     </div>
                     @endif
 
-                    <!-- Opción 2: Contactar administrador -->
+                    <!-- Opción 2: Pago por transferencia bancaria -->
+                    @if($pagoPendiente)
+                    <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-4">
+                        <div class="flex items-start">
+                            <svg class="w-8 h-8 text-blue-600 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                            </svg>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Pagar por transferencia bancaria</h3>
+                                <p class="text-gray-700 mb-3">
+                                    Realiza una transferencia bancaria y sube el comprobante para validación manual por el administrador.
+                                </p>
+                                <div class="bg-white border border-blue-200 rounded-lg p-4 mb-4">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <p class="text-sm text-gray-600">Monto a transferir:</p>
+                                            <p class="text-2xl font-bold text-blue-600">${{ number_format($pagoPendiente->monto, 0, ',', '.') }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{{ route('organizacion.pagos-suscripcion.solicitud-pago-manual', $pagoPendiente->id) }}"
+                                   class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition">
+                                    <span class="flex items-center">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        Solicitar pago manual
+                                    </span>
+                                </a>
+                                <p class="text-xs text-gray-500 mt-2">El administrador revisará tu comprobante en un plazo de 24-48 horas.</p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Opción 3: Contactar administrador -->
                     <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 mb-4">
                         <div class="flex items-start">
                             <svg class="w-8 h-8 text-purple-600 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,7 +148,7 @@
                         </div>
                     </div>
 
-                    <!-- Opción 2: Cambiar de plan -->
+                    <!-- Opción 4: Cambiar de plan -->
                     <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
                         <div class="flex items-start mb-4">
                             <svg class="w-8 h-8 text-blue-600 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
