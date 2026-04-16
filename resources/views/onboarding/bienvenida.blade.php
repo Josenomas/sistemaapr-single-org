@@ -73,7 +73,7 @@
         </h4>
         <p style="color: #92400e; margin: 0;">
             Visita nuestra <a href="#" style="color: #b45309; font-weight: 600;">guía de inicio rápido</a> o 
-            contáctanos en <a href="mailto:soporte@sistemaapr.cl" style="color: #b45309; font-weight: 600;">soporte@sistemaapr.cl</a>
+            contáctanos en <a href="mailto:soportesistemaapr@gmail.com" style="color: #b45309; font-weight: 600;">soportesistemaapr@gmail.com</a>
         </p>
     </div>
 

@@ -198,7 +198,7 @@
             <strong style="color: #1e3a8a;">💬 ¿Necesitas ayuda?</strong>
             <p style="margin: 5px 0 0 0; color: #1e40af;">
                 Si tienes problemas para realizar el pago o necesitas asistencia, contáctanos a
-                <a href="mailto:soporte@sistemaapr.cl" style="color: #2563eb;">soporte@sistemaapr.cl</a>
+                <a href="mailto:soportesistemaapr@gmail.com" style="color: #2563eb;">soportesistemaapr@gmail.com</a>
             </p>
         </div>
 
@@ -208,7 +208,7 @@
             <p style="margin-top: 20px;">
                 <small>
                     Este es un correo automático, por favor no respondas a este mensaje.<br>
-                    Para cualquier consulta, contáctanos a soporte@sistemaapr.cl
+                    Para cualquier consulta, contáctanos a soportesistemaapr@gmail.com
                 </small>
             </p>
             <p style="margin-top: 15px;">

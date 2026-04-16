@@ -194,7 +194,7 @@
             <p style="margin-top: 20px;">
                 <small>
                     Este es un correo automático, por favor no respondas a este mensaje.<br>
-                    Si tienes alguna consulta, ingresa al sistema o contáctanos a soporte@sistemaapr.cl
+                    Si tienes alguna consulta, ingresa al sistema o contáctanos a soportesistemaapr@gmail.com
                 </small>
             </p>
             <p style="margin-top: 15px;">

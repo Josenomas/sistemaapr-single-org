@@ -389,7 +389,7 @@
                     Para preguntas sobre estos términos y condiciones, puede contactarnos a través de:
                 </p>
                 <ul>
-                    <li><strong>Email:</strong> soporte@sistemaapr.cl</li>
+                    <li><strong>Email:</strong> soportesistemaapr@gmail.com</li>
                     <li><strong>Formulario de contacto:</strong> Disponible en nuestra página principal</li>
                 </ul>
             </div>

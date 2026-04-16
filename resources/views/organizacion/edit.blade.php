@@ -932,7 +932,7 @@
    • Los cambios DNS pueden tardar hasta 48 horas
 
 📞 SOPORTE:
-   Si necesitas ayuda, contacta a soporte@sistemaapr.cl
+   Si necesitas ayuda, contacta a soportesistemaapr@gmail.com
         `;
 
         alert(mensaje);

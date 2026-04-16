@@ -179,7 +179,7 @@
                 </div>
                 <div class="info-content">
                     <h4>Soporte</h4>
-                    <p>Si tienes dudas, contáctanos a <a href="mailto:soporte@sistemaapr.cl">soporte@sistemaapr.cl</a></p>
+                    <p>Si tienes dudas, contáctanos a <a href="mailto:soportesistemaapr@gmail.com">soportesistemaapr@gmail.com</a></p>
                 </div>
             </div>
         </div>
