@@ -718,6 +718,196 @@ class SuperAdminController extends Controller
     }
 
     /**
+     * Ver solicitudes de compra de dominio
+     */
+    public function solicitudesDominio()
+    {
+        $solicitudes = \App\Models\SolicitudCompraDominio::with(['organizacion', 'verificador', 'comprador'])
+            ->orderByRaw("FIELD(estado, 'solicitado', 'pagado', 'comprado', 'verificado_disponible', 'pendiente_pago', 'verificado_ocupado', 'activo', 'cancelado')")
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        $stats = [
+            'total' => \App\Models\SolicitudCompraDominio::count(),
+            'solicitados' => \App\Models\SolicitudCompraDominio::where('estado', 'solicitado')->count(),
+            'pagados' => \App\Models\SolicitudCompraDominio::where('estado', 'pagado')->count(),
+            'activos' => \App\Models\SolicitudCompraDominio::where('estado', 'activo')->count(),
+        ];
+
+        return view('superadmin.solicitudes-dominio', compact('solicitudes', 'stats'));
+    }
+
+    /**
+     * Aprobar solicitud (marcar como disponible)
+     */
+    public function aprobarSolicitudDominio($id)
+    {
+        $solicitud = \App\Models\SolicitudCompraDominio::findOrFail($id);
+
+        if (!$solicitud->puedeVerificarDisponible()) {
+            return redirect()->back()->with('error', 'Esta solicitud no puede ser aprobada en su estado actual.');
+        }
+
+        $solicitud->update([
+            'estado' => 'verificado_disponible',
+            'verificado_por' => auth()->id(),
+            'fecha_verificacion' => now(),
+            'observaciones' => 'Dominio verificado como disponible por el administrador.',
+        ]);
+
+        // Enviar email al cliente notificando disponibilidad
+        try {
+            \Mail::raw(
+                "¡Buenas noticias!\n\n" .
+                "El dominio {$solicitud->dominio_solicitado} está DISPONIBLE.\n\n" .
+                "Para proceder con la compra:\n" .
+                "1. Realiza el pago de $20.000\n" .
+                "2. Puedes pagar por transferencia bancaria:\n" .
+                "   - Envía comprobante a soportesistemaapr@gmail.com\n\n" .
+                "Una vez recibido el pago, compraremos y configuraremos tu dominio.\n\n" .
+                "Saludos,\n" .
+                "Equipo SistemaAPR",
+                function($message) use ($solicitud) {
+                    $message->to($solicitud->organizacion->email_contacto)
+                            ->subject('✅ Dominio Disponible - ' . $solicitud->dominio_solicitado);
+                }
+            );
+        } catch (\Exception $e) {
+            \Log::error('Error enviando email disponibilidad: ' . $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Solicitud aprobada. Se notificó al cliente que el dominio está disponible.');
+    }
+
+    /**
+     * Rechazar solicitud (marcar como ocupado)
+     */
+    public function rechazarSolicitudDominio(Request $request, $id)
+    {
+        $request->validate([
+            'motivo' => 'nullable|string|max:500',
+        ]);
+
+        $solicitud = \App\Models\SolicitudCompraDominio::findOrFail($id);
+
+        $motivo = $request->motivo ?? 'El dominio ya está registrado por otra persona.';
+
+        $solicitud->update([
+            'estado' => 'verificado_ocupado',
+            'verificado_por' => auth()->id(),
+            'fecha_verificacion' => now(),
+            'observaciones' => $motivo,
+        ]);
+
+        // Enviar email al cliente
+        try {
+            \Mail::raw(
+                "Lamentablemente el dominio {$solicitud->dominio_solicitado} NO está disponible.\n\n" .
+                "Motivo: {$motivo}\n\n" .
+                "¿Te gustaría que busquemos alternativas?\n" .
+                "Contáctanos a soportesistemaapr@gmail.com\n\n" .
+                "Saludos,\n" .
+                "Equipo SistemaAPR",
+                function($message) use ($solicitud) {
+                    $message->to($solicitud->organizacion->email_contacto)
+                            ->subject('❌ Dominio No Disponible - ' . $solicitud->dominio_solicitado);
+                }
+            );
+        } catch (\Exception $e) {
+            \Log::error('Error enviando email rechazo: ' . $e->getMessage());
+        }
+
+        return redirect()->back()->with('warning', 'Solicitud rechazada. Se notificó al cliente.');
+    }
+
+    /**
+     * Marcar como pagado
+     */
+    public function marcarPagadoDominio(Request $request, $id)
+    {
+        $solicitud = \App\Models\SolicitudCompraDominio::findOrFail($id);
+
+        if (!$solicitud->puedeRecibirPago()) {
+            return redirect()->back()->with('error', 'Esta solicitud no puede recibir pago en su estado actual.');
+        }
+
+        $solicitud->update([
+            'estado' => 'pagado',
+            'metodo_pago' => 'transferencia',
+            'fecha_pago' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Solicitud marcada como pagada. Ya puedes comprar el dominio en NIC Chile.');
+    }
+
+    /**
+     * Marcar como comprado en NIC Chile
+     */
+    public function marcarCompradoDominio($id)
+    {
+        $solicitud = \App\Models\SolicitudCompraDominio::findOrFail($id);
+
+        if (!$solicitud->puedeComprar()) {
+            return redirect()->back()->with('error', 'Esta solicitud no puede ser marcada como comprada.');
+        }
+
+        $solicitud->update([
+            'estado' => 'comprado',
+            'comprado_por' => auth()->id(),
+            'fecha_compra_nic' => now(),
+            'fecha_vencimiento' => now()->addYear(),
+        ]);
+
+        return redirect()->back()->with('success', 'Dominio marcado como comprado. Ya puedes activarlo.');
+    }
+
+    /**
+     * Activar dominio (configurado y listo)
+     */
+    public function activarDominio($id)
+    {
+        $solicitud = \App\Models\SolicitudCompraDominio::findOrFail($id);
+
+        if (!$solicitud->puedeActivar()) {
+            return redirect()->back()->with('error', 'Esta solicitud no puede ser activada.');
+        }
+
+        // Activar el dominio en la organización
+        $solicitud->organizacion->update([
+            'dominio_personalizado' => $solicitud->dominio_solicitado,
+            'estado_dominio_personalizado' => 'activo_aprobado',
+            'fecha_aprobacion_dominio' => now(),
+            'aprobado_por' => auth()->id(),
+        ]);
+
+        $solicitud->update([
+            'estado' => 'activo',
+            'fecha_activacion' => now(),
+        ]);
+
+        // Email al cliente
+        try {
+            \Mail::raw(
+                "¡Tu dominio está listo! 🎉\n\n" .
+                "Ya puedes acceder a tu sistema en:\n" .
+                "https://{$solicitud->dominio_solicitado}\n\n" .
+                "El dominio vence el: " . $solicitud->fecha_vencimiento->format('d/m/Y') . "\n" .
+                "Te avisaremos 30 días antes para renovar.\n\n" .
+                "Saludos,\n" .
+                "Equipo SistemaAPR",
+                function($message) use ($solicitud) {
+                    $message->to($solicitud->organizacion->email_contacto)
+                            ->subject('🎉 Tu Dominio está Activo - ' . $solicitud->dominio_solicitado);
+                }
+            );
+        } catch (\Exception $e) {
+            \Log::error('Error enviando email activación: ' . $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Dominio activado correctamente. El cliente fue notificado.');
+    }
+
+    /**
      * Mostrar formulario de edición del perfil del super admin
      */
     public function perfil()

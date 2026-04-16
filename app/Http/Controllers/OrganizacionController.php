@@ -640,4 +640,78 @@ class OrganizacionController extends Controller
         return redirect()->route('organizacion.index')
             ->with('error', 'Error al aplicar el cambio de plan.');
     }
+
+    /**
+     * Solicitar compra de dominio personalizado
+     */
+    public function solicitarCompraDominio(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user->id_organizacion) {
+            return redirect()->back()->with('error', 'No tienes una organización asignada.');
+        }
+
+        $organizacion = Organizacion::find($user->id_organizacion);
+
+        // Verificar que tenga plan Enterprise
+        if (!$organizacion->suscripcion || !$organizacion->suscripcion->permite_dominio_personalizado) {
+            return redirect()->back()->with('error', 'Esta función solo está disponible para el plan Enterprise.');
+        }
+
+        // Validar
+        $validated = $request->validate([
+            'dominio_solicitado' => 'required|string|regex:/^[a-z0-9\-]+$/|max:50',
+        ], [
+            'dominio_solicitado.regex' => 'El dominio solo puede contener letras minúsculas, números y guiones.',
+        ]);
+
+        // Construir dominio completo
+        $dominioCompleto = 'www.' . strtolower($validated['dominio_solicitado']) . '.cl';
+
+        // Verificar si ya tiene una solicitud pendiente
+        $solicitudExistente = \App\Models\SolicitudCompraDominio::where('id_organizacion', $organizacion->id)
+            ->whereIn('estado', ['solicitado', 'verificado_disponible', 'pendiente_pago', 'pagado', 'comprado'])
+            ->first();
+
+        if ($solicitudExistente) {
+            return redirect()->back()->with('error', 'Ya tienes una solicitud de dominio en proceso.');
+        }
+
+        // Crear solicitud
+        $solicitud = \App\Models\SolicitudCompraDominio::create([
+            'id_organizacion' => $organizacion->id,
+            'dominio_solicitado' => $dominioCompleto,
+            'estado' => 'solicitado',
+            'monto' => 20000,
+        ]);
+
+        // Enviar email al SuperAdmin
+        try {
+            \Mail::raw(
+                "Nueva solicitud de compra de dominio\n\n" .
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" .
+                "Organización: {$organizacion->nombre_apr}\n" .
+                "RUT: {$organizacion->rut}\n" .
+                "Dominio solicitado: {$dominioCompleto}\n" .
+                "Monto: $20.000\n" .
+                "Fecha: " . now()->format('d/m/Y H:i') . "\n" .
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" .
+                "ACCIONES REQUERIDAS:\n" .
+                "1. Verifica disponibilidad en https://nic.cl/whois\n" .
+                "2. Gestiona la solicitud en:\n" .
+                "   https://sistemaapr.cl/superadmin/solicitudes-dominio\n\n" .
+                "Saludos,\n" .
+                "Sistema Automático",
+                function($message) {
+                    $message->to('soportesistemaapr@gmail.com')
+                            ->subject('🌐 Nueva Solicitud de Dominio');
+                }
+            );
+        } catch (\Exception $e) {
+            \Log::error('Error enviando email de solicitud dominio: ' . $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', "✅ Solicitud enviada correctamente. Verificaremos la disponibilidad de {$dominioCompleto} y te contactaremos en las próximas 24 horas.");
+    }
 }

@@ -107,6 +107,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/solicitud-pago-manual/{idPago}', [App\Http\Controllers\SolicitudPagoManualController::class, 'create'])->name('solicitud-pago-manual.create');
         Route::post('/solicitud-pago-manual/{idPago}', [App\Http\Controllers\SolicitudPagoManualController::class, 'store'])->name('solicitud-pago-manual.store');
         Route::get('/solicitud-pago-manual/{id}/ver', [App\Http\Controllers\SolicitudPagoManualController::class, 'show'])->name('solicitud-pago-manual.show');
+
+        // Solicitud de compra de dominio
+        Route::post('/dominio/solicitar', [App\Http\Controllers\OrganizacionController::class, 'solicitarCompraDominio'])->name('dominio.solicitar');
     });
 });
 
@@ -574,6 +577,14 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->name('superadmi
     Route::post('/dominios/{id}/aprobar', [App\Http\Controllers\SuperAdminController::class, 'aprobarDominio'])->name('dominios.aprobar');
     Route::post('/dominios/{id}/rechazar', [App\Http\Controllers\SuperAdminController::class, 'rechazarDominio'])->name('dominios.rechazar');
     Route::post('/dominios/{id}/suspender', [App\Http\Controllers\SuperAdminController::class, 'suspenderDominio'])->name('dominios.suspender');
+
+    // Solicitudes de compra de dominio
+    Route::get('/solicitudes-dominio', [App\Http\Controllers\SuperAdminController::class, 'solicitudesDominio'])->name('solicitudes-dominio.index');
+    Route::post('/solicitudes-dominio/{id}/aprobar', [App\Http\Controllers\SuperAdminController::class, 'aprobarSolicitudDominio'])->name('solicitudes-dominio.aprobar');
+    Route::post('/solicitudes-dominio/{id}/rechazar', [App\Http\Controllers\SuperAdminController::class, 'rechazarSolicitudDominio'])->name('solicitudes-dominio.rechazar');
+    Route::post('/solicitudes-dominio/{id}/marcar-pagado', [App\Http\Controllers\SuperAdminController::class, 'marcarPagadoDominio'])->name('solicitudes-dominio.marcar-pagado');
+    Route::post('/solicitudes-dominio/{id}/marcar-comprado', [App\Http\Controllers\SuperAdminController::class, 'marcarCompradoDominio'])->name('solicitudes-dominio.marcar-comprado');
+    Route::post('/solicitudes-dominio/{id}/activar', [App\Http\Controllers\SuperAdminController::class, 'activarDominio'])->name('solicitudes-dominio.activar');
 
     // Perfil del super admin
     Route::get('/perfil', [App\Http\Controllers\SuperAdminController::class, 'perfil'])->name('perfil');

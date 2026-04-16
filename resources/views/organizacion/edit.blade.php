@@ -145,16 +145,97 @@
                 </div>
             </div>
 
-            <!-- Dominio Personalizado (solo Enterprise) -->
+            <!-- Solicitud de Compra de Dominio (solo Enterprise) -->
+            @if($organizacion->suscripcion && $organizacion->suscripcion->permite_dominio_personalizado)
+            <div class="domain-section" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 24px; border-radius: 12px; margin-bottom: 24px; border: 2px solid #3b82f6;">
+                <h4 class="section-title" style="color: #1e40af;">
+                    <i class="fas fa-shopping-cart"></i>
+                    ¿No tienes un dominio? ¡Nosotros lo compramos por ti!
+                    <span class="badge-enterprise">Enterprise</span>
+                </h4>
+                <p class="section-description" style="color: #1e40af;">
+                    Solicita que SistemaAPR compre y configure tu dominio personalizado .cl por solo <strong>$20.000/año</strong>
+                </p>
+
+                @php
+                    $solicitudPendiente = \App\Models\SolicitudCompraDominio::where('id_organizacion', $organizacion->id)
+                        ->whereIn('estado', ['solicitado', 'verificado_disponible', 'pendiente_pago', 'pagado', 'comprado'])
+                        ->first();
+                @endphp
+
+                @if($solicitudPendiente)
+                    <div class="alert alert-info">
+                        <i class="fas fa-clock"></i>
+                        <strong>Solicitud en proceso:</strong> {{ $solicitudPendiente->dominio_solicitado }}
+                        <br>
+                        <strong>Estado:</strong> {!! $solicitudPendiente->badge_estado !!}
+                        <br>
+                        <small>Fecha solicitud: {{ $solicitudPendiente->created_at->format('d/m/Y H:i') }}</small>
+                        @if($solicitudPendiente->observaciones)
+                            <br><small><i class="fas fa-info-circle"></i> {{ $solicitudPendiente->observaciones }}</small>
+                        @endif
+                    </div>
+                @else
+                    <form action="{{ route('organizacion.dominio.solicitar') }}" method="POST" style="margin-top: 16px;" onsubmit="return confirmarSolicitudDominio()">
+                        @csrf
+                        <div class="form-row">
+                            <div class="form-group col-md-8">
+                                <label for="dominio_compra" class="form-label" style="font-weight: 600;">Dominio deseado (.cl)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">www.</span>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="dominio_compra"
+                                           name="dominio_solicitado"
+                                           placeholder="aprnombre"
+                                           required
+                                           pattern="[a-z0-9\-]+"
+                                           title="Solo letras minúsculas, números y guiones">
+                                    <span class="input-group-text">.cl</span>
+                                </div>
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-lightbulb"></i>
+                                    Escribe solo el nombre (ejemplo: aprnombre). Nosotros verificaremos la disponibilidad.
+                                </small>
+                            </div>
+                            <div class="form-group col-md-4" style="display: flex; align-items: flex-end;">
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Solicitar Dominio
+                                </button>
+                            </div>
+                        </div>
+                        <div class="info-box" style="background: white; margin-top: 12px;">
+                            <i class="fas fa-info-circle" style="color: #3b82f6;"></i>
+                            <div style="color: #1e40af;">
+                                <strong>¿Cómo funciona?</strong>
+                                <ol style="margin: 8px 0 0 0; padding-left: 20px;">
+                                    <li>Envías tu solicitud con el nombre deseado</li>
+                                    <li>Verificamos la disponibilidad en 24 horas</li>
+                                    <li>Si está disponible, recibirás un link de pago ($20.000)</li>
+                                    <li>Compramos y configuramos el dominio por ti</li>
+                                    <li>¡Listo! Tu dominio estará activo en 48-72 horas</li>
+                                </ol>
+                                <small style="color: #64748b; display: block; margin-top: 8px;">
+                                    * Sujeto a disponibilidad. Te notificaremos si el dominio no está disponible.
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                @endif
+            </div>
+            @endif
+
+            <!-- Dominio Personalizado (ya registrado) -->
             @if($organizacion->suscripcion && $organizacion->suscripcion->permite_dominio_personalizado)
             <div class="domain-section">
                 <h4 class="section-title">
                     <i class="fas fa-globe"></i>
-                    Dominio Personalizado
+                    Dominio Personalizado (Ya registrado)
                     <span class="badge-enterprise">Enterprise</span>
                 </h4>
                 <p class="section-description">
-                    Configura un dominio personalizado para tu organización. El dominio debe estar previamente registrado y configurado con los DNS correctos.
+                    Si ya tienes un dominio registrado, configúralo aquí. El dominio debe estar previamente registrado a tu nombre y configurado con los DNS correctos.
                 </p>
 
                 <div class="info-box">
@@ -884,6 +965,20 @@
         if (confirm('¿Estás seguro de que deseas eliminar el logo de la organización?\n\nEsta acción no se puede deshacer.')) {
             document.getElementById('deleteLogoForm').submit();
         }
+    }
+
+    // Función para confirmar solicitud de dominio
+    function confirmarSolicitudDominio() {
+        const dominioInput = document.getElementById('dominio_compra');
+        const dominio = 'www.' + dominioInput.value.toLowerCase() + '.cl';
+
+        return confirm(
+            `¿Deseas solicitar el dominio ${dominio}?\n\n` +
+            `• Costo: $20.000 CLP/año\n` +
+            `• Verificaremos disponibilidad en 24 horas\n` +
+            `• Solo pagarás si está disponible\n\n` +
+            `¿Continuar con la solicitud?`
+        );
     }
 
     // Función para mostrar instrucciones DNS
