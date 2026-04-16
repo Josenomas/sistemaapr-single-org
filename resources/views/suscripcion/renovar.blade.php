@@ -129,26 +129,7 @@
                     </div>
                     @endif
 
-                    <!-- Opción 3: Contactar administrador -->
-                    <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 mb-4">
-                        <div class="flex items-start">
-                            <svg class="w-8 h-8 text-purple-600 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Contactar al administrador del sistema</h3>
-                                <p class="text-gray-700 mb-4">
-                                    Envía un correo al administrador para renovar tu suscripción o solicitar extensión del período de prueba.
-                                </p>
-                                <a href="mailto:admin@sistemaapr.cl?subject=Renovación de suscripción - {{ $organizacion->nombre_apr }}&body=Hola, necesito renovar la suscripción de mi organización {{ $organizacion->nombre_apr }} (RUT: {{ $organizacion->rut }})."
-                                   class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition">
-                                    Enviar correo de solicitud
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Opción 4: Cambiar de plan -->
+                    <!-- Opción 3: Cambiar de plan -->
                     <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
                         <div class="flex items-start mb-4">
                             <svg class="w-8 h-8 text-blue-600 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
