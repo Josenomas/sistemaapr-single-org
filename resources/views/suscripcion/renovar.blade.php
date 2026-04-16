@@ -248,7 +248,7 @@
 
         <!-- Footer -->
         <div class="text-center mt-6 text-gray-600 text-sm">
-            <p>¿Necesitas ayuda? Contacta a <a href="mailto:soporte@sistemaapr.cl" class="text-purple-600 hover:text-purple-700 font-medium">soporte@sistemaapr.cl</a></p>
+            <p>¿Necesitas ayuda? Contacta a <a href="mailto:soportesistemaapr@gmail.com" class="text-purple-600 hover:text-purple-700 font-medium">soportesistemaapr@gmail.com</a></p>
         </div>
     </div>
 </body>
