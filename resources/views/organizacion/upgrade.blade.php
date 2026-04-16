@@ -149,7 +149,7 @@
                 </div>
                 <div class="info-content">
                     <h4>Mejora de plan</h4>
-                    <p>Los cambios se aplicarán inmediatamente y se te cobrará la diferencia prorrateada.</p>
+                    <p>Los cambios se aplicarán inmediatamente. Si tu suscripción está activa, pagarás la diferencia prorrateada por los días restantes. Si está vencida, pagarás el mes completo del nuevo plan.</p>
                 </div>
             </div>
 
