@@ -98,6 +98,16 @@ class SolicitudPagoManual extends Model
             'fecha_pago' => now(),
             'notas' => 'Pago manual aprobado. Operación: ' . $this->numero_operacion,
         ]);
+
+        // Actualizar la suscripción de la organización
+        $organizacion = $this->organizacion;
+        $organizacion->update([
+            'estado_suscripcion' => 'activa',
+            'fecha_inicio_suscripcion' => now(),
+            'fecha_fin_suscripcion' => now()->addMonth(),
+            'metodo_pago' => 'transferencia',
+            'proximo_pago' => now()->addMonth(),
+        ]);
     }
 
     /**
