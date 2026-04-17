@@ -646,45 +646,59 @@ class OrganizacionController extends Controller
      */
     public function solicitarCompraDominio(Request $request)
     {
+        \Log::info('=== SOLICITUD DOMINIO INICIADA ===');
+        \Log::info('Request data: ', $request->all());
+
         $user = auth()->user();
+        \Log::info('Usuario ID: ' . $user->id . ', Org ID: ' . ($user->id_organizacion ?? 'NULL'));
 
         if (!$user->id_organizacion) {
+            \Log::warning('Usuario sin organización');
             return redirect()->back()->with('error', 'No tienes una organización asignada.');
         }
 
         $organizacion = Organizacion::find($user->id_organizacion);
+        \Log::info('Organización encontrada: ' . $organizacion->nombre_apr);
 
         // Verificar que tenga plan Enterprise
         if (!$organizacion->suscripcion || !$organizacion->suscripcion->permite_dominio_personalizado) {
+            \Log::warning('Organización sin plan Enterprise');
             return redirect()->back()->with('error', 'Esta función solo está disponible para el plan Enterprise.');
         }
 
         // Validar
+        \Log::info('Validando dominio...');
         $validated = $request->validate([
             'dominio_solicitado' => 'required|string|regex:/^[a-z0-9\-]+$/|max:50',
         ], [
             'dominio_solicitado.regex' => 'El dominio solo puede contener letras minúsculas, números y guiones.',
         ]);
+        \Log::info('Dominio validado: ' . $validated['dominio_solicitado']);
 
         // Construir dominio completo
         $dominioCompleto = 'www.' . strtolower($validated['dominio_solicitado']) . '.cl';
+        \Log::info('Dominio completo: ' . $dominioCompleto);
 
         // Verificar si ya tiene una solicitud pendiente
+        \Log::info('Verificando solicitudes existentes...');
         $solicitudExistente = \App\Models\SolicitudCompraDominio::where('id_organizacion', $organizacion->id)
             ->whereIn('estado', ['solicitado', 'verificado_disponible', 'pendiente_pago', 'pagado', 'comprado'])
             ->first();
 
         if ($solicitudExistente) {
+            \Log::warning('Ya existe una solicitud pendiente');
             return redirect()->back()->with('error', 'Ya tienes una solicitud de dominio en proceso.');
         }
 
         // Crear solicitud
+        \Log::info('Creando solicitud en BD...');
         $solicitud = \App\Models\SolicitudCompraDominio::create([
             'id_organizacion' => $organizacion->id,
             'dominio_solicitado' => $dominioCompleto,
             'estado' => 'solicitado',
             'monto' => 20000,
         ]);
+        \Log::info('Solicitud creada con ID: ' . $solicitud->id);
 
         // Enviar email al SuperAdmin
         try {
