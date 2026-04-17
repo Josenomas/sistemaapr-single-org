@@ -199,7 +199,7 @@
                                 </small>
                             </div>
                             <div class="form-group col-md-4" style="display: flex; align-items: flex-end;">
-                                <button type="submit" class="btn btn-primary" style="width: 100%;" onclick="return confirm('¿Confirmas solicitar este dominio?')">
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">
                                     <i class="fas fa-paper-plane"></i>
                                     Solicitar Dominio
                                 </button>
