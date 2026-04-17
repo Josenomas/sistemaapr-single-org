@@ -95,13 +95,6 @@ class OrganizacionController extends Controller
             ->whereIn('estado', ['solicitado', 'verificado_disponible', 'pendiente_pago', 'pagado', 'comprado'])
             ->first();
 
-        \Log::info('EDIT VIEW DEBUG', [
-            'org_id' => $organizacion->id,
-            'tiene_suscripcion' => $organizacion->suscripcion ? 'SI' : 'NO',
-            'permite_dominio' => $organizacion->suscripcion && $organizacion->suscripcion->permite_dominio_personalizado ? 'SI' : 'NO',
-            'solicitud_pendiente' => $solicitudPendiente ? 'SI (ID: ' . $solicitudPendiente->id . ')' : 'NO',
-        ]);
-
         return view('organizacion.edit', compact('organizacion', 'solicitudPendiente'));
     }
 
