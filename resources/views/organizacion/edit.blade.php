@@ -157,12 +157,6 @@
                     Solicita que SistemaAPR compre y configure tu dominio personalizado .cl por solo <strong>$20.000/año</strong>
                 </p>
 
-                @php
-                    $solicitudPendiente = \App\Models\SolicitudCompraDominio::where('id_organizacion', $organizacion->id)
-                        ->whereIn('estado', ['solicitado', 'verificado_disponible', 'pendiente_pago', 'pagado', 'comprado'])
-                        ->first();
-                @endphp
-
                 @if($solicitudPendiente)
                     <div class="alert alert-info">
                         <i class="fas fa-clock"></i>

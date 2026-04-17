@@ -91,7 +91,11 @@ class OrganizacionController extends Controller
                 ->with('error', 'Organización no encontrada.');
         }
 
-        return view('organizacion.edit', compact('organizacion'));
+        $solicitudPendiente = \App\Models\SolicitudCompraDominio::where('id_organizacion', $organizacion->id)
+            ->whereIn('estado', ['solicitado', 'verificado_disponible', 'pendiente_pago', 'pagado', 'comprado'])
+            ->first();
+
+        return view('organizacion.edit', compact('organizacion', 'solicitudPendiente'));
     }
 
     /**
