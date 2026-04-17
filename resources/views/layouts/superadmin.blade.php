@@ -767,7 +767,7 @@
                         <span class="badge bg-warning">{{ $pendientes }}</span>
                     @endif
                 </a>
-                <a href="{{ route('superadmin.dominios.index') }}" class="menu-item {{ request()->routeIs('superadmin.dominios*') ? 'active' : '' }}">
+                <a href="{{ route('superadmin.dominios.index') }}" class="menu-item {{ request()->routeIs('superadmin.dominios.index') ? 'active' : '' }}">
                     <i class="fas fa-globe"></i>
                     <span>Dominios Personalizados</span>
                     @php
@@ -775,6 +775,16 @@
                     @endphp
                     @if($dominiosVerificados > 0)
                         <span class="badge bg-success">{{ $dominiosVerificados }}</span>
+                    @endif
+                </a>
+                <a href="{{ route('solicitudes-dominio.index') }}" class="menu-item {{ request()->routeIs('solicitudes-dominio.*') ? 'active' : '' }}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Solicitudes Dominio</span>
+                    @php
+                        $solicitudesDominio = \App\Models\SolicitudCompraDominio::whereIn('estado', ['solicitado', 'verificado_disponible', 'pendiente_pago', 'pagado', 'comprado'])->count();
+                    @endphp
+                    @if($solicitudesDominio > 0)
+                        <span class="badge bg-warning">{{ $solicitudesDominio }}</span>
                     @endif
                 </a>
             </div>
