@@ -157,7 +157,7 @@
                     Solicita que SistemaAPR compre y configure tu dominio personalizado .cl por solo <strong>$20.000/año</strong>
                 </p>
 
-                @if($solicitudPendiente)
+                @if(!is_null($solicitudPendiente))
                     <div class="alert alert-info">
                         <i class="fas fa-clock"></i>
                         <strong>Solicitud en proceso:</strong> {{ $solicitudPendiente->dominio_solicitado }}
