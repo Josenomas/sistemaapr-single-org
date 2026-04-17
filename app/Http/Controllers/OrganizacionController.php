@@ -84,7 +84,7 @@ class OrganizacionController extends Controller
                 ->with('error', 'No tienes una organización asignada.');
         }
 
-        $organizacion = Organizacion::find($user->id_organizacion);
+        $organizacion = Organizacion::with('suscripcion')->find($user->id_organizacion);
 
         if (!$organizacion) {
             return redirect()->route('dashboard')
