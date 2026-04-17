@@ -176,7 +176,7 @@
                         @endif
                     </div>
                 @else
-                    <form action="{{ route('organizacion.dominio.solicitar') }}" method="POST" style="margin-top: 16px;" onsubmit="return confirm('¿Confirmas solicitar este dominio? Costo: $20.000/año. Verificaremos disponibilidad en 24 horas.');">
+                    <form action="{{ route('organizacion.dominio.solicitar') }}" method="POST" style="margin-top: 16px;">
                         @csrf
                         <div class="form-row">
                             <div class="form-group col-md-8">
@@ -199,7 +199,7 @@
                                 </small>
                             </div>
                             <div class="form-group col-md-4" style="display: flex; align-items: flex-end;">
-                                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <button type="submit" class="btn btn-primary" style="width: 100%;" onclick="return confirm('¿Confirmas solicitar este dominio?')">
                                     <i class="fas fa-paper-plane"></i>
                                     Solicitar Dominio
                                 </button>
