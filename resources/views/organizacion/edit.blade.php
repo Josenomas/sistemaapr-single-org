@@ -144,6 +144,7 @@
                     @enderror
                 </div>
             </div>
+        </form>
 
             <!-- Solicitud de Compra de Dominio (solo Enterprise) -->
             @if($organizacion->suscripcion && $organizacion->suscripcion->permite_dominio_personalizado)
