@@ -777,7 +777,7 @@
                         <span class="badge bg-success">{{ $dominiosVerificados }}</span>
                     @endif
                 </a>
-                <a href="{{ route('solicitudes-dominio.index') }}" class="menu-item {{ request()->routeIs('solicitudes-dominio.*') ? 'active' : '' }}">
+                <a href="{{ route('superadmin.solicitudes-dominio.index') }}" class="menu-item {{ request()->routeIs('superadmin.solicitudes-dominio.*') ? 'active' : '' }}">
                     <i class="fas fa-shopping-cart"></i>
                     <span>Solicitudes Dominio</span>
                     @php
