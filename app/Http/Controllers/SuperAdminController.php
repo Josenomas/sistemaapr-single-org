@@ -761,8 +761,18 @@ class SuperAdminController extends Controller
                 "¡Buenas noticias!\n\n" .
                 "El dominio {$solicitud->dominio_solicitado} está DISPONIBLE.\n\n" .
                 "Para proceder con la compra:\n" .
-                "1. Realiza el pago de $20.000\n" .
-                "2. Puedes pagar por transferencia bancaria:\n" .
+                "1. Realiza el pago de \$20.000\n" .
+                "2. Puedes pagar por transferencia bancaria:\n\n" .
+                "   DATOS DE TRANSFERENCIA:\n" .
+                "   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" .
+                "   Banco: [NOMBRE DEL BANCO]\n" .
+                "   Tipo de cuenta: Cuenta Corriente\n" .
+                "   Número de cuenta: [NÚMERO]\n" .
+                "   RUT: [RUT TITULAR]\n" .
+                "   Titular: [NOMBRE TITULAR]\n" .
+                "   Email: soportesistemaapr@gmail.com\n" .
+                "   Monto: \$20.000\n" .
+                "   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" .
                 "   - Envía comprobante a soportesistemaapr@gmail.com\n\n" .
                 "Una vez recibido el pago, compraremos y configuraremos tu dominio.\n\n" .
                 "Saludos,\n" .
