@@ -309,6 +309,11 @@
 
         <div class="login-footer">
             <p>&copy; {{ date('Y') }} Sistema APR - Agua Potable Rural</p>
+            <p style="margin-top: 10px;">
+                <a href="{{ route('reclamos.create') }}" style="color: #dc3545; font-weight: 600; text-decoration: none; font-size: 0.9rem;">
+                    <i class="fas fa-book"></i> Libro de Reclamos
+                </a>
+            </p>
         </div>
     </div>
 

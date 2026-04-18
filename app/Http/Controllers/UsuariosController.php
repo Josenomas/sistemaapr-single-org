@@ -316,4 +316,63 @@ class UsuariosController extends Controller
         return redirect()->route('usuarios.index')
                         ->with('success', 'Usuario eliminado exitosamente');
     }
+
+    /**
+     * Eliminar cuenta propia (Derecho ARCO - Cancelación)
+     * Ley 19.628 de Protección de Datos Personales
+     */
+    public function eliminarCuenta($id)
+    {
+        $usuario = Usuario::findOrFail($id);
+
+        // Verificar que el usuario solo pueda eliminar su propia cuenta
+        if ($usuario->id !== auth()->id()) {
+            return redirect()->back()
+                           ->with('error', 'Solo puedes eliminar tu propia cuenta.');
+        }
+
+        // Verificar que la organización tenga al menos otro administrador
+        $cantidadAdmins = Usuario::where('id_organizacion', $usuario->id_organizacion)
+                                ->where('rol', 'admin')
+                                ->where('activo', true)
+                                ->count();
+
+        if ($usuario->rol === 'admin' && $cantidadAdmins <= 1) {
+            return redirect()->back()
+                           ->with('error', 'No puedes eliminar tu cuenta porque eres el último administrador de la organización. Debes asignar otro administrador primero.');
+        }
+
+        // Guardar información antes de eliminar para auditoría
+        $nombreUsuario = $usuario->nombre_usuario;
+        $nombreCompleto = $usuario->nombre_completo;
+        $datosAnteriores = $usuario->toArray();
+
+        // Registrar actividad ANTES de eliminar
+        ActividadHelper::registrar(
+            'Usuarios',
+            "Usuario eliminó su propia cuenta (Derecho ARCO - Cancelación): {$nombreUsuario} - {$nombreCompleto}",
+            $usuario->id
+        );
+
+        // Registrar en auditoría ANTES de eliminar
+        Auditoria::registrar(
+            'usuarios',
+            'eliminar_cuenta_propia',
+            "Usuario ejerció derecho de cancelación (Ley 19.628) y eliminó su cuenta: {$nombreUsuario} - {$nombreCompleto}",
+            'usuarios',
+            $usuario->id,
+            $datosAnteriores,
+            null
+        );
+
+        // Cerrar sesión
+        auth()->logout();
+
+        // Eliminar usuario (soft delete si está configurado)
+        $usuario->delete();
+
+        // Redirigir a página de inicio con mensaje
+        return redirect('/')
+                      ->with('success', 'Tu cuenta ha sido eliminada exitosamente. Gracias por usar Sistema APR.');
+    }
 }

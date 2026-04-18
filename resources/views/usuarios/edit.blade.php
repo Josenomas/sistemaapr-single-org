@@ -276,6 +276,47 @@
         </form>
     </div>
 </div>
+
+@if(auth()->user()->id === $usuario->id)
+<!-- Sección de Derechos ARCO -->
+<div class="card mt-4" style="border-left: 4px solid #dc3545;">
+    <div class="card-header bg-light">
+        <h3 class="card-title" style="color: #dc3545; margin: 0;">
+            <i class="fas fa-user-shield"></i>
+            Derechos sobre mis Datos Personales (ARCO)
+        </h3>
+    </div>
+    <div class="card-body">
+        <p style="margin-bottom: 1rem; color: #6c757d;">
+            De acuerdo con la <strong>Ley 19.628 de Protección de Datos Personales</strong>,
+            tienes derecho a solicitar la eliminación de tu cuenta y todos tus datos personales del sistema.
+        </p>
+
+        <div style="background-color: #fff3cd; border: 1px solid #ffc107; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+            <strong style="color: #856404;"><i class="fas fa-exclamation-triangle"></i> Advertencia:</strong>
+            <p style="margin: 0.5rem 0 0 0; color: #856404;">
+                Esta acción es <strong>permanente e irreversible</strong>. Se eliminarán:
+            </p>
+            <ul style="margin: 0.5rem 0 0 1.5rem; color: #856404;">
+                <li>Tu usuario y acceso al sistema</li>
+                <li>Tus datos personales (nombre, email, teléfono)</li>
+                <li>Tu historial de actividad</li>
+            </ul>
+        </div>
+
+        <form action="{{ route('usuarios.eliminar-cuenta', $usuario->id) }}" method="POST" id="form-eliminar-cuenta">
+            @csrf
+            @method('DELETE')
+
+            <button type="button" class="btn btn-danger" onclick="confirmarEliminacion()">
+                <i class="fas fa-trash-alt"></i>
+                Eliminar mi Cuenta Permanentemente
+            </button>
+        </form>
+    </div>
+</div>
+@endif
+
 @endsection
 
 @section('styles')
@@ -553,6 +594,63 @@ function mostrarAyuda() {
         icon: 'info',
         width: '600px',
         confirmButtonText: 'Entendido'
+    });
+}
+
+// Función de confirmación de eliminación de cuenta
+function confirmarEliminacion() {
+    Swal.fire({
+        title: '¿Estás completamente seguro?',
+        html: `
+            <div style="text-align: left; padding: 1rem;">
+                <p style="color: #dc3545; font-weight: bold; margin-bottom: 1rem;">
+                    <i class="fas fa-exclamation-triangle"></i> Esta acción eliminará permanentemente:
+                </p>
+                <ul style="color: #6c757d; margin-bottom: 1rem;">
+                    <li>Tu usuario y acceso al sistema</li>
+                    <li>Tus datos personales</li>
+                    <li>Tu historial de actividad</li>
+                </ul>
+                <p style="background-color: #fff3cd; padding: 0.75rem; border-radius: 0.5rem; color: #856404;">
+                    <strong>⚠️ Importante:</strong> No podrás volver a acceder al sistema y esta acción NO se puede deshacer.
+                </p>
+                <p style="margin-top: 1rem; font-weight: bold;">
+                    Escribe <code style="background: #f8f9fa; padding: 0.25rem 0.5rem; border-radius: 3px;">ELIMINAR</code> para confirmar:
+                </p>
+            </div>
+        `,
+        input: 'text',
+        inputPlaceholder: 'Escribe ELIMINAR en mayúsculas',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar mi cuenta',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (value !== 'ELIMINAR') {
+                return 'Debes escribir exactamente "ELIMINAR" para confirmar'
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Segunda confirmación
+            Swal.fire({
+                title: 'Última confirmación',
+                text: '¿Realmente deseas eliminar tu cuenta? Esta acción es irreversible.',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, eliminar definitivamente',
+                cancelButtonText: 'No, conservar mi cuenta'
+            }).then((finalResult) => {
+                if (finalResult.isConfirmed) {
+                    // Enviar formulario
+                    document.getElementById('form-eliminar-cuenta').submit();
+                }
+            });
+        }
     });
 }
 </script>

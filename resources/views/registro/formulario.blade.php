@@ -531,6 +531,16 @@
                     @error('acepta_terminos')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
+                <div class="checkbox-wrapper">
+                    <label>
+                        <input type="checkbox" name="acepta_privacidad" value="1" required {{ old('acepta_privacidad') ? 'checked' : '' }}>
+                        <span>
+                            He leído y acepto la <a href="{{ route('politicas.privacidad') }}" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 600;">política de privacidad</a> y autorizo el tratamiento de mis datos personales <span class="required">*</span>
+                        </span>
+                    </label>
+                    @error('acepta_privacidad')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
                 <button type="submit" class="btn-primary">
                     <i class="fas fa-rocket"></i> Crear Cuenta Gratis
                 </button>

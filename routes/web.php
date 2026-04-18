@@ -60,6 +60,16 @@ Route::get('/terminos-y-condiciones', function () {
     return view('terminos-condiciones');
 })->name('terminos.condiciones');
 
+// Política de Privacidad
+Route::get('/politicas-de-privacidad', function () {
+    return view('politicas-privacidad');
+})->name('politicas.privacidad');
+
+// Libro de Reclamos SERNAC (Público - Ley 19.496)
+Route::get('/libro-reclamos', [App\Http\Controllers\ReclamosController::class, 'create'])->name('reclamos.create');
+Route::post('/libro-reclamos', [App\Http\Controllers\ReclamosController::class, 'store'])->name('reclamos.store');
+Route::get('/reclamo/{numeroReclamo}/confirmacion', [App\Http\Controllers\ReclamosController::class, 'confirmacion'])->name('reclamos.confirmacion');
+
 // Formulario de contacto
 Route::post('/contacto', [ContactoController::class, 'enviar'])->name('contacto.enviar');
 
@@ -319,6 +329,9 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
         Route::resource('usuarios', UsuariosController::class)->except(['store']);
         Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store')->middleware('limite.usuarios');
     });
+
+    // Eliminar cuenta propia (Derecho ARCO de Cancelación) - Sin middleware de permiso
+    Route::delete('/usuarios/{usuario}/eliminar-cuenta', [UsuariosController::class, 'eliminarCuenta'])->name('usuarios.eliminar-cuenta');
 
     // ========================================
     // GESTIÓN DE FUNCIONARIOS

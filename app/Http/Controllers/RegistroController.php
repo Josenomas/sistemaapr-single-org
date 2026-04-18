@@ -7,6 +7,7 @@ use App\Models\RegistroOrganizacion;
 use App\Models\Organizacion;
 use App\Models\Usuario;
 use App\Models\Suscripcion;
+use App\Models\Consentimiento;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -49,14 +50,16 @@ class RegistroController extends Controller
             // Plan deseado (opcional)
             'id_suscripcion' => 'nullable|exists:suscripciones,id',
 
-            // Aceptación de términos
+            // Aceptación de términos y privacidad
             'acepta_terminos' => 'required|accepted',
+            'acepta_privacidad' => 'required|accepted',
         ], [
             'rut.unique' => 'Ya existe una organización registrada con este RUT.',
             'email_contacto.unique' => 'Este email ya está registrado.',
             'admin_email.unique' => 'Este email ya está en uso.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
             'acepta_terminos.accepted' => 'Debes aceptar los términos y condiciones.',
+            'acepta_privacidad.accepted' => 'Debes aceptar la política de privacidad.',
         ]);
 
         try {
@@ -141,6 +144,10 @@ class RegistroController extends Controller
 
             // Crear el usuario administrador
             $usuario = $this->crearUsuarioAdmin($registro, $organizacion);
+
+            // Registrar consentimientos (términos y privacidad)
+            Consentimiento::registrar($organizacion->id, 'terminos_condiciones', '1.0');
+            Consentimiento::registrar($organizacion->id, 'politica_privacidad', '1.0');
 
             // Autenticar automáticamente
             auth()->login($usuario);

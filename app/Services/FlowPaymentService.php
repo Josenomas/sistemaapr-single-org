@@ -214,7 +214,11 @@ class FlowPaymentService
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, config('flow.timeout', 30));
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        // Habilitar verificación SSL (Seguridad - Ley 20.998)
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/x-www-form-urlencoded',
         ]);
