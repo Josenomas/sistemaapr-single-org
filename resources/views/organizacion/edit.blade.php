@@ -234,9 +234,11 @@
                 </p>
 
                 <div class="info-box">
-                    <i class="fas fa-info-circle"></i>
+                    <i class="fas fa-info-circle" style="font-size: 1.5em;"></i>
                     <div>
-                        <strong>Subdominio actual:</strong> <code>{{ $organizacion->slug }}.sistemaapr.cl</code><br>
+                        <div style="font-size: 1.25em; margin-bottom: 8px;">
+                            <strong>Subdominio actual:</strong> <code style="font-size: 1.1em;">{{ $organizacion->slug }}.sistemaapr.cl</code>
+                        </div>
                         @if($organizacion->dominio_personalizado)
                             <strong>Dominio personalizado:</strong> <code>{{ $organizacion->dominio_personalizado }}</code>
                             <br>
@@ -248,21 +250,24 @@
                                 <br><small style="color: #d97706;"><i class="fas fa-exclamation-triangle"></i> {{ $organizacion->observaciones_dominio }}</small>
                             @endif
                         @else
-                            <small>Aún no has configurado un dominio personalizado</small>
+                            <div style="font-size: 1.15em; color: #64748b; margin-top: 4px;">
+                                Aún no has configurado un dominio personalizado
+                            </div>
                         @endif
                     </div>
                 </div>
 
-                <div class="form-row">
+                <div class="form-row" style="font-size: 0.9em; margin-top: 16px;">
                     <div class="form-group col-md-12">
-                        <label for="dominio_personalizado" class="form-label">Dominio Personalizado</label>
+                        <label for="dominio_personalizado" class="form-label" style="font-size: 0.95em;">Dominio Personalizado</label>
                         <input type="text"
                                class="form-control @error('dominio_personalizado') is-invalid @enderror"
                                id="dominio_personalizado"
                                name="dominio_personalizado"
                                value="{{ old('dominio_personalizado', $organizacion->dominio_personalizado) }}"
-                               placeholder="www.aprnombre.cl">
-                        <small class="form-text">
+                               placeholder="www.aprnombre.cl"
+                               style="font-size: 0.9em;">
+                        <small class="form-text" style="font-size: 0.85em;">
                             <i class="fas fa-lightbulb"></i>
                             Ingresa solo el dominio (ejemplo: www.aprnombre.cl). No incluyas http:// o https://
                         </small>
@@ -272,16 +277,16 @@
                     </div>
                 </div>
 
-                <div class="warning-box">
-                    <i class="fas fa-exclamation-triangle"></i>
+                <div class="warning-box" style="font-size: 0.85em;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 1em;"></i>
                     <div>
                         <strong>Importante:</strong> Antes de configurar tu dominio personalizado, debes:
-                        <ol>
+                        <ol style="font-size: 0.95em;">
                             <li>Tener el dominio registrado a tu nombre</li>
                             <li>Configurar un registro CNAME apuntando a <code>sistemaapr.cl</code></li>
                             <li>Esperar a que los cambios DNS se propaguen (puede tomar hasta 48 horas)</li>
                         </ol>
-                        <a href="#" onclick="mostrarInstruccionesDNS(); return false;" class="link-help">
+                        <a href="#" onclick="mostrarInstruccionesDNS(); return false;" class="link-help" style="font-size: 0.9em;">
                             <i class="fas fa-question-circle"></i> Ver instrucciones detalladas
                         </a>
                     </div>
