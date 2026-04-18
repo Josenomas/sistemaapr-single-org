@@ -765,11 +765,11 @@ class SuperAdminController extends Controller
                 "2. Puedes pagar por transferencia bancaria:\n\n" .
                 "   DATOS DE TRANSFERENCIA:\n" .
                 "   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" .
-                "   Banco: [NOMBRE DEL BANCO]\n" .
+                "   Banco: Banco Bci\n" .
                 "   Tipo de cuenta: Cuenta Corriente\n" .
-                "   Número de cuenta: [NÚMERO]\n" .
-                "   RUT: [RUT TITULAR]\n" .
-                "   Titular: [NOMBRE TITULAR]\n" .
+                "   Número de cuenta: 89538463\n" .
+                "   RUT: 19.762.564-3\n" .
+                "   Titular: JOSE ARAVENA\n" .
                 "   Email: soportesistemaapr@gmail.com\n" .
                 "   Monto: \$20.000\n" .
                 "   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" .
