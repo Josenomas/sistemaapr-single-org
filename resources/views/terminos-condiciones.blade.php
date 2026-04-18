@@ -376,7 +376,25 @@
             </div>
 
             <div class="section">
-                <h2>14. Ley Aplicable</h2>
+                <h2>14. Funcionalidades Beta</h2>
+                <p>
+                    Algunos módulos de la aplicación pueden aparecer marcados con la etiqueta <strong>"BETA"</strong>
+                    en el menú lateral. Esto significa que:
+                </p>
+                <ul>
+                    <li><strong>Son completamente funcionales:</strong> Puede usar estas funcionalidades sin restricciones</li>
+                    <li><strong>En fase de prueba:</strong> Estamos recopilando retroalimentación y realizando mejoras continuas</li>
+                    <li><strong>Pueden cambiar:</strong> Las funcionalidades beta pueden ser modificadas o mejoradas basándose en el feedback de los usuarios</li>
+                    <li><strong>Reporte de problemas:</strong> Agradecemos que nos informe cualquier error o sugerencia de mejora</li>
+                </ul>
+                <div class="highlight">
+                    <strong>Importante:</strong> Las funcionalidades beta son seguras de usar y sus datos están protegidos.
+                    La etiqueta beta solo indica que seguimos perfeccionando la experiencia de usuario.
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>15. Ley Aplicable</h2>
                 <p>
                     Estos términos se rigen por las leyes de la República de Chile. Cualquier disputa será
                     resuelta en los tribunales competentes de Chile.
@@ -384,7 +402,7 @@
             </div>
 
             <div class="section">
-                <h2>15. Contacto</h2>
+                <h2>16. Contacto</h2>
                 <p>
                     Para preguntas sobre estos términos y condiciones, puede contactarnos a través de:
                 </p>
