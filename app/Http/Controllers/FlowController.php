@@ -87,34 +87,17 @@ class FlowController extends Controller
                 'message' => $resultado['message'] ?? 'Error desconocido',
             ]);
 
-            // Si es error 105 (No services available), verificar estado manualmente
+            // Si es error 105 (No services available), alertar para revisión manual
             if (isset($resultado['message']) && strpos($resultado['message'], '"code":105') !== false) {
-                Log::warning('Flow - Error 105 detectado, intentando procesar manualmente', ['token' => $token]);
-
-                // Buscar la transacción localmente
                 $transaccion = \App\Models\TransaccionFlow::where('token', $token)->first();
 
-                if ($transaccion && $transaccion->tipo_pago === 'cambio_plan' && $transaccion->estado === 'pendiente') {
-                    Log::info('Flow - Procesando cambio de plan manualmente debido a error 105', [
-                        'token' => $token,
-                        'transaccion_id' => $transaccion->id,
-                    ]);
-
-                    // Marcar transacción como pagada (ya que Khipu confirmó)
-                    $transaccion->update([
-                        'estado' => 'pagado',
-                        'flow_status' => 2,
-                        'payment_data' => json_encode(['status' => 'paid', 'flow_error_105_bypass' => true]),
-                    ]);
-
-                    // Aplicar cambio de plan
-                    $cambioPlan = \App\Models\CambioPlan::find($transaccion->referencia_id);
-                    if ($cambioPlan && $cambioPlan->aplicar()) {
-                        Log::info('Flow - Cambio de plan aplicado exitosamente (bypass error 105)', [
-                            'cambio_plan_id' => $cambioPlan->id,
-                        ]);
-                    }
-                }
+                Log::warning('Flow - Error 105 detectado, requiere revisión manual', [
+                    'token' => $token,
+                    'transaccion_id' => $transaccion->id ?? null,
+                    'tipo_pago' => $transaccion->tipo_pago ?? null,
+                    'flow_order' => $transaccion->flow_order ?? null,
+                    'mensaje' => 'ACCIÓN REQUERIDA: Verificar en Flow si el pago fue confirmado y aplicar manualmente si es necesario'
+                ]);
             }
 
             // Incluso con error, devolver 200 para que Flow no reintente
