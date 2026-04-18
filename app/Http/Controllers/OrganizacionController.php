@@ -493,6 +493,21 @@ class OrganizacionController extends Controller
 
         // Si es upgrade, generar pago con Flow
         if ($tipo === 'upgrade' && $montoDiferencia > 0) {
+            // Verificar si ya existe un cambio de plan COMPLETADO recientemente (últimas 24 horas)
+            $cambioPlanCompletado = \App\Models\CambioPlan::where('id_organizacion', $organizacion->id)
+                ->where('id_suscripcion_nueva', $idSuscripcionNueva)
+                ->where('estado', 'completado')
+                ->where('created_at', '>=', now()->subDay())
+                ->first();
+
+            if ($cambioPlanCompletado) {
+                // Eliminar el nuevo cambio de plan creado
+                $cambioPlan->delete();
+
+                return redirect()->route('organizacion.index')
+                    ->with('info', 'Ya realizaste este cambio de plan recientemente. Si el cambio no se ha aplicado, contacta a soporte.');
+            }
+
             // Verificar si ya existe un cambio de plan pendiente con token
             $cambioPlanPendiente = \App\Models\CambioPlan::where('id_organizacion', $organizacion->id)
                 ->where('id_suscripcion_nueva', $idSuscripcionNueva)
