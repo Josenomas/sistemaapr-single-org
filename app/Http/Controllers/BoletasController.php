@@ -319,14 +319,6 @@ class BoletasController extends Controller
                               ->count();
         $boletasExistentes = Boleta::activos()->where('mes', $mesActual)->count();
 
-        // DEBUG: Ver los números
-        \Log::info('Generación de boletas', [
-            'mes' => $mesActual,
-            'socios_activos' => $sociosActivos,
-            'boletas_existentes' => $boletasExistentes,
-            'puede_generar' => ($boletasExistentes < $sociosActivos)
-        ]);
-
         if ($boletasExistentes >= $sociosActivos) {
             return redirect()->route('boletas.index')
                            ->with('error', "Ya se generaron boletas para todos los socios del mes {$mesActual} (Socios: {$sociosActivos}, Boletas: {$boletasExistentes})");
@@ -490,9 +482,6 @@ class BoletasController extends Controller
      */
     public function imprimirV2($id)
     {
-        // LOG DE DEBUG - CONFIRMAR QUE ESTE METODO SE EJECUTA
-        \Log::info('===== EJECUTANDO imprimirV2() - NUEVO CODIGO =====', ['boleta_id' => $id]);
-
         $boleta = Boleta::activos()->with(['socio.organizacion', 'lectura'])->findOrFail($id);
 
         // Obtener historial de consumo de los últimos 12 meses
