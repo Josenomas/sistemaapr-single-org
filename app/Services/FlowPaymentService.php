@@ -268,7 +268,14 @@ class FlowPaymentService
     private function generarNumeroOrden()
     {
         $ultimaTransaccion = TransaccionFlow::orderBy('id', 'desc')->first();
-        return ($ultimaTransaccion ? $ultimaTransaccion->flow_order + 1 : 1000);
+
+        if ($ultimaTransaccion) {
+            return $ultimaTransaccion->flow_order + 1;
+        }
+
+        // Si no hay transacciones, generar número basado en timestamp para evitar duplicados
+        // Formato: últimos 6 dígitos del timestamp unix (ej: 234567)
+        return intval(substr(time(), -6));
     }
 
     /**
