@@ -8,10 +8,16 @@
         <i class="fas fa-user-plus"></i>
         Registrar Nuevo Usuario
     </h2>
-    <a href="{{ route('usuarios.index') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i>
-        Volver
-    </a>
+    <div class="page-actions">
+        <button type="button" class="btn btn-info" onclick="mostrarAyuda()">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('usuarios.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Volver
+        </a>
+    </div>
 </div>
 
 @php
@@ -222,6 +228,26 @@
                     <label class="permission-item">
                         <input type="checkbox" name="permisos[]" value="cortes" {{ in_array('cortes', old('permisos', [])) ? 'checked' : '' }}>
                         <span>Cortes de Suministro</span>
+                    </label>
+                    <label class="permission-item">
+                        <input type="checkbox" name="permisos[]" value="noticias" {{ in_array('noticias', old('permisos', [])) ? 'checked' : '' }}>
+                        <span>Noticias</span>
+                    </label>
+                    <label class="permission-item">
+                        <input type="checkbox" name="permisos[]" value="renovaciones" {{ in_array('renovaciones', old('permisos', [])) ? 'checked' : '' }}>
+                        <span>Renovaciones</span>
+                    </label>
+                    <label class="permission-item">
+                        <input type="checkbox" name="permisos[]" value="vacaciones" {{ in_array('vacaciones', old('permisos', [])) ? 'checked' : '' }}>
+                        <span>Vacaciones</span>
+                    </label>
+                    <label class="permission-item">
+                        <input type="checkbox" name="permisos[]" value="compras" {{ in_array('compras', old('permisos', [])) ? 'checked' : '' }}>
+                        <span>Compras</span>
+                    </label>
+                    <label class="permission-item">
+                        <input type="checkbox" name="permisos[]" value="activos" {{ in_array('activos', old('permisos', [])) ? 'checked' : '' }}>
+                        <span>Activos Fijos</span>
                     </label>
                     <label class="permission-item">
                         <input type="checkbox" name="permisos[]" value="trabajos" {{ in_array('trabajos', old('permisos', [])) ? 'checked' : '' }}>
@@ -531,5 +557,44 @@ document.getElementById('rol').addEventListener('change', function() {
         if (checkbox) checkbox.checked = true;
     }
 });
+
+// Función de ayuda
+function mostrarAyuda() {
+    const ayuda = `
+        <div style="text-align: left;">
+            <h4 style="margin-top: 0;">📋 Crear Nuevo Usuario</h4>
+
+            <p><strong>Campos obligatorios:</strong></p>
+            <ul>
+                <li><strong>Nombre de Usuario:</strong> Identificador único para iniciar sesión</li>
+                <li><strong>Rol:</strong> Define el nivel de acceso del usuario</li>
+                <li><strong>Contraseña:</strong> Mínimo 6 caracteres</li>
+            </ul>
+
+            <p><strong>Roles disponibles:</strong></p>
+            <ul>
+                <li><strong>Administrador:</strong> Acceso completo al sistema</li>
+                <li><strong>Tesorero:</strong> Gestión financiera (boletas, pagos, reportes)</li>
+                <li><strong>Operador:</strong> Operaciones diarias (socios, lecturas, mantenciones)</li>
+                <li><strong>Lecturista:</strong> Solo registro de lecturas de medidores</li>
+            </ul>
+
+            <p><strong>Permisos del Sistema:</strong></p>
+            <p>Selecciona los módulos específicos a los que tendrá acceso este usuario. Los permisos se asignan automáticamente según el rol seleccionado, pero puedes personalizarlos.</p>
+
+            <p style="background: #e3f2fd; padding: 10px; border-radius: 5px; margin-top: 15px;">
+                <strong>💡 Tip:</strong> Los permisos se ajustan automáticamente al seleccionar un rol, pero puedes modificarlos manualmente después.
+            </p>
+        </div>
+    `;
+
+    Swal.fire({
+        title: 'Ayuda',
+        html: ayuda,
+        icon: 'info',
+        width: '600px',
+        confirmButtonText: 'Entendido'
+    });
+}
 </script>
 @endsection

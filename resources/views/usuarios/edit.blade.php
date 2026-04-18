@@ -8,10 +8,16 @@
         <i class="fas fa-user-edit"></i>
         Editar Usuario
     </h2>
-    <a href="{{ route('usuarios.index') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i>
-        Volver
-    </a>
+    <div class="page-actions">
+        <button type="button" class="btn btn-info" onclick="mostrarAyuda()">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('usuarios.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Volver
+        </a>
+    </div>
 </div>
 
 <div class="card">
@@ -195,6 +201,10 @@
                         <span>Cortes de Suministro</span>
                     </label>
                     <label class="permission-item">
+                        <input type="checkbox" name="permisos[]" value="noticias" {{ in_array('noticias', old('permisos', $permisosActuales)) ? 'checked' : '' }}>
+                        <span>Noticias</span>
+                    </label>
+                    <label class="permission-item">
                         <input type="checkbox" name="permisos[]" value="trabajos" {{ in_array('trabajos', old('permisos', $permisosActuales)) ? 'checked' : '' }}>
                         <span>Trabajos Realizados</span>
                     </label>
@@ -213,6 +223,10 @@
                     <label class="permission-item">
                         <input type="checkbox" name="permisos[]" value="inventario" {{ in_array('inventario', old('permisos', $permisosActuales)) ? 'checked' : '' }}>
                         <span>Inventario</span>
+                    </label>
+                    <label class="permission-item">
+                        <input type="checkbox" name="permisos[]" value="activos" {{ in_array('activos', old('permisos', $permisosActuales)) ? 'checked' : '' }}>
+                        <span>Activos Fijos</span>
                     </label>
                     <label class="permission-item">
                         <input type="checkbox" name="permisos[]" value="tickets" {{ in_array('tickets', old('permisos', $permisosActuales)) ? 'checked' : '' }}>
@@ -502,5 +516,44 @@ document.getElementById('rol').addEventListener('change', function() {
         if (checkbox) checkbox.checked = true;
     }
 });
+
+// Función de ayuda
+function mostrarAyuda() {
+    const ayuda = `
+        <div style="text-align: left;">
+            <h4 style="margin-top: 0;">✏️ Editar Usuario</h4>
+
+            <p><strong>Modificar información:</strong></p>
+            <ul>
+                <li><strong>Nombre de Usuario:</strong> No se puede cambiar una vez creado</li>
+                <li><strong>Rol:</strong> Cambia el nivel de acceso del usuario</li>
+                <li><strong>Contraseña:</strong> Déjala en blanco si no deseas cambiarla</li>
+            </ul>
+
+            <p><strong>Roles disponibles:</strong></p>
+            <ul>
+                <li><strong>Administrador:</strong> Acceso completo al sistema</li>
+                <li><strong>Tesorero:</strong> Gestión financiera (boletas, pagos, reportes)</li>
+                <li><strong>Operador:</strong> Operaciones diarias (socios, lecturas, mantenciones)</li>
+                <li><strong>Lecturista:</strong> Solo registro de lecturas de medidores</li>
+            </ul>
+
+            <p><strong>Permisos del Sistema:</strong></p>
+            <p>Puedes personalizar los permisos específicos de este usuario. Los cambios se aplicarán inmediatamente.</p>
+
+            <p style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-top: 15px;">
+                <strong>⚠️ Importante:</strong> Si cambias el rol, los permisos se ajustarán automáticamente. Revisa que sean los correctos antes de guardar.
+            </p>
+        </div>
+    `;
+
+    Swal.fire({
+        title: 'Ayuda',
+        html: ayuda,
+        icon: 'info',
+        width: '600px',
+        confirmButtonText: 'Entendido'
+    });
+}
 </script>
 @endsection
