@@ -254,18 +254,6 @@
                         <span>Trabajos Realizados</span>
                     </label>
                     <label class="permission-item">
-                        <input type="checkbox" name="permisos[]" value="renovaciones" {{ in_array('renovaciones', old('permisos', [])) ? 'checked' : '' }}>
-                        <span>Renovaciones de Medidores</span>
-                    </label>
-                    <label class="permission-item">
-                        <input type="checkbox" name="permisos[]" value="vacaciones" {{ in_array('vacaciones', old('permisos', [])) ? 'checked' : '' }}>
-                        <span>Vacaciones</span>
-                    </label>
-                    <label class="permission-item">
-                        <input type="checkbox" name="permisos[]" value="compras" {{ in_array('compras', old('permisos', [])) ? 'checked' : '' }}>
-                        <span>Compras</span>
-                    </label>
-                    <label class="permission-item">
                         <input type="checkbox" name="permisos[]" value="inventario" {{ in_array('inventario', old('permisos', [])) ? 'checked' : '' }}>
                         <span>Inventario</span>
                     </label>
