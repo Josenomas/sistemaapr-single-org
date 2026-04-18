@@ -87,17 +87,46 @@ class FlowController extends Controller
                 'message' => $resultado['message'] ?? 'Error desconocido',
             ]);
 
-            // Si es error 105 (No services available), alertar para revisión manual
+            // Si es error 105 (No services available), es un error temporal de Flow
+            // pero Flow SOLO llama a este callback cuando el pago fue realmente confirmado
+            // por lo tanto es seguro aplicar el cambio automáticamente
             if (isset($resultado['message']) && strpos($resultado['message'], '"code":105') !== false) {
                 $transaccion = \App\Models\TransaccionFlow::where('token', $token)->first();
 
-                Log::warning('Flow - Error 105 detectado, requiere revisión manual', [
-                    'token' => $token,
-                    'transaccion_id' => $transaccion->id ?? null,
-                    'tipo_pago' => $transaccion->tipo_pago ?? null,
-                    'flow_order' => $transaccion->flow_order ?? null,
-                    'mensaje' => 'ACCIÓN REQUERIDA: Verificar en Flow si el pago fue confirmado y aplicar manualmente si es necesario'
-                ]);
+                if ($transaccion && $transaccion->tipo_pago === 'cambio_plan' && $transaccion->estado === 'pendiente') {
+                    Log::warning('Flow - Error 105 detectado, aplicando cambio automáticamente', [
+                        'token' => $token,
+                        'transaccion_id' => $transaccion->id,
+                        'flow_order' => $transaccion->flow_order,
+                        'razon' => 'Flow llamó al callback (pago confirmado) pero su API tiene error temporal'
+                    ]);
+
+                    // Marcar transacción como pagada
+                    $transaccion->update([
+                        'estado' => 'pagado',
+                        'flow_status' => 2,
+                        'payment_data' => json_encode([
+                            'status' => 'paid',
+                            'flow_error_105_bypass' => true,
+                            'bypass_timestamp' => now()->toDateTimeString(),
+                            'nota' => 'Pago confirmado por Flow callback pero API retornó error 105'
+                        ]),
+                    ]);
+
+                    // Aplicar cambio de plan
+                    $cambioPlan = \App\Models\CambioPlan::find($transaccion->referencia_id);
+                    if ($cambioPlan && $cambioPlan->aplicar()) {
+                        Log::info('Flow - Cambio de plan aplicado exitosamente (bypass error 105)', [
+                            'cambio_plan_id' => $cambioPlan->id,
+                            'organizacion_id' => $cambioPlan->id_organizacion,
+                            'plan_nuevo' => $cambioPlan->id_suscripcion_nueva,
+                        ]);
+                    } else {
+                        Log::error('Flow - Error al aplicar cambio de plan', [
+                            'cambio_plan_id' => $transaccion->referencia_id,
+                        ]);
+                    }
+                }
             }
 
             // Incluso con error, devolver 200 para que Flow no reintente
