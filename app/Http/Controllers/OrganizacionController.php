@@ -493,11 +493,11 @@ class OrganizacionController extends Controller
 
         // Si es upgrade, generar pago con Flow
         if ($tipo === 'upgrade' && $montoDiferencia > 0) {
-            // Verificar si ya existe un cambio de plan COMPLETADO recientemente (últimas 24 horas)
+            // Verificar si ya existe un cambio de plan COMPLETADO
             $cambioPlanCompletado = \App\Models\CambioPlan::where('id_organizacion', $organizacion->id)
                 ->where('id_suscripcion_nueva', $idSuscripcionNueva)
                 ->where('estado', 'completado')
-                ->where('created_at', '>=', now()->subDay())
+                ->orderBy('id', 'desc')
                 ->first();
 
             if ($cambioPlanCompletado) {
