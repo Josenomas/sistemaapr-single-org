@@ -825,6 +825,16 @@
 
             <div class="menu-section">
                 <div class="menu-section-title">Sistema</div>
+                <a href="{{ route('superadmin.reclamos.index') }}" class="menu-item {{ request()->routeIs('superadmin.reclamos.*') ? 'active' : '' }}">
+                    <i class="fas fa-book"></i>
+                    <span>Libro de Reclamos</span>
+                    @php
+                        $reclamosPendientes = \App\Models\Reclamo::whereIn('estado', ['pendiente', 'en_revision'])->count();
+                    @endphp
+                    @if($reclamosPendientes > 0)
+                        <span class="badge bg-danger">{{ $reclamosPendientes }}</span>
+                    @endif
+                </a>
                 <a href="{{ route('superadmin.auditoria') }}" class="menu-item {{ request()->routeIs('superadmin.auditoria') ? 'active' : '' }}">
                     <i class="fas fa-clipboard-list"></i>
                     <span>Auditoría y Logs</span>
