@@ -572,6 +572,11 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->name('superadmi
     Route::get('/reportes/uso', [App\Http\Controllers\SuperAdminController::class, 'reporteUso'])->name('reportes.uso');
     Route::get('/reportes/comparativo', [App\Http\Controllers\SuperAdminController::class, 'reporteComparativo'])->name('reportes.comparativo');
 
+    // Gestión de Libro de Reclamos (Ley 19.496)
+    Route::get('/reclamos', [App\Http\Controllers\ReclamosController::class, 'index'])->name('reclamos.index');
+    Route::get('/reclamos/{id}', [App\Http\Controllers\ReclamosController::class, 'show'])->name('reclamos.show');
+    Route::put('/reclamos/{id}/responder', [App\Http\Controllers\ReclamosController::class, 'responder'])->name('reclamos.responder');
+
     // Renovaciones y vencimientos
     Route::get('/renovaciones', [App\Http\Controllers\SuperAdminController::class, 'renovaciones'])->name('renovaciones');
     Route::post('/renovaciones/{id}/pagar', [App\Http\Controllers\SuperAdminController::class, 'pagarRenovacion'])->name('renovaciones.pagar');
