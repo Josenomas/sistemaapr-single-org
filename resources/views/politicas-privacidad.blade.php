@@ -206,30 +206,11 @@
             </div>
 
             <div class="section">
-                <h2>2. Responsable del Tratamiento de Datos</h2>
-
-                <div class="info-box">
-                    <strong>Identificación del Responsable:</strong>
-                    <p><strong>Razón Social:</strong> Sistema APR</p>
-                    <p><strong>RUT:</strong> 19.762.564-3</p>
-                    <p><strong>Representante Legal:</strong> José Aravena</p>
-                    <p><strong>Correo electrónico:</strong> soportesistemaapr@gmail.com</p>
-                    <p><strong>Dirección:</strong> Chile</p>
-                </div>
-
-                <p>
-                    Esta base de datos está inscrita en el Registro de Bancos de Datos Personales del
-                    Servicio de Registro Civil e Identificación de Chile, en cumplimiento del Art. 22
-                    de la Ley 19.628.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>3. Datos Personales que Recopilamos</h2>
+                <h2>2. Datos Personales que Recopilamos</h2>
 
                 <p>Recopilamos diferentes tipos de información personal según su relación con nuestro sistema:</p>
 
-                <h3>3.1. Datos de Organizaciones (APR)</h3>
+                <h3>2.1. Datos de Organizaciones (APR)</h3>
                 <table>
                     <thead>
                         <tr>
@@ -262,7 +243,7 @@
                     </tbody>
                 </table>
 
-                <h3>3.2. Datos de Usuarios del Sistema</h3>
+                <h3>2.2. Datos de Usuarios del Sistema</h3>
                 <ul>
                     <li><strong>Identificación:</strong> Nombre completo, RUT, cargo</li>
                     <li><strong>Contacto:</strong> Correo electrónico, teléfono</li>
@@ -270,7 +251,7 @@
                     <li><strong>Actividad:</strong> Registro de acciones, IP, navegador, fecha/hora</li>
                 </ul>
 
-                <h3>3.3. Datos de Socios/Clientes de las APR</h3>
+                <h3>2.3. Datos de Socios/Clientes de las APR</h3>
 
                 <div class="info-box">
                     <strong>Importante:</strong> Los socios/clientes de las APR <strong>NO tienen acceso directo</strong>
@@ -299,7 +280,7 @@
                     sus datos personales. La APR utilizará Sistema APR para gestionar dichas solicitudes.
                 </p>
 
-                <h3>3.4. Datos Técnicos</h3>
+                <h3>2.4. Datos Técnicos</h3>
                 <ul>
                     <li>Dirección IP</li>
                     <li>Tipo de navegador y sistema operativo</li>
@@ -309,7 +290,7 @@
             </div>
 
             <div class="section">
-                <h2>4. Finalidad del Tratamiento de Datos</h2>
+                <h2>3. Finalidad del Tratamiento de Datos</h2>
 
                 <p>Utilizamos sus datos personales para las siguientes finalidades legítimas:</p>
 
@@ -336,33 +317,33 @@
             </div>
 
             <div class="section">
-                <h2>5. Compartir Datos con Terceros</h2>
+                <h2>4. Compartir Datos con Terceros</h2>
 
                 <p>
                     <strong>No vendemos ni cedemos</strong> sus datos personales a terceros para fines comerciales.
                     Sin embargo, compartimos datos limitados con terceros en los siguientes casos:
                 </p>
 
-                <h3>5.1. Procesadores de Pago</h3>
+                <h3>4.1. Procesadores de Pago</h3>
                 <ul>
                     <li><strong>Flow / Khipu:</strong> Compartimos email y monto de transacción para procesar pagos de manera segura</li>
                     <li>Estos proveedores están certificados y cumplen estándares PCI-DSS</li>
                 </ul>
 
-                <h3>5.2. Servicio de Impuestos Internos (SII)</h3>
+                <h3>4.2. Servicio de Impuestos Internos (SII)</h3>
                 <ul>
                     <li>Compartimos RUT, nombre y monto para emisión de boletas electrónicas</li>
                     <li>Obligación legal según normativa tributaria chilena</li>
                 </ul>
 
-                <h3>5.3. Proveedores de Servicios Técnicos</h3>
+                <h3>4.3. Proveedores de Servicios Técnicos</h3>
                 <ul>
                     <li>Hosting de servidores y almacenamiento en la nube</li>
                     <li>Servicios de envío de correos electrónicos</li>
                     <li>Todos los proveedores están contractualmente obligados a proteger sus datos</li>
                 </ul>
 
-                <h3>5.4. Autoridades Competentes</h3>
+                <h3>4.4. Autoridades Competentes</h3>
                 <ul>
                     <li>Cuando sea requerido por ley o por orden judicial</li>
                     <li>Para proteger derechos legales o seguridad</li>
@@ -375,11 +356,11 @@
             </div>
 
             <div class="section">
-                <h2>6. Seguridad de los Datos Personales</h2>
+                <h2>5. Seguridad de los Datos Personales</h2>
 
                 <p>Implementamos medidas técnicas y organizativas para proteger sus datos personales:</p>
 
-                <h3>6.1. Medidas Técnicas</h3>
+                <h3>5.1. Medidas Técnicas</h3>
                 <ul>
                     <li><strong>Encriptación:</strong> Todas las contraseñas se almacenan encriptadas con bcrypt</li>
                     <li><strong>SSL/TLS:</strong> Comunicaciones cifradas mediante protocolo HTTPS</li>
@@ -389,7 +370,7 @@
                     <li><strong>Auditoría:</strong> Registro de todos los accesos y modificaciones de datos</li>
                 </ul>
 
-                <h3>6.2. Medidas Organizativas</h3>
+                <h3>5.2. Medidas Organizativas</h3>
                 <ul>
                     <li>Acceso restringido solo a personal autorizado</li>
                     <li>Acuerdos de confidencialidad con empleados</li>
@@ -397,7 +378,7 @@
                     <li>Procedimientos de respuesta ante incidentes de seguridad</li>
                 </ul>
 
-                <h3>6.3. Aislamiento de Datos (Multi-tenancy)</h3>
+                <h3>5.3. Aislamiento de Datos (Multi-tenancy)</h3>
                 <p>
                     Cada organización APR tiene sus datos completamente aislados. Los usuarios de una
                     organización <strong>no pueden acceder</strong> a los datos de otras organizaciones.
@@ -405,25 +386,25 @@
             </div>
 
             <div class="section">
-                <h2>7. Sus Derechos sobre los Datos Personales (Derechos ARCO)</h2>
+                <h2>6. Sus Derechos sobre los Datos Personales (Derechos ARCO)</h2>
 
                 <p>
                     De acuerdo con la Ley 19.628, usted tiene los siguientes derechos sobre sus datos personales:
                 </p>
 
-                <h3>7.1. Derecho de Acceso</h3>
+                <h3>6.1. Derecho de Acceso</h3>
                 <p>
                     Tiene derecho a conocer qué datos personales tenemos sobre usted y cómo los utilizamos.
                     Puede solicitar una copia de sus datos en formato estructurado.
                 </p>
 
-                <h3>7.2. Derecho de Rectificación</h3>
+                <h3>6.2. Derecho de Rectificación</h3>
                 <p>
                     Puede solicitar la corrección de datos inexactos o incompletos. Nos comprometemos a
                     actualizar o corregir sus datos dentro de 2 días hábiles.
                 </p>
 
-                <h3>7.3. Derecho de Cancelación (Eliminación)</h3>
+                <h3>6.3. Derecho de Cancelación (Eliminación)</h3>
                 <p>
                     Puede solicitar la eliminación de sus datos personales cuando:
                 </p>
@@ -437,13 +418,13 @@
                     tributarias por 6 años según normativa SII).
                 </p>
 
-                <h3>7.4. Derecho de Oposición</h3>
+                <h3>6.4. Derecho de Oposición</h3>
                 <p>
                     Puede oponerse al tratamiento de sus datos personales en situaciones particulares,
                     especialmente para fines de marketing directo.
                 </p>
 
-                <h3>7.5. Derecho de Bloqueo</h3>
+                <h3>6.5. Derecho de Bloqueo</h3>
                 <p>
                     Puede solicitar el bloqueo temporal de sus datos cuando cuestione su exactitud o
                     legalidad del tratamiento, mientras se verifica su solicitud.
@@ -465,9 +446,9 @@
             </div>
 
             <div class="section">
-                <h2>8. Retención y Eliminación de Datos</h2>
+                <h2>7. Retención y Eliminación de Datos</h2>
 
-                <h3>8.1. Plazos de Retención</h3>
+                <h3>7.1. Plazos de Retención</h3>
                 <p>Conservamos sus datos personales durante los siguientes períodos:</p>
 
                 <table>
@@ -507,13 +488,13 @@
                     </tbody>
                 </table>
 
-                <h3>8.2. Eliminación Definitiva</h3>
+                <h3>7.2. Eliminación Definitiva</h3>
                 <p>
                     Transcurridos los plazos establecidos, procedemos a la eliminación definitiva e irreversible
                     de los datos personales, salvo aquellos que debamos conservar por obligación legal.
                 </p>
 
-                <h3>8.3. Eliminación de Cuenta</h3>
+                <h3>7.3. Eliminación de Cuenta</h3>
                 <p>
                     Si solicita la eliminación de su cuenta, sus datos personales serán:
                 </p>
@@ -526,24 +507,24 @@
             </div>
 
             <div class="section">
-                <h2>9. Cookies y Tecnologías Similares</h2>
+                <h2>8. Cookies y Tecnologías Similares</h2>
 
                 <p>Utilizamos cookies y tecnologías similares para mejorar la experiencia del usuario:</p>
 
-                <h3>9.1. Cookies Estrictamente Necesarias</h3>
+                <h3>8.1. Cookies Estrictamente Necesarias</h3>
                 <ul>
                     <li><strong>Sesión de usuario:</strong> Mantienen su sesión activa mientras navega</li>
                     <li><strong>CSRF Token:</strong> Protegen contra ataques de falsificación de peticiones</li>
                     <li>Estas cookies son esenciales y no requieren consentimiento</li>
                 </ul>
 
-                <h3>9.2. Cookies de Funcionalidad</h3>
+                <h3>8.2. Cookies de Funcionalidad</h3>
                 <ul>
                     <li>Recordar preferencias de usuario (idioma, configuración de pantalla)</li>
                     <li>Puede deshabilitarlas, pero algunas funcionalidades pueden verse limitadas</li>
                 </ul>
 
-                <h3>9.3. Control de Cookies</h3>
+                <h3>8.3. Control de Cookies</h3>
                 <p>
                     Puede configurar su navegador para rechazar cookies o recibir una notificación cuando
                     se envíen. Sin embargo, esto puede afectar la funcionalidad del sistema.
@@ -551,7 +532,7 @@
             </div>
 
             <div class="section">
-                <h2>10. Transferencia Internacional de Datos</h2>
+                <h2>9. Transferencia Internacional de Datos</h2>
 
                 <p>
                     Actualmente, todos sus datos personales se almacenan en servidores ubicados en
@@ -566,7 +547,7 @@
             </div>
 
             <div class="section">
-                <h2>11. Menores de Edad</h2>
+                <h2>10. Menores de Edad</h2>
 
                 <p>
                     Nuestro servicio no está dirigido a menores de 18 años. No recopilamos
@@ -585,7 +566,7 @@
             </div>
 
             <div class="section">
-                <h2>12. Actualizaciones de esta Política</h2>
+                <h2>11. Actualizaciones de esta Política</h2>
 
                 <p>
                     Podemos actualizar esta Política de Privacidad periódicamente para reflejar cambios en:
@@ -618,7 +599,7 @@
             </div>
 
             <div class="section">
-                <h2>13. Contacto y Consultas</h2>
+                <h2>12. Contacto y Consultas</h2>
 
                 <p>
                     Para cualquier consulta, solicitud o reclamo relacionado con el tratamiento de sus
@@ -639,7 +620,7 @@
             </div>
 
             <div class="section">
-                <h2>14. Consentimiento</h2>
+                <h2>13. Consentimiento</h2>
 
                 <div class="highlight">
                     <p>
@@ -661,7 +642,7 @@
             </div>
 
             <div class="section">
-                <h2>15. Legislación Aplicable</h2>
+                <h2>14. Legislación Aplicable</h2>
 
                 <p>Esta Política de Privacidad se rige por:</p>
                 <ul>
