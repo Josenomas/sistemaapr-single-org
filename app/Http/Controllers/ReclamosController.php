@@ -125,7 +125,7 @@ class ReclamosController extends Controller
         // Enviar email al reclamante con la respuesta
         $this->enviarEmailRespuesta($reclamo);
 
-        return redirect()->route('reclamos.show', $reclamo->id)
+        return redirect()->route('superadmin.reclamos.show', $reclamo->id)
                        ->with('success', 'Reclamo respondido exitosamente.');
     }
 
