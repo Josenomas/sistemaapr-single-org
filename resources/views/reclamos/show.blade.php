@@ -14,7 +14,7 @@
                     </h1>
                     <p class="text-muted mb-0">Detalles y gestión del reclamo</p>
                 </div>
-                <a href="{{ route('reclamos.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('superadmin.reclamos.index') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Volver
                 </a>
             </div>
@@ -202,7 +202,7 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('reclamos.responder', $reclamo->id) }}" method="POST">
+                    <form action="{{ route('superadmin.reclamos.responder', $reclamo->id) }}" method="POST">
                         @csrf
                         @method('PUT')
 

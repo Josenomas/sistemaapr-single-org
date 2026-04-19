@@ -169,7 +169,7 @@
                                 @endif
                             </td>
                             <td class="text-center">
-                                <a href="{{ route('reclamos.show', $reclamo->id) }}" class="btn btn-sm btn-primary">
+                                <a href="{{ route('superadmin.reclamos.show', $reclamo->id) }}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-eye"></i> Ver
                                 </a>
                             </td>
