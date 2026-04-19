@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Política de Privacidad - Sistema APR</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,172 +12,97 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f8fafc;
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.8;
+            color: #000;
+            background: #fff;
+            padding: 40px 20px;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 2rem;
+            background: #fff;
         }
 
         .header {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            padding: 3rem 2rem;
             text-align: center;
-            margin-bottom: 2rem;
-            border-radius: 1rem;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #000;
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
         }
 
         .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+            font-size: 12px;
+            margin: 5px 0;
         }
 
-        .content {
-            background: white;
-            padding: 3rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-            margin-bottom: 2rem;
+        h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
         }
 
-        .section {
-            margin-bottom: 2.5rem;
+        h3 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
         }
 
-        .section h2 {
-            color: #1e40af;
-            font-size: 1.75rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 3px solid #2563eb;
-        }
-
-        .section h3 {
-            color: #1e40af;
-            font-size: 1.3rem;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .section p {
-            margin-bottom: 1rem;
+        p {
             text-align: justify;
+            margin-bottom: 15px;
+            font-size: 13px;
         }
 
-        .section ul, .section ol {
-            margin-left: 2rem;
-            margin-bottom: 1rem;
+        ul, ol {
+            margin-left: 40px;
+            margin-bottom: 15px;
         }
 
-        .section li {
-            margin-bottom: 0.5rem;
+        li {
+            margin-bottom: 8px;
+            text-align: justify;
+            font-size: 13px;
         }
 
-        .highlight {
-            background-color: #dbeafe;
-            border-left: 4px solid #2563eb;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 0.5rem;
-        }
-
-        .info-box {
-            background-color: #f0f9ff;
-            border: 1px solid #bae6fd;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 0.75rem;
-        }
-
-        .info-box strong {
-            color: #0c4a6e;
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        .warning-box {
-            background-color: #fef3c7;
-            border: 1px solid #fbbf24;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 0.75rem;
-        }
-
-        .warning-box strong {
-            color: #92400e;
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-        }
-
-        table th {
-            background-color: #2563eb;
-            color: white;
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        table tr:hover {
-            background-color: #f9fafb;
+        strong {
+            font-weight: bold;
         }
 
         .footer {
-            background: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #000;
             text-align: center;
-            color: #6b7280;
+            font-size: 12px;
         }
 
-        .footer a {
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        .back-button {
+        .back-link {
             display: inline-block;
-            padding: 0.75rem 1.5rem;
-            background: #2563eb;
-            color: white;
-            text-decoration: none;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            transition: background 0.2s;
-            margin-top: 1rem;
+            margin-top: 20px;
+            color: #0066cc;
+            text-decoration: underline;
+            cursor: pointer;
         }
 
-        .back-button:hover {
-            background: #1d4ed8;
+        @media print {
+            body {
+                padding: 0;
+            }
+            .back-link {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -186,488 +110,253 @@
     <div class="container">
         <div class="header">
             <h1>Política de Privacidad</h1>
+            <p>Sistema APR - Gestión Integral de Agua Potable Rural</p>
             <p>Última actualización: {{ date('d/m/Y') }}</p>
-            <p>Protección de Datos Personales - Ley 19.628</p>
+            <p>Conforme a la Ley 19.628 sobre Protección de la Vida Privada</p>
         </div>
 
-        <div class="content">
-            <div class="section">
-                <h2>1. Introducción</h2>
-                <p>
-                    En <strong>Sistema APR</strong> nos comprometemos con la protección de sus datos personales.
-                    Esta Política de Privacidad explica cómo recopilamos, usamos, almacenamos y protegemos su
-                    información personal de acuerdo con la <strong>Ley 19.628 sobre Protección de la Vida Privada</strong>
-                    de Chile.
-                </p>
-                <p>
-                    Al utilizar nuestros servicios, usted acepta las prácticas descritas en esta política.
-                    Le recomendamos leerla cuidadosamente.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>2. Datos Personales que Recopilamos</h2>
-
-                <p>Recopilamos diferentes tipos de información personal según su relación con nuestro sistema:</p>
-
-                <h3>2.1. Datos de Organizaciones (APR)</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tipo de Dato</th>
-                            <th>Ejemplos</th>
-                            <th>Finalidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Identificación</strong></td>
-                            <td>Nombre APR, RUT, razón social</td>
-                            <td>Identificación y facturación</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Contacto</strong></td>
-                            <td>Email, teléfono, dirección</td>
-                            <td>Comunicaciones y soporte</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Representante Legal</strong></td>
-                            <td>Nombre, RUT, cargo</td>
-                            <td>Validación contractual</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Datos Bancarios</strong></td>
-                            <td>Banco, tipo cuenta, número cuenta</td>
-                            <td>Procesamiento de pagos</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h3>2.2. Datos de Usuarios del Sistema</h3>
-                <ul>
-                    <li><strong>Identificación:</strong> Nombre completo, RUT, cargo</li>
-                    <li><strong>Contacto:</strong> Correo electrónico, teléfono</li>
-                    <li><strong>Acceso:</strong> Contraseña encriptada, permisos de usuario</li>
-                    <li><strong>Actividad:</strong> Registro de acciones, IP, navegador, fecha/hora</li>
-                </ul>
-
-                <h3>2.3. Datos de Socios/Clientes de las APR</h3>
-
-                <div class="info-box">
-                    <strong>Importante:</strong> Los socios/clientes de las APR <strong>NO tienen acceso directo</strong>
-                    a Sistema APR. Sus datos son gestionados únicamente por los administradores de cada APR.
-                </div>
-
-                <p>
-                    <strong>Base Legal del Tratamiento:</strong> Los datos de socios son recopilados por cada APR
-                    mediante <strong>contratos de adhesión al servicio de agua potable</strong>, donde el socio
-                    autoriza expresamente el tratamiento de sus datos personales para la gestión del servicio.
-                    Sistema APR actúa como <strong>encargado del tratamiento</strong> (procesador de datos),
-                    siendo cada APR el <strong>responsable del tratamiento</strong> de los datos de sus socios.
-                </p>
-
-                <p>Datos almacenados de socios:</p>
-                <ul>
-                    <li><strong>Identificación:</strong> Nombre completo, RUT</li>
-                    <li><strong>Contacto:</strong> Dirección, teléfono, correo electrónico</li>
-                    <li><strong>Servicios:</strong> Medidor asignado, tarifa, consumo de agua</li>
-                    <li><strong>Financieros:</strong> Boletas emitidas, pagos realizados, morosidad</li>
-                </ul>
-
-                <p>
-                    <strong>Derechos ARCO de los socios:</strong> Los socios deben ejercer sus derechos de acceso,
-                    rectificación, cancelación y oposición directamente ante su APR, quien es el responsable de
-                    sus datos personales. La APR utilizará Sistema APR para gestionar dichas solicitudes.
-                </p>
-
-                <h3>2.4. Datos Técnicos</h3>
-                <ul>
-                    <li>Dirección IP</li>
-                    <li>Tipo de navegador y sistema operativo</li>
-                    <li>Fecha y hora de acceso</li>
-                    <li>Páginas visitadas dentro del sistema</li>
-                </ul>
-            </div>
-
-            <div class="section">
-                <h2>3. Finalidad del Tratamiento de Datos</h2>
-
-                <p>Utilizamos sus datos personales para las siguientes finalidades legítimas:</p>
-
-                <ol>
-                    <li><strong>Prestación del Servicio:</strong> Proporcionar acceso y funcionalidades del sistema de gestión APR</li>
-                    <li><strong>Facturación y Cobro:</strong> Emitir boletas electrónicas y gestionar pagos</li>
-                    <li><strong>Soporte Técnico:</strong> Responder consultas y resolver problemas técnicos</li>
-                    <li><strong>Cumplimiento Contractual:</strong> Ejecutar los términos del servicio contratado</li>
-                    <li><strong>Seguridad:</strong> Prevenir fraudes y proteger la integridad del sistema</li>
-                    <li><strong>Auditoría:</strong> Mantener registro de actividades para trazabilidad</li>
-                    <li><strong>Cumplimiento Legal:</strong> Cumplir obligaciones tributarias (SII) y regulatorias</li>
-                    <li><strong>Comunicaciones:</strong> Enviar notificaciones sobre el servicio, actualizaciones y cambios importantes</li>
-                    <li><strong>Mejora del Servicio:</strong> Análisis estadísticos agregados para optimizar funcionalidades</li>
-                </ol>
-
-                <div class="highlight">
-                    <strong>Base Legal del Tratamiento:</strong> El tratamiento de sus datos se fundamenta en:
-                    <ul style="margin-top: 0.5rem;">
-                        <li>Ejecución del contrato de servicios (Art. 4 letra d, Ley 19.628)</li>
-                        <li>Consentimiento informado del titular</li>
-                        <li>Cumplimiento de obligaciones legales (tributarias, sanitarias)</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>4. Compartir Datos con Terceros</h2>
-
-                <p>
-                    <strong>No vendemos ni cedemos</strong> sus datos personales a terceros para fines comerciales.
-                    Sin embargo, compartimos datos limitados con terceros en los siguientes casos:
-                </p>
-
-                <h3>4.1. Procesadores de Pago</h3>
-                <ul>
-                    <li><strong>Flow / Khipu:</strong> Compartimos email y monto de transacción para procesar pagos de manera segura</li>
-                    <li>Estos proveedores están certificados y cumplen estándares PCI-DSS</li>
-                </ul>
-
-                <h3>4.2. Servicio de Impuestos Internos (SII)</h3>
-                <ul>
-                    <li>Compartimos RUT, nombre y monto para emisión de boletas electrónicas</li>
-                    <li>Obligación legal según normativa tributaria chilena</li>
-                </ul>
-
-                <h3>4.3. Proveedores de Servicios Técnicos</h3>
-                <ul>
-                    <li>Hosting de servidores y almacenamiento en la nube</li>
-                    <li>Servicios de envío de correos electrónicos</li>
-                    <li>Todos los proveedores están contractualmente obligados a proteger sus datos</li>
-                </ul>
-
-                <h3>4.4. Autoridades Competentes</h3>
-                <ul>
-                    <li>Cuando sea requerido por ley o por orden judicial</li>
-                    <li>Para proteger derechos legales o seguridad</li>
-                </ul>
-
-                <div class="warning-box">
-                    <strong>Importante:</strong> Ningún tercero tiene permiso para usar sus datos personales
-                    para fines distintos a los específicamente autorizados por Sistema APR.
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>5. Seguridad de los Datos Personales</h2>
-
-                <p>Implementamos medidas técnicas y organizativas para proteger sus datos personales:</p>
-
-                <h3>5.1. Medidas Técnicas</h3>
-                <ul>
-                    <li><strong>Encriptación:</strong> Todas las contraseñas se almacenan encriptadas con bcrypt</li>
-                    <li><strong>SSL/TLS:</strong> Comunicaciones cifradas mediante protocolo HTTPS</li>
-                    <li><strong>Control de Acceso:</strong> Sistema de permisos basado en roles</li>
-                    <li><strong>Firewall:</strong> Protección perimetral de servidores</li>
-                    <li><strong>Copias de Seguridad:</strong> Respaldos diarios automatizados</li>
-                    <li><strong>Auditoría:</strong> Registro de todos los accesos y modificaciones de datos</li>
-                </ul>
-
-                <h3>5.2. Medidas Organizativas</h3>
-                <ul>
-                    <li>Acceso restringido solo a personal autorizado</li>
-                    <li>Acuerdos de confidencialidad con empleados</li>
-                    <li>Capacitación en protección de datos</li>
-                    <li>Procedimientos de respuesta ante incidentes de seguridad</li>
-                </ul>
-
-                <h3>5.3. Aislamiento de Datos (Multi-tenancy)</h3>
-                <p>
-                    Cada organización APR tiene sus datos completamente aislados. Los usuarios de una
-                    organización <strong>no pueden acceder</strong> a los datos de otras organizaciones.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>6. Sus Derechos sobre los Datos Personales (Derechos ARCO)</h2>
-
-                <p>
-                    De acuerdo con la Ley 19.628, usted tiene los siguientes derechos sobre sus datos personales:
-                </p>
-
-                <h3>6.1. Derecho de Acceso</h3>
-                <p>
-                    Tiene derecho a conocer qué datos personales tenemos sobre usted y cómo los utilizamos.
-                    Puede solicitar una copia de sus datos en formato estructurado.
-                </p>
-
-                <h3>6.2. Derecho de Rectificación</h3>
-                <p>
-                    Puede solicitar la corrección de datos inexactos o incompletos. Nos comprometemos a
-                    actualizar o corregir sus datos dentro de 2 días hábiles.
-                </p>
-
-                <h3>6.3. Derecho de Cancelación (Eliminación)</h3>
-                <p>
-                    Puede solicitar la eliminación de sus datos personales cuando:
-                </p>
-                <ul>
-                    <li>Ya no sean necesarios para las finalidades para las cuales fueron recopilados</li>
-                    <li>Haya retirado su consentimiento y no exista otra base legal</li>
-                    <li>Los datos hayan sido tratados ilícitamente</li>
-                </ul>
-                <p>
-                    <strong>Nota:</strong> Algunos datos deben conservarse por obligaciones legales (ej: boletas
-                    tributarias por 6 años según normativa SII).
-                </p>
-
-                <h3>6.4. Derecho de Oposición</h3>
-                <p>
-                    Puede oponerse al tratamiento de sus datos personales en situaciones particulares,
-                    especialmente para fines de marketing directo.
-                </p>
-
-                <h3>6.5. Derecho de Bloqueo</h3>
-                <p>
-                    Puede solicitar el bloqueo temporal de sus datos cuando cuestione su exactitud o
-                    legalidad del tratamiento, mientras se verifica su solicitud.
-                </p>
-
-                <div class="info-box">
-                    <strong>¿Cómo Ejercer sus Derechos?</strong>
-                    <p>Para ejercer cualquiera de estos derechos, puede:</p>
-                    <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                        <li>Enviar un correo electrónico a: <strong>soportesistemaapr@gmail.com</strong></li>
-                        <li>Utilizar el formulario de solicitud ARCO disponible en su panel de usuario</li>
-                        <li>Contactarnos a través del sistema de tickets de soporte</li>
-                    </ol>
-                    <p style="margin-top: 0.5rem;">
-                        <strong>Plazo de respuesta:</strong> Responderemos su solicitud dentro de
-                        <strong>5 días hábiles</strong> desde su recepción.
-                    </p>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>7. Retención y Eliminación de Datos</h2>
-
-                <h3>7.1. Plazos de Retención</h3>
-                <p>Conservamos sus datos personales durante los siguientes períodos:</p>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tipo de Dato</th>
-                            <th>Plazo de Retención</th>
-                            <th>Fundamento</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Datos de cuenta activa</td>
-                            <td>Mientras dure la relación contractual</td>
-                            <td>Prestación del servicio</td>
-                        </tr>
-                        <tr>
-                            <td>Boletas y documentos tributarios</td>
-                            <td>Mínimo 6 años</td>
-                            <td>Obligación legal SII</td>
-                        </tr>
-                        <tr>
-                            <td>Registros de auditoría</td>
-                            <td>3 años</td>
-                            <td>Seguridad y trazabilidad</td>
-                        </tr>
-                        <tr>
-                            <td>Datos de cuenta eliminada</td>
-                            <td>30 días (período de gracia)</td>
-                            <td>Posibilidad de recuperación</td>
-                        </tr>
-                        <tr>
-                            <td>Copias de respaldo</td>
-                            <td>90 días</td>
-                            <td>Continuidad operacional</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h3>7.2. Eliminación Definitiva</h3>
-                <p>
-                    Transcurridos los plazos establecidos, procedemos a la eliminación definitiva e irreversible
-                    de los datos personales, salvo aquellos que debamos conservar por obligación legal.
-                </p>
-
-                <h3>7.3. Eliminación de Cuenta</h3>
-                <p>
-                    Si solicita la eliminación de su cuenta, sus datos personales serán:
-                </p>
-                <ul>
-                    <li>Marcados como "eliminados" inmediatamente (soft delete)</li>
-                    <li>Inaccesibles para todos los usuarios del sistema</li>
-                    <li>Purgados definitivamente después de 30 días</li>
-                    <li>Conservados solo en backups por 90 días adicionales (luego eliminados automáticamente)</li>
-                </ul>
-            </div>
-
-            <div class="section">
-                <h2>8. Cookies y Tecnologías Similares</h2>
-
-                <p>Utilizamos cookies y tecnologías similares para mejorar la experiencia del usuario:</p>
-
-                <h3>8.1. Cookies Estrictamente Necesarias</h3>
-                <ul>
-                    <li><strong>Sesión de usuario:</strong> Mantienen su sesión activa mientras navega</li>
-                    <li><strong>CSRF Token:</strong> Protegen contra ataques de falsificación de peticiones</li>
-                    <li>Estas cookies son esenciales y no requieren consentimiento</li>
-                </ul>
-
-                <h3>8.2. Cookies de Funcionalidad</h3>
-                <ul>
-                    <li>Recordar preferencias de usuario (idioma, configuración de pantalla)</li>
-                    <li>Puede deshabilitarlas, pero algunas funcionalidades pueden verse limitadas</li>
-                </ul>
-
-                <h3>8.3. Control de Cookies</h3>
-                <p>
-                    Puede configurar su navegador para rechazar cookies o recibir una notificación cuando
-                    se envíen. Sin embargo, esto puede afectar la funcionalidad del sistema.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>9. Transferencia Internacional de Datos</h2>
-
-                <p>
-                    Actualmente, todos sus datos personales se almacenan en servidores ubicados en
-                    <strong>Chile</strong> y no se transfieren fuera del país.
-                </p>
-
-                <p>
-                    En caso de que en el futuro sea necesario transferir datos a otros países, le
-                    notificaremos previamente y solicitaremos su consentimiento explícito, asegurando
-                    que el país receptor tenga niveles adecuados de protección de datos.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>10. Menores de Edad</h2>
-
-                <p>
-                    Nuestro servicio no está dirigido a menores de 18 años. No recopilamos
-                    intencionalmente datos personales de menores.
-                </p>
-
-                <p>
-                    En caso de gestión de servicios de agua para hogares con menores, los datos
-                    recopilados corresponden al titular adulto del servicio (padre, madre o tutor legal).
-                </p>
-
-                <p>
-                    Si descubrimos que hemos recopilado datos de un menor sin consentimiento del tutor,
-                    eliminaremos esa información inmediatamente.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>11. Actualizaciones de esta Política</h2>
-
-                <p>
-                    Podemos actualizar esta Política de Privacidad periódicamente para reflejar cambios en:
-                </p>
-                <ul>
-                    <li>Nuestras prácticas de tratamiento de datos</li>
-                    <li>Requisitos legales o regulatorios</li>
-                    <li>Nuevas funcionalidades del sistema</li>
-                </ul>
-
-                <p>
-                    <strong>Notificación de cambios:</strong> Le notificaremos cambios importantes mediante:
-                </p>
-                <ul>
-                    <li>Correo electrónico a la dirección registrada</li>
-                    <li>Aviso destacado en el sistema al iniciar sesión</li>
-                    <li>Actualización de la fecha en la parte superior de este documento</li>
-                </ul>
-
-                <p>
-                    Le recomendamos revisar esta política periódicamente. El uso continuado del servicio
-                    después de las modificaciones constituye su aceptación de los cambios.
-                </p>
-
-                <div class="info-box">
-                    <strong>Versión Actual:</strong> 1.0<br>
-                    <strong>Fecha de Vigencia:</strong> {{ date('d/m/Y') }}<br>
-                    <strong>Última Modificación:</strong> {{ date('d/m/Y') }}
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>12. Contacto y Consultas</h2>
-
-                <p>
-                    Para cualquier consulta, solicitud o reclamo relacionado con el tratamiento de sus
-                    datos personales, puede contactarnos:
-                </p>
-
-                <div class="info-box">
-                    <strong>Datos de Contacto del Responsable de Protección de Datos:</strong>
-                    <p><strong>Correo electrónico:</strong> soportesistemaapr@gmail.com</p>
-                    <p><strong>Asunto:</strong> "Protección de Datos Personales"</p>
-                    <p><strong>Horario de atención:</strong> Lunes a Viernes, 9:00 - 18:00 hrs (hora Chile)</p>
-                    <p><strong>Plazo de respuesta:</strong> Máximo 5 días hábiles</p>
-                </div>
-
-                <p>
-                    Nos comprometemos a responder todas sus consultas de manera oportuna y transparente.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>13. Consentimiento</h2>
-
-                <div class="highlight">
-                    <p>
-                        Al registrarse y utilizar Sistema APR, usted confirma que:
-                    </p>
-                    <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                        <li>Ha leído y comprendido esta Política de Privacidad</li>
-                        <li>Consiente el tratamiento de sus datos personales según lo descrito</li>
-                        <li>Conoce sus derechos ARCO y cómo ejercerlos</li>
-                        <li>Acepta que compartamos datos mínimos necesarios con terceros mencionados</li>
-                        <li>Comprende los plazos de retención y eliminación de datos</li>
-                    </ol>
-                    <p style="margin-top: 1rem;">
-                        <strong>Puede retirar su consentimiento en cualquier momento</strong> solicitando
-                        la eliminación de su cuenta, sujeto a las obligaciones legales de retención de
-                        ciertos datos.
-                    </p>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>14. Legislación Aplicable</h2>
-
-                <p>Esta Política de Privacidad se rige por:</p>
-                <ul>
-                    <li><strong>Ley 19.628</strong> sobre Protección de la Vida Privada (Chile)</li>
-                    <li><strong>Ley 19.496</strong> sobre Protección de los Derechos de los Consumidores</li>
-                    <li><strong>Ley 20.575</strong> sobre Principio de Finalidad en el Tratamiento de Datos</li>
-                    <li>Normativa del Servicio de Impuestos Internos (SII)</li>
-                </ul>
-
-                <p>
-                    Cualquier controversia relacionada con el tratamiento de datos personales será
-                    resuelta conforme a la legislación chilena y bajo la jurisdicción de los tribunales
-                    competentes de Chile.
-                </p>
-            </div>
-        </div>
+        <h2>1. Introducción</h2>
+        <p>
+            En Sistema APR nos comprometemos con la protección de sus datos personales. Esta Política de Privacidad explica cómo recopilamos, usamos, almacenamos y protegemos su información personal de acuerdo con la Ley 19.628 sobre Protección de la Vida Privada de Chile y demás normativa aplicable.
+        </p>
+        <p>
+            Al utilizar nuestros servicios, usted acepta las prácticas descritas en esta política. Le recomendamos leerla cuidadosamente.
+        </p>
+
+        <h2>2. Datos Personales que Recopilamos</h2>
+        <p>
+            Recopilamos diferentes tipos de información personal según su relación con nuestro sistema:
+        </p>
+
+        <h3>2.1. Datos de Organizaciones (APR)</h3>
+        <p>
+            Cuando una organización APR se registra en nuestro sistema, recopilamos: nombre de la organización, RUT, dirección física completa, región y comuna, información de contacto (teléfono, correo electrónico), datos del representante legal (nombre completo, RUT, correo electrónico), información del plan de suscripción contratado, y datos de facturación cuando corresponda.
+        </p>
+
+        <h3>2.2. Datos de Usuarios del Sistema</h3>
+        <p>
+            Los usuarios administradores de las organizaciones registran: nombre completo, RUT, cargo dentro de la organización, correo electrónico, número de teléfono, contraseña encriptada, permisos y roles asignados, registro de actividad dentro del sistema (IP, navegador, fecha y hora de acceso).
+        </p>
+
+        <h3>2.3. Datos de Socios/Clientes de las APR</h3>
+        <p>
+            Importante: Los socios o clientes de las organizaciones APR NO tienen acceso directo a Sistema APR. Sus datos son gestionados únicamente por los administradores de cada APR.
+        </p>
+        <p>
+            Base Legal del Tratamiento: Los datos de socios son recopilados por cada APR mediante contratos de adhesión al servicio de agua potable. Sistema APR actúa como encargado del tratamiento (procesador de datos), siendo cada APR el responsable del tratamiento de los datos de sus socios.
+        </p>
+        <p>
+            Datos que pueden ser gestionados por las APR: identificación personal (nombre completo, RUT), domicilio del suministro de agua, información de contacto, datos de medidor y consumo, historial de pagos y facturación, estado de morosidad, información familiar (cuando aplique según reglamento APR).
+        </p>
+        <p>
+            Derechos de los Socios: Los socios pueden ejercer sus derechos de acceso, rectificación, cancelación y oposición directamente ante su APR, quien es el responsable de sus datos personales. La APR utilizará Sistema APR para gestionar dichas solicitudes.
+        </p>
+
+        <h3>2.4. Datos Técnicos</h3>
+        <p>
+            Recopilamos automáticamente: dirección IP, tipo de navegador y sistema operativo, fecha y hora de acceso, páginas visitadas dentro del sistema, cookies de sesión estrictamente necesarias.
+        </p>
+
+        <h2>3. Finalidad del Tratamiento de Datos</h2>
+        <p>
+            Utilizamos sus datos personales para las siguientes finalidades legítimas:
+        </p>
+        <ol>
+            <li>Proveer y mantener el servicio de gestión de organizaciones APR.</li>
+            <li>Gestionar el registro y autenticación de usuarios.</li>
+            <li>Procesar pagos de suscripciones mediante pasarelas de pago seguras (Flow, Khipu).</li>
+            <li>Emitir boletas electrónicas y cumplir con obligaciones tributarias ante el SII.</li>
+            <li>Enviar notificaciones importantes sobre el servicio (vencimientos, renovaciones, actualizaciones de seguridad).</li>
+            <li>Brindar soporte técnico cuando sea solicitado.</li>
+            <li>Mejorar la funcionalidad y seguridad del sistema.</li>
+            <li>Cumplir con obligaciones legales, incluyendo auditorías de seguridad y solicitudes de autoridades competentes.</li>
+            <li>Permitir a las organizaciones APR gestionar datos de sus socios conforme a sus obligaciones como prestadores de servicios.</li>
+        </ol>
+
+        <h2>4. Compartir Datos con Terceros</h2>
+        <p>
+            No vendemos ni cedemos sus datos personales a terceros para fines comerciales. Sin embargo, compartimos datos limitados con terceros en los siguientes casos:
+        </p>
+
+        <h3>4.1. Procesadores de Pago</h3>
+        <p>
+            Compartimos con Flow y Khipu el correo electrónico y monto de transacción para procesar pagos de manera segura. Estos proveedores están certificados y cumplen estándares PCI-DSS.
+        </p>
+
+        <h3>4.2. Servicio de Impuestos Internos (SII)</h3>
+        <p>
+            Transmitimos datos de facturación electrónica como RUT, razón social y montos conforme a las obligaciones tributarias vigentes.
+        </p>
+
+        <h3>4.3. Proveedores de Servicios Técnicos</h3>
+        <p>
+            Utilizamos servicios de hosting y almacenamiento en la nube que pueden tener acceso limitado a datos necesarios para operar el sistema. Todos nuestros proveedores firman acuerdos de confidencialidad.
+        </p>
+
+        <h3>4.4. Autoridades Competentes</h3>
+        <p>
+            Podemos compartir datos cuando sea requerido por ley, orden judicial, o solicitud de autoridades competentes (Fiscalía, SII, Superintendencia de Servicios Sanitarios, etc.).
+        </p>
+
+        <h2>5. Seguridad de los Datos Personales</h2>
+        <p>
+            Implementamos medidas técnicas y organizativas para proteger sus datos personales contra acceso no autorizado, pérdida, destrucción o alteración.
+        </p>
+
+        <h3>5.1. Medidas Técnicas</h3>
+        <p>
+            Encriptación SSL/TLS para todas las transmisiones de datos, contraseñas almacenadas con hash seguro (bcrypt), firewall y protección contra ataques DDoS, copias de seguridad automatizadas diarias, certificados SSL renovados automáticamente.
+        </p>
+
+        <h3>5.2. Medidas Organizativas</h3>
+        <p>
+            Acceso restringido a datos personales solo para personal autorizado, políticas de contraseñas fuertes obligatorias, registro de auditoría de todas las acciones críticas en el sistema, procedimientos de respuesta ante incidentes de seguridad.
+        </p>
+
+        <h3>5.3. Aislamiento de Datos (Multi-tenancy)</h3>
+        <p>
+            Cada organización APR tiene su propia base de datos lógicamente aislada. Los datos de una organización nunca son accesibles para usuarios de otras organizaciones.
+        </p>
+
+        <h2>6. Sus Derechos sobre los Datos Personales (Derechos ARCO)</h2>
+        <p>
+            De acuerdo con la Ley 19.628, usted tiene los siguientes derechos sobre sus datos personales:
+        </p>
+
+        <h3>6.1. Derecho de Acceso</h3>
+        <p>
+            Puede solicitar una copia de los datos personales que tenemos sobre usted. Los administradores pueden ver y descargar sus datos desde el panel de usuario.
+        </p>
+
+        <h3>6.2. Derecho de Rectificación</h3>
+        <p>
+            Puede solicitar la corrección de datos inexactos o incompletos. Los administradores pueden editar sus datos directamente desde su perfil de usuario.
+        </p>
+
+        <h3>6.3. Derecho de Cancelación (Eliminación)</h3>
+        <p>
+            Puede solicitar la eliminación de sus datos personales. Importante: La eliminación de datos puede estar sujeta a obligaciones legales de retención (ej. registros tributarios que deben conservarse por 6 años según normativa del SII). Los usuarios pueden eliminar su propia cuenta desde Configuración > Mi Perfil > Derechos ARCO > Eliminar mi cuenta. Limitación: No podrá eliminar su cuenta si es el último administrador de la organización.
+        </p>
+
+        <h3>6.4. Derecho de Oposición</h3>
+        <p>
+            Puede oponerse al tratamiento de sus datos para fines específicos. Nota: No podrá oponerse a tratamientos necesarios para el cumplimiento de obligaciones legales o contractuales.
+        </p>
+
+        <h3>6.5. Derecho de Bloqueo</h3>
+        <p>
+            Puede solicitar el bloqueo temporal de sus datos mientras se verifica la procedencia de una solicitud de rectificación o eliminación.
+        </p>
+
+        <h3>Cómo ejercer sus derechos:</h3>
+        <p>
+            Para ejercer cualquiera de estos derechos, puede enviar un correo electrónico a soportesistemaapr@gmail.com, utilizar el formulario de solicitud ARCO disponible en su panel de usuario, o contactarnos a través del sistema de tickets de soporte.
+        </p>
+        <p>
+            Plazo de respuesta: Responderemos su solicitud dentro de 5 días hábiles desde su recepción.
+        </p>
+
+        <h2>7. Retención y Eliminación de Datos</h2>
+
+        <h3>7.1. Plazos de Retención</h3>
+        <p>
+            Conservamos sus datos personales durante los siguientes períodos: datos de organizaciones activas se conservan mientras la suscripción esté vigente, datos de usuarios activos se conservan mientras mantengan acceso al sistema, datos tributarios y de facturación se conservan por 6 años conforme a la normativa del SII, datos de socios se conservan según políticas de retención de cada APR, logs de auditoría y seguridad se conservan por 2 años.
+        </p>
+
+        <h3>7.2. Eliminación Definitiva</h3>
+        <p>
+            Transcurridos los plazos de retención, y cuando no existan obligaciones legales que impidan la eliminación, procederemos a eliminar definitivamente los datos personales de nuestros sistemas.
+        </p>
+
+        <h3>7.3. Eliminación de Cuenta</h3>
+        <p>
+            Si elimina su cuenta voluntariamente, sus datos personales serán eliminados dentro de 30 días, excepto aquellos que debamos conservar por obligaciones legales.
+        </p>
+
+        <h2>8. Cookies y Tecnologías Similares</h2>
+        <p>
+            Utilizamos cookies únicamente para fines estrictamente necesarios para el funcionamiento del sistema:
+        </p>
+
+        <h3>8.1. Cookies Estrictamente Necesarias</h3>
+        <p>
+            Cookies de sesión para mantener su autenticación, token CSRF para protección contra ataques de falsificación de solicitudes entre sitios, cookies de preferencias de idioma y configuración.
+        </p>
+
+        <h3>8.2. Cookies de Funcionalidad</h3>
+        <p>
+            Cookies para recordar su organización en caso de múltiples organizaciones asociadas a un mismo correo.
+        </p>
+
+        <h3>8.3. Control de Cookies</h3>
+        <p>
+            Puede configurar su navegador para rechazar cookies, pero esto puede afectar la funcionalidad del sistema.
+        </p>
+
+        <h2>9. Transferencia Internacional de Datos</h2>
+        <p>
+            Sus datos personales son almacenados y procesados en servidores ubicados en Chile. En caso de utilizar proveedores internacionales de servicios (ej. servicios de nube), nos aseguramos de que cumplan con estándares adecuados de protección de datos y firmamos cláusulas contractuales apropiadas.
+        </p>
+        <p>
+            En ningún caso transferiremos sus datos a países que no ofrezcan un nivel adecuado de protección de datos personales sin su consentimiento expreso.
+        </p>
+
+        <h2>10. Menores de Edad</h2>
+        <p>
+            Sistema APR es una plataforma de gestión empresarial destinada a organizaciones y no está dirigida a menores de 18 años. No recopilamos intencionalmente datos de menores de edad.
+        </p>
+        <p>
+            Excepción: En el contexto de gestión de socios de las APR, pueden registrarse datos de menores de edad cuando estos sean beneficiarios del servicio de agua potable en calidad de titulares o co-titulares del suministro (ejemplo: hijo heredero de un socio fallecido). En estos casos:
+        </p>
+        <ul>
+            <li>La APR debe contar con consentimiento del representante legal del menor.</li>
+            <li>Los datos del menor serán tratados con especial cuidado y seguridad.</li>
+            <li>Sistema APR actúa únicamente como encargado del tratamiento, siendo la APR responsable de verificar y documentar el consentimiento.</li>
+        </ul>
+
+        <h2>11. Actualizaciones de esta Política</h2>
+        <p>
+            Nos reservamos el derecho de modificar esta Política de Privacidad en cualquier momento para reflejar cambios en nuestras prácticas de tratamiento de datos o en la legislación aplicable.
+        </p>
+        <p>
+            Notificación de Cambios: Cuando realicemos cambios significativos, le notificaremos mediante correo electrónico a la dirección registrada en su cuenta y/o mediante un aviso destacado en el sistema.
+        </p>
+        <p>
+            Fecha de Vigencia: Los cambios entrarán en vigencia 15 días después de su publicación, salvo que la ley requiera un plazo diferente.
+        </p>
+        <p>
+            Aceptación de Cambios: El uso continuado del sistema después de la entrada en vigencia de los cambios constituye su aceptación de la Política de Privacidad modificada. Si no está de acuerdo con los cambios, puede cancelar su suscripción y solicitar la eliminación de sus datos conforme a los procedimientos establecidos.
+        </p>
+
+        <h2>12. Consentimiento</h2>
+        <p>
+            Al registrarse en Sistema APR, al crear una cuenta de usuario, o al utilizar nuestros servicios, usted declara:
+        </p>
+        <ol>
+            <li>Haber leído y comprendido esta Política de Privacidad.</li>
+            <li>Otorgar su consentimiento expreso, libre e informado para el tratamiento de sus datos personales conforme a lo establecido en esta política.</li>
+            <li>Comprender que puede revocar su consentimiento en cualquier momento, lo que puede resultar en la cancelación del servicio.</li>
+        </ol>
+        <p>
+            Organizaciones APR: Al registrar a una organización APR, el representante legal declara que cuenta con las facultades necesarias para comprometer a la organización y que ha informado a los usuarios de la organización sobre esta Política de Privacidad.
+        </p>
+
+        <h2>13. Legislación Aplicable</h2>
+        <p>
+            Esta Política de Privacidad se rige por la Ley 19.628 sobre Protección de la Vida Privada (Chile), Ley 19.496 sobre Protección de los Derechos de los Consumidores, Ley 20.575 sobre Principio de Finalidad en el Tratamiento de Datos, y la normativa del Servicio de Impuestos Internos (SII).
+        </p>
+        <p>
+            Cualquier controversia relacionada con el tratamiento de datos personales será resuelta conforme a la legislación chilena y bajo la jurisdicción de los tribunales competentes de Chile.
+        </p>
 
         <div class="footer">
-            <p><strong>Sistema APR</strong> - Gestión Integral de Agua Potable Rural</p>
-            <p>RUT: 19.762.564-3 | Email: soportesistemaapr@gmail.com</p>
-            <p style="margin-top: 1rem;">
-                <a href="{{ route('terminos.condiciones') }}">Términos y Condiciones</a> |
-                <a href="{{ route('politicas.privacidad') }}">Política de Privacidad</a>
+            <p><strong>Sistema APR</strong></p>
+            <p>Gestión Integral de Agua Potable Rural</p>
+            <p>Chile</p>
+            <p style="margin-top: 15px;">
+                <a href="{{ route('terminos.condiciones') }}">Términos y Condiciones</a>
             </p>
-            <a href="javascript:history.back()" class="back-button">Volver</a>
+            <a href="javascript:history.back()" class="back-link">← Volver</a>
         </div>
     </div>
 </body>
