@@ -462,17 +462,6 @@
                         <strong>5 días hábiles</strong> desde su recepción.
                     </p>
                 </div>
-
-                <h3>7.6. Derecho a Presentar Reclamo</h3>
-                <p>
-                    Si considera que sus derechos han sido vulnerados, puede presentar un reclamo ante el
-                    <strong>Consejo para la Transparencia</strong> de Chile:
-                </p>
-                <ul>
-                    <li>Web: <a href="https://www.consejotransparencia.cl" target="_blank">www.consejotransparencia.cl</a></li>
-                    <li>Teléfono: +56 2 2754 8100</li>
-                    <li>Dirección: Morandé 360, Santiago</li>
-                </ul>
             </div>
 
             <div class="section">
@@ -680,7 +669,6 @@
                     <li><strong>Ley 19.496</strong> sobre Protección de los Derechos de los Consumidores</li>
                     <li><strong>Ley 20.575</strong> sobre Principio de Finalidad en el Tratamiento de Datos</li>
                     <li>Normativa del Servicio de Impuestos Internos (SII)</li>
-                    <li>Instrucciones del Consejo para la Transparencia</li>
                 </ul>
 
                 <p>
