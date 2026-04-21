@@ -295,9 +295,6 @@
         </p>
 
         <div class="footer">
-            <p><strong>Sistema APR</strong></p>
-            <p>Gestión Integral de Agua Potable Rural</p>
-            <p>Chile</p>
             <p style="margin-top: 15px;">
                 <a href="{{ route('terminos.condiciones') }}">Términos y Condiciones</a>
             </p>

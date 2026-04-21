@@ -267,15 +267,6 @@
         </p>
 
         <div class="footer">
-            <p><strong>Sistema APR</strong></p>
-            <p>Gestión Integral de Agua Potable Rural</p>
-            <p>Chile</p>
-            <p style="margin-top: 20px;">
-                Al hacer clic en "Acepto los términos y condiciones" en el formulario de registro, usted confirma que ha leído, entendido y aceptado estos términos en su totalidad.
-            </p>
-            <p style="margin-top: 15px;">
-                Email de contacto: soportesistemaapr@gmail.com
-            </p>
             <p style="margin-top: 15px;">
                 <a href="{{ route('politicas.privacidad') }}">Política de Privacidad</a>
             </p>
