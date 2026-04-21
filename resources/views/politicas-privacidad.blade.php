@@ -218,44 +218,27 @@
             Cada organización APR tiene su propia base de datos lógicamente aislada. Los datos de una organización nunca son accesibles para usuarios de otras organizaciones.
         </p>
 
-        <h2>6. Retención y Eliminación de Datos</h2>
-
-        <h3>6.1. Plazos de Retención</h3>
-        <p>
-            Conservamos sus datos personales durante los siguientes períodos: datos de organizaciones activas se conservan mientras la suscripción esté vigente, datos de usuarios activos se conservan mientras mantengan acceso al sistema, datos tributarios y de facturación se conservan por 6 años conforme a la normativa del SII, datos de socios se conservan según políticas de retención de cada APR, logs de auditoría y seguridad se conservan por 2 años.
-        </p>
-
-        <h3>6.2. Eliminación Definitiva</h3>
-        <p>
-            Transcurridos los plazos de retención, y cuando no existan obligaciones legales que impidan la eliminación, procederemos a eliminar definitivamente los datos personales de nuestros sistemas.
-        </p>
-
-        <h3>6.3. Eliminación de Cuenta</h3>
-        <p>
-            Si elimina su cuenta voluntariamente, sus datos personales serán eliminados dentro de 30 días, excepto aquellos que debamos conservar por obligaciones legales.
-        </p>
-
-        <h2>7. Cookies y Tecnologías Similares</h2>
+        <h2>6. Cookies y Tecnologías Similares</h2>
         <p>
             Utilizamos cookies únicamente para fines estrictamente necesarios para el funcionamiento del sistema:
         </p>
 
-        <h3>7.1. Cookies Estrictamente Necesarias</h3>
+        <h3>6.1. Cookies Estrictamente Necesarias</h3>
         <p>
             Cookies de sesión para mantener su autenticación, token CSRF para protección contra ataques de falsificación de solicitudes entre sitios, cookies de preferencias de idioma y configuración.
         </p>
 
-        <h3>7.2. Cookies de Funcionalidad</h3>
+        <h3>6.2. Cookies de Funcionalidad</h3>
         <p>
             Cookies para recordar su organización en caso de múltiples organizaciones asociadas a un mismo correo.
         </p>
 
-        <h3>7.3. Control de Cookies</h3>
+        <h3>6.3. Control de Cookies</h3>
         <p>
             Puede configurar su navegador para rechazar cookies, pero esto puede afectar la funcionalidad del sistema.
         </p>
 
-        <h2>8. Transferencia Internacional de Datos</h2>
+        <h2>7. Transferencia Internacional de Datos</h2>
         <p>
             Sus datos personales son almacenados y procesados en servidores ubicados en Chile. En caso de utilizar proveedores internacionales de servicios (ej. servicios de nube), nos aseguramos de que cumplan con estándares adecuados de protección de datos y firmamos cláusulas contractuales apropiadas.
         </p>
@@ -263,7 +246,7 @@
             En ningún caso transferiremos sus datos a países que no ofrezcan un nivel adecuado de protección de datos personales sin su consentimiento expreso.
         </p>
 
-        <h2>9. Menores de Edad</h2>
+        <h2>8. Menores de Edad</h2>
         <p>
             Sistema APR es una plataforma de gestión empresarial destinada a organizaciones y no está dirigida a menores de 18 años. No recopilamos intencionalmente datos de menores de edad.
         </p>
@@ -276,7 +259,7 @@
             <li>Sistema APR actúa únicamente como encargado del tratamiento, siendo la APR responsable de verificar y documentar el consentimiento.</li>
         </ul>
 
-        <h2>10. Actualizaciones de esta Política</h2>
+        <h2>9. Actualizaciones de esta Política</h2>
         <p>
             Nos reservamos el derecho de modificar esta Política de Privacidad en cualquier momento para reflejar cambios en nuestras prácticas de tratamiento de datos o en la legislación aplicable.
         </p>
@@ -290,7 +273,7 @@
             Aceptación de Cambios: El uso continuado del sistema después de la entrada en vigencia de los cambios constituye su aceptación de la Política de Privacidad modificada. Si no está de acuerdo con los cambios, puede cancelar su suscripción y solicitar la eliminación de sus datos conforme a los procedimientos establecidos.
         </p>
 
-        <h2>11. Consentimiento</h2>
+        <h2>10. Consentimiento</h2>
         <p>
             Al registrarse en Sistema APR, al crear una cuenta de usuario, o al utilizar nuestros servicios, usted declara:
         </p>
@@ -303,7 +286,7 @@
             Organizaciones APR: Al registrar a una organización APR, el representante legal declara que cuenta con las facultades necesarias para comprometer a la organización y que ha informado a los usuarios de la organización sobre esta Política de Privacidad.
         </p>
 
-        <h2>12. Legislación Aplicable</h2>
+        <h2>11. Legislación Aplicable</h2>
         <p>
             Esta Política de Privacidad se rige por la Ley 19.628 sobre Protección de la Vida Privada (Chile), Ley 19.496 sobre Protección de los Derechos de los Consumidores, Ley 20.575 sobre Principio de Finalidad en el Tratamiento de Datos, y la normativa del Servicio de Impuestos Internos (SII).
         </p>
