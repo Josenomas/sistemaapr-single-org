@@ -301,7 +301,7 @@
             <p style="margin-top: 15px;">
                 <a href="{{ route('terminos.condiciones') }}">Términos y Condiciones</a>
             </p>
-            <a href="javascript:history.back()" class="back-link">← Volver</a>
+            <a href="{{ url('/') }}" class="back-link">← Volver</a>
         </div>
     </div>
 </body>
