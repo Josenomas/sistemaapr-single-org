@@ -544,3 +544,25 @@
     }
 </script>
 @endsection
+
+<script>
+let prevCount = 0;
+function checkNew() {
+    fetch("/notificaciones-sistema/contador", {headers: {"Accept": "application/json", "X-Requested-With": "XMLHttpRequest"}})
+    .then(r => r.json())
+    .then(d => {
+        if (prevCount > 0 && d.total > prevCount) {
+            const a = document.createElement("div");
+            a.style = "position:fixed;top:80px;right:20px;background:#10b981;color:#fff;padding:16px 24px;border-radius:8px;z-index:9999;cursor:pointer";
+            a.innerHTML = "<i class=\"fas fa-bell\"></i> Nueva notificación <button onclick=\"location.reload()\" style=\"background:rgba(255,255,255,.2);border:none;color:#fff;padding:4px 12px;border-radius:4px;margin-left:8px\">Ver</button>";
+            document.body.appendChild(a);
+            setTimeout(() => a.remove(), 10000);
+        }
+        prevCount = d.total;
+    });
+}
+if (window.location.pathname.includes("/notificaciones-sistema")) {
+    setTimeout(() => { prevCount = document.querySelectorAll(".notificacion-card").length; }, 1000);
+    setInterval(checkNew, 5000);
+}
+</script>
