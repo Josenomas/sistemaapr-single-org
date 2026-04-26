@@ -58,7 +58,7 @@ BEGIN
                IFNULL(s.descuento_monto, 0),
                s.id_organizacion
         FROM socios s
-        WHERE s.activo = 1 AND s.estado != 'desconectado';
+        WHERE s.activo = 1 AND s.estado COLLATE utf8mb4_unicode_ci != 'desconectado';
 
     -- Cursor para recorrer TODOS los tramos del tipo de cliente
     DECLARE cur_tramos CURSOR FOR
@@ -177,6 +177,9 @@ BEGIN
 
             CLOSE cur_tramos;
         END BLOCK_TRAMOS;
+
+        -- Reset done flag after tramos block
+        SET done = FALSE;
 
         -- 3. Calcular subtotal (cargo_consumo + cargo_fijo)
         SET v_subtotal = v_cargo_consumo + v_cargo_fijo;
