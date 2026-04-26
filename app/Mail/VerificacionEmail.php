@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 use App\Models\RegistroOrganizacion;
 
@@ -29,7 +30,8 @@ class VerificacionEmail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Verifica tu cuenta - Sistema APR',
+            from: new Address('cuenta@sistemaapr.cl', 'Sistema APR'),
+            subject: 'Verificar Email - Sistema APR',
         );
     }
 

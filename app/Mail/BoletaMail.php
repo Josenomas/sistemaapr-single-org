@@ -98,9 +98,11 @@ class BoletaMail extends Mailable
 
         // Eliminar archivos temporales
         @unlink($tempHtmlPath);
+        @unlink($tempHtmlPath);
         @unlink($pdfPath);
 
-        return $this->subject('Boleta de Agua N° ' . $this->boleta->numero_boleta . ' - ' . $this->boleta->mes_texto)
+        return $this->from("boletas@sistemaapr.cl", "Sistema APR - Boletas")
+                    ->subject("Boleta de Agua N° " . $this->boleta->numero_boleta . " - " . $this->boleta->mes_texto)
                     ->view('emails.boleta')
                     ->with([
                         'boleta' => $this->boleta,

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 use App\Models\PagoSuscripcion;
 
@@ -38,6 +39,7 @@ class SuscripcionPorVencer extends Mailable
         $urgencia = $this->dias <= 3 ? '⚠️ URGENTE - ' : '';
 
         return new Envelope(
+            from: new Address('suscripciones@sistemaapr.cl', 'Sistema APR - Suscripciones'),
             subject: "{$urgencia}Tu suscripción vence en {$this->dias} días - Sistema APR",
         );
     }

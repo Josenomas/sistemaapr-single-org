@@ -3,62 +3,44 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 use App\Models\RenovacionSuscripcion;
 
-class RenovacionProximaMail extends Mailable
+class RenovacionProximaMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     public $renovacion;
     public $diasRestantes;
 
-    /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
     public function __construct(RenovacionSuscripcion $renovacion, $diasRestantes)
     {
         $this->renovacion = $renovacion;
         $this->diasRestantes = $diasRestantes;
     }
 
-    /**
-     * Get the message envelope.
-     *
-     * @return \Illuminate\Mail\Mailables\Envelope
-     */
-    public function envelope()
+    public function envelope(): Envelope
     {
-        $diasTexto = $this->diasRestantes == 1 ? '1 día' : "$this->diasRestantes días";
-
+        $urgencia = $this->diasRestantes <= 3 ? '⚠️ URGENTE - ' : '';
         return new Envelope(
-            subject: "Tu suscripción vence en $diasTexto - Sistema APR",
+            from: new Address('suscripciones@sistemaapr.cl', 'Sistema APR - Suscripciones'),
+            subject: "{$urgencia}Renovación de suscripción próxima en {$this->diasRestantes} días - Sistema APR",
         );
     }
 
-    /**
-     * Get the message content definition.
-     *
-     * @return \Illuminate\Mail\Mailables\Content
-     */
-    public function content()
+    public function content(): Content
     {
         return new Content(
             view: 'emails.renovacion-proxima',
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array
-     */
-    public function attachments()
+    public function attachments(): array
     {
         return [];
     }

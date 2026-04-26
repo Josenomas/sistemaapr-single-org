@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Notificacion;
 use App\Models\Socio;
@@ -32,6 +33,7 @@ class NotificacionMail extends Mailable
     public function envelope()
     {
         return new Envelope(
+            from: new Address('notificaciones@sistemaapr.cl', 'Sistema APR - Notificaciones'),
             subject: $this->notificacion->titulo,
         );
     }

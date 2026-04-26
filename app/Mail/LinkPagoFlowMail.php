@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 
 class LinkPagoFlowMail extends Mailable implements ShouldQueue
@@ -39,6 +40,7 @@ class LinkPagoFlowMail extends Mailable implements ShouldQueue
     public function envelope()
     {
         return new Envelope(
+            from: new Address('pagos@sistemaapr.cl', 'Sistema APR - Pagos'),
             subject: 'Link de Pago - Sistema APR',
         );
     }

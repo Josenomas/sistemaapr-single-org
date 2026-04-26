@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Ticket;
 use App\Models\Socio;
@@ -33,6 +34,7 @@ class TicketMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
+            from: new Address('tickets@sistemaapr.cl', 'Sistema APR - Tickets'),
             subject: 'Ticket Registrado #' . $this->ticket->numero_ticket . ' - Sistema APR',
         );
     }

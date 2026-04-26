@@ -31,6 +31,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'scaleway' => [
+        'access_key' => env('SCALEWAY_ACCESS_KEY'),
+        'secret_key' => env('SCALEWAY_SECRET_KEY'),
+        'project_id' => env('SCALEWAY_PROJECT_ID'),
+        'region' => env('SCALEWAY_REGION', 'fr-par'),
+    ],
+
     'flow' => [
         'api_key' => env('FLOW_API_KEY'),
         'secret_key' => env('FLOW_SECRET_KEY'),
