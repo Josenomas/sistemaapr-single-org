@@ -13,7 +13,7 @@ DROP PROCEDURE IF EXISTS `sp_generar_boletas_mes`;
 
 DELIMITER $$
 
-CREATE PROCEDURE `sp_generar_boletas_mes`(IN p_mes VARCHAR(7))
+CREATE PROCEDURE `sp_generar_boletas_mes`(IN p_mes VARCHAR(7), IN p_id_organizacion INT)
 BEGIN
     DECLARE done INT DEFAULT FALSE;
     DECLARE done_tramos INT DEFAULT FALSE;
@@ -58,7 +58,8 @@ BEGIN
                IFNULL(s.descuento_monto, 0),
                s.id_organizacion
         FROM socios s
-        WHERE s.activo = 1 AND s.estado COLLATE utf8mb4_unicode_ci != 'desconectado';
+        WHERE s.activo = 1 AND s.estado COLLATE utf8mb4_unicode_ci != 'desconectado'
+          AND s.id_organizacion = p_id_organizacion;
 
     -- Cursor para recorrer TODOS los tramos del tipo de cliente
     DECLARE cur_tramos CURSOR FOR

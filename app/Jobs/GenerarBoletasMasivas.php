@@ -50,7 +50,7 @@ class GenerarBoletasMasivas implements ShouldQueue
         DB::beginTransaction();
         try {
             // Ejecutar procedimiento almacenado
-            DB::connection('mysql')->statement('CALL sp_generar_boletas_mes(?)', [$this->mes]);
+            DB::connection('mysql')->statement('CALL sp_generar_boletas_mes(?, ?)', [$this->mes, $this->idOrganizacion]);
 
             // Obtener boletas recién generadas
             $boletasGeneradas = Boleta::activos()
