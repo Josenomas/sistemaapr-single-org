@@ -8,10 +8,10 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use App\Models\Boleta;
 use App\Models\User;
+use App\Models\NotificacionSistema;
 use App\Helpers\ActividadHelper;
 
 class GenerarBoletasMasivas implements ShouldQueue
@@ -50,7 +50,7 @@ class GenerarBoletasMasivas implements ShouldQueue
         DB::beginTransaction();
         try {
             // Ejecutar procedimiento almacenado
-            DB::statement('CALL sp_generar_boletas_mes(?, ?)', [$this->mes, $this->idOrganizacion]);
+            DB::connection('mysql')->statement('CALL sistema_apr.sp_generar_boletas_mes(?, ?)', [$this->mes, $this->idOrganizacion]);
 
             // Obtener boletas recién generadas
             $boletasGeneradas = Boleta::activos()
@@ -92,18 +92,24 @@ class GenerarBoletasMasivas implements ShouldQueue
                 'tiempo_segundos' => $tiempoTranscurrido
             ]);
 
-            // Enviar notificación por email al usuario
+            // Enviar notificación en sistema
             $usuario = User::find($this->userId);
-            if ($usuario && $usuario->email) {
+            if ($usuario) {
                 try {
-                    Mail::to($usuario->email)->send(new \App\Mail\BoletasGeneradasMail([
-                        'mes' => $this->mes,
-                        'total_generadas' => $totalGeneradas,
-                        'folios_asignados' => $foliosAsignados,
-                        'tiempo_proceso' => $tiempoTranscurrido
-                    ]));
+                    NotificacionSistema::create([
+                        'titulo' => '✅ Generación de Boletas Completada',
+                        'mensaje' => "Se generaron {$totalGeneradas} boletas para " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY') . 
+                                    ($foliosAsignados > 0 ? ". Se asignaron {$foliosAsignados} folios SII" : '') .
+                                    ". Tiempo: {$tiempoTranscurrido}s",
+                        'tipo' => 'exito',
+                        'icono' => 'check-circle',
+                        'url' => route('boletas.index'),
+                        'id_usuario' => $this->userId,
+                        'id_organizacion' => $this->idOrganizacion,
+                        'leida' => 0
+                    ]);
                 } catch (\Exception $e) {
-                    Log::warning('No se pudo enviar email de notificación', [
+                    Log::warning('No se pudo crear notificación del sistema', [
                         'error' => $e->getMessage()
                     ]);
                 }
@@ -117,6 +123,22 @@ class GenerarBoletasMasivas implements ShouldQueue
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
+
+            // Crear notificación de error
+            try {
+                NotificacionSistema::create([
+                    'titulo' => '❌ Error en Generación de Boletas',
+                    'mensaje' => "No se pudieron generar las boletas de {$this->mes}. Error: " . $e->getMessage(),
+                    'tipo' => 'error',
+                    'icono' => 'exclamation-circle',
+                    'url' => route('boletas.generar'),
+                    'id_usuario' => $this->userId,
+                    'id_organizacion' => $this->idOrganizacion,
+                    'leida' => 0
+                ]);
+            } catch (\Exception $notifError) {
+                Log::error('No se pudo crear notificación de error', ['error' => $notifError->getMessage()]);
+            }
 
             // Re-lanzar excepción para que Laravel maneje el retry
             throw $e;
@@ -134,17 +156,20 @@ class GenerarBoletasMasivas implements ShouldQueue
             'error' => $exception->getMessage()
         ]);
 
-        // Aquí podrías enviar un email de error al usuario
-        $usuario = User::find($this->userId);
-        if ($usuario && $usuario->email) {
-            try {
-                Mail::to($usuario->email)->send(new \App\Mail\ErrorGeneracionBoletasMail([
-                    'mes' => $this->mes,
-                    'error' => $exception->getMessage()
-                ]));
-            } catch (\Exception $e) {
-                Log::error('No se pudo enviar email de error', ['error' => $e->getMessage()]);
-            }
+        // Notificación final de fallo
+        try {
+            NotificacionSistema::create([
+                'titulo' => '🔴 Generación de Boletas Falló',
+                'mensaje' => "La generación de boletas para {$this->mes} falló después de 3 intentos. Por favor, contacta al soporte técnico.",
+                'tipo' => 'error',
+                'icono' => 'times-circle',
+                'url' => route('boletas.generar'),
+                'id_usuario' => $this->userId,
+                'id_organizacion' => $this->idOrganizacion,
+                'leida' => 0
+            ]);
+        } catch (\Exception $e) {
+            Log::error('No se pudo crear notificación de fallo', ['error' => $e->getMessage()]);
         }
     }
 }
