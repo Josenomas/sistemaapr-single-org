@@ -392,7 +392,7 @@ class BoletasController extends Controller
             ]);
 
             return redirect()->route('boletas.index')
-                           ->with('success', "✅ Generación de boletas para {$mes} iniciada. El proceso se ejecutará en segundo plano y recibirás una notificación por email cuando finalice.");
+                           ->with('success', "✅ Generación de boletas para {$mes} iniciada. El proceso se ejecutará en segundo plano y recibirás una notificación en el sistema cuando finalice.");
 
         } catch (\Exception $e) {
             \Log::error('Error al despachar job de generación de boletas', [

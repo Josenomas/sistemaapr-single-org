@@ -50,7 +50,7 @@ class GenerarBoletasMasivas implements ShouldQueue
         DB::beginTransaction();
         try {
             // Ejecutar procedimiento almacenado
-            DB::connection('mysql')->statement('CALL sistema_apr.sp_generar_boletas_mes(?, ?)', [$this->mes, $this->idOrganizacion]);
+            DB::connection('mysql')->statement('CALL sistema_apr.sp_generar_boletas_mes(?)', [$this->mes, $this->idOrganizacion]);
 
             // Obtener boletas recién generadas
             $boletasGeneradas = Boleta::activos()
@@ -101,7 +101,7 @@ class GenerarBoletasMasivas implements ShouldQueue
                         'mensaje' => "Se generaron {$totalGeneradas} boletas para " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY') . 
                                     ($foliosAsignados > 0 ? ". Se asignaron {$foliosAsignados} folios SII" : '') .
                                     ". Tiempo: {$tiempoTranscurrido}s",
-                        'tipo' => 'exito',
+                        'tipo' => 'otro',
                         'icono' => 'check-circle',
                         'url' => route('boletas.index'),
                         'id_usuario' => $this->userId,
@@ -129,7 +129,7 @@ class GenerarBoletasMasivas implements ShouldQueue
                 NotificacionSistema::create([
                     'titulo' => '❌ Error en Generación de Boletas',
                     'mensaje' => "No se pudieron generar las boletas de {$this->mes}. Error: " . $e->getMessage(),
-                    'tipo' => 'error',
+                    'tipo' => 'otro',
                     'icono' => 'exclamation-circle',
                     'url' => route('boletas.generar'),
                     'id_usuario' => $this->userId,
@@ -161,7 +161,7 @@ class GenerarBoletasMasivas implements ShouldQueue
             NotificacionSistema::create([
                 'titulo' => '🔴 Generación de Boletas Falló',
                 'mensaje' => "La generación de boletas para {$this->mes} falló después de 3 intentos. Por favor, contacta al soporte técnico.",
-                'tipo' => 'error',
+                'tipo' => 'otro',
                 'icono' => 'times-circle',
                 'url' => route('boletas.generar'),
                 'id_usuario' => $this->userId,
