@@ -124,7 +124,7 @@
 
         <h2>2. Descripción del Servicio</h2>
         <p>
-            Sistema APR es una plataforma SaaS (Software as a Service) diseñada específicamente para la gestión integral de organizaciones de Agua Potable Rural en Chile, que incluye:
+            Sistema APR es una plataforma SaaS (Software as a Service) diseñada específicamente para la gestión integral de organizaciones de Agua Potable Rural en Chile, que incluye entre otros:
         </p>
         <ul>
             <li>Gestión de socios y usuarios del sistema</li>
@@ -215,11 +215,6 @@
             Nos reservamos el derecho de realizar mantenimiento programado con previo aviso. Intentaremos realizar el mantenimiento en horarios de baja actividad para minimizar el impacto en las operaciones de su organización.
         </p>
 
-        <h3>7.3 Respaldos</h3>
-        <p>
-            Realizamos respaldos automáticos diarios de todos los datos. Sin embargo, recomendamos que también mantenga copias de seguridad de sus datos críticos.
-        </p>
-
         <h2>8. Límites del Servicio</h2>
         <p>
             Cada plan tiene límites específicos en cuanto a número de socios que puede gestionar, número de usuarios del sistema, módulos y funcionalidades disponibles, y almacenamiento de archivos.
@@ -230,18 +225,12 @@
 
         <h2>9. Propiedad Intelectual</h2>
         <p>
-            El Sistema APR, incluyendo su diseño, código fuente, lógica de negocio, interfaz de usuario y funcionalidades, es propiedad exclusiva de nuestros desarrolladores y está protegido por las leyes de propiedad intelectual de la República de Chile.
-        </p>
-        <p>
-            La licencia otorgada es únicamente para el uso del servicio según estos términos, y no confiere derecho alguno para copiar, modificar, distribuir o redistribuir el software.
+            El Sistema APR, incluyendo su diseño, código fuente, lógica de negocio, interfaz de usuario y funcionalidades, es propiedad exclusiva de nuestros desarrolladores.
         </p>
 
         <h2>10. Limitación de Responsabilidad</h2>
         <p>
             En la máxima medida permitida por la ley chilena, no seremos responsables por pérdida de datos o información, pérdidas financieras indirectas o consecuenciales, interrupción del servicio por causas de fuerza mayor, errores en cálculos o reportes generados por el sistema, ni uso indebido del sistema por parte de sus usuarios.
-        </p>
-        <p>
-            Nuestra responsabilidad total en cualquier circunstancia no excederá el monto total pagado por usted en los últimos doce (12) meses.
         </p>
 
         <h2>11. Modificaciones de los Términos</h2>
@@ -277,30 +266,11 @@
             Importante: Las funcionalidades beta son seguras de usar y sus datos están protegidos con el mismo nivel de seguridad que el resto del sistema. La etiqueta beta solo indica que seguimos perfeccionando la experiencia de usuario.
         </p>
 
-        <h2>15. Ley Aplicable y Jurisdicción</h2>
-        <p>
-            Estos términos se rigen exclusivamente por las leyes de la República de Chile. Cualquier controversia o disputa derivada de estos términos será resuelta en los tribunales ordinarios de justicia competentes de Chile, renunciando expresamente las partes a cualquier otro fuero o jurisdicción.
-        </p>
-
-        <h2>16. Disposiciones Generales</h2>
-        <p>
-            Si alguna disposición de estos términos fuere declarada nula o inaplicable por un tribunal competente, las demás disposiciones mantendrán su plena vigencia y efecto. La falta de ejercicio o la demora en el ejercicio de cualquier derecho bajo estos términos no constituirá una renuncia a dicho derecho.
-        </p>
-
         <div class="footer">
-            <p><strong>Sistema APR</strong></p>
-            <p>Gestión Integral de Agua Potable Rural</p>
-            <p>Chile</p>
-            <p style="margin-top: 20px;">
-                Al hacer clic en "Acepto los términos y condiciones" en el formulario de registro, usted confirma que ha leído, entendido y aceptado estos términos en su totalidad.
-            </p>
-            <p style="margin-top: 15px;">
-                Email de contacto: soportesistemaapr@gmail.com
-            </p>
             <p style="margin-top: 15px;">
                 <a href="{{ route('politicas.privacidad') }}">Política de Privacidad</a>
             </p>
-            <a href="javascript:history.back()" class="back-link">← Volver</a>
+            <a href="{{ url('/') }}" class="back-link">← Volver</a>
         </div>
     </div>
 </body>
