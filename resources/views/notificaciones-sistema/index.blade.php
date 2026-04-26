@@ -11,7 +11,7 @@
                 <p class="text-muted">Centro de notificaciones y alertas importantes</p>
             </div>
             @if($contadorNoLeidas > 0)
-                <button onclick="marcarTodasLeidas()" class="btn btn-primary">
+                <button onclick="marcarTodasLeidas(event)" class="btn btn-primary">
                     <i class="fas fa-check-double"></i>
                     Marcar todas como leídas
                 </button>
@@ -84,20 +84,20 @@
                         @if($notificacion->url)
                             <a href="{{ $notificacion->url }}"
                                class="btn btn-sm btn-{{ $notificacion->color ?? 'primary' }}"
-                               onclick="marcarLeida({{ $notificacion->id }})">
+                               onclick="marcarLeida({{ $notificacion->id }}, event)">
                                 {{ $notificacion->texto_accion ?? 'Ver más' }}
                             </a>
                         @endif
 
                         @if(!$notificacion->leida)
-                            <button onclick="marcarLeida({{ $notificacion->id }})"
+                            <button onclick="marcarLeida({{ $notificacion->id }}, event)"
                                     class="btn btn-sm btn-outline-secondary"
                                     title="Marcar como leída">
                                 <i class="fas fa-check"></i>
                             </button>
                         @endif
 
-                        <button onclick="eliminarNotificacion({{ $notificacion->id }})"
+                        <button onclick="eliminarNotificacion({{ $notificacion->id }}, event)"
                                 class="btn btn-sm btn-outline-danger"
                                 title="Eliminar">
                             <i class="fas fa-trash"></i>
@@ -426,7 +426,7 @@
         window.location.href = url;
     }
 
-    function marcarLeida(id) {
+    function marcarLeida(id, event) {
         fetch(`/notificaciones-sistema/${id}/marcar-leida`, {
             method: 'POST',
             headers: {
@@ -461,7 +461,7 @@
         });
     }
 
-    function marcarTodasLeidas() {
+    function marcarTodasLeidas(event) {
         if (!confirm('¿Marcar todas las notificaciones como leídas?')) {
             return;
         }
@@ -499,7 +499,7 @@
         });
     }
 
-    function eliminarNotificacion(id) {
+    function eliminarNotificacion(id, event) {
         if (!confirm('¿Eliminar esta notificación?')) {
             return;
         }
