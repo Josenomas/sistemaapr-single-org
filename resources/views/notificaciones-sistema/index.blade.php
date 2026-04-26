@@ -437,7 +437,17 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                const card = event.target.closest('.notificacion-card');
+                if (card) {
+                    card.classList.remove('no-leida');
+                    const badge = card.querySelector('.badge-no-leida');
+                    if (badge) badge.remove();
+                    const btn = event.target.closest('button');
+                    if (btn) btn.remove();
+                }
+                const count = document.querySelectorAll('.notificacion-card.no-leida').length;
+                const opt = document.querySelector('#filtro option[value="no_leidas"]');
+                if (opt) opt.textContent = `No leídas (${count})`;
             }
         });
     }
@@ -457,7 +467,16 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                document.querySelectorAll('.notificacion-card.no-leida').forEach(c => {
+                    c.classList.remove('no-leida');
+                    const b = c.querySelector('.badge-no-leida');
+                    if (b) b.remove();
+                    const btn = c.querySelector('button[onclick*="marcarLeida("]');
+                    if (btn && btn.querySelector('.fa-check')) btn.remove();
+                });
+                event.target.style.display = 'none';
+                const opt = document.querySelector('#filtro option[value="no_leidas"]');
+                if (opt) opt.textContent = 'No leídas (0)';
             }
         });
     }
@@ -477,7 +496,22 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                const card = event.target.closest('.notificacion-card');
+                if (card) {
+                    card.style.transition = 'all 0.3s';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateX(20px)';
+                    setTimeout(() => {
+                        card.remove();
+                        const remaining = document.querySelectorAll('.notificacion-card');
+                        if (remaining.length === 0) {
+                            document.querySelector('.notificaciones-lista').innerHTML = '<div class="empty-state"><i class="fas fa-bell-slash"></i><h3>No hay notificaciones</h3><p>No tienes notificaciones en este momento.</p></div>';
+                        }
+                        const count = document.querySelectorAll('.notificacion-card.no-leida').length;
+                        const opt = document.querySelector('#filtro option[value="no_leidas"]');
+                        if (opt) opt.textContent = `No leídas (${count})`;
+                    }, 300);
+                }
             }
         });
     }
