@@ -432,9 +432,14 @@
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Error en la respuesta');
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 const card = event.target.closest('.notificacion-card');
@@ -449,6 +454,10 @@
                 const opt = document.querySelector('#filtro option[value="no_leidas"]');
                 if (opt) opt.textContent = `No leídas (${count})`;
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al marcar la notificación');
         });
     }
 
@@ -462,9 +471,14 @@
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Error en la respuesta');
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 document.querySelectorAll('.notificacion-card.no-leida').forEach(c => {
@@ -478,6 +492,10 @@
                 const opt = document.querySelector('#filtro option[value="no_leidas"]');
                 if (opt) opt.textContent = 'No leídas (0)';
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al marcar las notificaciones');
         });
     }
 
@@ -491,9 +509,14 @@
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Error en la respuesta');
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 const card = event.target.closest('.notificacion-card');
@@ -513,6 +536,10 @@
                     }, 300);
                 }
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al eliminar la notificación');
         });
     }
 </script>
