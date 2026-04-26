@@ -328,7 +328,7 @@ class BoletasController extends Controller
     }
 
     /**
-     * Procesar generación de boletas
+     * Procesar generación de boletas (OPTIMIZADO CON QUEUE)
      */
     public function storeGenerar(Request $request)
     {
@@ -377,59 +377,31 @@ class BoletasController extends Controller
                            ->with('warning', "⚠️ FALTAN LECTURAS: {$faltantes} socios sin lectura de {$mes}. Primeros 10: {$sociosSinLectura}");
         }
 
-        DB::beginTransaction();
+        // OPTIMIZACIÓN: Despachar a Queue en lugar de procesamiento síncrono
         try {
             $idOrganizacion = auth()->user()->id_organizacion;
+            $userId = auth()->id();
 
-            // Llamar al procedimiento almacenado con filtro de organización
-            DB::statement('CALL sp_generar_boletas_mes(?, ?)', [$mes, $idOrganizacion]);
+            // Despachar Job a la cola
+            \App\Jobs\GenerarBoletasMasivas::dispatch($mes, $idOrganizacion, $userId);
 
-            // Obtener boletas recién generadas
-            $boletasGeneradas = Boleta::activos()
-                                      ->where('mes', $mes)
-                                      ->whereNull('folio_sii') // Solo las que no tienen folio
-                                      ->get();
-
-            $totalGeneradas = $boletasGeneradas->count();
-            $foliosAsignados = 0;
-
-            // Intentar asignar folios SII a cada boleta generada
-            foreach ($boletasGeneradas as $boleta) {
-                $folioAsignado = $boleta->asignarFolioSII('boleta');
-                if ($folioAsignado) {
-                    $boleta->save();
-                    $foliosAsignados++;
-                }
-            }
-
-            ActividadHelper::registrar(
-                'Boletas',
-                "Generación masiva de boletas para {$mes}: {$totalGeneradas} boletas creadas" .
-                ($foliosAsignados > 0 ? " | {$foliosAsignados} folios SII asignados" : ""),
-                auth()->id()
-            );
-
-            DB::commit();
-
-            $mensaje = "Se generaron {$totalGeneradas} boletas para el mes {$mes}";
-            if ($foliosAsignados > 0) {
-                $mensaje .= " ({$foliosAsignados} con folio SII asignado)";
-            }
+            \Log::info('Job de generación de boletas despachado', [
+                'mes' => $mes,
+                'id_organizacion' => $idOrganizacion,
+                'user_id' => $userId
+            ]);
 
             return redirect()->route('boletas.index')
-                           ->with('success', $mensaje);
-        } catch (\Exception $e) {
-            DB::rollBack();
+                           ->with('success', "✅ Generación de boletas para {$mes} iniciada. El proceso se ejecutará en segundo plano y recibirás una notificación por email cuando finalice.");
 
-            // Capturar error de lecturas faltantes
-            $errorMsg = $e->getMessage();
-            if (strpos($errorMsg, 'FALTAN LECTURAS:') !== false) {
-                return redirect()->route('boletas.generar')
-                               ->with('warning', $errorMsg);
-            }
+        } catch (\Exception $e) {
+            \Log::error('Error al despachar job de generación de boletas', [
+                'mes' => $mes,
+                'error' => $e->getMessage()
+            ]);
 
             return redirect()->route('boletas.generar')
-                           ->with('error', 'Error al generar boletas: ' . $errorMsg);
+                           ->with('error', 'Error al iniciar la generación de boletas: ' . $e->getMessage());
         }
     }
 
