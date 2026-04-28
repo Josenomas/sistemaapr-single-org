@@ -33,4 +33,4 @@ Disallow: /*.json$
 Disallow: /*.xml$
 
 # Sitemap (si existe)
-# Sitemap: https://sistemaapr.cl/sitemap.xml
+Sitemap: https://sistemaapr.cl/sitemap.xml

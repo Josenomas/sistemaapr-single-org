@@ -1,47 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <!-- Landing Page -->
+    <!-- Landing Page Principal -->
     <url>
         <loc>https://sistemaapr.cl/</loc>
-        <lastmod>2026-04-07</lastmod>
+        <lastmod>2026-04-27</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
 
-    <!-- Autenticación -->
+    <!-- Páginas Legales Públicas -->
     <url>
-        <loc>https://sistemaapr.cl/login</loc>
-        <lastmod>2026-04-07</lastmod>
+        <loc>https://sistemaapr.cl/terminos-y-condiciones</loc>
+        <lastmod>2026-04-26</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
+        <priority>0.4</priority>
     </url>
 
     <url>
-        <loc>https://sistemaapr.cl/registro</loc>
-        <lastmod>2026-04-07</lastmod>
+        <loc>https://sistemaapr.cl/politicas-de-privacidad</loc>
+        <lastmod>2026-04-26</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-
-    <!-- Páginas Públicas -->
-    <url>
-        <loc>https://sistemaapr.cl/conoce-tu-boleta</loc>
-        <lastmod>2026-04-07</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.6</priority>
-    </url>
-
-    <url>
-        <loc>https://sistemaapr.cl/terminos-condiciones</loc>
-        <lastmod>2026-04-07</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.3</priority>
-    </url>
-
-    <url>
-        <loc>https://sistemaapr.cl/contacto</loc>
-        <lastmod>2026-04-07</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
+        <priority>0.4</priority>
     </url>
 </urlset>
