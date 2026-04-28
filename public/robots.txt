@@ -1,5 +1,36 @@
-User-agent: *
-Disallow: /
+# Sistema APR - Robots.txt
+# Permitir indexación de páginas públicas, bloquear sistema interno
 
-# Este es un sistema interno de gestión
-# No debe ser indexado por motores de búsqueda
+User-agent: *
+
+# Permitir páginas públicas
+Allow: /$
+Allow: /terminos-y-condiciones
+Allow: /politicas-de-privacidad
+
+# Bloquear sistema interno (dashboard, gestión, etc.)
+Disallow: /login
+Disallow: /register
+Disallow: /dashboard
+Disallow: /password
+Disallow: /socios
+Disallow: /lecturas
+Disallow: /boletas
+Disallow: /pagos
+Disallow: /usuarios
+Disallow: /configuracion
+Disallow: /reportes
+Disallow: /api
+Disallow: /admin
+Disallow: /notificaciones
+Disallow: /tickets
+Disallow: /mi-cuenta
+
+# Bloquear archivos y directorios sensibles
+Disallow: /storage
+Disallow: /vendor
+Disallow: /*.json$
+Disallow: /*.xml$
+
+# Sitemap (si existe)
+# Sitemap: https://sistemaapr.cl/sitemap.xml
