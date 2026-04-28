@@ -37,6 +37,7 @@ use App\Http\Controllers\ActivosFijosController;
 use App\Http\Controllers\RendicionMensualController;
 use App\Http\Controllers\FolioSIIController;
 use App\Http\Controllers\NotificacionesSistemaController;
+use App\Http\Controllers\NotificacionesStreamController;
 use App\Http\Controllers\PagosSuscripcionController;
 
 /*
@@ -526,6 +527,7 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
         Route::post('/marcar-todas-leidas', [NotificacionesSistemaController::class, 'marcarTodasLeidas'])->name('marcar-todas-leidas');
         Route::get('/no-leidas', [NotificacionesSistemaController::class, 'noLeidas'])->name('no-leidas');
         Route::delete('/{id}', [NotificacionesSistemaController::class, 'eliminar'])->name('eliminar');
+        Route::get('/stream', [NotificacionesStreamController::class, 'stream'])->name('stream');
     });
 
     // ========================================
