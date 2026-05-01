@@ -100,7 +100,7 @@ class GenerarBoletasMasivas implements ShouldQueue
                         'titulo' => 'Generación de Boletas Completada',
                         'mensaje' => "Se generaron {$totalGeneradas} boletas para " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY') .
                                     ($foliosAsignados > 0 ? ". Se asignaron {$foliosAsignados} folios SII" : ''),
-                        'tipo' => 'sistema',
+                        'tipo' => 'otro',
                         'prioridad' => 'alta',
                         'icono' => 'fa-file-invoice',
                         'color' => 'success',
@@ -136,7 +136,7 @@ class GenerarBoletasMasivas implements ShouldQueue
                 NotificacionSistema::create([
                     'titulo' => 'Error en Generación de Boletas',
                     'mensaje' => "No se pudieron generar las boletas de {$this->mes}",
-                    'tipo' => 'sistema',
+                    'tipo' => 'otro',
                     'prioridad' => 'alta',
                     'icono' => 'fa-exclamation-circle',
                     'color' => 'danger',
@@ -171,7 +171,7 @@ class GenerarBoletasMasivas implements ShouldQueue
             NotificacionSistema::create([
                 'titulo' => 'Generación de Boletas Falló',
                 'mensaje' => "La generación de boletas para {$this->mes} falló después de 3 intentos. Contacta al soporte técnico.",
-                'tipo' => 'sistema',
+                'tipo' => 'otro',
                 'prioridad' => 'critica',
                 'icono' => 'fa-times-circle',
                 'color' => 'danger',
