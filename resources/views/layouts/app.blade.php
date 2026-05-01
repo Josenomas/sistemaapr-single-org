@@ -430,7 +430,11 @@
         (function() {
             let lastNotifId = 0;
             let eventSource = null;
-            let notificacionesMostradas = new Set(); // Guardar IDs ya mostradas
+
+            // Cargar IDs ya mostradas desde localStorage
+            let notificacionesMostradas = new Set(
+                JSON.parse(localStorage.getItem('notificacionesMostradas') || '[]')
+            );
 
             function startSSE() {
                 if (eventSource) return; // Ya hay conexión activa
@@ -443,6 +447,11 @@
                     // Solo mostrar si NO se ha mostrado antes
                     if (!notificacionesMostradas.has(notif.id)) {
                         notificacionesMostradas.add(notif.id);
+
+                        // Guardar en localStorage para persistir entre páginas
+                        localStorage.setItem('notificacionesMostradas',
+                            JSON.stringify(Array.from(notificacionesMostradas)));
+
                         lastNotifId = notif.id;
                         mostrarNotificacionPopup(notif);
                     }
