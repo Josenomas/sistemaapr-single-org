@@ -422,6 +422,116 @@
                 });
             });
         });
+
+        // ============================================
+        // NOTIFICACIONES EN TIEMPO REAL CON SSE
+        // ============================================
+        @auth
+        (function() {
+            let lastNotifId = 0;
+            let eventSource = null;
+            let checkInterval = null;
+
+            function startSSE() {
+                if (eventSource) return; // Ya hay conexión activa
+
+                eventSource = new EventSource('/notificaciones-sistema/stream?lastId=' + lastNotifId);
+
+                eventSource.onmessage = function(event) {
+                    const notif = JSON.parse(event.data);
+                    lastNotifId = notif.id;
+                    mostrarNotificacionPopup(notif);
+                };
+
+                eventSource.onerror = function() {
+                    if (eventSource) {
+                        eventSource.close();
+                        eventSource = null;
+                    }
+                };
+            }
+
+            function mostrarNotificacionPopup(notif) {
+                const colores = {
+                    'success': '#10b981',
+                    'info': '#06b6d4',
+                    'warning': '#f59e0b',
+                    'danger': '#ef4444'
+                };
+
+                const iconos = {
+                    'success': 'fa-check-circle',
+                    'info': 'fa-info-circle',
+                    'warning': 'fa-exclamation-triangle',
+                    'danger': 'fa-exclamation-circle'
+                };
+
+                const popup = document.createElement('div');
+                popup.style.cssText = `
+                    position: fixed;
+                    top: 80px;
+                    right: 20px;
+                    background: white;
+                    border-left: 4px solid ${colores[notif.color] || '#06b6d4'};
+                    border-radius: 8px;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                    padding: 20px;
+                    max-width: 400px;
+                    z-index: 9999;
+                    animation: slideInRight 0.3s ease-out;
+                `;
+
+                popup.innerHTML = `
+                    <div style="display: flex; gap: 12px; align-items: start;">
+                        <i class="fas ${iconos[notif.color] || 'fa-bell'}" style="font-size: 24px; color: ${colores[notif.color] || '#06b6d4'}; margin-top: 2px;"></i>
+                        <div style="flex: 1;">
+                            <h4 style="margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 600; color: #1f2937;">${notif.titulo}</h4>
+                            <p style="margin: 0; color: #6b7280; font-size: 0.95rem;">${notif.mensaje}</p>
+                            ${notif.url ? `<a href="${notif.url}" style="display: inline-block; margin-top: 12px; color: ${colores[notif.color] || '#06b6d4'}; font-weight: 600; text-decoration: none;">Ver detalles →</a>` : ''}
+                        </div>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 20px; padding: 0; line-height: 1;">×</button>
+                    </div>
+                `;
+
+                document.body.appendChild(popup);
+
+                // Auto-cerrar después de 10 segundos
+                setTimeout(() => {
+                    popup.style.animation = 'slideOutRight 0.3s ease-in';
+                    setTimeout(() => popup.remove(), 300);
+                }, 10000);
+            }
+
+            // Agregar animaciones CSS
+            if (!document.getElementById('sse-animations')) {
+                const style = document.createElement('style');
+                style.id = 'sse-animations';
+                style.textContent = `
+                    @keyframes slideInRight {
+                        from { transform: translateX(400px); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOutRight {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(400px); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // Iniciar SSE cuando la página carga
+            startSSE();
+
+            // Reconectar cada 35 segundos (después del timeout del servidor)
+            setInterval(() => {
+                if (eventSource) {
+                    eventSource.close();
+                    eventSource = null;
+                }
+                startSSE();
+            }, 35000);
+        })();
+        @endauth
     </script>
 
     @yield('scripts')

@@ -93,33 +93,30 @@ class GenerarBoletasMasivas implements ShouldQueue
             ]);
 
             // Enviar notificación en sistema
-            $usuario = User::find($this->userId);
-            if ($usuario) {
-                try {
-                    NotificacionSistema::create([
-                        'titulo' => 'Generación de Boletas Completada',
-                        'mensaje' => "Se generaron {$totalGeneradas} boletas para " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY') .
-                                    ($foliosAsignados > 0 ? ". Se asignaron {$foliosAsignados} folios SII" : ''),
-                        'tipo' => 'otro',
-                        'prioridad' => 'alta',
-                        'icono' => 'fa-file-invoice',
-                        'color' => 'success',
-                        'url' => '/boletas',
-                        'texto_accion' => 'Ver Boletas',
-                        'id_usuario' => $this->userId,
-                        'id_organizacion' => $this->idOrganizacion,
-                        'leida' => 0
-                    ]);
-                    Log::info('Notificación de generación de boletas creada', [
-                        'user_id' => $this->userId,
-                        'total_boletas' => $totalGeneradas
-                    ]);
-                } catch (\Exception $e) {
-                    Log::error('No se pudo crear notificación del sistema', [
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                }
+            try {
+                NotificacionSistema::create([
+                    'titulo' => 'Generación de Boletas Completada',
+                    'mensaje' => "Se generaron {$totalGeneradas} boletas para " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY') .
+                                ($foliosAsignados > 0 ? ". Se asignaron {$foliosAsignados} folios SII" : ''),
+                    'tipo' => 'otro',
+                    'prioridad' => 'alta',
+                    'icono' => 'fa-file-invoice',
+                    'color' => 'success',
+                    'url' => '/boletas',
+                    'texto_accion' => 'Ver Boletas',
+                    'id_usuario' => $this->userId,
+                    'id_organizacion' => $this->idOrganizacion,
+                    'leida' => 0
+                ]);
+                Log::info('Notificación de generación de boletas creada', [
+                    'user_id' => $this->userId,
+                    'total_boletas' => $totalGeneradas
+                ]);
+            } catch (\Exception $e) {
+                Log::error('No se pudo crear notificación del sistema', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
             }
 
         } catch (\Exception $e) {
@@ -172,7 +169,7 @@ class GenerarBoletasMasivas implements ShouldQueue
                 'titulo' => 'Generación de Boletas Falló',
                 'mensaje' => "La generación de boletas para {$this->mes} falló después de 3 intentos. Contacta al soporte técnico.",
                 'tipo' => 'otro',
-                'prioridad' => 'critica',
+                'prioridad' => 'urgente',
                 'icono' => 'fa-times-circle',
                 'color' => 'danger',
                 'url' => '/boletas/generar',
