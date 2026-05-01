@@ -430,7 +430,7 @@
         (function() {
             let lastNotifId = 0;
             let eventSource = null;
-            let checkInterval = null;
+            let notificacionesMostradas = new Set(); // Guardar IDs ya mostradas
 
             function startSSE() {
                 if (eventSource) return; // Ya hay conexión activa
@@ -439,8 +439,13 @@
 
                 eventSource.onmessage = function(event) {
                     const notif = JSON.parse(event.data);
-                    lastNotifId = notif.id;
-                    mostrarNotificacionPopup(notif);
+
+                    // Solo mostrar si NO se ha mostrado antes
+                    if (!notificacionesMostradas.has(notif.id)) {
+                        notificacionesMostradas.add(notif.id);
+                        lastNotifId = notif.id;
+                        mostrarNotificacionPopup(notif);
+                    }
                 };
 
                 eventSource.onerror = function() {
