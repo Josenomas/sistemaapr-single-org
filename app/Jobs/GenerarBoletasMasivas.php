@@ -62,12 +62,22 @@ class GenerarBoletasMasivas implements ShouldQueue
             $foliosAsignados = 0;
 
             // Asignar folios SII en chunks de 100
-            $boletasGeneradas->chunk(100)->each(function ($chunk) use (&$foliosAsignados) {
+            $erroresFolios = 0;
+            $boletasGeneradas->chunk(100)->each(function ($chunk) use (&$foliosAsignados, &$erroresFolios) {
                 foreach ($chunk as $boleta) {
-                    $folioAsignado = $boleta->asignarFolioSII('boleta');
-                    if ($folioAsignado) {
-                        $boleta->save();
-                        $foliosAsignados++;
+                    try {
+                        $folioAsignado = $boleta->asignarFolioSII('boleta');
+                        if ($folioAsignado) {
+                            $boleta->save();
+                            $foliosAsignados++;
+                        } else {
+                            $erroresFolios++;
+                        }
+                    } catch (\Exception $e) {
+                        $erroresFolios++;
+                        Log::warning("Error asignando folio SII a boleta {$boleta->id}", [
+                            'error' => $e->getMessage()
+                        ]);
                     }
                 }
             });
@@ -89,19 +99,36 @@ class GenerarBoletasMasivas implements ShouldQueue
                 'mes' => $this->mes,
                 'total_generadas' => $totalGeneradas,
                 'folios_asignados' => $foliosAsignados,
+                'errores_folios' => $erroresFolios,
                 'tiempo_segundos' => $tiempoTranscurrido
             ]);
 
             // Enviar notificación en sistema
             try {
+                // Determinar color y prioridad según errores de folios
+                $color = 'success';
+                $prioridad = 'alta';
+                $titulo = 'Generación de Boletas Completada';
+
+                $mensaje = "Se generaron {$totalGeneradas} boletas para " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY');
+
+                if ($erroresFolios > 0) {
+                    $color = 'warning';
+                    $prioridad = 'alta';
+                    $titulo = 'Generación de Boletas - Con Advertencias';
+                    $mensaje .= ". Se asignaron {$foliosAsignados} folios SII correctamente";
+                    $mensaje .= ", pero {$erroresFolios} boleta(s) no pudieron obtener folio (verifica folios disponibles en SII)";
+                } elseif ($foliosAsignados > 0) {
+                    $mensaje .= ". Se asignaron {$foliosAsignados} folios SII exitosamente";
+                }
+
                 NotificacionSistema::create([
-                    'titulo' => 'Generación de Boletas Completada',
-                    'mensaje' => "Se generaron {$totalGeneradas} boletas para " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY') .
-                                ($foliosAsignados > 0 ? ". Se asignaron {$foliosAsignados} folios SII" : ''),
+                    'titulo' => $titulo,
+                    'mensaje' => $mensaje,
                     'tipo' => 'otro',
-                    'prioridad' => 'alta',
-                    'icono' => 'fa-file-invoice',
-                    'color' => 'success',
+                    'prioridad' => $prioridad,
+                    'icono' => $erroresFolios > 0 ? 'fa-exclamation-triangle' : 'fa-file-invoice',
+                    'color' => $color,
                     'url' => '/boletas',
                     'texto_accion' => 'Ver Boletas',
                     'id_usuario' => $this->userId,
@@ -110,7 +137,9 @@ class GenerarBoletasMasivas implements ShouldQueue
                 ]);
                 Log::info('Notificación de generación de boletas creada', [
                     'user_id' => $this->userId,
-                    'total_boletas' => $totalGeneradas
+                    'total_boletas' => $totalGeneradas,
+                    'folios_asignados' => $foliosAsignados,
+                    'errores_folios' => $erroresFolios
                 ]);
             } catch (\Exception $e) {
                 Log::error('No se pudo crear notificación del sistema', [
@@ -121,21 +150,41 @@ class GenerarBoletasMasivas implements ShouldQueue
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
+            // Determinar tipo de error
+            $tipoError = 'desconocido';
+            $mensajeDetallado = $e->getMessage();
+
+            if (str_contains($mensajeDetallado, 'sp_generar_boletas_mes')) {
+                $tipoError = 'procedimiento_almacenado';
+            } elseif (str_contains($mensajeDetallado, 'Connection') || str_contains($mensajeDetallado, 'timeout')) {
+                $tipoError = 'conexion_base_datos';
+            } elseif (str_contains($mensajeDetallado, 'folio') || str_contains($mensajeDetallado, 'SII')) {
+                $tipoError = 'asignacion_folios_sii';
+            }
+
             Log::error('Error en generación masiva de boletas', [
                 'mes' => $this->mes,
-                'error' => $e->getMessage(),
+                'tipo_error' => $tipoError,
+                'error' => $mensajeDetallado,
                 'trace' => $e->getTraceAsString()
             ]);
 
-            // Crear notificación de error
+            // Crear notificación de error detallada
             try {
+                $mensajeUsuario = match($tipoError) {
+                    'procedimiento_almacenado' => "Error al generar boletas de " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY') . ". Problema en el proceso de generación.",
+                    'conexion_base_datos' => "Error de conexión con la base de datos al generar boletas de " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY') . ". Intenta nuevamente.",
+                    'asignacion_folios_sii' => "Las boletas se generaron pero hubo un error al asignar folios SII. Verifica los folios disponibles.",
+                    default => "Error inesperado al generar boletas de " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY') . "."
+                };
+
                 NotificacionSistema::create([
                     'titulo' => 'Error en Generación de Boletas',
-                    'mensaje' => "No se pudieron generar las boletas de {$this->mes}",
+                    'mensaje' => $mensajeUsuario,
                     'tipo' => 'otro',
-                    'prioridad' => 'alta',
-                    'icono' => 'fa-exclamation-circle',
+                    'prioridad' => 'urgente',
+                    'icono' => 'fa-exclamation-triangle',
                     'color' => 'danger',
                     'url' => '/boletas/generar',
                     'texto_accion' => 'Reintentar',
