@@ -281,9 +281,22 @@ class LecturasController extends Controller
         ]);
 
         $registradas = 0;
+        $duplicadas = [];
+
         foreach ($validated['lecturas'] as $lecturaData) {
             // Solo procesar si tiene lectura actual
             if (!isset($lecturaData['lectura_actual']) || $lecturaData['lectura_actual'] === '' || $lecturaData['lectura_actual'] === null) {
+                continue;
+            }
+
+            // Verificar si ya existe lectura para este socio en este mes
+            $existe = Lectura::where('id_socio', $lecturaData['id_socio'])
+                            ->where('mes', $validated['mes'])
+                            ->exists();
+
+            if ($existe) {
+                $socio = Socio::find($lecturaData['id_socio']);
+                $duplicadas[] = $socio ? $socio->numero_socio : 'Desconocido';
                 continue;
             }
 
@@ -335,6 +348,13 @@ class LecturasController extends Controller
             null,
             ['mes' => $validated['mes'], 'total_registradas' => $registradas]
         );
+
+        // Mensaje de éxito con advertencia de duplicados si hay
+        if (count($duplicadas) > 0) {
+            $mensaje = "Se registraron {$registradas} lecturas exitosamente. ";
+            $mensaje .= count($duplicadas) . " lectura(s) ya existía(n) para el mes seleccionado (Socios: " . implode(', ', $duplicadas) . ")";
+            return redirect()->route('lecturas.index')->with('warning', $mensaje);
+        }
 
         return redirect()->route('lecturas.index')
                         ->with('success', "Se registraron {$registradas} lecturas exitosamente");

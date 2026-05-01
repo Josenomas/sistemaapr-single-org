@@ -97,20 +97,27 @@ class GenerarBoletasMasivas implements ShouldQueue
             if ($usuario) {
                 try {
                     NotificacionSistema::create([
-                        'titulo' => '✅ Generación de Boletas Completada',
-                        'mensaje' => "Se generaron {$totalGeneradas} boletas para " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY') . 
-                                    ($foliosAsignados > 0 ? ". Se asignaron {$foliosAsignados} folios SII" : '') .
-                                    ". Tiempo: {$tiempoTranscurrido}s",
-                        'tipo' => 'otro',
-                        'icono' => 'check-circle',
-                        'url' => route('boletas.index'),
+                        'titulo' => 'Generación de Boletas Completada',
+                        'mensaje' => "Se generaron {$totalGeneradas} boletas para " . \Carbon\Carbon::createFromFormat('Y-m', $this->mes)->locale('es')->isoFormat('MMMM YYYY') .
+                                    ($foliosAsignados > 0 ? ". Se asignaron {$foliosAsignados} folios SII" : ''),
+                        'tipo' => 'sistema',
+                        'prioridad' => 'alta',
+                        'icono' => 'fa-file-invoice',
+                        'color' => 'success',
+                        'url' => '/boletas',
+                        'texto_accion' => 'Ver Boletas',
                         'id_usuario' => $this->userId,
                         'id_organizacion' => $this->idOrganizacion,
                         'leida' => 0
                     ]);
+                    Log::info('Notificación de generación de boletas creada', [
+                        'user_id' => $this->userId,
+                        'total_boletas' => $totalGeneradas
+                    ]);
                 } catch (\Exception $e) {
-                    Log::warning('No se pudo crear notificación del sistema', [
-                        'error' => $e->getMessage()
+                    Log::error('No se pudo crear notificación del sistema', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
                     ]);
                 }
             }
@@ -127,11 +134,14 @@ class GenerarBoletasMasivas implements ShouldQueue
             // Crear notificación de error
             try {
                 NotificacionSistema::create([
-                    'titulo' => '❌ Error en Generación de Boletas',
-                    'mensaje' => "No se pudieron generar las boletas de {$this->mes}. Error: " . $e->getMessage(),
-                    'tipo' => 'otro',
-                    'icono' => 'exclamation-circle',
-                    'url' => route('boletas.generar'),
+                    'titulo' => 'Error en Generación de Boletas',
+                    'mensaje' => "No se pudieron generar las boletas de {$this->mes}",
+                    'tipo' => 'sistema',
+                    'prioridad' => 'alta',
+                    'icono' => 'fa-exclamation-circle',
+                    'color' => 'danger',
+                    'url' => '/boletas/generar',
+                    'texto_accion' => 'Reintentar',
                     'id_usuario' => $this->userId,
                     'id_organizacion' => $this->idOrganizacion,
                     'leida' => 0
@@ -159,11 +169,14 @@ class GenerarBoletasMasivas implements ShouldQueue
         // Notificación final de fallo
         try {
             NotificacionSistema::create([
-                'titulo' => '🔴 Generación de Boletas Falló',
-                'mensaje' => "La generación de boletas para {$this->mes} falló después de 3 intentos. Por favor, contacta al soporte técnico.",
-                'tipo' => 'otro',
-                'icono' => 'times-circle',
-                'url' => route('boletas.generar'),
+                'titulo' => 'Generación de Boletas Falló',
+                'mensaje' => "La generación de boletas para {$this->mes} falló después de 3 intentos. Contacta al soporte técnico.",
+                'tipo' => 'sistema',
+                'prioridad' => 'critica',
+                'icono' => 'fa-times-circle',
+                'color' => 'danger',
+                'url' => '/boletas/generar',
+                'texto_accion' => 'Ver Detalles',
                 'id_usuario' => $this->userId,
                 'id_organizacion' => $this->idOrganizacion,
                 'leida' => 0
