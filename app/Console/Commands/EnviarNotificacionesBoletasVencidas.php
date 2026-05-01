@@ -38,11 +38,12 @@ class EnviarNotificacionesBoletasVencidas extends Command
             $this->warn('⚠️  MODO DE PRUEBA: No se enviarán correos reales');
         }
 
-        // Obtener todas las boletas vencidas agrupadas por socio
+        // Obtener solo las boletas que vencieron AYER (para enviar notificación solo 1 vez)
+        $ayer = now()->subDay()->startOfDay();
         $boletasVencidas = Boleta::activos()
             ->with('socio')
             ->where('estado', 'vencida')
-            ->whereDate('fecha_vencimiento', '<', now())
+            ->whereDate('fecha_vencimiento', '=', $ayer->toDateString())
             ->get()
             ->groupBy('id_socio');
 
