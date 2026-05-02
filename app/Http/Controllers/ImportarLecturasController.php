@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Lectura;
 use App\Models\Socio;
 use App\Models\Auditoria;
+use App\Models\NotificacionSistema;
 use App\Helpers\ActividadHelper;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -223,11 +225,53 @@ class ImportarLecturasController extends Controller
                 auth()->id()
             );
 
+            // Enviar notificación SSE
+            try {
+                $color = $omitidas > 0 ? 'warning' : 'success';
+                $titulo = $omitidas > 0 ? 'Importación de Lecturas - Con Advertencias' : 'Importación de Lecturas Completada';
+                $mensaje = "Se importaron {$importadas} lecturas exitosamente" . ($omitidas > 0 ? ". {$omitidas} lectura(s) omitida(s) (ya existían)" : "");
+
+                NotificacionSistema::create([
+                    'titulo' => $titulo,
+                    'mensaje' => $mensaje,
+                    'tipo' => 'otro',
+                    'prioridad' => 'alta',
+                    'icono' => $omitidas > 0 ? 'fa-exclamation-triangle' : 'fa-clipboard-check',
+                    'color' => $color,
+                    'url' => '/lecturas',
+                    'texto_accion' => 'Ver Lecturas',
+                    'id_usuario' => auth()->id(),
+                    'id_organizacion' => session('tenant_id') ?? auth()->user()->id_organizacion,
+                    'leida' => 0
+                ]);
+            } catch (\Exception $e) {
+                Log::error('No se pudo crear notificación', ['error' => $e->getMessage()]);
+            }
+
             return redirect()->route('lecturas.index')
                 ->with('success', "Importación exitosa: {$importadas} lecturas importadas" . ($omitidas > 0 ? ", {$omitidas} omitidas (ya existían)" : ''));
 
         } catch (\Exception $e) {
             DB::rollback();
+
+            // Notificar error
+            try {
+                NotificacionSistema::create([
+                    'titulo' => 'Error en Importación de Lecturas',
+                    'mensaje' => 'No se pudieron guardar las lecturas. ' . substr($e->getMessage(), 0, 100),
+                    'tipo' => 'otro',
+                    'prioridad' => 'urgente',
+                    'icono' => 'fa-times-circle',
+                    'color' => 'danger',
+                    'url' => '/lecturas/importar',
+                    'texto_accion' => 'Reintentar',
+                    'id_usuario' => auth()->id(),
+                    'id_organizacion' => session('tenant_id') ?? auth()->user()->id_organizacion,
+                    'leida' => 0
+                ]);
+            } catch (\Exception $notifError) {
+                Log::error('No se pudo crear notificación de error', ['error' => $notifError->getMessage()]);
+            }
 
             return redirect()->route('lecturas.importar.index')
                 ->with('error', 'Error al guardar las lecturas: ' . $e->getMessage());
