@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suscripción {{ ucfirst($organizacion->estado_suscripcion) }} - {{ $organizacion->nombre_apr }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen flex items-center justify-center p-4">
     <div class="max-w-2xl w-full">
@@ -92,12 +93,12 @@
                         <div class="flex-1">
                             <h3 class="text-lg font-semibold text-gray-900 mb-2">Contacta al administrador</h3>
                             <p class="text-gray-700 mb-4">
-                                Para resolver esta situación y reactivar tu cuenta, envía un correo al administrador del sistema.
+                                Para resolver esta situación y reactivar tu cuenta, envía una solicitud al administrador del sistema.
                             </p>
-                            <a href="mailto:admin@sistemaapr.cl?subject=Reactivación de cuenta - {{ $organizacion->nombre_apr }}&body=Hola, mi cuenta de {{ $organizacion->nombre_apr }} (RUT: {{ $organizacion->rut }}) está {{ $organizacion->estado_suscripcion }}. Necesito información sobre cómo reactivarla."
+                            <button onclick="abrirModal()"
                                class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition">
-                                Enviar correo de soporte
-                            </a>
+                                Enviar solicitud de reactivación
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -134,5 +135,124 @@
             <p>¿Necesitas ayuda? Contacta a <a href="mailto:soportesistemaapr@gmail.com" class="text-purple-600 hover:text-purple-700 font-medium">soportesistemaapr@gmail.com</a></p>
         </div>
     </div>
+
+    <!-- Modal de solicitud de soporte -->
+    <div id="modalSoporte" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-2xl max-w-md w-full p-6">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Solicitar Reactivación</h3>
+                <button onclick="cerrarModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p class="text-sm text-blue-900">
+                    <strong>Se enviará automáticamente:</strong><br>
+                    • Nombre de la organización<br>
+                    • RUT<br>
+                    • Estado actual<br>
+                    • Email de contacto
+                </p>
+            </div>
+
+            <form id="formSoporte">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Mensaje adicional (opcional)
+                    </label>
+                    <textarea
+                        id="mensaje_adicional"
+                        name="mensaje_adicional"
+                        rows="4"
+                        maxlength="1000"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Si deseas, puedes agregar información adicional aquí..."></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Opcional. Máximo 1000 caracteres.</p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button
+                        type="button"
+                        onclick="cerrarModal()"
+                        class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                        Cancelar
+                    </button>
+                    <button
+                        type="submit"
+                        id="btnEnviar"
+                        class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                        Enviar Solicitud
+                    </button>
+                </div>
+            </form>
+
+            <div id="mensajeResultado" class="hidden mt-4 p-3 rounded-lg"></div>
+        </div>
+    </div>
+
+    <script>
+        function abrirModal() {
+            document.getElementById('modalSoporte').classList.remove('hidden');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalSoporte').classList.add('hidden');
+            document.getElementById('formSoporte').reset();
+            document.getElementById('mensajeResultado').classList.add('hidden');
+        }
+
+        document.getElementById('formSoporte').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btnEnviar = document.getElementById('btnEnviar');
+            const mensajeResultado = document.getElementById('mensajeResultado');
+            const mensaje_adicional = document.getElementById('mensaje_adicional').value;
+
+            btnEnviar.disabled = true;
+            btnEnviar.textContent = 'Enviando...';
+
+            try {
+                const response = await fetch('{{ route("suscripcion.enviar-soporte") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ mensaje_adicional })
+                });
+
+                const data = await response.json();
+
+                mensajeResultado.classList.remove('hidden');
+                if (data.success) {
+                    mensajeResultado.className = 'mt-4 p-3 rounded-lg bg-green-100 border border-green-300 text-green-800';
+                    mensajeResultado.textContent = data.message;
+
+                    setTimeout(() => {
+                        cerrarModal();
+                    }, 2000);
+                } else {
+                    mensajeResultado.className = 'mt-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-800';
+                    mensajeResultado.textContent = data.message;
+                }
+            } catch (error) {
+                mensajeResultado.classList.remove('hidden');
+                mensajeResultado.className = 'mt-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-800';
+                mensajeResultado.textContent = 'Error al enviar la solicitud. Por favor intenta nuevamente.';
+            } finally {
+                btnEnviar.disabled = false;
+                btnEnviar.textContent = 'Enviar Solicitud';
+            }
+        });
+
+        document.getElementById('modalSoporte').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModal();
+            }
+        });
+    </script>
 </body>
 </html>

@@ -106,6 +106,7 @@ Route::get('/comprobante-pago/{id}/descargar', [PagosController::class, 'descarg
 Route::middleware(['auth'])->group(function () {
     Route::get('/suscripcion/renovar', [App\Http\Controllers\SuscripcionController::class, 'renovar'])->name('suscripcion.renovar');
     Route::get('/suscripcion/estado', [App\Http\Controllers\SuscripcionController::class, 'estado'])->name('suscripcion.estado');
+    Route::post('/suscripcion/enviar-soporte', [App\Http\Controllers\SuscripcionController::class, 'enviarSolicitudSoporte'])->name('suscripcion.enviar-soporte');
 
     // Logout (debe estar fuera del middleware suscripcion.activa para permitir logout a usuarios suspendidos)
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

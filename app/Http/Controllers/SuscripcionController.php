@@ -56,4 +56,42 @@ class SuscripcionController extends Controller
 
         return view('suscripcion.estado', compact('organizacion'));
     }
+
+    /**
+     * Enviar solicitud de soporte para reactivación
+     */
+    public function enviarSolicitudSoporte(Request $request)
+    {
+        $request->validate([
+            'mensaje_adicional' => 'nullable|string|max:1000'
+        ]);
+
+        $organizacion = auth()->user()->organizacion;
+        $usuario = auth()->user();
+
+        try {
+            \Mail::send([], [], function ($message) use ($organizacion, $usuario, $request) {
+                $message->to('soportesistemaapr@gmail.com')
+                    ->subject('Solicitud de Reactivación - ' . $organizacion->nombre_apr)
+                    ->html(view('emails.solicitud-reactivacion', [
+                        'organizacion' => $organizacion,
+                        'usuario' => $usuario,
+                        'mensajeAdicional' => $request->mensaje_adicional
+                    ])->render());
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Solicitud enviada exitosamente. Te contactaremos pronto.'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error enviando solicitud de soporte: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al enviar la solicitud. Por favor intenta nuevamente.'
+            ], 500);
+        }
+    }
 }
