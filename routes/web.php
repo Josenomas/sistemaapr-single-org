@@ -107,6 +107,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/suscripcion/renovar', [App\Http\Controllers\SuscripcionController::class, 'renovar'])->name('suscripcion.renovar');
     Route::get('/suscripcion/estado', [App\Http\Controllers\SuscripcionController::class, 'estado'])->name('suscripcion.estado');
 
+    // Logout (debe estar fuera del middleware suscripcion.activa para permitir logout a usuarios suspendidos)
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
     // Pagos de suscripción (deben estar FUERA del middleware suscripcion.activa para permitir renovación)
     Route::prefix('organizacion')->name('organizacion.')->group(function () {
         Route::get('/pagos-suscripcion', [PagosSuscripcionController::class, 'index'])->name('pagos-suscripcion');
@@ -132,9 +135,6 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
 
     // Onboarding
     Route::get('/bienvenida', [App\Http\Controllers\OnboardingController::class, 'bienvenida'])->name('onboarding.bienvenida');
-
-    // Logout
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // RUTA ALTERNATIVA PARA GENERAR PDFs (sin OPcache)
     Route::get('/pdf-boleta/{id}', function($id) {
