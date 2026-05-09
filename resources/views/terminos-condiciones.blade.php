@@ -111,7 +111,7 @@
         <div class="header">
             <h1>Términos y Condiciones de Uso</h1>
             <p>Sistema APR - Gestión Integral de Agua Potable Rural</p>
-            <p>Última actualización: {{ date('d/m/Y') }}</p>
+            <p>Última actualización: 15/04/2026</p>
         </div>
 
         <h2>1. Aceptación de los Términos</h2>
