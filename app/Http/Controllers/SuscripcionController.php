@@ -63,20 +63,42 @@ class SuscripcionController extends Controller
     public function enviarSolicitudSoporte(Request $request)
     {
         $request->validate([
-            'mensaje_adicional' => 'nullable|string|max:1000'
+            'mensaje_adicional' => 'nullable|string|max:2000'
         ]);
 
         $organizacion = auth()->user()->organizacion;
         $usuario = auth()->user();
 
         try {
-            \Mail::send([], [], function ($message) use ($organizacion, $usuario, $request) {
+            // Detectar si viene del formulario de ayuda (con formato ASUNTO:) o del botón de reactivación
+            $mensajeCompleto = $request->mensaje_adicional;
+            $asunto = null;
+            $descripcion = null;
+            $esAyuda = false;
+
+            if ($mensajeCompleto && strpos($mensajeCompleto, 'ASUNTO:') === 0) {
+                // Es del botón de ayuda
+                $esAyuda = true;
+                $partes = explode("\n\n", $mensajeCompleto, 2);
+                $asunto = str_replace('ASUNTO: ', '', $partes[0]);
+                $descripcion = $partes[1] ?? '';
+            }
+
+            \Mail::send([], [], function ($message) use ($organizacion, $usuario, $request, $asunto, $descripcion, $mensajeCompleto, $esAyuda) {
+                $subject = $esAyuda
+                    ? 'Solicitud de Soporte - ' . $organizacion->nombre_apr
+                    : 'Solicitud de Reactivación - ' . $organizacion->nombre_apr;
+
+                $template = $esAyuda ? 'emails.solicitud-soporte' : 'emails.solicitud-reactivacion';
+
                 $message->to('soportesistemaapr@gmail.com')
-                    ->subject('Solicitud de Reactivación - ' . $organizacion->nombre_apr)
-                    ->html(view('emails.solicitud-reactivacion', [
+                    ->subject($subject)
+                    ->html(view($template, [
                         'organizacion' => $organizacion,
                         'usuario' => $usuario,
-                        'mensajeAdicional' => $request->mensaje_adicional
+                        'asunto' => $asunto,
+                        'descripcion' => $descripcion,
+                        'mensajeAdicional' => !$esAyuda ? $mensajeCompleto : null
                     ])->render());
             });
 
