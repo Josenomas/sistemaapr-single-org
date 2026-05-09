@@ -19,20 +19,20 @@
                     @foreach($actividades as $item)
                         <div class="activity-item">
                             <div class="activity-icon">
-                                @if(str_contains(strtoupper($item->tipo), 'PAGO'))
+                                @if(str_contains(strtoupper($item->modulo), 'PAGO'))
                                     <span class="badge badge-success">💰 PAGOS</span>
-                                @elseif(str_contains(strtoupper($item->tipo), 'BOLETA'))
+                                @elseif(str_contains(strtoupper($item->modulo), 'BOLETA'))
                                     <span class="badge badge-primary">📄 BOLETAS</span>
-                                @elseif(str_contains(strtoupper($item->tipo), 'SOCIO'))
+                                @elseif(str_contains(strtoupper($item->modulo), 'SOCIO'))
                                     <span class="badge badge-info">👥 SOCIOS</span>
-                                @elseif(str_contains(strtoupper($item->tipo), 'LECTURA'))
+                                @elseif(str_contains(strtoupper($item->modulo), 'LECTURA'))
                                     <span class="badge badge-warning">📊 LECTURAS</span>
-                                @elseif(str_contains(strtoupper($item->tipo), 'INCIDENTE'))
+                                @elseif(str_contains(strtoupper($item->modulo), 'INCIDENTE'))
                                     <span class="badge badge-danger">🚨 INCIDENTES</span>
-                                @elseif(str_contains(strtoupper($item->tipo), 'USUARIO'))
+                                @elseif(str_contains(strtoupper($item->modulo), 'USUARIO'))
                                     <span class="badge badge-secondary">👤 USUARIOS</span>
                                 @else
-                                    <span class="badge badge-secondary">📋 {{ strtoupper($item->tipo) }}</span>
+                                    <span class="badge badge-secondary">📋 {{ strtoupper($item->modulo) }}</span>
                                 @endif
                             </div>
 
