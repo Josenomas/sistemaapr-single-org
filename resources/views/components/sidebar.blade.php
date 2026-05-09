@@ -378,6 +378,18 @@
             </a>
         </div>
 
+        <!-- Actividad Reciente -->
+        <div class="nav-section">
+            <div class="nav-section-title">
+                <i class="fas fa-history"></i>
+                <span>Actividad</span>
+            </div>
+            <a href="{{ route('actividades.index') }}" class="nav-item {{ request()->routeIs('actividades.*') ? 'active' : '' }}">
+                <i class="fas fa-list"></i>
+                <span>Ver Actividades</span>
+            </a>
+        </div>
+
         <!-- Mi Organización -->
         <div class="nav-section">
             <div class="nav-section-title">

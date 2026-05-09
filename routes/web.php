@@ -39,6 +39,7 @@ use App\Http\Controllers\FolioSIIController;
 use App\Http\Controllers\NotificacionesSistemaController;
 use App\Http\Controllers\NotificacionesStreamController;
 use App\Http\Controllers\PagosSuscripcionController;
+use App\Http\Controllers\ActividadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -133,6 +134,9 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Actividad Reciente
+    Route::get('/actividades', [ActividadController::class, 'index'])->name('actividades.index');
 
     // Onboarding
     Route::get('/bienvenida', [App\Http\Controllers\OnboardingController::class, 'bienvenida'])->name('onboarding.bienvenida');
