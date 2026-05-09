@@ -132,7 +132,12 @@
 
         <!-- Footer -->
         <div class="text-center mt-6 text-gray-600 text-sm">
-            <p>¿Necesitas ayuda? Contacta a <a href="mailto:soportesistemaapr@gmail.com" class="text-purple-600 hover:text-purple-700 font-medium">soportesistemaapr@gmail.com</a></p>
+            <p>¿Necesitas ayuda? Contacta a
+                <a href="mailto:soportesistemaapr@gmail.com?subject=Consulta sobre cuenta - {{ $organizacion->nombre_apr }}&body=Hola,%0D%0A%0D%0ANecesito ayuda con mi cuenta:%0D%0A%0D%0AOrganización: {{ $organizacion->nombre_apr }}%0D%0ARUT: {{ $organizacion->rut }}%0D%0AEstado: {{ $organizacion->suscripcion?->estado }}%0D%0AEmail: {{ $organizacion->email }}%0D%0A%0D%0AMi consulta es:%0D%0A"
+                   class="text-purple-600 hover:text-purple-700 font-medium">
+                    soportesistemaapr@gmail.com
+                </a>
+            </p>
         </div>
     </div>
 
