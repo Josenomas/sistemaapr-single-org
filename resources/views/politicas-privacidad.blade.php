@@ -111,7 +111,7 @@
         <div class="header">
             <h1>Política de Privacidad</h1>
             <p>Sistema APR - Gestión Integral de Agua Potable Rural</p>
-            <p>Última actualización: {{ date('d/m/Y') }}</p>
+            <p>Última actualización: 15/04/2026</p>
             <p>Conforme a la Ley 19.628 sobre Protección de la Vida Privada</p>
         </div>
 
