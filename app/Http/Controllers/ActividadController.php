@@ -27,7 +27,7 @@ class ActividadController extends Controller
             ->where('usuarios.id_organizacion', $idOrganizacion)
             ->where('actividad_reciente.activo', 1)
             ->orderBy('actividad_reciente.fecha_creacion', 'desc')
-            ->paginate(50);
+            ->paginate(20);
 
         return view('actividades.index', compact('actividades'));
     }
