@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- <meta name="robots" content="noindex, nofollow"> -->
     <link rel="canonical" href="{{ url()->current() }}">
     <title>@yield('title', 'Sistema APR')</title>
@@ -215,6 +216,28 @@
             position: relative;
         }
 
+        .help-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            color: white;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .help-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
         .notif-bell {
             position: relative;
             display: flex;
@@ -330,6 +353,11 @@
                             ->noLeidas()
                             ->count();
                     @endphp
+
+                    <!-- Botón de Ayuda -->
+                    <button onclick="abrirModalSoporte()" class="help-btn" title="¿Necesitas ayuda?">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
 
                     <div class="notificaciones-dropdown">
                         <a href="{{ route('notificaciones-sistema.index') }}" class="notif-bell" id="notifBell">
@@ -546,6 +574,388 @@
             }, 35000);
         })();
         @endauth
+    </script>
+
+    <!-- Modal de Soporte Global -->
+    <div id="modalSoporteGlobal" class="modal-soporte hidden">
+        <div class="modal-soporte-overlay" onclick="cerrarModalSoporte()"></div>
+        <div class="modal-soporte-content">
+            <div class="modal-soporte-header">
+                <h3><i class="fas fa-headset"></i> Solicitar Soporte</h3>
+                <button onclick="cerrarModalSoporte()" class="modal-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-soporte-body">
+                <!-- Información prellenada -->
+                <div class="info-prellenada">
+                    <div class="info-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="info-text">
+                        <strong>Se enviará automáticamente:</strong>
+                        <ul>
+                            <li>Nombre de la organización</li>
+                            <li>RUT y email de contacto</li>
+                            <li>Usuario que reporta</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Formulario -->
+                <form id="formSoporteGlobal">
+                    <div class="form-group">
+                        <label for="asunto">Asunto *</label>
+                        <input type="text" id="asunto" name="asunto" required
+                               placeholder="Ej: Problema al generar boletas"
+                               maxlength="200">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion">Descripción del problema *</label>
+                        <textarea id="descripcion" name="descripcion" rows="6" required
+                                  placeholder="Por favor describe el problema con el mayor detalle posible..."
+                                  maxlength="2000"></textarea>
+                        <small>Máximo 2000 caracteres</small>
+                    </div>
+
+                    <div class="modal-soporte-footer">
+                        <button type="button" onclick="cerrarModalSoporte()" class="btn-cancelar">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="btnEnviarSoporte" class="btn-enviar">
+                            <i class="fas fa-paper-plane"></i> Enviar Solicitud
+                        </button>
+                    </div>
+                </form>
+
+                <div id="mensajeResultadoSoporte" class="mensaje-resultado hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal-soporte {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-soporte.hidden {
+            display: none;
+        }
+
+        .modal-soporte-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-soporte-content {
+            position: relative;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-soporte-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 2px solid #e2e8f0;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-soporte-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-soporte-body {
+            padding: 24px;
+        }
+
+        .info-prellenada {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .info-icon {
+            color: #3b82f6;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .info-text {
+            color: #1e40af;
+            font-size: 0.875rem;
+        }
+
+        .info-text strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9375rem;
+        }
+
+        .info-text ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .info-text li {
+            margin: 4px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 0.8125rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .modal-soporte-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-cancelar,
+        .btn-enviar {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.9375rem;
+        }
+
+        .btn-cancelar {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-cancelar:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-enviar {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-enviar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-enviar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .mensaje-resultado {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+        }
+
+        .mensaje-resultado.hidden {
+            display: none;
+        }
+
+        .mensaje-resultado.success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+        }
+
+        .mensaje-resultado.error {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+
+        @media (max-width: 768px) {
+            .modal-soporte-content {
+                max-width: 100%;
+                margin: 0 10px;
+            }
+
+            .modal-soporte-footer {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    <script>
+        function abrirModalSoporte() {
+            document.getElementById('modalSoporteGlobal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalSoporte() {
+            document.getElementById('modalSoporteGlobal').classList.add('hidden');
+            document.getElementById('formSoporteGlobal').reset();
+            document.getElementById('mensajeResultadoSoporte').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('formSoporteGlobal').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btnEnviar = document.getElementById('btnEnviarSoporte');
+            const mensajeResultado = document.getElementById('mensajeResultadoSoporte');
+            const asunto = document.getElementById('asunto').value;
+            const descripcion = document.getElementById('descripcion').value;
+
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            mensajeResultado.classList.add('hidden');
+
+            try {
+                const response = await fetch('{{ route("suscripcion.enviar-soporte") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        mensaje_adicional: `ASUNTO: ${asunto}\n\n${descripcion}`
+                    })
+                });
+
+                const data = await response.json();
+
+                mensajeResultado.classList.remove('hidden');
+                if (data.success) {
+                    mensajeResultado.className = 'mensaje-resultado success';
+                    mensajeResultado.innerHTML = '<i class="fas fa-check-circle"></i> ' + data.message;
+
+                    setTimeout(() => {
+                        cerrarModalSoporte();
+                    }, 2000);
+                } else {
+                    mensajeResultado.className = 'mensaje-resultado error';
+                    mensajeResultado.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + data.message;
+                }
+            } catch (error) {
+                mensajeResultado.classList.remove('hidden');
+                mensajeResultado.className = 'mensaje-resultado error';
+                mensajeResultado.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error al enviar la solicitud. Por favor intenta nuevamente.';
+            } finally {
+                btnEnviar.disabled = false;
+                btnEnviar.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Solicitud';
+            }
+        });
+
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cerrarModalSoporte();
+            }
+        });
     </script>
 
     @yield('scripts')
