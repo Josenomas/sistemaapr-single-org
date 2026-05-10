@@ -300,7 +300,6 @@
             <ul style="margin: 0.5rem 0 0 1.5rem; color: #856404;">
                 <li>Tu usuario y acceso al sistema</li>
                 <li>Tus datos personales (nombre, email, teléfono)</li>
-                <li>Tu historial de actividad</li>
             </ul>
         </div>
 
@@ -609,7 +608,6 @@ function confirmarEliminacion() {
                 <ul style="color: #6c757d; margin-bottom: 1rem;">
                     <li>Tu usuario y acceso al sistema</li>
                     <li>Tus datos personales</li>
-                    <li>Tu historial de actividad</li>
                 </ul>
                 <p style="background-color: #fff3cd; padding: 0.75rem; border-radius: 0.5rem; color: #856404;">
                     <strong>⚠️ Importante:</strong> No podrás volver a acceder al sistema y esta acción NO se puede deshacer.
