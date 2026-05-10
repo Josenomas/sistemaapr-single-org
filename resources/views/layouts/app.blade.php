@@ -378,13 +378,39 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('logout') }}" method="POST">
+                    <form action="{{ route('logout') }}" method="POST" id="logout-form">
                         @csrf
                         <button type="submit" class="logout-btn">
                             <i class="fas fa-sign-out-alt"></i>
                             <span>Salir</span>
                         </button>
                     </form>
+
+                    <script>
+                    // Manejar errores de token CSRF expirado en logout
+                    document.getElementById('logout-form').addEventListener('submit', function(e) {
+                        e.preventDefault();
+
+                        fetch(this.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json',
+                            },
+                            body: new FormData(this)
+                        })
+                        .then(response => {
+                            if (response.ok || response.status === 419) {
+                                // Si logout exitoso O token expirado, redirigir a login
+                                window.location.href = '/login';
+                            }
+                        })
+                        .catch(() => {
+                            // En caso de cualquier error, redirigir a login de todas formas
+                            window.location.href = '/login';
+                        });
+                    });
+                    </script>
                 </div>
             </div>
         </div>

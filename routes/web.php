@@ -111,6 +111,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Logout (debe estar fuera del middleware suscripcion.activa para permitir logout a usuarios suspendidos)
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout.get'); // Fallback para tokens expirados
 
     // Pagos de suscripción (deben estar FUERA del middleware suscripcion.activa para permitir renovación)
     Route::prefix('organizacion')->name('organizacion.')->group(function () {
