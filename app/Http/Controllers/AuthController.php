@@ -88,6 +88,17 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        // Si es GET, validar que venga desde la aplicación (prevenir CSRF externo)
+        if ($request->isMethod('get')) {
+            $referer = $request->headers->get('referer');
+            $appUrl = config('app.url');
+
+            // Solo permitir GET si viene del mismo dominio
+            if (!$referer || !str_starts_with($referer, $appUrl)) {
+                abort(403, 'Acceso no autorizado');
+            }
+        }
+
         $usuario = Auth::user();
 
         // Registrar logout en auditoría
