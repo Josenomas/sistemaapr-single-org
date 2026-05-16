@@ -229,16 +229,27 @@
         }
 
         /* Asegurar que cards sean oscuras en modo oscuro */
-        .card.border-0.shadow-sm {
+        body:not(.light-mode) .card {
             background: var(--dark-card) !important;
         }
 
-        .card.bg-white,
+        body:not(.light-mode) .card-header.bg-white {
+            background: var(--dark-card) !important;
+        }
+
         body:not(.light-mode) .bg-white {
             background: var(--dark-card) !important;
         }
 
-        body.light-mode .card.bg-white,
+        /* Modo claro: mantener fondo blanco */
+        body.light-mode .card {
+            background: #ffffff !important;
+        }
+
+        body.light-mode .card-header.bg-white {
+            background: #ffffff !important;
+        }
+
         body.light-mode .bg-white {
             background: #ffffff !important;
         }
