@@ -92,7 +92,11 @@
     .activity-item:nth-child(5) { animation-delay: 1.5s; }
 
     .dashboard-header {
-        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+        @php
+            $colorPrimario = auth()->user()->organizacion->color_primario ?? '#3b82f6';
+            $colorSecundario = auth()->user()->organizacion->color_secundario ?? '#60a5fa';
+        @endphp
+        background: linear-gradient(135deg, {{ $colorPrimario }} 0%, {{ $colorSecundario }} 100%);
         padding: 32px;
         border-radius: 16px;
         margin-bottom: 32px;
