@@ -309,11 +309,11 @@
         }
 
         .pricing-cards {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
         }
 
         .pricing-card {
@@ -1064,7 +1064,7 @@
         <div class="pricing-cards">
             <div class="pricing-card">
                 <h3>Básico</h3>
-                <div class="price">$20.000<span>/mes</span></div>
+                <div class="price">$25.000<span>/mes</span></div>
                 <ul class="features-list">
                     <li><i class="fas fa-check"></i> Hasta 100 socios</li>
                     <li><i class="fas fa-check"></i> Módulos básicos</li>
@@ -1077,7 +1077,7 @@
 
             <div class="pricing-card featured">
                 <h3>Profesional</h3>
-                <div class="price">$30.000<span>/mes</span></div>
+                <div class="price">$45.000<span>/mes</span></div>
                 <ul class="features-list">
                     <li><i class="fas fa-check"></i> Hasta 500 socios</li>
                     <li><i class="fas fa-check"></i> Todos los módulos</li>
@@ -1091,16 +1091,34 @@
 
             <div class="pricing-card">
                 <h3>Enterprise</h3>
-                <div class="price">$50.000<span>/mes</span></div>
+                <div class="price">$75.000<span>/mes</span></div>
                 <ul class="features-list">
-                    <li><i class="fas fa-check"></i> Socios ilimitados</li>
+                    <li><i class="fas fa-check"></i> Hasta 2,000 socios</li>
                     <li><i class="fas fa-check"></i> Todos los módulos</li>
-                    <li><i class="fas fa-check"></i> Usuarios ilimitados</li>
+                    <li><i class="fas fa-check"></i> Hasta 10 usuarios</li>
                     <li><i class="fas fa-check"></i> Soporte prioritario</li>
                     <li><i class="fas fa-check"></i> Módulo de noticias públicas</li>
                     <li><i class="fas fa-check"></i> Gestión de inventario</li>
                     <li><i class="fas fa-check"></i> Gestión de personal y RRHH</li>
                     <li><i class="fas fa-check"></i> Personalización de marca</li>
+                </ul>
+                <a href="#contact" class="btn-primary">Contratar</a>
+            </div>
+
+            <div class="pricing-card featured">
+                <h3>Enterprise Custom</h3>
+                <div class="price">$120.000<span>/mes</span></div>
+                <ul class="features-list">
+                    <li><i class="fas fa-check"></i> Socios ilimitados</li>
+                    <li><i class="fas fa-check"></i> Todos los módulos</li>
+                    <li><i class="fas fa-check"></i> Usuarios ilimitados</li>
+                    <li><i class="fas fa-check"></i> Mensajes ilimitados</li>
+                    <li><i class="fas fa-check"></i> Soporte prioritario 24/7</li>
+                    <li><i class="fas fa-check"></i> Módulo de noticias públicas</li>
+                    <li><i class="fas fa-check"></i> Gestión de inventario</li>
+                    <li><i class="fas fa-check"></i> Gestión de personal y RRHH</li>
+                    <li><i class="fas fa-check"></i> Personalización avanzada</li>
+                    <li><i class="fas fa-check"></i> Desarrollo a medida</li>
                 </ul>
                 <a href="#contact" class="btn-primary">Contactar</a>
             </div>

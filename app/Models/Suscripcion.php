@@ -90,4 +90,20 @@ class Suscripcion extends Model
     {
         return $this->max_usuarios;
     }
+
+    /**
+     * Accessor para compatibilidad: socios_ilimitados
+     */
+    public function getSociosIlimitadosAttribute()
+    {
+        return $this->tieneSociosIlimitados();
+    }
+
+    /**
+     * Accessor para compatibilidad: usuarios_ilimitados
+     */
+    public function getUsuariosIlimitadosAttribute()
+    {
+        return $this->tieneUsuariosIlimitados();
+    }
 }

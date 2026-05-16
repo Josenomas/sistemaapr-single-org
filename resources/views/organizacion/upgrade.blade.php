@@ -37,10 +37,15 @@
 <!-- Planes Disponibles -->
 <div class="plans-grid">
     @foreach($planes as $plan)
-    <div class="plan-card {{ $plan->id === $organizacion->id_suscripcion ? 'current-plan' : '' }} {{ $plan->nombre === 'enterprise' ? 'featured-plan' : '' }}">
-        @if($plan->nombre === 'enterprise')
+    <div class="plan-card {{ $plan->id === $organizacion->id_suscripcion ? 'current-plan' : '' }} {{ in_array($plan->nombre, ['profesional', 'enterprise_custom']) ? 'featured-plan' : '' }}">
+        @if($plan->nombre === 'profesional')
             <div class="featured-badge">
                 <i class="fas fa-star"></i> Más Popular
+            </div>
+        @endif
+        @if($plan->nombre === 'enterprise_custom')
+            <div class="featured-badge">
+                <i class="fas fa-crown"></i> Más Completo
             </div>
         @endif
 
@@ -63,7 +68,7 @@
             <div class="feature-item">
                 <i class="fas fa-users"></i>
                 <span>
-                    @if($plan->max_socios === -1)
+                    @if($plan->max_socios === null || $plan->max_socios === -1)
                         Socios ilimitados
                     @else
                         Hasta {{ number_format($plan->max_socios) }} socios
@@ -74,7 +79,7 @@
             <div class="feature-item">
                 <i class="fas fa-user-shield"></i>
                 <span>
-                    @if($plan->max_usuarios === -1)
+                    @if($plan->max_usuarios === null || $plan->max_usuarios === -1)
                         Usuarios ilimitados
                     @else
                         {{ $plan->max_usuarios }} {{ $plan->max_usuarios === 1 ? 'usuario' : 'usuarios' }}
