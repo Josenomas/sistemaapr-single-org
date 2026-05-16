@@ -280,14 +280,27 @@
         body:not(.light-mode) tbody,
         body:not(.light-mode) tr,
         body:not(.light-mode) .stat-card,
-        body:not(.light-mode) .empty-state,
-        body:not(.light-mode) div[class*="bg-white"],
-        body:not(.light-mode) div[style*="background: white"],
-        body:not(.light-mode) div[style*="background: #fff"],
-        body:not(.light-mode) div[style*="background-color: white"],
-        body:not(.light-mode) div[style*="background-color: #fff"] {
+        body:not(.light-mode) .empty-state {
             background: var(--dark-card) !important;
             background-color: var(--dark-card) !important;
+        }
+
+        /* Sobrescribir cualquier .text-dark a texto claro en modo oscuro */
+        body:not(.light-mode) .text-dark,
+        body:not(.light-mode) h1.text-dark,
+        body:not(.light-mode) h2.text-dark,
+        body:not(.light-mode) h3.text-dark,
+        body:not(.light-mode) h4.text-dark,
+        body:not(.light-mode) h5.text-dark,
+        body:not(.light-mode) p.text-dark,
+        body:not(.light-mode) th.text-dark,
+        body:not(.light-mode) td.text-dark {
+            color: var(--text-light) !important;
+        }
+
+        /* Forzar .text-secondary a color muted en modo oscuro */
+        body:not(.light-mode) .text-secondary {
+            color: var(--text-muted) !important;
         }
 
         /* Modo claro: mantener fondo blanco */
