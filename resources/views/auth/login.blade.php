@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login - Sistema APR</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -260,7 +261,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('login') }}" id="login-form">
             @csrf
 
             <div class="form-group">
@@ -341,6 +342,47 @@
                 toggleIcon.classList.add('fa-eye');
             }
         }
+
+        // Manejar error 419 (token CSRF expirado)
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="_token"]').value,
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+            .then(response => {
+                if (response.status === 419) {
+                    // Token expirado - recargar la página para obtener nuevo token
+                    window.location.reload();
+                    return;
+                }
+
+                if (response.redirected) {
+                    // Login exitoso - redirigir
+                    window.location.href = response.url;
+                    return;
+                }
+
+                // Otro error - recargar para mostrar mensaje
+                return response.json().then(data => {
+                    if (data.errors) {
+                        // Mostrar errores de validación
+                        window.location.reload();
+                    }
+                });
+            })
+            .catch(error => {
+                // En caso de error de red, recargar
+                window.location.reload();
+            });
+        });
     </script>
 </body>
 </html>
