@@ -49,7 +49,7 @@ class AuthController extends Controller
         $throttleKey = strtolower($request->input('username')) . '|' . $request->ip();
 
         // Verificar si está bloqueado por demasiados intentos
-        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
             $seconds = RateLimiter::availableIn($throttleKey);
             $minutes = ceil($seconds / 60);
 
