@@ -245,9 +245,18 @@
         @endif
 
         @if($errors->any())
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-circle"></i>
-                {{ $errors->first() }}
+            @php
+                $errorMessage = $errors->first();
+                $isBloqueado = str_contains($errorMessage, 'Demasiados intentos');
+            @endphp
+            <div class="alert alert-danger" style="{{ $isBloqueado ? 'background: #fee2e2; border-color: #dc2626; color: #991b1b;' : '' }}">
+                <i class="fas {{ $isBloqueado ? 'fa-lock' : 'fa-exclamation-circle' }}"></i>
+                {{ $errorMessage }}
+                @if($isBloqueado)
+                    <div style="margin-top: 8px; font-size: 0.875rem; opacity: 0.9;">
+                        <i class="fas fa-shield-alt"></i> Tu cuenta está temporalmente bloqueada por seguridad.
+                    </div>
+                @endif
             </div>
         @endif
 

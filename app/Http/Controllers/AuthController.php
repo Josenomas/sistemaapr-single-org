@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use App\Models\Usuario;
 use App\Models\Auditoria;
 use App\Mail\RecuperarPasswordMail;
@@ -43,6 +45,30 @@ class AuthController extends Controller
             'password.required' => 'La contraseña es obligatoria',
         ]);
 
+        // Generar clave para rate limiting (IP + username)
+        $throttleKey = strtolower($request->input('username')) . '|' . $request->ip();
+
+        // Verificar si está bloqueado por demasiados intentos
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            $minutes = ceil($seconds / 60);
+
+            // Registrar intento bloqueado en auditoría
+            Auditoria::create([
+                'id_organizacion' => null,
+                'id_usuario' => null,
+                'modulo' => 'auth',
+                'accion' => 'login_bloqueado',
+                'descripcion' => "Intento de login bloqueado por demasiados intentos fallidos - Usuario: {$request->username}",
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
+            throw ValidationException::withMessages([
+                'username' => "Demasiados intentos de inicio de sesión. Por favor, intenta de nuevo en {$minutes} minuto(s).",
+            ]);
+        }
+
         // Buscar usuario por nombre_usuario o email
         $usuario = Usuario::where(function($query) use ($request) {
                             $query->where('nombre_usuario', $request->username)
@@ -52,6 +78,9 @@ class AuthController extends Controller
                         ->first();
 
         if ($usuario && Hash::check($request->password, $usuario->password)) {
+            // Login exitoso - limpiar intentos fallidos
+            RateLimiter::clear($throttleKey);
+
             Auth::login($usuario, $request->has('remember'));
 
             // Actualizar último acceso
@@ -77,6 +106,20 @@ class AuthController extends Controller
 
             return redirect()->intended(route('dashboard'));
         }
+
+        // Login fallido - incrementar contador de intentos
+        RateLimiter::hit($throttleKey, 900); // 900 segundos = 15 minutos
+
+        // Registrar intento fallido en auditoría
+        Auditoria::create([
+            'id_organizacion' => null,
+            'id_usuario' => null,
+            'modulo' => 'auth',
+            'accion' => 'login_fallido',
+            'descripcion' => "Intento de login fallido - Usuario: {$request->username}",
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
 
         return back()->withErrors([
             'username' => 'Las credenciales no coinciden con nuestros registros.',
