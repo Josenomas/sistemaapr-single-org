@@ -317,6 +317,13 @@
             </a>
         </div>
 
+        <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200);">
+            <a href="{{ url('/') }}" style="color: var(--primary); font-size: 0.875rem; text-decoration: none; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fas fa-home"></i>
+                Volver al inicio
+            </a>
+        </div>
+
         <div class="login-footer">
             <p>&copy; {{ date('Y') }} Sistema APR - Agua Potable Rural</p>
             <p style="margin-top: 10px;">
