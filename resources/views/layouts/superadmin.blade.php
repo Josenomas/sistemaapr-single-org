@@ -12,21 +12,21 @@
     @yield('styles')
     <style>
         :root {
-            /* Tema oscuro para super-admin - colores profesionales */
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
+            /* Tema oscuro para super-admin - colores brillantes y visibles */
+            --primary: #60a5fa;
+            --primary-dark: #3b82f6;
             --primary-light: #dbeafe;
-            --secondary: #0ea5e9;
+            --secondary: #38bdf8;
             --dark: #0f172a;
             --dark-sidebar: #1e293b;
             --dark-card: #1e293b;
             --text-light: #e2e8f0;
             --text-muted: #94a3b8;
             --border: #334155;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #0ea5e9;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --info: #38bdf8;
         }
 
         /* Tema Claro */
@@ -228,6 +228,21 @@
             color: var(--primary);
         }
 
+        /* Asegurar que cards sean oscuras en modo oscuro */
+        .card.border-0.shadow-sm {
+            background: var(--dark-card) !important;
+        }
+
+        .card.bg-white,
+        body:not(.light-mode) .bg-white {
+            background: var(--dark-card) !important;
+        }
+
+        body.light-mode .card.bg-white,
+        body.light-mode .bg-white {
+            background: #ffffff !important;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -304,8 +319,8 @@
         }
 
         .menu-item:hover {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--primary-light);
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--primary);
         }
 
         .menu-item.active {
@@ -370,7 +385,7 @@
             align-items: center;
             gap: 0.75rem;
             padding: 0.5rem 1rem;
-            background: rgba(59, 130, 246, 0.1);
+            background: rgba(96, 165, 250, 0.15);
             border-radius: 0.5rem;
             border: 1px solid var(--primary);
         }
@@ -548,7 +563,7 @@
         }
 
         tbody tr:hover {
-            background: rgba(59, 130, 246, 0.05);
+            background: rgba(96, 165, 250, 0.08);
         }
 
         /* Badges */
@@ -629,7 +644,7 @@
         .form-control:focus, .form-select:focus {
             outline: none;
             border-color: var(--primary);
-            background: rgba(59, 130, 246, 0.05);
+            background: rgba(96, 165, 250, 0.08);
         }
 
         /* Grid */
