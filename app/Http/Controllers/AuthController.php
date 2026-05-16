@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Models\Usuario;
@@ -46,23 +46,34 @@ class AuthController extends Controller
         ]);
 
         // Generar clave para rate limiting (IP + username)
-        $throttleKey = strtolower($request->input('username')) . '|' . $request->ip();
+        $throttleKey = 'login_attempts:' . strtolower($request->input('username')) . '|' . $request->ip();
+        $maxAttempts = 10;
+        $decayMinutes = 15;
+        $decaySeconds = $decayMinutes * 60;
 
-        // Verificar si está bloqueado por demasiados intentos
-        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
-            $seconds = RateLimiter::availableIn($throttleKey);
+        // Obtener intentos actuales y tiempo de expiración
+        $attempts = (int) Cache::get($throttleKey . ':count', 0);
+        $lockUntil = Cache::get($throttleKey . ':lock');
+
+        // Verificar si está bloqueado
+        if ($attempts >= $maxAttempts && $lockUntil && now()->lt($lockUntil)) {
+            $seconds = now()->diffInSeconds($lockUntil);
             $minutes = ceil($seconds / 60);
 
-            // Registrar intento bloqueado en auditoría
-            Auditoria::create([
-                'id_organizacion' => null,
-                'id_usuario' => null,
-                'modulo' => 'auth',
-                'accion' => 'login_bloqueado',
-                'descripcion' => "Intento de login bloqueado por demasiados intentos fallidos - Usuario: {$request->username}",
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
+            // Registrar intento bloqueado en auditoría (solo una vez cada 5 minutos para no spam)
+            $logKey = $throttleKey . ':logged';
+            if (!Cache::has($logKey)) {
+                Cache::put($logKey, true, 300); // Log cada 5 minutos
+                Auditoria::create([
+                    'id_organizacion' => null,
+                    'id_usuario' => null,
+                    'modulo' => 'auth',
+                    'accion' => 'login_bloqueado',
+                    'descripcion' => "Intento de login bloqueado por demasiados intentos fallidos - Usuario: {$request->username}",
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
+            }
 
             throw ValidationException::withMessages([
                 'username' => "Demasiados intentos de inicio de sesión. Por favor, intenta de nuevo en {$minutes} minuto(s).",
@@ -79,7 +90,8 @@ class AuthController extends Controller
 
         if ($usuario && Hash::check($request->password, $usuario->password)) {
             // Login exitoso - limpiar intentos fallidos
-            RateLimiter::clear($throttleKey);
+            Cache::forget($throttleKey . ':count');
+            Cache::forget($throttleKey . ':lock');
 
             Auth::login($usuario, $request->has('remember'));
 
@@ -108,7 +120,15 @@ class AuthController extends Controller
         }
 
         // Login fallido - incrementar contador de intentos
-        RateLimiter::hit($throttleKey, 900); // 900 segundos = 15 minutos
+        // Si es el primer intento, establecer el tiempo de bloqueo
+        if ($attempts === 0) {
+            $lockUntil = now()->addSeconds($decaySeconds);
+            Cache::put($throttleKey . ':lock', $lockUntil, $decaySeconds);
+        }
+
+        // Incrementar contador (sin cambiar el tiempo de expiración del lock)
+        $newAttempts = $attempts + 1;
+        Cache::put($throttleKey . ':count', $newAttempts, $decaySeconds);
 
         // Registrar intento fallido en auditoría
         Auditoria::create([
@@ -116,7 +136,7 @@ class AuthController extends Controller
             'id_usuario' => null,
             'modulo' => 'auth',
             'accion' => 'login_fallido',
-            'descripcion' => "Intento de login fallido - Usuario: {$request->username}",
+            'descripcion' => "Intento de login fallido - Usuario: {$request->username} (Intento {$newAttempts}/{$maxAttempts})",
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
