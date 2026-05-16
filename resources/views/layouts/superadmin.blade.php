@@ -275,6 +275,21 @@
             background: var(--dark-card) !important;
         }
 
+        /* Forzar todos los elementos con background blanco a oscuro */
+        body:not(.light-mode) thead,
+        body:not(.light-mode) tbody,
+        body:not(.light-mode) tr,
+        body:not(.light-mode) .stat-card,
+        body:not(.light-mode) .empty-state,
+        body:not(.light-mode) div[class*="bg-white"],
+        body:not(.light-mode) div[style*="background: white"],
+        body:not(.light-mode) div[style*="background: #fff"],
+        body:not(.light-mode) div[style*="background-color: white"],
+        body:not(.light-mode) div[style*="background-color: #fff"] {
+            background: var(--dark-card) !important;
+            background-color: var(--dark-card) !important;
+        }
+
         /* Modo claro: mantener fondo blanco */
         body.light-mode .card {
             background: #ffffff !important;
@@ -309,6 +324,16 @@
 
         body.light-mode .bg-white {
             background: #ffffff !important;
+        }
+
+        body.light-mode .stat-card {
+            background: #ffffff !important;
+        }
+
+        body.light-mode thead,
+        body.light-mode tbody,
+        body.light-mode tr {
+            background: transparent !important;
         }
 
         * {
