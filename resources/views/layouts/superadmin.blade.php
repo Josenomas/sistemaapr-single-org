@@ -233,8 +233,19 @@
             background: var(--dark-card) !important;
         }
 
-        body:not(.light-mode) .card-header.bg-white {
+        body:not(.light-mode) .card-header {
             background: var(--dark-card) !important;
+            border-bottom-color: var(--border) !important;
+        }
+
+        body:not(.light-mode) .card-body {
+            background: var(--dark-card) !important;
+        }
+
+        body:not(.light-mode) .list-group-item {
+            background: transparent !important;
+            border-color: var(--border) !important;
+            color: var(--text-light) !important;
         }
 
         body:not(.light-mode) .bg-white {
@@ -246,8 +257,18 @@
             background: #ffffff !important;
         }
 
-        body.light-mode .card-header.bg-white {
+        body.light-mode .card-header {
             background: #ffffff !important;
+            border-bottom-color: #e2e8f0 !important;
+        }
+
+        body.light-mode .card-body {
+            background: #ffffff !important;
+        }
+
+        body.light-mode .list-group-item {
+            background: #ffffff !important;
+            border-color: #e2e8f0 !important;
         }
 
         body.light-mode .bg-white {
