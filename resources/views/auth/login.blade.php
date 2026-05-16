@@ -261,7 +261,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('login') }}" id="login-form">
+        <form method="POST" action="{{ route('login') }}">
             @csrf
 
             <div class="form-group">
@@ -343,46 +343,6 @@
             }
         }
 
-        // Manejar error 419 (token CSRF expirado)
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-
-            fetch(this.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="_token"]').value,
-                    'Accept': 'application/json',
-                },
-                body: formData
-            })
-            .then(response => {
-                if (response.status === 419) {
-                    // Token expirado - recargar la página para obtener nuevo token
-                    window.location.reload();
-                    return;
-                }
-
-                if (response.redirected) {
-                    // Login exitoso - redirigir
-                    window.location.href = response.url;
-                    return;
-                }
-
-                // Otro error - recargar para mostrar mensaje
-                return response.json().then(data => {
-                    if (data.errors) {
-                        // Mostrar errores de validación
-                        window.location.reload();
-                    }
-                });
-            })
-            .catch(error => {
-                // En caso de error de red, recargar
-                window.location.reload();
-            });
-        });
     </script>
 </body>
 </html>
