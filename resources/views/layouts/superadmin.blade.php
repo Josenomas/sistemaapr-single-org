@@ -12,11 +12,11 @@
     @yield('styles')
     <style>
         :root {
-            /* Tema oscuro para super-admin */
-            --primary: #7c3aed;
-            --primary-dark: #6d28d9;
-            --primary-light: #ede9fe;
-            --secondary: #f59e0b;
+            /* Tema oscuro para super-admin - colores profesionales */
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #dbeafe;
+            --secondary: #0ea5e9;
             --dark: #0f172a;
             --dark-sidebar: #1e293b;
             --dark-card: #1e293b;
@@ -26,7 +26,7 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --info: #06b6d4;
+            --info: #0ea5e9;
         }
 
         /* Tema Claro */
@@ -48,7 +48,7 @@
         }
 
         body.light-mode .menu-item:hover {
-            background: rgba(124, 58, 237, 0.08);
+            background: rgba(59, 130, 246, 0.08);
             color: var(--primary);
         }
 
@@ -70,7 +70,7 @@
         }
 
         body.light-mode tbody tr:hover {
-            background: rgba(124, 58, 237, 0.03);
+            background: rgba(59, 130, 246, 0.03);
         }
 
         body.light-mode .topbar,
@@ -200,7 +200,7 @@
         }
 
         body.light-mode .text-primary {
-            color: #7c3aed !important;
+            color: #3b82f6 !important;
         }
 
         body.light-mode .text-success {
@@ -304,7 +304,7 @@
         }
 
         .menu-item:hover {
-            background: rgba(124, 58, 237, 0.1);
+            background: rgba(59, 130, 246, 0.1);
             color: var(--primary-light);
         }
 
@@ -370,7 +370,7 @@
             align-items: center;
             gap: 0.75rem;
             padding: 0.5rem 1rem;
-            background: rgba(124, 58, 237, 0.1);
+            background: rgba(59, 130, 246, 0.1);
             border-radius: 0.5rem;
             border: 1px solid var(--primary);
         }
@@ -548,7 +548,7 @@
         }
 
         tbody tr:hover {
-            background: rgba(124, 58, 237, 0.05);
+            background: rgba(59, 130, 246, 0.05);
         }
 
         /* Badges */
@@ -629,7 +629,7 @@
         .form-control:focus, .form-select:focus {
             outline: none;
             border-color: var(--primary);
-            background: rgba(124, 58, 237, 0.05);
+            background: rgba(59, 130, 246, 0.05);
         }
 
         /* Grid */
@@ -728,7 +728,7 @@
         }
 
         body.light-mode .theme-toggle-icon {
-            color: #7c3aed;
+            color: #3b82f6;
         }
     </style>
 </head>
