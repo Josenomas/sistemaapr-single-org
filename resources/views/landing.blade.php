@@ -1075,7 +1075,7 @@
                 <a href="#contact" class="btn-primary">Contratar</a>
             </div>
 
-            <div class="pricing-card featured">
+            <div class="pricing-card">
                 <h3>Profesional</h3>
                 <div class="price">$45.000<span>/mes</span></div>
                 <ul class="features-list">
@@ -1089,7 +1089,7 @@
                 <a href="#contact" class="btn-primary">Contratar</a>
             </div>
 
-            <div class="pricing-card">
+            <div class="pricing-card featured">
                 <h3>Enterprise</h3>
                 <div class="price">$75.000<span>/mes</span></div>
                 <ul class="features-list">
@@ -1105,7 +1105,7 @@
                 <a href="#contact" class="btn-primary">Contratar</a>
             </div>
 
-            <div class="pricing-card featured">
+            <div class="pricing-card">
                 <h3>Enterprise Custom</h3>
                 <div class="price">$120.000<span>/mes</span></div>
                 <ul class="features-list">
