@@ -128,13 +128,25 @@ Route::middleware(['auth'])->group(function () {
         // Solicitud de compra de dominio
         Route::post('/dominio/solicitar', [App\Http\Controllers\OrganizacionController::class, 'solicitarCompraDominio'])->name('dominio.solicitar');
     });
+});
+
+// Rutas protegidas (requieren autenticación y suscripción activa)
+Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Actividad Reciente
+    Route::get('/actividades', [ActividadController::class, 'index'])->name('actividades.index');
+
+    // Onboarding
+    Route::get('/bienvenida', [App\Http\Controllers\OnboardingController::class, 'bienvenida'])->name('onboarding.bienvenida');
 
     // RUTA ALTERNATIVA PARA GENERAR PDFs (sin OPcache)
-    // Esta ruta NO requiere suscripción activa, solo autenticación
     Route::get('/pdf-boleta/{id}', function($id) {
         \Log::info('===== INICIANDO GENERACION PDF RUTA DIRECTA =====', ['boleta_id' => $id]);
 
-        $boleta = \App\Models\Boleta::with(['socio.organizacion', 'lectura'])->findOrFail($id);
+        $boleta = App\Models\Boleta::with(['socio.organizacion', 'lectura'])->findOrFail($id);
 
         if (!$boleta) {
             return 'Boleta no encontrada';
@@ -142,7 +154,7 @@ Route::middleware(['auth'])->group(function () {
 
         \Log::info('Boleta encontrada', ['numero' => $boleta->numero_boleta]);
 
-        $historialConsumo = \App\Models\Boleta::where('id_socio', $boleta->id_socio)
+        $historialConsumo = App\Models\Boleta::where('id_socio', $boleta->id_socio)
             ->where('mes', '<=', $boleta->mes)
             ->orderBy('mes', 'desc')
             ->limit(12)
@@ -156,12 +168,12 @@ Route::middleware(['auth'])->group(function () {
                 ];
             });
 
-        $ultimoPago = \DB::table('pagos')
+        $ultimoPago = DB::table('pagos')
             ->where('id_socio', $boleta->id_socio)
             ->orderBy('fecha_pago', 'desc')
             ->first();
 
-        $boletasPendientes = \App\Models\Boleta::where('id_socio', $boleta->id_socio)
+        $boletasPendientes = App\Models\Boleta::where('id_socio', $boleta->id_socio)
             ->whereIn('estado', ['pendiente', 'vencida'])
             ->with('pagos')
             ->orderBy('mes', 'asc')
@@ -219,19 +231,6 @@ Route::middleware(['auth'])->group(function () {
             'Pragma' => 'no-cache'
         ]);
     });
-});
-
-// Rutas protegidas (requieren autenticación y suscripción activa)
-Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
-
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Actividad Reciente
-    Route::get('/actividades', [ActividadController::class, 'index'])->name('actividades.index');
-
-    // Onboarding
-    Route::get('/bienvenida', [App\Http\Controllers\OnboardingController::class, 'bienvenida'])->name('onboarding.bienvenida');
 
     // ========================================
     // GESTIÓN DE SOCIOS
