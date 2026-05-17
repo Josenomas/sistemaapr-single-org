@@ -134,7 +134,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pdf-boleta/{id}', function($id) {
         \Log::info('===== INICIANDO GENERACION PDF RUTA DIRECTA =====', ['boleta_id' => $id]);
 
-        $boleta = App\Models\Boleta::with(['socio.organizacion', 'lectura'])->findOrFail($id);
+        $boleta = \App\Models\Boleta::with(['socio.organizacion', 'lectura'])->findOrFail($id);
 
         if (!$boleta) {
             return 'Boleta no encontrada';
@@ -142,7 +142,7 @@ Route::middleware(['auth'])->group(function () {
 
         \Log::info('Boleta encontrada', ['numero' => $boleta->numero_boleta]);
 
-        $historialConsumo = App\Models\Boleta::where('id_socio', $boleta->id_socio)
+        $historialConsumo = \App\Models\Boleta::where('id_socio', $boleta->id_socio)
             ->where('mes', '<=', $boleta->mes)
             ->orderBy('mes', 'desc')
             ->limit(12)
@@ -156,12 +156,12 @@ Route::middleware(['auth'])->group(function () {
                 ];
             });
 
-        $ultimoPago = DB::table('pagos')
+        $ultimoPago = \DB::table('pagos')
             ->where('id_socio', $boleta->id_socio)
             ->orderBy('fecha_pago', 'desc')
             ->first();
 
-        $boletasPendientes = App\Models\Boleta::where('id_socio', $boleta->id_socio)
+        $boletasPendientes = \App\Models\Boleta::where('id_socio', $boleta->id_socio)
             ->whereIn('estado', ['pendiente', 'vencida'])
             ->with('pagos')
             ->orderBy('mes', 'asc')
