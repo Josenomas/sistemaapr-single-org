@@ -182,6 +182,12 @@ class BoletasController extends Controller
                            ->with('error', 'No se puede editar una boleta pagada.');
         }
 
+        // No permitir editar boletas con folio SII (documento tributario oficial)
+        if ($boleta->folio_sii) {
+            return redirect()->route('boletas.show', $id)
+                           ->with('error', 'No se puede editar una boleta con folio SII asignado. Si necesita hacer cambios, debe anular esta boleta y crear una nueva.');
+        }
+
         $socios = Socio::activos()
                       ->where('estado', 'activo')
                       ->orderBy('numero_socio')
@@ -201,6 +207,12 @@ class BoletasController extends Controller
         if ($boleta->estado === 'pagada') {
             return redirect()->route('boletas.show', $id)
                            ->with('error', 'No se puede actualizar una boleta pagada.');
+        }
+
+        // No permitir actualizar boletas con folio SII (documento tributario oficial)
+        if ($boleta->folio_sii) {
+            return redirect()->route('boletas.show', $id)
+                           ->with('error', 'No se puede actualizar una boleta con folio SII asignado. Si necesita hacer cambios, debe anular esta boleta y crear una nueva.');
         }
 
         $validated = $request->validate([

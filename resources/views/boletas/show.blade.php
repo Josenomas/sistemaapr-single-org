@@ -9,7 +9,7 @@
         Detalle de la Boleta
     </h2>
     <div class="header-actions">
-        @if($boleta->estado !== 'pagada')
+        @if($boleta->estado !== 'pagada' && !$boleta->folio_sii)
         <a href="{{ route('boletas.edit', $boleta->id) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i>
             Editar
