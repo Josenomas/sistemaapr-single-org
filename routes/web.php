@@ -128,21 +128,9 @@ Route::middleware(['auth'])->group(function () {
         // Solicitud de compra de dominio
         Route::post('/dominio/solicitar', [App\Http\Controllers\OrganizacionController::class, 'solicitarCompraDominio'])->name('dominio.solicitar');
     });
-});
-
-// Rutas protegidas (requieren autenticación y suscripción activa)
-Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
-
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Actividad Reciente
-    Route::get('/actividades', [ActividadController::class, 'index'])->name('actividades.index');
-
-    // Onboarding
-    Route::get('/bienvenida', [App\Http\Controllers\OnboardingController::class, 'bienvenida'])->name('onboarding.bienvenida');
 
     // RUTA ALTERNATIVA PARA GENERAR PDFs (sin OPcache)
+    // Esta ruta NO requiere suscripción activa, solo autenticación
     Route::get('/pdf-boleta/{id}', function($id) {
         \Log::info('===== INICIANDO GENERACION PDF RUTA DIRECTA =====', ['boleta_id' => $id]);
 
@@ -231,6 +219,19 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
             'Pragma' => 'no-cache'
         ]);
     });
+});
+
+// Rutas protegidas (requieren autenticación y suscripción activa)
+Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Actividad Reciente
+    Route::get('/actividades', [ActividadController::class, 'index'])->name('actividades.index');
+
+    // Onboarding
+    Route::get('/bienvenida', [App\Http\Controllers\OnboardingController::class, 'bienvenida'])->name('onboarding.bienvenida');
 
     // ========================================
     // GESTIÓN DE SOCIOS
