@@ -464,7 +464,7 @@
   <td><div class="section info-section">
     <div class="tooltip">
       <strong>Estado de Cuenta</strong>
-      Resumen de tu situación financiera. Si tienes deudas pendientes, aquí aparecerán los meses adeudados y el total a pagar. Si no hay deudas, muestra el último pago realizado.
+      Resumen de tu situación financiera. Si tienes deudas pendientes, aquí aparecerán los últimos 6 meses adeudados y el total a pagar. Si hay más deuda anterior, se indica con una nota. Si no hay deudas, muestra el último pago realizado.
     </div>
     <div class="section-title">Estado de cuenta</div>
     <div style="margin-bottom:5px"><span class="badge">5 meses pendientes</span></div>
@@ -491,9 +491,13 @@
       </tr>
       <tr>
         <td style="font-weight:600; border-top:0.5px solid #eee; padding-top:4px; padding-bottom:4px; margin-top:3px;">Total adeudado</td>
-        <td style="text-align:right; font-weight:600; border-top:0.5px solid #eee; padding-top:4px; padding-bottom:4px;">$166.990</td>
+        <td style="text-align:right; font-weight:600; border-top:0.5px solid #eee; padding-top:4px; padding-bottom:4px;">$100.000</td>
       </tr>
     </table>
+    <p style="color:#888; font-size:11.5px; font-style:italic; margin-top:8px; line-height:1.4;">
+      <strong>Nota:</strong> Si tienes más de 6 meses de deuda, solo se muestran los 6 más recientes.
+      El total incluye todos los meses adeudados.
+    </p>
   </div></td>
 </tr></table>
 
