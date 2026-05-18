@@ -317,13 +317,25 @@
     <div class="section-title">Estado de cuenta</div>
     @if($mesesAdeudados > 0)
       <div style="margin-bottom:5px"><span class="badge">{{ $mesesAdeudados }} {{ $mesesAdeudados == 1 ? 'mes pendiente' : 'meses pendientes' }}</span></div>
+      @php
+        // Mostrar solo los últimos 6 meses
+        $boletasMostrar = $boletasPendientes->take(-6);
+        $mesesAnteriores = $mesesAdeudados - $boletasMostrar->count();
+      @endphp
       <table width="100%" style="border-collapse:collapse; font-size:13.5px;">
-        @foreach($boletasPendientes as $boletaPendiente)
+        @foreach($boletasMostrar as $boletaPendiente)
           <tr>
             <td style="color:#666; padding:4px 0; width:55%">{{ $boletaPendiente->mes_texto ?? \Carbon\Carbon::parse($boletaPendiente->mes)->locale('es')->isoFormat('MMMM YYYY') }}</td>
             <td style="text-align:right; padding:4px 0;">${{ number_format($boletaPendiente->total, 0, ',', '.') }}</td>
           </tr>
         @endforeach
+        @if($mesesAnteriores > 0)
+          <tr>
+            <td colspan="2" style="color:#888; padding:6px 0; font-size:12px; font-style:italic;">
+              * Deuda total incluye {{ $mesesAnteriores }} {{ $mesesAnteriores == 1 ? 'mes anterior' : 'meses anteriores' }}
+            </td>
+          </tr>
+        @endif
         @if($totalAdeudado > 0)
           <tr>
             <td style="font-weight:600; border-top:0.5px solid #eee; padding-top:4px; padding-bottom:4px; margin-top:3px;">Total adeudado</td>
