@@ -211,10 +211,28 @@ class ImportarSociosController extends Controller
         $organizacion = Organizacion::findOrFail($idOrganizacion);
 
         try {
+            DB::beginTransaction();
+
             // Contar cuántos socios se van a eliminar
             $cantidadSocios = Socio::where('id_organizacion', $idOrganizacion)->count();
 
-            // Eliminar SOLO los socios de esta organización específica
+            // Obtener IDs de los socios a eliminar
+            $sociosIds = Socio::where('id_organizacion', $idOrganizacion)->pluck('id');
+
+            // Eliminar registros relacionados de SOLO esta organización
+            // (Las foreign keys pueden estar configuradas como RESTRICT en lugar de CASCADE)
+            DB::table('lecturas')->whereIn('id_socio', $sociosIds)->delete();
+            DB::table('boletas')->whereIn('id_socio', $sociosIds)->delete();
+            DB::table('pagos')->whereIn('id_socio', $sociosIds)->delete();
+            DB::table('cortes_suministro')->whereIn('id_socio', $sociosIds)->delete();
+            DB::table('incidentes')->whereIn('id_socio_reporta', $sociosIds)->delete();
+            DB::table('renovaciones_medidor')->whereIn('id_socio', $sociosIds)->delete();
+            DB::table('historial_consumo')->whereIn('id_socio', $sociosIds)->delete();
+            DB::table('notificaciones')->whereIn('id_socio', $sociosIds)->delete();
+            DB::table('tickets')->whereIn('id_socio', $sociosIds)->delete();
+            DB::table('transacciones_flow')->whereIn('id_socio', $sociosIds)->delete();
+
+            // Finalmente eliminar los socios
             $eliminados = Socio::where('id_organizacion', $idOrganizacion)->delete();
 
             // Registrar en auditoría
@@ -223,13 +241,16 @@ class ImportarSociosController extends Controller
                 'modelo' => 'Socio',
                 'id_modelo' => null,
                 'usuario' => auth()->user()->nombre . ' ' . auth()->user()->apellido,
-                'detalles' => "Se eliminaron {$eliminados} socios de la organización {$organizacion->nombre_apr} (ID: {$idOrganizacion})"
+                'detalles' => "Se eliminaron {$eliminados} socios y sus datos relacionados de la organización {$organizacion->nombre_apr} (ID: {$idOrganizacion})"
             ]);
+
+            DB::commit();
 
             return redirect()->route('superadmin.organizacion.importar-socios', $idOrganizacion)
                 ->with('success', "Se eliminaron exitosamente {$eliminados} socios de {$organizacion->nombre_apr}. Ahora puedes importar nuevamente.");
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->back()
                 ->with('error', 'Error al eliminar los socios: ' . $e->getMessage());
         }
