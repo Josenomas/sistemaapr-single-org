@@ -482,7 +482,7 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" onclick="guardarCambiosOrganizacion()">
                     <i class="fas fa-save"></i>
                     Guardar Cambios
                 </button>
@@ -925,6 +925,15 @@
             });
         }
     });
+
+    // Función para guardar cambios de organización
+    function guardarCambiosOrganizacion() {
+        // Obtener el formulario principal
+        const form = document.querySelector('form[action="{{ route('organizacion.update') }}"]');
+        if (form) {
+            form.submit();
+        }
+    }
 
     // Función para previsualizar colores
     function previsualizarColores() {
