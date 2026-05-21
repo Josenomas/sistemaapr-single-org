@@ -144,7 +144,6 @@
                     @enderror
                 </div>
             </div>
-        </form>
 
             <!-- Solicitud de Compra de Dominio (solo Enterprise) -->
             @if($organizacion->suscripcion && $organizacion->suscripcion->permite_dominio_personalizado)
@@ -482,7 +481,7 @@
             </div>
 
             <div class="form-actions">
-                <button type="button" class="btn btn-primary" onclick="guardarCambiosOrganizacion()">
+                <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i>
                     Guardar Cambios
                 </button>
