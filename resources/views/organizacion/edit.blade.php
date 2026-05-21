@@ -927,7 +927,7 @@
         }
     });
 
-    // Función para previsualizar colores
+    // Función para previsualizar colores y logo
     function previsualizarColores() {
         const colorPrimario = document.getElementById('color_primario').value;
         const colorSecundario = document.getElementById('color_secundario').value;
@@ -940,8 +940,23 @@
         document.documentElement.style.setProperty('--primary-dark', colorPrimarioDark);
         document.documentElement.style.setProperty('--secondary', colorSecundario);
 
+        // Previsualizar logo si hay uno seleccionado
+        const logoInput = document.getElementById('logo');
+        if (logoInput && logoInput.files && logoInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Buscar la imagen del logo en la página
+                const logoElements = document.querySelectorAll('img[alt*="Logo"], .logo-preview img, img[src*="logo"]');
+                logoElements.forEach(img => {
+                    img.src = e.target.result;
+                });
+            };
+            reader.readAsDataURL(logoInput.files[0]);
+        }
+
         // Mostrar mensaje
-        alert('Vista previa aplicada. Los colores se han aplicado temporalmente a esta página.\n\nPara hacer los cambios permanentes, haz clic en "Guardar Cambios".\n\nRecarga la página para volver a los colores originales.');
+        const tieneLogoNuevo = logoInput && logoInput.files && logoInput.files[0];
+        alert('Vista previa aplicada. Los colores' + (tieneLogoNuevo ? ' y el logo' : '') + ' se han aplicado temporalmente a esta página.\n\nPara hacer los cambios permanentes, haz clic en "Guardar Cambios".\n\nRecarga la página para volver a la versión original.');
     }
 
     // Función para ajustar brillo de color hexadecimal
