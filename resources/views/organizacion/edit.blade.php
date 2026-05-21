@@ -135,10 +135,12 @@
                            class="form-control @error('logo') is-invalid @enderror"
                            id="logo"
                            name="logo"
-                           accept="image/*">
+                           accept="image/jpeg,image/png,image/svg+xml"
+                           onchange="validarTamanoLogo(this)">
                     <small class="form-text">
                         Formatos permitidos: JPG, PNG, SVG. Tamaño máximo: 2MB
                     </small>
+                    <small id="logo-error" class="form-text text-danger" style="display: none;"></small>
                     @error('logo')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -1051,6 +1053,40 @@
         form.appendChild(csrfInput);
         document.body.appendChild(form);
         form.submit();
+    }
+
+    // Función para validar tamaño del logo
+    function validarTamanoLogo(input) {
+        const maxSize = 2 * 1024 * 1024; // 2MB en bytes
+        const errorElement = document.getElementById('logo-error');
+
+        if (input.files && input.files[0]) {
+            const fileSize = input.files[0].size;
+            const fileName = input.files[0].name;
+            const fileExt = fileName.split('.').pop().toLowerCase();
+
+            // Validar extensión
+            const allowedExtensions = ['jpg', 'jpeg', 'png', 'svg'];
+            if (!allowedExtensions.includes(fileExt)) {
+                errorElement.textContent = '❌ Formato no permitido. Solo se permiten: JPG, PNG, SVG';
+                errorElement.style.display = 'block';
+                input.value = '';
+                return false;
+            }
+
+            // Validar tamaño
+            if (fileSize > maxSize) {
+                const sizeMB = (fileSize / (1024 * 1024)).toFixed(2);
+                errorElement.textContent = `❌ El archivo es demasiado grande (${sizeMB}MB). Tamaño máximo permitido: 2MB`;
+                errorElement.style.display = 'block';
+                input.value = '';
+                return false;
+            }
+
+            // Todo OK
+            errorElement.style.display = 'none';
+            return true;
+        }
     }
 
     // Función para solicitar dominio externo (fuera del formulario principal)
