@@ -202,4 +202,36 @@ class ImportarSociosController extends Controller
 
         return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
     }
+
+    /**
+     * Eliminar todos los socios de una organización
+     */
+    public function eliminarTodosSocios($idOrganizacion)
+    {
+        $organizacion = Organizacion::findOrFail($idOrganizacion);
+
+        try {
+            // Contar cuántos socios se van a eliminar
+            $cantidadSocios = Socio::where('id_organizacion', $idOrganizacion)->count();
+
+            // Eliminar SOLO los socios de esta organización específica
+            $eliminados = Socio::where('id_organizacion', $idOrganizacion)->delete();
+
+            // Registrar en auditoría
+            Auditoria::create([
+                'accion' => 'Eliminación masiva de socios',
+                'modelo' => 'Socio',
+                'id_modelo' => null,
+                'usuario' => auth()->user()->nombre . ' ' . auth()->user()->apellido,
+                'detalles' => "Se eliminaron {$eliminados} socios de la organización {$organizacion->nombre_apr} (ID: {$idOrganizacion})"
+            ]);
+
+            return redirect()->route('superadmin.organizacion.importar-socios', $idOrganizacion)
+                ->with('success', "Se eliminaron exitosamente {$eliminados} socios de {$organizacion->nombre_apr}. Ahora puedes importar nuevamente.");
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al eliminar los socios: ' . $e->getMessage());
+        }
+    }
 }
