@@ -171,8 +171,7 @@
                         @endif
                     </div>
                 @else
-                    <form action="{{ route('organizacion.dominio.solicitar') }}" method="POST" style="margin-top: 16px;">
-                        @csrf
+                    <div style="margin-top: 16px;">
                         <div class="form-row">
                             <div class="form-group col-md-8">
                                 <label for="dominio_compra" class="form-label" style="font-weight: 600;">Dominio deseado (.cl)</label>
@@ -181,9 +180,7 @@
                                     <input type="text"
                                            class="form-control"
                                            id="dominio_compra"
-                                           name="dominio_solicitado"
                                            placeholder="aprnombre"
-                                           required
                                            pattern="[a-z0-9\-]+"
                                            title="Solo letras minúsculas, números y guiones">
                                     <span class="input-group-text">.cl</span>
@@ -194,7 +191,7 @@
                                 </small>
                             </div>
                             <div class="form-group col-md-4" style="display: flex; align-items: flex-end;">
-                                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <button type="button" class="btn btn-primary" style="width: 100%;" onclick="solicitarDominioExterno()">
                                     <i class="fas fa-paper-plane"></i>
                                     Solicitar Dominio
                                 </button>
@@ -216,7 +213,7 @@
                                 </small>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 @endif
             </div>
             @endif
@@ -1055,6 +1052,49 @@
         form.appendChild(csrfInput);
         document.body.appendChild(form);
         form.submit();
+    }
+
+    // Función para solicitar dominio externo (fuera del formulario principal)
+    function solicitarDominioExterno() {
+        const dominioInput = document.getElementById('dominio_compra');
+
+        if (!dominioInput.value.trim()) {
+            alert('Por favor, escribe el nombre del dominio que deseas.');
+            return;
+        }
+
+        const dominio = 'www.' + dominioInput.value.toLowerCase() + '.cl';
+
+        if (confirm(
+            `¿Solicitar el dominio ${dominio}?\n\n` +
+            `• Verificaremos disponibilidad en 24 horas\n` +
+            `• Costo: $20.000 CLP/año\n` +
+            `• Verificaremos disponibilidad en 24 horas\n` +
+            `• Solo pagarás si está disponible\n\n` +
+            `¿Continuar con la solicitud?`
+        )) {
+            // Crear formulario temporal
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("organizacion.dominio.solicitar") }}';
+
+            // CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+
+            // Dominio solicitado
+            const dominioHidden = document.createElement('input');
+            dominioHidden.type = 'hidden';
+            dominioHidden.name = 'dominio_solicitado';
+            dominioHidden.value = dominioInput.value;
+            form.appendChild(dominioHidden);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
     }
 </script>
 @endsection
