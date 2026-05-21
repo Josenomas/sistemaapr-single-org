@@ -25,7 +25,10 @@
     @if(session('errores') && count(session('errores')) > 0)
         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
             <p style="margin-bottom: 10px;"><strong>¿Importación con errores?</strong> Puedes eliminar todos los socios de esta organización y volver a intentar:</p>
-            <form action="{{ route('superadmin.organizacion.eliminar-todos-socios', $organizacion->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ ATENCIÓN\n\n¿Estás seguro de eliminar TODOS los socios de {{ $organizacion->nombre_apr }}?\n\nEsta acción NO se puede deshacer.\n\nSocios actuales: {{ \App\Models\Socio::where(\'id_organizacion\', $organizacion->id)->count() }}');">
+            @php
+                $totalSocios = \App\Models\Socio::where('id_organizacion', $organizacion->id)->count();
+            @endphp
+            <form action="{{ route('superadmin.organizacion.eliminar-todos-socios', $organizacion->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ ¿Eliminar TODOS los {{ $totalSocios }} socios de esta organización? Esta acción NO se puede deshacer.');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-danger btn-sm">
