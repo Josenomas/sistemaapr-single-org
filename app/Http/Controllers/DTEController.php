@@ -67,7 +67,7 @@ class DTEController extends Controller
     public function emitir($idBoleta)
     {
         try {
-            $boleta = Boleta::findOrFail($idBoleta);
+            $boleta = Boleta::with('socio')->findOrFail($idBoleta);
 
             // Verificar que pertenece a la organización del usuario
             if ($boleta->id_organizacion != auth()->user()->id_organizacion) {
@@ -84,6 +84,12 @@ class DTEController extends Controller
 
             // Emitir boleta
             $response = $this->libredteService->emitirBoleta($boleta);
+
+            // Enviar email automático con PDF timbrado si el socio tiene email
+            if ($boleta->socio && $boleta->socio->email && $boleta->pdf_url) {
+                \App\Jobs\EnviarBoletaDTEEmail::dispatch($boleta->fresh());
+                return redirect()->back()->with('success', "Boleta electrónica emitida exitosamente. Folio: {$response['folio']}. Email enviado a {$boleta->socio->email}");
+            }
 
             return redirect()->back()->with('success', "Boleta electrónica emitida exitosamente. Folio: {$response['folio']}");
 
