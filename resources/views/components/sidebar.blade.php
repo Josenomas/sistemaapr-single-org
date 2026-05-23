@@ -65,6 +65,11 @@
                 <span>Folios SII</span>
                 <span class="badge-beta">BETA</span>
             </a>
+            <a href="{{ route('dte.configuracion') }}" class="nav-item {{ request()->routeIs('dte.*') ? 'active' : '' }}">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Facturación Electrónica</span>
+                <span class="badge-new">NUEVO</span>
+            </a>
         </div>
 
         <!-- Pagos -->

@@ -174,6 +174,7 @@
                         <th>Consumo</th>
                         <th>Total</th>
                         <th data-intro="Estados posibles: Pendiente (sin pagar), Pagada, Vencida (pasó la fecha de vencimiento sin pago)." data-step="5">Estado</th>
+                        <th>DTE</th>
                         <th data-intro="Ver detalles, Descargar PDF, Enviar por email, Registrar pago o Anular boleta según corresponda." data-step="6">Acciones</th>
                     </tr>
                 </thead>
@@ -200,6 +201,16 @@
                             <td><strong>{{ $boleta->total_formateado }}</strong></td>
                             <td>{!! $boleta->estado_badge !!}</td>
                             <td>
+                                @if($boleta->tieneDTE())
+                                    {!! $boleta->estado_dte_badge !!}
+                                    @if($boleta->folio_sii)
+                                        <br><small class="text-muted">Folio: {{ $boleta->folio_sii }}</small>
+                                    @endif
+                                @else
+                                    <span class="badge badge-secondary">Sin DTE</span>
+                                @endif
+                            </td>
+                            <td>
                                 <div class="action-buttons">
                                     <a href="{{ route('boletas.show', $boleta->id) }}"
                                        class="btn btn-sm btn-info"
@@ -219,6 +230,31 @@
                                        target="_blank">
                                         <i class="fas fa-print"></i>
                                     </a>
+
+                                    <!-- Botones DTE -->
+                                    @if(!$boleta->dteEmitido())
+                                        <form action="{{ route('dte.boleta.emitir', $boleta->id) }}"
+                                              method="POST"
+                                              style="display: inline;"
+                                              onsubmit="return confirm('¿Emitir boleta electrónica para este documento?');">
+                                            @csrf
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-success"
+                                                    title="Emitir Boleta Electrónica">
+                                                <i class="fas fa-file-invoice"></i>
+                                            </button>
+                                        </form>
+                                    @else
+                                        @if($boleta->pdf_url)
+                                            <a href="{{ route('dte.boleta.pdf', $boleta->id) }}"
+                                               class="btn btn-sm btn-primary"
+                                               title="Descargar PDF Timbrado"
+                                               target="_blank">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                        @endif
+                                    @endif
+
                                     @if($boleta->estado !== 'pagada' && $boleta->pagos->count() == 0)
                                     <form action="{{ route('boletas.destroy', $boleta->id) }}"
                                           method="POST"
@@ -238,7 +274,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center text-muted">
+                            <td colspan="10" class="text-center text-muted">
                                 <i class="fas fa-inbox"></i>
                                 <p>No se encontraron boletas</p>
                             </td>
