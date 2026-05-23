@@ -4,11 +4,20 @@
 
 @section('content')
 <div class="page-header">
-    <h1 class="page-title">
-        <i class="fas fa-file-invoice"></i>
-        Configuración de Facturación Electrónica (DTE)
-    </h1>
-    <p class="page-subtitle">Configure los datos de su organización para emitir Documentos Tributarios Electrónicos</p>
+    <h2 class="page-title">
+        <i class="fas fa-file-invoice-dollar"></i>
+        Configuración de Facturación Electrónica
+    </h2>
+    <div class="page-actions">
+        <button type="button" class="btn btn-info" onclick="mostrarAyuda()">
+            <i class="fas fa-question-circle"></i>
+            Ayuda
+        </button>
+        <a href="{{ route('dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Volver
+        </a>
+    </div>
 </div>
 
 @if(session('success'))
@@ -27,372 +36,474 @@
 
 <div class="card">
     <div class="card-header">
-        <h3><i class="fas fa-cog"></i> Configuración LibreDTE</h3>
+        <h3 class="card-title">Datos del Emisor</h3>
     </div>
     <div class="card-body">
         <form action="{{ route('dte.guardar-configuracion') }}" method="POST" id="formConfigDTE">
             @csrf
 
-            <!-- Información del Emisor -->
-            <div class="form-section">
-                <h4><i class="fas fa-building"></i> Datos del Emisor</h4>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="rut_emisor">RUT Emisor <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="rut_emisor"
-                                   name="rut_emisor"
-                                   value="{{ old('rut_emisor', $config->rut_emisor ?? '') }}"
-                                   placeholder="12.345.678-9"
-                                   required>
-                            @error('rut_emisor')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="form-group">
-                            <label for="razon_social">Razón Social <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="razon_social"
-                                   name="razon_social"
-                                   value="{{ old('razon_social', $config->razon_social ?? '') }}"
-                                   placeholder="APR Ejemplo S.A."
-                                   required>
-                            @error('razon_social')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="rut_emisor" class="form-label required">RUT Emisor</label>
+                    <input type="text"
+                           class="form-control @error('rut_emisor') is-invalid @enderror"
+                           id="rut_emisor"
+                           name="rut_emisor"
+                           value="{{ old('rut_emisor', $config->rut_emisor ?? '') }}"
+                           placeholder="12.345.678-9"
+                           required>
+                    @error('rut_emisor')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="giro">Giro <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="giro"
-                                   name="giro"
-                                   value="{{ old('giro', $config->giro ?? 'Servicios de Agua Potable Rural') }}"
-                                   placeholder="Servicios de Agua Potable Rural"
-                                   required>
-                            @error('giro')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="direccion_casa_matriz">Dirección Casa Matriz <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="direccion_casa_matriz"
-                                   name="direccion_casa_matriz"
-                                   value="{{ old('direccion_casa_matriz', $config->direccion_casa_matriz ?? '') }}"
-                                   placeholder="Av. Principal 123"
-                                   required>
-                            @error('direccion_casa_matriz')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="comuna">Comuna <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="comuna"
-                                   name="comuna"
-                                   value="{{ old('comuna', $config->comuna ?? '') }}"
-                                   placeholder="Panguipulli"
-                                   required>
-                            @error('comuna')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="ciudad">Ciudad <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="ciudad"
-                                   name="ciudad"
-                                   value="{{ old('ciudad', $config->ciudad ?? '') }}"
-                                   placeholder="Panguipulli"
-                                   required>
-                            @error('ciudad')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="telefono">Teléfono</label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="telefono"
-                                   name="telefono"
-                                   value="{{ old('telefono', $config->telefono ?? '') }}"
-                                   placeholder="+56912345678">
-                            @error('telefono')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="email_contacto">Email de Contacto <span class="text-danger">*</span></label>
-                            <input type="email"
-                                   class="form-control"
-                                   id="email_contacto"
-                                   name="email_contacto"
-                                   value="{{ old('email_contacto', $config->email_contacto ?? '') }}"
-                                   placeholder="contacto@aprejemplo.cl"
-                                   required>
-                            @error('email_contacto')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
+                <div class="form-group col-md-8">
+                    <label for="razon_social" class="form-label required">Razón Social</label>
+                    <input type="text"
+                           class="form-control @error('razon_social') is-invalid @enderror"
+                           id="razon_social"
+                           name="razon_social"
+                           value="{{ old('razon_social', $config->razon_social ?? '') }}"
+                           placeholder="APR Ejemplo S.A."
+                           required>
+                    @error('razon_social')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
-            <!-- Configuración LibreDTE -->
-            <div class="form-section">
-                <h4><i class="fas fa-link"></i> Conexión LibreDTE</h4>
-
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    <strong>¿Cómo obtener el Hash de API?</strong><br>
-                    1. Ingresa a tu cuenta en <a href="https://libredte.cl" target="_blank">LibreDTE.cl</a><br>
-                    2. Ve a <strong>Configuración > Usuarios > API Token</strong><br>
-                    3. Copia el token y pégalo aquí
-                </div>
-
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="form-group">
-                            <label for="libredte_hash">Hash de API LibreDTE <span class="text-danger">*</span></label>
-                            <input type="password"
-                                   class="form-control"
-                                   id="libredte_hash"
-                                   name="libredte_hash"
-                                   value="{{ old('libredte_hash', $config->libredte_hash ?? '') }}"
-                                   placeholder="Tu hash de API de LibreDTE"
-                                   required>
-                            <small class="text-muted">Este token se mantiene privado y seguro</small>
-                            @error('libredte_hash')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="ambiente">Ambiente <span class="text-danger">*</span></label>
-                            <select class="form-control" id="ambiente" name="ambiente" required>
-                                <option value="certificacion" {{ old('ambiente', $config->ambiente ?? 'certificacion') == 'certificacion' ? 'selected' : '' }}>
-                                    Certificación (Pruebas)
-                                </option>
-                                <option value="produccion" {{ old('ambiente', $config->ambiente ?? '') == 'produccion' ? 'selected' : '' }}>
-                                    Producción (Real)
-                                </option>
-                            </select>
-                            <small class="text-muted">Usa Certificación para pruebas</small>
-                            @error('ambiente')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="form-group">
-                            <label for="libredte_url">URL de LibreDTE</label>
-                            <input type="url"
-                                   class="form-control"
-                                   id="libredte_url"
-                                   name="libredte_url"
-                                   value="{{ old('libredte_url', $config->libredte_url ?? 'https://libredte.cl') }}"
-                                   placeholder="https://libredte.cl">
-                            <small class="text-muted">Normalmente no necesitas cambiar esto</small>
-                            @error('libredte_url')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label>&nbsp;</label><br>
-                            <button type="button" class="btn btn-secondary btn-block" id="btnVerificarConexion">
-                                <i class="fas fa-plug"></i> Verificar Conexión
-                            </button>
-                        </div>
-                    </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="giro" class="form-label required">Giro</label>
+                    <input type="text"
+                           class="form-control @error('giro') is-invalid @enderror"
+                           id="giro"
+                           name="giro"
+                           value="{{ old('giro', $config->giro ?? 'Servicios de Agua Potable Rural') }}"
+                           placeholder="Servicios de Agua Potable Rural"
+                           required>
+                    @error('giro')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
-            <!-- Estado -->
-            @if($config && $config->exists)
-            <div class="form-section">
-                <h4><i class="fas fa-chart-line"></i> Estado Actual</h4>
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-receipt"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-value">{{ $config->folio_boleta_actual }}</div>
-                                <div class="stat-label">Boletas Emitidas</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-file-invoice"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-value">{{ $config->folio_factura_actual }}</div>
-                                <div class="stat-label">Facturas Emitidas</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-server"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-value">{{ ucfirst($config->ambiente) }}</div>
-                                <div class="stat-label">Ambiente</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card {{ $config->activo ? 'stat-success' : 'stat-danger' }}">
-                            <div class="stat-icon">
-                                <i class="fas {{ $config->activo ? 'fa-check-circle' : 'fa-times-circle' }}"></i>
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-value">{{ $config->activo ? 'Activo' : 'Inactivo' }}</div>
-                                <div class="stat-label">Estado</div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="direccion_casa_matriz" class="form-label required">Dirección Casa Matriz</label>
+                    <input type="text"
+                           class="form-control @error('direccion_casa_matriz') is-invalid @enderror"
+                           id="direccion_casa_matriz"
+                           name="direccion_casa_matriz"
+                           value="{{ old('direccion_casa_matriz', $config->direccion_casa_matriz ?? '') }}"
+                           placeholder="Av. Principal 123"
+                           required>
+                    @error('direccion_casa_matriz')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
-            @endif
 
-            <!-- Botones -->
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="comuna" class="form-label required">Comuna</label>
+                    <input type="text"
+                           class="form-control @error('comuna') is-invalid @enderror"
+                           id="comuna"
+                           name="comuna"
+                           value="{{ old('comuna', $config->comuna ?? '') }}"
+                           placeholder="Panguipulli"
+                           required>
+                    @error('comuna')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="ciudad" class="form-label required">Ciudad</label>
+                    <input type="text"
+                           class="form-control @error('ciudad') is-invalid @enderror"
+                           id="ciudad"
+                           name="ciudad"
+                           value="{{ old('ciudad', $config->ciudad ?? '') }}"
+                           placeholder="Panguipulli"
+                           required>
+                    @error('ciudad')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="email_contacto" class="form-label required">Email de Contacto</label>
+                    <input type="email"
+                           class="form-control @error('email_contacto') is-invalid @enderror"
+                           id="email_contacto"
+                           name="email_contacto"
+                           value="{{ old('email_contacto', $config->email_contacto ?? '') }}"
+                           placeholder="contacto@aprejemplo.cl"
+                           required>
+                    @error('email_contacto')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--gray-200);">
+                <div class="form-group col-md-8">
+                    <label for="libredte_hash" class="form-label required">Hash de API LibreDTE</label>
+                    <input type="password"
+                           class="form-control @error('libredte_hash') is-invalid @enderror"
+                           id="libredte_hash"
+                           name="libredte_hash"
+                           value="{{ old('libredte_hash', $config->libredte_hash ?? '') }}"
+                           placeholder="Tu hash de API de LibreDTE"
+                           required>
+                    <small class="form-text">Obtén tu token en LibreDTE.cl → Configuración → Usuarios → API Token</small>
+                    @error('libredte_hash')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="ambiente" class="form-label required">Ambiente</label>
+                    <select class="form-control @error('ambiente') is-invalid @enderror" id="ambiente" name="ambiente" required>
+                        <option value="certificacion" {{ old('ambiente', $config->ambiente ?? 'certificacion') == 'certificacion' ? 'selected' : '' }}>
+                            Certificación (Pruebas)
+                        </option>
+                        <option value="produccion" {{ old('ambiente', $config->ambiente ?? '') == 'produccion' ? 'selected' : '' }}>
+                            Producción (Real)
+                        </option>
+                    </select>
+                    <small class="form-text">Usa Certificación para pruebas</small>
+                    @error('ambiente')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
             <div class="form-actions">
-                <a href="{{ route('dashboard') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Volver
-                </a>
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Guardar Configuración
+                    <i class="fas fa-save"></i>
+                    Guardar Configuración
                 </button>
+                <button type="button" class="btn btn-info" id="btnVerificarConexion">
+                    <i class="fas fa-plug"></i>
+                    Verificar Conexión
+                </button>
+                <a href="{{ route('dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </a>
             </div>
         </form>
     </div>
 </div>
 
+<!-- Estadísticas DTE -->
+@if($config && $config->exists)
+<div class="card mt-4">
+    <div class="card-header">
+        <h3 class="card-title">Estado de Facturación Electrónica</h3>
+    </div>
+    <div class="card-body">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ $config->folio_boleta_actual }}</div>
+                    <div class="stat-label">Boletas Emitidas</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ $config->folio_factura_actual }}</div>
+                    <div class="stat-label">Facturas Emitidas</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-server"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ ucfirst($config->ambiente) }}</div>
+                    <div class="stat-label">Ambiente Activo</div>
+                </div>
+            </div>
+            <div class="stat-card {{ $config->activo ? 'stat-success' : 'stat-danger' }}">
+                <div class="stat-icon">
+                    <i class="fas {{ $config->activo ? 'fa-check-circle' : 'fa-times-circle' }}"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ $config->activo ? 'Activo' : 'Inactivo' }}</div>
+                    <div class="stat-label">Estado DTE</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@endsection
+
+@section('styles')
 <style>
-.form-section {
-    margin-bottom: 40px;
-    padding-bottom: 30px;
-    border-bottom: 1px solid var(--border);
-}
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
 
-.form-section:last-of-type {
-    border-bottom: none;
-}
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+    }
 
-.form-section h4 {
-    color: var(--text-light);
-    margin-bottom: 20px;
-    font-size: 1.1rem;
-}
+    .page-title i {
+        color: var(--primary);
+    }
 
-.stat-card {
-    background: var(--dark-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
+    .page-actions {
+        display: flex;
+        gap: 12px;
+    }
 
-.stat-card.stat-success {
-    border-color: #10b981;
-    background: rgba(16, 185, 129, 0.1);
-}
+    .card {
+        background: var(--white);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
 
-.stat-card.stat-danger {
-    border-color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
-}
+    .card-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--gray-200);
+        background: var(--gray-50);
+    }
 
-.stat-icon {
-    font-size: 2rem;
-    color: var(--primary);
-    opacity: 0.8;
-}
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin: 0;
+    }
 
-.stat-success .stat-icon {
-    color: #10b981;
-}
+    .card-body {
+        padding: 24px;
+    }
 
-.stat-danger .stat-icon {
-    color: #ef4444;
-}
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
 
-.stat-info {
-    flex: 1;
-}
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
 
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text-light);
-    line-height: 1.2;
-}
+    .form-label {
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 8px;
+        font-size: 0.875rem;
+    }
 
-.stat-label {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-top: 4px;
-}
+    .form-label.required::after {
+        content: ' *';
+        color: var(--danger);
+    }
 
-.form-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-}
+    .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius);
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        font-family: inherit;
+    }
 
-.alert a {
-    color: inherit;
-    text-decoration: underline;
-}
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .form-control.is-invalid {
+        border-color: var(--danger);
+    }
+
+    .invalid-feedback {
+        color: var(--danger);
+        font-size: 0.875rem;
+        margin-top: 4px;
+    }
+
+    .form-text {
+        color: var(--gray-500);
+        font-size: 0.8rem;
+        margin-top: 4px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: var(--radius);
+        border: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+        background: var(--gray-200);
+        color: var(--gray-700);
+    }
+
+    .btn-secondary:hover {
+        background: var(--gray-300);
+    }
+
+    .btn-info {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .btn-info:hover {
+        background: #138496;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    select.form-control {
+        cursor: pointer;
+    }
+
+    .col-md-4 {
+        grid-column: span 1;
+    }
+
+    .col-md-8 {
+        grid-column: span 2;
+    }
+
+    .col-md-12 {
+        grid-column: span 3;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .stat-card {
+        background: var(--gray-50);
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius);
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-card.stat-success {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    .stat-card.stat-danger {
+        border-color: #ef4444;
+        background: rgba(239, 68, 68, 0.05);
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        color: var(--primary);
+        opacity: 0.8;
+    }
+
+    .stat-success .stat-icon {
+        color: #10b981;
+    }
+
+    .stat-danger .stat-icon {
+        color: #ef4444;
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark);
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: var(--gray-600);
+        margin-top: 4px;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .col-md-4,
+        .col-md-8,
+        .col-md-12 {
+            grid-column: span 1;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .page-actions {
+            width: 100%;
+        }
+    }
 </style>
 
 <script>
@@ -407,18 +518,75 @@ document.getElementById('btnVerificarConexion').addEventListener('click', functi
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                alert('✅ ' + data.message);
+                Swal.fire({
+                    title: '¡Conexión Exitosa!',
+                    text: data.message,
+                    icon: 'success',
+                    confirmButtonText: 'Entendido'
+                });
             } else {
-                alert('❌ ' + data.message);
+                Swal.fire({
+                    title: 'Error de Conexión',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonText: 'Entendido'
+                });
             }
         })
         .catch(error => {
-            alert('❌ Error al verificar conexión: ' + error.message);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al verificar conexión: ' + error.message,
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
         })
         .finally(() => {
             btn.disabled = false;
             btn.innerHTML = originalHTML;
         });
 });
+
+function mostrarAyuda() {
+    const ayuda = `
+        <div style="text-align: left;">
+            <h4 style="margin-top: 0;">📄 Configuración de Facturación Electrónica</h4>
+
+            <p><strong>¿Qué es LibreDTE?</strong></p>
+            <p>LibreDTE es un servicio que permite emitir Documentos Tributarios Electrónicos (DTE)
+            válidos ante el SII (Servicio de Impuestos Internos de Chile).</p>
+
+            <p><strong>Pasos para configurar:</strong></p>
+            <ol>
+                <li>Completa los datos del emisor (RUT, razón social, dirección, etc.)</li>
+                <li>Obtén tu Hash de API desde LibreDTE.cl</li>
+                <li>Selecciona el ambiente (usa Certificación para pruebas)</li>
+                <li>Haz clic en "Verificar Conexión" para comprobar</li>
+                <li>Guarda la configuración</li>
+            </ol>
+
+            <p><strong>¿Cómo obtener el Hash de API?</strong></p>
+            <ol>
+                <li>Ingresa a <a href="https://libredte.cl" target="_blank">LibreDTE.cl</a></li>
+                <li>Ve a Configuración → Usuarios → API Token</li>
+                <li>Copia el token completo</li>
+                <li>Pégalo en el campo "Hash de API LibreDTE"</li>
+            </ol>
+
+            <p style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-top: 15px;">
+                <strong>⚠️ Importante:</strong> Usa el ambiente de Certificación primero para hacer pruebas.
+                Solo cambia a Producción cuando estés seguro de que todo funciona correctamente.
+            </p>
+        </div>
+    `;
+
+    Swal.fire({
+        title: 'Ayuda',
+        html: ayuda,
+        icon: 'info',
+        width: '600px',
+        confirmButtonText: 'Entendido'
+    });
+}
 </script>
 @endsection
