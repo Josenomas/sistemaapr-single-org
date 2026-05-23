@@ -290,6 +290,22 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
         // Folios SII
         Route::resource('folios-sii', FolioSIIController::class)->names('folios-sii');
         Route::post('/folios-sii-obtener-siguiente', [FolioSIIController::class, 'obtenerSiguiente'])->name('folios-sii.obtener-siguiente');
+
+        // ========================================
+        // DOCUMENTOS TRIBUTARIOS ELECTRÓNICOS (DTE)
+        // ========================================
+        Route::prefix('dte')->name('dte.')->group(function () {
+            // Configuración
+            Route::get('/configuracion', [App\Http\Controllers\DTEController::class, 'configuracion'])->name('configuracion');
+            Route::post('/configuracion', [App\Http\Controllers\DTEController::class, 'guardarConfiguracion'])->name('guardar-configuracion');
+            Route::get('/verificar-conexion', [App\Http\Controllers\DTEController::class, 'verificarConexion'])->name('verificar-conexion');
+
+            // Operaciones sobre boletas
+            Route::post('/boleta/{id}/emitir', [App\Http\Controllers\DTEController::class, 'emitir'])->name('boleta.emitir');
+            Route::get('/boleta/{id}/consultar-estado', [App\Http\Controllers\DTEController::class, 'consultarEstado'])->name('boleta.consultar-estado');
+            Route::post('/boleta/{id}/anular', [App\Http\Controllers\DTEController::class, 'anular'])->name('boleta.anular');
+            Route::get('/boleta/{id}/pdf', [App\Http\Controllers\DTEController::class, 'descargarPDF'])->name('boleta.pdf');
+        });
     });
 
     // ========================================
