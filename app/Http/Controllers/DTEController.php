@@ -7,6 +7,7 @@ use App\Models\ConfiguracionDTE;
 use App\Services\LibreDTEService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DTEController extends Controller
 {
@@ -178,11 +179,18 @@ class DTEController extends Controller
             abort(403);
         }
 
-        if (!$boleta->pdf_url) {
-            return redirect()->back()->with('error', 'No hay PDF disponible para esta boleta');
+        // Prioridad 1: Descargar desde almacenamiento local si existe
+        if ($boleta->pdf_local_path && Storage::exists($boleta->pdf_local_path)) {
+            $nombreArchivo = "DTE_{$boleta->tipo_dte}_F{$boleta->folio_sii}_B{$boleta->numero_boleta}.pdf";
+            return Storage::download($boleta->pdf_local_path, $nombreArchivo);
         }
 
-        return redirect($boleta->pdf_url);
+        // Prioridad 2: Redirigir a LibreDTE si no hay copia local
+        if ($boleta->pdf_url) {
+            return redirect($boleta->pdf_url);
+        }
+
+        return redirect()->back()->with('error', 'No hay PDF disponible para esta boleta');
     }
 
     /**

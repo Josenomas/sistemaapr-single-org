@@ -21,6 +21,7 @@ class Boleta extends Model
         'estado_dte',
         'xml_dte',
         'pdf_url',
+        'pdf_local_path',
         'fecha_emision_dte',
         'id_socio',
         'id_lectura',

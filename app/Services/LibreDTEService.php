@@ -7,6 +7,7 @@ use App\Models\ConfiguracionDTE;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class LibreDTEService
 {
@@ -55,6 +56,12 @@ class LibreDTEService
         // Enviar a LibreDTE
         $response = $this->enviarDTE($dte);
 
+        // Descargar y guardar PDF localmente
+        $pdfLocalPath = null;
+        if (isset($response['pdf'])) {
+            $pdfLocalPath = $this->descargarYGuardarPDF($response['pdf'], $boleta);
+        }
+
         // Actualizar boleta con los datos del DTE
         $boleta->update([
             'tipo_dte' => 39, // Boleta Electrónica
@@ -62,6 +69,7 @@ class LibreDTEService
             'folio_sii' => $response['folio'] ?? null,
             'xml_dte' => $response['xml'] ?? null,
             'pdf_url' => $response['pdf'] ?? null,
+            'pdf_local_path' => $pdfLocalPath,
             'fecha_emision_dte' => now(),
         ]);
 
@@ -306,6 +314,58 @@ class LibreDTEService
 
         } catch (\Exception $e) {
             return false;
+        }
+    }
+
+    /**
+     * Descargar PDF desde LibreDTE y guardarlo localmente
+     */
+    protected function descargarYGuardarPDF($pdfUrl, Boleta $boleta)
+    {
+        try {
+            // Descargar PDF desde LibreDTE
+            $pdfContent = $this->client->get($pdfUrl)->getBody()->getContents();
+
+            // Crear estructura de directorios: dtes/YYYY/MM/
+            $año = now()->format('Y');
+            $mes = now()->format('m');
+            $directorio = "dtes/{$año}/{$mes}";
+
+            // Crear directorio si no existe
+            if (!Storage::exists($directorio)) {
+                Storage::makeDirectory($directorio, 0755, true);
+            }
+
+            // Nombre del archivo: DTE_[tipo]_[folio]_[id_boleta].pdf
+            $nombreArchivo = sprintf(
+                'DTE_%s_F%s_B%s.pdf',
+                $boleta->tipo_dte ?? 39,
+                $boleta->folio_sii ?? 'PENDING',
+                $boleta->id
+            );
+
+            $rutaCompleta = "{$directorio}/{$nombreArchivo}";
+
+            // Guardar PDF en storage/app/dtes/
+            Storage::put($rutaCompleta, $pdfContent);
+
+            Log::info('PDF DTE guardado localmente', [
+                'boleta_id' => $boleta->id,
+                'ruta' => $rutaCompleta,
+                'tamaño' => strlen($pdfContent) . ' bytes',
+            ]);
+
+            return $rutaCompleta;
+
+        } catch (\Exception $e) {
+            Log::error('Error al guardar PDF localmente', [
+                'boleta_id' => $boleta->id,
+                'pdf_url' => $pdfUrl,
+                'error' => $e->getMessage(),
+            ]);
+
+            // No lanzar excepción - el PDF ya está en LibreDTE
+            return null;
         }
     }
 }
