@@ -17,6 +17,11 @@ class Boleta extends Model
         'folio_sii',
         'timbre_electronico',
         'fecha_timbraje',
+        'tipo_dte',
+        'estado_dte',
+        'xml_dte',
+        'pdf_url',
+        'fecha_emision_dte',
         'id_socio',
         'id_lectura',
         'mes',
@@ -38,6 +43,8 @@ class Boleta extends Model
         'fecha_emision' => 'date',
         'fecha_vencimiento' => 'date',
         'fecha_timbraje' => 'datetime',
+        'fecha_emision_dte' => 'datetime',
+        'tipo_dte' => 'integer',
         'consumo_m3' => 'decimal:2',
         'cargo_fijo' => 'decimal:2',
         'cargo_consumo' => 'decimal:2',
@@ -333,5 +340,56 @@ class Boleta extends Model
     public function tieneFolioSII()
     {
         return !is_null($this->folio_sii);
+    }
+
+    /**
+     * Verificar si tiene DTE emitido
+     */
+    public function tieneDTE()
+    {
+        return !is_null($this->tipo_dte) && !is_null($this->folio_sii);
+    }
+
+    /**
+     * Verificar si el DTE está emitido
+     */
+    public function dteEmitido()
+    {
+        return in_array($this->estado_dte, ['emitida', 'aceptada']);
+    }
+
+    /**
+     * Obtener nombre del tipo de DTE
+     */
+    public function getTipoDteNombreAttribute()
+    {
+        $tipos = [
+            33 => 'Factura Electrónica',
+            39 => 'Boleta Electrónica',
+            61 => 'Nota de Crédito',
+            56 => 'Nota de Débito',
+        ];
+
+        return $tipos[$this->tipo_dte] ?? '-';
+    }
+
+    /**
+     * Obtener badge de estado DTE
+     */
+    public function getEstadoDteBadgeAttribute()
+    {
+        if (!$this->estado_dte) {
+            return '<span class="badge badge-secondary">Sin DTE</span>';
+        }
+
+        $badges = [
+            'pendiente' => '<span class="badge badge-warning">Pendiente</span>',
+            'emitida' => '<span class="badge badge-success">Emitida</span>',
+            'aceptada' => '<span class="badge badge-success">Aceptada SII</span>',
+            'rechazada' => '<span class="badge badge-danger">Rechazada</span>',
+            'anulada' => '<span class="badge badge-secondary">Anulada</span>',
+        ];
+
+        return $badges[$this->estado_dte] ?? '<span class="badge badge-secondary">' . ucfirst($this->estado_dte) . '</span>';
     }
 }
