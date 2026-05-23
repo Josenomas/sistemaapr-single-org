@@ -193,9 +193,12 @@
         @endif
 
         <div class="alert success">
-            <strong>📎 Documento Adjunto</strong><br>
-            El PDF timbrado electrónicamente está adjunto a este correo.
-            Este documento contiene el <strong>timbre electrónico del SII</strong> que valida su autenticidad.
+            <strong>📎 Archivos Adjuntos (2 documentos PDF)</strong><br><br>
+            <strong>1. Detalle_Boleta_{{ $boleta->numero_boleta }}.pdf</strong><br>
+            → Información completa con gráficos de consumo, historial y estado de cuenta
+            <br><br>
+            <strong>2. DTE_{{ $boleta->numero_boleta }}_F{{ $boleta->folio_sii }}.pdf</strong><br>
+            → Documento tributario electrónico con <strong>timbre del SII</strong> (validez legal)
         </div>
 
         <p><strong>Modalidades de pago disponibles:</strong></p>
