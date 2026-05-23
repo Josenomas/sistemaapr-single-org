@@ -253,6 +253,15 @@
                                                 <i class="fas fa-file-pdf"></i>
                                             </a>
                                         @endif
+
+                                        @if($boleta->estado_dte !== 'anulada' && in_array($boleta->estado_dte, ['emitida', 'aceptada']))
+                                            <button type="button"
+                                                    class="btn btn-sm btn-warning"
+                                                    title="Anular DTE (Nota de Crédito)"
+                                                    onclick="mostrarModalAnular({{ $boleta->id }}, '{{ $boleta->folio_sii }}', {{ $boleta->total }})">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        @endif
                                     @endif
 
                                     @if($boleta->estado !== 'pagada' && $boleta->pagos->count() == 0)
@@ -682,5 +691,88 @@
             }, 500);
         }
     });
+
+    // Modal de anulación DTE
+    function mostrarModalAnular(boletaId, folio, monto) {
+        Swal.fire({
+            title: '⚠️ Anular Documento Tributario',
+            html: `
+                <div style="text-align: left; padding: 1rem;">
+                    <p style="margin-bottom: 1rem;">
+                        <strong>Folio SII:</strong> ${folio}<br>
+                        <strong>Monto:</strong> $${new Intl.NumberFormat('es-CL').format(monto)}
+                    </p>
+                    <div style="background: #fff3cd; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                        <strong style="color: #856404;">ℹ️ Importante:</strong>
+                        <p style="margin: 0.5rem 0 0 0; color: #856404; font-size: 0.9rem;">
+                            Se emitirá una <strong>Nota de Crédito Electrónica</strong> que anulará este documento ante el SII.
+                            Esta acción es <strong>irreversible</strong>.
+                        </p>
+                    </div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">
+                        Motivo de la anulación: <span style="color: #dc3545;">*</span>
+                    </label>
+                    <textarea id="motivoAnulacion"
+                              class="swal2-textarea"
+                              placeholder="Ej: Error en monto, Servicio no prestado, Anulación a solicitud del cliente..."
+                              style="width: 100%; min-height: 100px; padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem;"
+                              maxlength="500"></textarea>
+                    <small style="color: #6c757d;">Máximo 500 caracteres</small>
+                </div>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-file-invoice"></i> Sí, emitir Nota de Crédito',
+            cancelButtonText: 'Cancelar',
+            width: '600px',
+            preConfirm: () => {
+                const motivo = document.getElementById('motivoAnulacion').value.trim();
+                if (!motivo) {
+                    Swal.showValidationMessage('Debe ingresar un motivo de anulación');
+                    return false;
+                }
+                if (motivo.length < 10) {
+                    Swal.showValidationMessage('El motivo debe tener al menos 10 caracteres');
+                    return false;
+                }
+                return motivo;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Crear formulario y enviarlo
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/dte/boleta/${boletaId}/anular`;
+
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                form.appendChild(csrfToken);
+
+                const motivoInput = document.createElement('input');
+                motivoInput.type = 'hidden';
+                motivoInput.name = 'motivo';
+                motivoInput.value = result.value;
+                form.appendChild(motivoInput);
+
+                document.body.appendChild(form);
+
+                // Mostrar loader
+                Swal.fire({
+                    title: 'Emitiendo Nota de Crédito...',
+                    html: 'Por favor espere mientras se procesa la anulación ante el SII',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                form.submit();
+            }
+        });
+    }
 </script>
 @endsection

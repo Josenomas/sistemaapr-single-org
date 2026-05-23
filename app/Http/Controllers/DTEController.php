@@ -120,20 +120,41 @@ class DTEController extends Controller
     public function anular(Request $request, $idBoleta)
     {
         $request->validate([
-            'motivo' => 'required|string|max:500',
+            'motivo' => 'required|string|min:10|max:500',
+        ], [
+            'motivo.required' => 'Debe ingresar un motivo de anulación',
+            'motivo.min' => 'El motivo debe tener al menos 10 caracteres',
+            'motivo.max' => 'El motivo no puede exceder 500 caracteres',
         ]);
 
         try {
             $boleta = Boleta::findOrFail($idBoleta);
 
+            // Verificar multi-tenancy
             if ($boleta->id_organizacion != auth()->user()->id_organizacion) {
                 return redirect()->back()->with('error', 'Acceso denegado');
             }
 
+            // Verificar que tenga DTE emitido
+            if (!$boleta->dteEmitido()) {
+                return redirect()->back()->with('error', 'La boleta no tiene DTE emitido para anular');
+            }
+
+            // Verificar que no esté ya anulada
+            if ($boleta->estado_dte === 'anulada') {
+                return redirect()->back()->with('error', 'El DTE ya está anulado');
+            }
+
+            // Verificar que el estado sea válido para anular (emitida o aceptada)
+            if (!in_array($boleta->estado_dte, ['emitida', 'aceptada'])) {
+                return redirect()->back()->with('error', 'Solo se pueden anular DTEs emitidos o aceptados por el SII');
+            }
+
+            // Emitir Nota de Crédito
             $this->libredteService->setOrganizacion($boleta->id_organizacion);
             $response = $this->libredteService->anularDocumento($boleta, $request->motivo);
 
-            return redirect()->back()->with('success', "DTE anulado exitosamente. NC Folio: {$response['folio']}");
+            return redirect()->back()->with('success', "DTE anulado exitosamente. Nota de Crédito Folio: {$response['folio']}");
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error al anular DTE: ' . $e->getMessage());

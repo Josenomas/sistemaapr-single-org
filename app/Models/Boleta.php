@@ -387,7 +387,7 @@ class Boleta extends Model
             'emitida' => '<span class="badge badge-success">Emitida</span>',
             'aceptada' => '<span class="badge badge-success">Aceptada SII</span>',
             'rechazada' => '<span class="badge badge-danger">Rechazada</span>',
-            'anulada' => '<span class="badge badge-secondary">Anulada</span>',
+            'anulada' => '<span class="badge badge-dark"><i class="fas fa-ban"></i> Anulada (NC)</span>',
         ];
 
         return $badges[$this->estado_dte] ?? '<span class="badge badge-secondary">' . ucfirst($this->estado_dte) . '</span>';
