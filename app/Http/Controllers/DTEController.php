@@ -19,6 +19,74 @@ class DTEController extends Controller
     }
 
     /**
+     * Dashboard de estadísticas DTE
+     */
+    public function dashboard()
+    {
+        $idOrganizacion = auth()->user()->id_organizacion;
+
+        // Total de DTEs emitidos
+        $totalDTEsEmitidos = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNotNull('folio_sii')
+            ->count();
+
+        // DTEs por estado
+        $dtesPorEstado = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNotNull('folio_sii')
+            ->select('estado_dte', DB::raw('count(*) as total'))
+            ->groupBy('estado_dte')
+            ->get()
+            ->pluck('total', 'estado_dte');
+
+        // DTEs emitidos por mes (últimos 12 meses)
+        $dtesPorMes = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNotNull('folio_sii')
+            ->where('fecha_emision_dte', '>=', now()->subMonths(12))
+            ->select(
+                DB::raw('DATE_FORMAT(fecha_emision_dte, "%Y-%m") as mes'),
+                DB::raw('count(*) as total')
+            )
+            ->groupBy('mes')
+            ->orderBy('mes', 'asc')
+            ->get();
+
+        // Monto total facturado electrónicamente
+        $montoTotalFacturado = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNotNull('folio_sii')
+            ->sum('total');
+
+        // Últimos 10 DTEs emitidos
+        $ultimosDTEs = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNotNull('folio_sii')
+            ->with('socio')
+            ->orderBy('fecha_emision_dte', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Estado de conexión con LibreDTE
+        $conexionLibreDTE = false;
+        try {
+            $this->libredteService->setOrganizacion($idOrganizacion);
+            $conexionLibreDTE = $this->libredteService->verificarConexion();
+        } catch (\Exception $e) {
+            // Conexión fallida
+        }
+
+        // Configuración DTE
+        $config = ConfiguracionDTE::where('id_organizacion', $idOrganizacion)->first();
+
+        return view('dte.dashboard', compact(
+            'totalDTEsEmitidos',
+            'dtesPorEstado',
+            'dtesPorMes',
+            'montoTotalFacturado',
+            'ultimosDTEs',
+            'conexionLibreDTE',
+            'config'
+        ));
+    }
+
+    /**
      * Mostrar configuración DTE de la organización
      */
     public function configuracion()

@@ -295,6 +295,9 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
         // DOCUMENTOS TRIBUTARIOS ELECTRÓNICOS (DTE)
         // ========================================
         Route::prefix('dte')->name('dte.')->group(function () {
+            // Dashboard de estadísticas
+            Route::get('/dashboard', [App\Http\Controllers\DTEController::class, 'dashboard'])->name('dashboard');
+
             // Configuración
             Route::get('/configuracion', [App\Http\Controllers\DTEController::class, 'configuracion'])->name('configuracion');
             Route::post('/configuracion', [App\Http\Controllers\DTEController::class, 'guardarConfiguracion'])->name('guardar-configuracion');
@@ -304,7 +307,7 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
             Route::post('/boleta/{id}/emitir', [App\Http\Controllers\DTEController::class, 'emitir'])->name('boleta.emitir');
             Route::get('/boleta/{id}/consultar-estado', [App\Http\Controllers\DTEController::class, 'consultarEstado'])->name('boleta.consultar-estado');
             Route::post('/boleta/{id}/anular', [App\Http\Controllers\DTEController::class, 'anular'])->name('boleta.anular');
-            Route::get('/boleta/{id}/pdf', [App\Http\Controllers\DTEController::class, 'descargarPDF'])->name('boleta.pdf');
+            Route::get('/boleta/{id}/pdf', [App\Http\Controllers\DTEController::class, 'descargarPDF'])->name('descargar-pdf');
         });
     });
 
