@@ -311,6 +311,9 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
             Route::get('/boleta/{id}/consultar-estado', [App\Http\Controllers\DTEController::class, 'consultarEstado'])->name('boleta.consultar-estado');
             Route::post('/boleta/{id}/anular', [App\Http\Controllers\DTEController::class, 'anular'])->name('boleta.anular');
             Route::get('/boleta/{id}/pdf', [App\Http\Controllers\DTEController::class, 'descargarPDF'])->name('descargar-pdf');
+
+            // Emisión masiva
+            Route::post('/emitir-masivo', [App\Http\Controllers\DTEController::class, 'emitirMasivo'])->name('emitir-masivo');
         });
     });
 

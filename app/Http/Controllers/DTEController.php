@@ -345,4 +345,112 @@ class DTEController extends Controller
             'ultimoFolioEmitido'
         ));
     }
+
+    /**
+     * Emisión masiva de DTEs
+     */
+    public function emitirMasivo(Request $request)
+    {
+        $request->validate([
+            'boleta_ids' => 'required|array|min:1',
+            'boleta_ids.*' => 'required|integer|exists:boletas,id',
+        ]);
+
+        $idOrganizacion = auth()->user()->id_organizacion;
+        $boletaIds = $request->input('boleta_ids');
+
+        // Verificar que todas las boletas pertenecen a la organización
+        $boletas = Boleta::whereIn('id', $boletaIds)
+            ->where('id_organizacion', $idOrganizacion)
+            ->get();
+
+        if ($boletas->count() !== count($boletaIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Algunas boletas no pertenecen a su organización',
+            ], 403);
+        }
+
+        // Verificar configuración DTE
+        try {
+            $this->libredteService->setOrganizacion($idOrganizacion);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de configuración: ' . $e->getMessage(),
+            ], 500);
+        }
+
+        $exitosos = 0;
+        $errores = 0;
+        $resultados = [];
+
+        foreach ($boletas as $boleta) {
+            // Verificar si ya tiene DTE
+            if ($boleta->tieneDTE()) {
+                $errores++;
+                $resultados[] = [
+                    'boleta_id' => $boleta->id,
+                    'numero_boleta' => $boleta->numero_boleta,
+                    'success' => false,
+                    'message' => 'Ya tiene DTE emitido',
+                ];
+                continue;
+            }
+
+            try {
+                $resultado = $this->libredteService->emitirBoleta($boleta);
+
+                if ($resultado['success']) {
+                    $exitosos++;
+                    $resultados[] = [
+                        'boleta_id' => $boleta->id,
+                        'numero_boleta' => $boleta->numero_boleta,
+                        'success' => true,
+                        'folio' => $resultado['folio'] ?? null,
+                    ];
+                } else {
+                    $errores++;
+                    $resultados[] = [
+                        'boleta_id' => $boleta->id,
+                        'numero_boleta' => $boleta->numero_boleta,
+                        'success' => false,
+                        'message' => $resultado['error'] ?? 'Error desconocido',
+                    ];
+                }
+
+                // Delay de 1 segundo entre emisiones para no sobrecargar la API
+                sleep(1);
+
+            } catch (\Exception $e) {
+                $errores++;
+                $resultados[] = [
+                    'boleta_id' => $boleta->id,
+                    'numero_boleta' => $boleta->numero_boleta,
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ];
+
+                Log::error('Error al emitir DTE masivamente', [
+                    'boleta_id' => $boleta->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        Log::info('Emisión masiva de DTEs completada', [
+            'total' => count($boletaIds),
+            'exitosos' => $exitosos,
+            'errores' => $errores,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'total' => count($boletaIds),
+            'exitosos' => $exitosos,
+            'errores' => $errores,
+            'message' => "Proceso completado: {$exitosos} éxitos, {$errores} errores",
+            'resultados' => $resultados,
+        ]);
+    }
 }

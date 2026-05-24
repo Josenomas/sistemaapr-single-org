@@ -162,10 +162,35 @@
 <!-- Tabla de Boletas -->
 <div class="card" data-intro="Listado de todas las boletas generadas. Puedes filtrar por mes, socio o estado para encontrar boletas específicas." data-step="4">
     <div class="card-body">
+        <!-- Barra de Acciones Masivas -->
+        <div id="bulk-actions-bar" style="display: none; background: linear-gradient(135deg, #7c3aed, #5b21b6); color: white; padding: 16px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <strong style="font-size: 16px;">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="selected-count">0</span> boletas seleccionadas
+                    </strong>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" id="bulk-emit-btn" class="btn" style="background: white; color: #7c3aed; border: none; font-weight: 600;">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        Emitir DTEs Masivamente
+                    </button>
+                    <button type="button" id="deselect-all-btn" class="btn" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid white;">
+                        <i class="fas fa-times"></i>
+                        Deseleccionar Todo
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" id="select-all-checkbox" style="width: 18px; height: 18px; cursor: pointer;">
+                        </th>
                         <th>Número</th>
                         <th>Socio</th>
                         <th>Mes</th>
@@ -180,7 +205,14 @@
                 </thead>
                 <tbody>
                     @forelse($boletas as $boleta)
-                        <tr class="{{ $boleta->estado == 'vencida' ? 'row-danger' : '' }}">
+                        <tr class="{{ $boleta->estado == 'vencida' ? 'row-danger' : '' }}" data-boleta-id="{{ $boleta->id }}">
+                            <td>
+                                @if(!$boleta->tieneDTE())
+                                    <input type="checkbox" class="boleta-checkbox" value="{{ $boleta->id }}" style="width: 18px; height: 18px; cursor: pointer;">
+                                @else
+                                    <i class="fas fa-check text-success" title="Ya tiene DTE emitido"></i>
+                                @endif
+                            </td>
                             <td><strong>{{ $boleta->numero_boleta }}</strong></td>
                             <td>
                                 <a href="{{ route('socios.show', $boleta->socio->id) }}">
@@ -771,6 +803,126 @@
                 });
 
                 form.submit();
+            }
+        });
+    }
+
+    // ========================================
+    // SELECCIÓN MASIVA DE BOLETAS
+    // ========================================
+
+    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+    const boletaCheckboxes = document.querySelectorAll('.boleta-checkbox');
+    const bulkActionsBar = document.getElementById('bulk-actions-bar');
+    const selectedCountSpan = document.getElementById('selected-count');
+    const bulkEmitBtn = document.getElementById('bulk-emit-btn');
+    const deselectAllBtn = document.getElementById('deselect-all-btn');
+
+    function updateBulkActionsBar() {
+        const selectedCheckboxes = document.querySelectorAll('.boleta-checkbox:checked');
+        const count = selectedCheckboxes.length;
+
+        selectedCountSpan.textContent = count;
+
+        if (count > 0) {
+            bulkActionsBar.style.display = 'block';
+        } else {
+            bulkActionsBar.style.display = 'none';
+        }
+    }
+
+    // Seleccionar/deseleccionar todas
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            boletaCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateBulkActionsBar();
+        });
+    }
+
+    // Actualizar contador al seleccionar individual
+    boletaCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateBulkActionsBar();
+
+            // Actualizar estado del checkbox "seleccionar todo"
+            const allChecked = Array.from(boletaCheckboxes).every(cb => cb.checked);
+            const someChecked = Array.from(boletaCheckboxes).some(cb => cb.checked);
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = someChecked && !allChecked;
+            }
+        });
+    });
+
+    // Deseleccionar todo
+    if (deselectAllBtn) {
+        deselectAllBtn.addEventListener('click', function() {
+            boletaCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            }
+            updateBulkActionsBar();
+        });
+    }
+
+    // Emisión masiva de DTEs
+    if (bulkEmitBtn) {
+        bulkEmitBtn.addEventListener('click', async function() {
+            const selectedCheckboxes = document.querySelectorAll('.boleta-checkbox:checked');
+            const boletaIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+            if (boletaIds.length === 0) {
+                alert('No hay boletas seleccionadas');
+                return;
+            }
+
+            if (!confirm(`¿Está seguro de emitir ${boletaIds.length} DTEs?\n\nEste proceso puede tardar varios minutos.`)) {
+                return;
+            }
+
+            // Deshabilitar botón y mostrar loading
+            bulkEmitBtn.disabled = true;
+            bulkEmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+
+            try {
+                const response = await fetch('{{ route("dte.emitir-masivo") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        boleta_ids: boletaIds
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`✅ Proceso iniciado exitosamente\n\n` +
+                          `Total: ${data.total}\n` +
+                          `Éxitos: ${data.exitosos}\n` +
+                          `Errores: ${data.errores}\n\n` +
+                          `${data.message || 'Los DTEs se están emitiendo. Recibirá notificaciones por email.'}`);
+
+                    // Recargar página para ver los cambios
+                    window.location.reload();
+                } else {
+                    alert('❌ Error: ' + (data.message || 'No se pudo iniciar la emisión masiva'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al procesar la solicitud: ' + error.message);
+            } finally {
+                bulkEmitBtn.disabled = false;
+                bulkEmitBtn.innerHTML = '<i class="fas fa-file-invoice-dollar"></i> Emitir DTEs Masivamente';
             }
         });
     }

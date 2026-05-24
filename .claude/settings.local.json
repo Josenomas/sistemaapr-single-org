@@ -3,7 +3,11 @@
     "allow": [
       "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan migrate --force && php artisan view:clear && php artisan config:clear && php artisan cache:clear && php artisan schedule:list && echo ''✅ Verificación Automática DTE implementada''\")",
       "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && php artisan migrate --path=database/migrations/2026_05_23_203715_add_notification_fields_to_configuracion_libredte_table.php --force && php artisan view:clear && php artisan config:clear && php artisan cache:clear && echo ''✅ Migración ejecutada correctamente''\")",
-      "Bash(git commit -m \"Fix: Corregir nombre de tabla configuracion_libredte → configuracion_dte\")"
+      "Bash(git commit -m \"Fix: Corregir nombre de tabla configuracion_libredte → configuracion_dte\")",
+      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan migrate --path=database/migrations/2026_05_23_203715_add_notification_fields_to_configuracion_libredte_table.php --force && php artisan view:clear && php artisan config:clear && php artisan cache:clear && php artisan schedule:list | head -30 && echo ''✅ Verificación Automática DTE implementada''\")",
+      "Bash(git add app/Models/Organizacion.php)",
+      "Bash(git commit -m \"Feat: Agregar relación configuracionDTE a modelo Organizacion\")",
+      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && php artisan config:clear && php artisan cache:clear && echo ''✅ Relación configuracionDTE agregada''\")"
     ],
     "deny": [],
     "ask": []
