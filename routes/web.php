@@ -298,6 +298,9 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
             // Dashboard de estadísticas
             Route::get('/dashboard', [App\Http\Controllers\DTEController::class, 'dashboard'])->name('dashboard');
 
+            // Gestión de folios
+            Route::get('/folios', [App\Http\Controllers\DTEController::class, 'folios'])->name('folios');
+
             // Configuración
             Route::get('/configuracion', [App\Http\Controllers\DTEController::class, 'configuracion'])->name('configuracion');
             Route::post('/configuracion', [App\Http\Controllers\DTEController::class, 'guardarConfiguracion'])->name('guardar-configuracion');

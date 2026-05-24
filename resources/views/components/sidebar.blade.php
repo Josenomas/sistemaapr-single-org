@@ -65,10 +65,39 @@
                 <span>Folios SII</span>
                 <span class="badge-beta">BETA</span>
             </a>
-            <a href="{{ route('dte.dashboard') }}" class="nav-item {{ request()->routeIs('dte.*') ? 'active' : '' }}">
+        </div>
+
+        <!-- Facturación Electrónica (DTE) -->
+        <div class="nav-section">
+            <div class="nav-section-title">
                 <i class="fas fa-file-invoice-dollar"></i>
                 <span>Facturación Electrónica</span>
                 <span class="badge-new">NUEVO</span>
+            </div>
+            <a href="{{ route('dte.dashboard') }}" class="nav-item {{ request()->routeIs('dte.dashboard') ? 'active' : '' }}">
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard DTE</span>
+            </a>
+            <a href="{{ route('dte.folios') }}" class="nav-item {{ request()->routeIs('dte.folios') ? 'active' : '' }}">
+                <i class="fas fa-list-ol"></i>
+                <span>Gestión de Folios</span>
+                @php
+                    try {
+                        $libredteService = app(\App\Services\LibreDTEService::class);
+                        $libredteService->setOrganizacion(auth()->user()->id_organizacion);
+                        $foliosData = $libredteService->obtenerFoliosDisponibles();
+                        $mostrarAlerta = !isset($foliosData['error']) && isset($foliosData['disponibles']) && $foliosData['disponibles'] <= 50;
+                    } catch (\Exception $e) {
+                        $mostrarAlerta = false;
+                    }
+                @endphp
+                @if($mostrarAlerta)
+                    <span class="badge-alert">{{ $foliosData['disponibles'] }}</span>
+                @endif
+            </a>
+            <a href="{{ route('dte.configuracion') }}" class="nav-item {{ request()->routeIs('dte.configuracion') ? 'active' : '' }}">
+                <i class="fas fa-cog"></i>
+                <span>Configuración DTE</span>
             </a>
         </div>
 
@@ -482,8 +511,32 @@
         box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
     }
 
+    .badge-alert {
+        display: inline-block;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        margin-left: auto;
+        box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
+        }
+    }
+
     .nav-item .badge-beta,
-    .nav-item .badge-new {
+    .nav-item .badge-new,
+    .nav-item .badge-alert {
         font-size: 0.6rem;
         padding: 2px 5px;
     }

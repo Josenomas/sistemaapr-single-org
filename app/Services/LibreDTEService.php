@@ -318,6 +318,55 @@ class LibreDTEService
     }
 
     /**
+     * Obtener información de folios disponibles
+     */
+    public function obtenerFoliosDisponibles()
+    {
+        if (!$this->config) {
+            throw new \Exception('Debe configurar la organización primero usando setOrganizacion()');
+        }
+
+        try {
+            // Consultar folios para Boleta Electrónica (tipo 39)
+            $url = rtrim($this->config->libredte_url, '/') . '/api/dte/documentos/disponibles';
+
+            $response = $this->client->get($url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->config->libredte_hash,
+                    'Accept' => 'application/json',
+                ],
+                'query' => [
+                    'dte' => 39, // Boleta Electrónica
+                ],
+                'timeout' => 15,
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            // Estructura esperada de respuesta de LibreDTE
+            return [
+                'tipo_dte' => 39,
+                'disponibles' => $data['disponibles'] ?? 0,
+                'siguiente' => $data['siguiente'] ?? null,
+                'alerta' => ($data['disponibles'] ?? 0) < 50,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error al consultar folios LibreDTE', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'tipo_dte' => 39,
+                'disponibles' => null,
+                'siguiente' => null,
+                'alerta' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Descargar PDF desde LibreDTE y guardarlo localmente
      */
     protected function descargarYGuardarPDF($pdfUrl, Boleta $boleta)

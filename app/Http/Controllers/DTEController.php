@@ -282,4 +282,67 @@ class DTEController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Gestión de Folios DTE
+     */
+    public function folios()
+    {
+        $idOrganizacion = auth()->user()->id_organizacion;
+
+        // Obtener folios disponibles desde LibreDTE
+        $foliosData = null;
+        $errorConexion = false;
+
+        try {
+            $this->libredteService->setOrganizacion($idOrganizacion);
+            $foliosData = $this->libredteService->obtenerFoliosDisponibles();
+
+            if (isset($foliosData['error'])) {
+                $errorConexion = true;
+            }
+        } catch (\Exception $e) {
+            $errorConexion = true;
+            $foliosData = [
+                'tipo_dte' => 39,
+                'disponibles' => null,
+                'siguiente' => null,
+                'alerta' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+
+        // Obtener historial de uso de folios (últimos 30 DTEs emitidos)
+        $historialFolios = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNotNull('folio_sii')
+            ->with('socio')
+            ->orderBy('fecha_emision_dte', 'desc')
+            ->limit(30)
+            ->get();
+
+        // Estadísticas de uso
+        $totalFoliosUsados = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNotNull('folio_sii')
+            ->count();
+
+        $foliosUsadosEsteMes = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNotNull('folio_sii')
+            ->whereYear('fecha_emision_dte', now()->year)
+            ->whereMonth('fecha_emision_dte', now()->month)
+            ->count();
+
+        $ultimoFolioEmitido = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNotNull('folio_sii')
+            ->orderBy('folio_sii', 'desc')
+            ->first();
+
+        return view('dte.folios', compact(
+            'foliosData',
+            'errorConexion',
+            'historialFolios',
+            'totalFoliosUsados',
+            'foliosUsadosEsteMes',
+            'ultimoFolioEmitido'
+        ));
+    }
 }
