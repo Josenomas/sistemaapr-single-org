@@ -1,10 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && php artisan config:clear && php artisan cache:clear && php artisan route:clear && echo ''✅ Emisión Masiva de DTEs desplegada''\")",
-      "Bash(git add -A)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nFeat: Integrar Emisión Masiva en Dashboard DTE\n\nController (DTEController::dashboard):\n- Agregado totalBoletasPendientes (count boletas sin folio_sii)\n- Agregado boletasSinDTE (últimas 20 boletas sin DTE)\n- Pasados al view con compact()\n\nFrontend (dte/dashboard.blade.php):\n- Card \"Pendientes de Emitir\" en stats grid\n  * Color dinámico (naranja si hay, verde si 0)\n  * Contador de boletas sin DTE\n  \n- Sección \"Boletas Pendientes de Emitir DTE\"\n  * Header morado con contador total\n  * Barra de acciones masivas integrada en header\n  * Tabla con checkboxes de selección\n  * Mostrar últimas 20 boletas sin DTE\n  * Enlace \"Ver todas\" si hay más de 20\n  \n- Mensaje de éxito si no hay pendientes\n  * Ícono check verde\n  * Mensaje motivacional\n  * Botón para ir a boletas\n\nJavaScript:\n- Selección masiva independiente del módulo boletas\n- IDs únicos: *-dashboard para no conflictuar\n- Contador dinámico en header\n- Botones: Emitir DTEs, Limpiar\n- Same endpoint: route(''dte.emitir-masivo'')\n- Loading states y confirmaciones\n- Auto-reload al completar\n\nCaracterísticas:\n✅ Funcionalidad INDEPENDIENTE de /boletas\n✅ Mismo endpoint backend reutilizado\n✅ Card dinámico (naranja/verde según pendientes)\n✅ Máximo 20 boletas en dashboard\n✅ Enlace a lista completa si hay más\n✅ Checkboxes con select all\n✅ Barra de acciones en header morado\n✅ No hay conflictos JS entre módulos\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git push origin main)"
+      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && php artisan config:clear && php artisan cache:clear && php artisan route:clear && echo ''✅ Emisión Masiva integrada en Dashboard DTE''\")"
     ],
     "deny": [],
     "ask": []

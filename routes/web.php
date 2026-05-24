@@ -314,6 +314,10 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
 
             // Emisión masiva
             Route::post('/emitir-masivo', [App\Http\Controllers\DTEController::class, 'emitirMasivo'])->name('emitir-masivo');
+
+            // Libro de Ventas
+            Route::get('/libro-ventas', [App\Http\Controllers\DTEController::class, 'libroVentas'])->name('libro-ventas');
+            Route::post('/libro-ventas/descargar', [App\Http\Controllers\DTEController::class, 'descargarLibroVentas'])->name('descargar-libro-ventas');
         });
     });
 

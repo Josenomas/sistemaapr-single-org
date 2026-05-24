@@ -468,4 +468,143 @@ class DTEController extends Controller
             'resultados' => $resultados,
         ]);
     }
+
+    /**
+     * Libro de Ventas Electrónico (IECV)
+     */
+    public function libroVentas(Request $request)
+    {
+        $idOrganizacion = auth()->user()->id_organizacion;
+
+        // Obtener filtros de fecha (por defecto: mes actual)
+        $mesInicio = $request->input('mes_inicio', now()->startOfMonth()->format('Y-m-d'));
+        $mesFin = $request->input('mes_fin', now()->endOfMonth()->format('Y-m-d'));
+
+        // DTEs del período seleccionado
+        $dtes = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNotNull('folio_sii')
+            ->whereBetween('fecha_emision_dte', [$mesInicio, $mesFin])
+            ->with('socio')
+            ->orderBy('fecha_emision_dte', 'asc')
+            ->get();
+
+        // Estadísticas del período
+        $totalDTEs = $dtes->count();
+        $montoNeto = $dtes->sum(function($dte) {
+            // Calcular neto (total / 1.19 para documentos con IVA)
+            return round($dte->total / 1.19);
+        });
+        $montoIVA = $dtes->sum(function($dte) {
+            return round($dte->total - ($dte->total / 1.19));
+        });
+        $montoTotal = $dtes->sum('total');
+
+        // Agrupar por tipo de DTE
+        $dtesPorTipo = $dtes->groupBy('tipo_dte')->map(function($grupo) {
+            return [
+                'cantidad' => $grupo->count(),
+                'monto' => $grupo->sum('total'),
+            ];
+        });
+
+        $config = ConfiguracionDTE::where('id_organizacion', $idOrganizacion)->first();
+
+        return view('dte.libro-ventas', compact(
+            'dtes',
+            'totalDTEs',
+            'montoNeto',
+            'montoIVA',
+            'montoTotal',
+            'dtesPorTipo',
+            'mesInicio',
+            'mesFin',
+            'config'
+        ));
+    }
+
+    /**
+     * Descargar Libro de Ventas en formato IECV (CSV para SII)
+     */
+    public function descargarLibroVentas(Request $request)
+    {
+        $idOrganizacion = auth()->user()->id_organizacion;
+        $config = ConfiguracionDTE::where('id_organizacion', $idOrganizacion)->first();
+
+        if (!$config) {
+            return redirect()->back()->with('error', 'No hay configuración DTE');
+        }
+
+        $mesInicio = $request->input('mes_inicio');
+        $mesFin = $request->input('mes_fin');
+
+        $dtes = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNotNull('folio_sii')
+            ->whereBetween('fecha_emision_dte', [$mesInicio, $mesFin])
+            ->with('socio')
+            ->orderBy('fecha_emision_dte', 'asc')
+            ->get();
+
+        // Generar archivo CSV en formato IECV del SII
+        $csv = $this->generarIECV($dtes, $config);
+
+        $filename = 'libro_ventas_' . str_replace('-', '', $mesInicio) . '_' . str_replace('-', '', $mesFin) . '.csv';
+
+        return response($csv)
+            ->header('Content-Type', 'text/csv; charset=ISO-8859-1')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+    }
+
+    /**
+     * Generar archivo IECV en formato CSV
+     */
+    protected function generarIECV($dtes, $config)
+    {
+        $lineas = [];
+
+        // Encabezado CSV (formato SII)
+        $lineas[] = implode(';', [
+            'Tipo Doc',
+            'Folio',
+            'Fecha Emision',
+            'RUT Receptor',
+            'Razon Social',
+            'Monto Exento',
+            'Monto Neto',
+            'Monto IVA',
+            'Monto Total',
+            'IVA No Recuperable',
+            'IVA Uso Comun',
+        ]);
+
+        foreach ($dtes as $dte) {
+            $montoNeto = round($dte->total / 1.19);
+            $montoIVA = round($dte->total - $montoNeto);
+
+            $lineas[] = implode(';', [
+                $dte->tipo_dte ?? 39,                           // Tipo Doc
+                $dte->folio_sii,                                 // Folio
+                $dte->fecha_emision_dte->format('d/m/Y'),       // Fecha
+                $dte->socio->rut ?? '66666666-6',               // RUT (o genérico)
+                $this->limpiarTexto($dte->socio->nombre_completo ?? 'Cliente Final'), // Razón Social
+                0,                                               // Monto Exento
+                $montoNeto,                                      // Monto Neto
+                $montoIVA,                                       // Monto IVA
+                $dte->total,                                     // Monto Total
+                0,                                               // IVA No Recuperable
+                0,                                               // IVA Uso Común
+            ]);
+        }
+
+        // Convertir a ISO-8859-1 para compatibilidad con SII
+        return mb_convert_encoding(implode("\r\n", $lineas), 'ISO-8859-1', 'UTF-8');
+    }
+
+    /**
+     * Limpiar texto para CSV (eliminar caracteres especiales)
+     */
+    protected function limpiarTexto($texto)
+    {
+        $texto = str_replace([';', "\n", "\r", '"'], ' ', $texto);
+        return trim($texto);
+    }
 }

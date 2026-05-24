@@ -95,6 +95,10 @@
                     <span class="badge-alert">{{ $foliosData['disponibles'] }}</span>
                 @endif
             </a>
+            <a href="{{ route('dte.libro-ventas') }}" class="nav-item {{ request()->routeIs('dte.libro-ventas') ? 'active' : '' }}">
+                <i class="fas fa-book"></i>
+                <span>Libro de Ventas</span>
+            </a>
             <a href="{{ route('dte.configuracion') }}" class="nav-item {{ request()->routeIs('dte.configuracion') ? 'active' : '' }}">
                 <i class="fas fa-cog"></i>
                 <span>Configuración DTE</span>
