@@ -210,6 +210,98 @@
                 @enderror
             </div>
 
+            <!-- Datos Factura Electrónica (Opcional) -->
+            <div class="form-section factura-section">
+                <div class="section-header-factura" onclick="toggleFacturaFields()">
+                    <h4 class="section-title">
+                        <i class="fas fa-file-invoice" style="color: #3b82f6;"></i>
+                        Datos para Factura Electrónica (Opcional)
+                        <i class="fas fa-chevron-down toggle-icon" id="toggleIcon"></i>
+                    </h4>
+                    <p class="section-description">
+                        Completar solo si desea emitir una <strong>Factura Electrónica (tipo 33)</strong> en lugar de Boleta.
+                        Si deja vacío, se emitirá Boleta Electrónica (tipo 39).
+                    </p>
+                </div>
+
+                <div class="factura-fields" id="facturaFields" style="display: {{ old('rut_receptor', $boleta->rut_receptor) ? 'block' : 'none' }};">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="rut_receptor" class="form-label">RUT Receptor</label>
+                            <input type="text"
+                                   class="form-control @error('rut_receptor') is-invalid @enderror"
+                                   id="rut_receptor"
+                                   name="rut_receptor"
+                                   value="{{ old('rut_receptor', $boleta->rut_receptor) }}"
+                                   placeholder="12.345.678-9"
+                                   maxlength="12">
+                            <small class="form-text">Si completa este campo, se emitirá Factura Electrónica</small>
+                            @error('rut_receptor')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="razon_social_receptor" class="form-label">Razón Social</label>
+                            <input type="text"
+                                   class="form-control @error('razon_social_receptor') is-invalid @enderror"
+                                   id="razon_social_receptor"
+                                   name="razon_social_receptor"
+                                   value="{{ old('razon_social_receptor', $boleta->razon_social_receptor) }}"
+                                   placeholder="Empresa S.A."
+                                   maxlength="255">
+                            @error('razon_social_receptor')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="giro_receptor" class="form-label">Giro</label>
+                            <input type="text"
+                                   class="form-control @error('giro_receptor') is-invalid @enderror"
+                                   id="giro_receptor"
+                                   name="giro_receptor"
+                                   value="{{ old('giro_receptor', $boleta->giro_receptor) }}"
+                                   placeholder="Comercio al por menor"
+                                   maxlength="255">
+                            @error('giro_receptor')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group col-md-5">
+                            <label for="direccion_receptor" class="form-label">Dirección</label>
+                            <input type="text"
+                                   class="form-control @error('direccion_receptor') is-invalid @enderror"
+                                   id="direccion_receptor"
+                                   name="direccion_receptor"
+                                   value="{{ old('direccion_receptor', $boleta->direccion_receptor) }}"
+                                   placeholder="Calle 123"
+                                   maxlength="255">
+                            @error('direccion_receptor')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label for="comuna_receptor" class="form-label">Comuna</label>
+                            <input type="text"
+                                   class="form-control @error('comuna_receptor') is-invalid @enderror"
+                                   id="comuna_receptor"
+                                   name="comuna_receptor"
+                                   value="{{ old('comuna_receptor', $boleta->comuna_receptor) }}"
+                                   placeholder="Santiago"
+                                   maxlength="100">
+                            @error('comuna_receptor')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i>
@@ -405,11 +497,76 @@
         min-height: 80px;
     }
 
+    /* Sección Factura Electrónica */
+    .factura-section {
+        background: #f8faff;
+        border: 2px dashed #3b82f6;
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .section-header-factura {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .section-header-factura:hover {
+        opacity: 0.8;
+    }
+
+    .section-header-factura .section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .toggle-icon {
+        margin-left: auto;
+        font-size: 0.9rem;
+        transition: transform 0.3s ease;
+        color: #3b82f6;
+    }
+
+    .toggle-icon.rotated {
+        transform: rotate(180deg);
+    }
+
+    .section-description {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        margin: 0;
+        padding-left: 32px;
+    }
+
+    .factura-fields {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #3b82f680;
+    }
+
+    .form-text {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.8rem;
+        color: #3b82f6;
+        font-weight: 500;
+    }
+
     .col-md-3 {
         grid-column: span 1;
     }
 
     .col-md-4 {
+        grid-column: span 1;
+    }
+
+    .col-md-5 {
+        grid-column: span 1;
+    }
+
+    .col-md-6 {
         grid-column: span 1;
     }
 
@@ -424,6 +581,8 @@
 
         .col-md-3,
         .col-md-4,
+        .col-md-5,
+        .col-md-6,
         .col-md-12 {
             grid-column: span 1;
         }
@@ -445,13 +604,113 @@
         document.getElementById('totalDisplay').textContent = '$' + total.toLocaleString('es-CL');
     }
 
+    // Toggle para mostrar/ocultar campos de factura
+    function toggleFacturaFields() {
+        const fields = document.getElementById('facturaFields');
+        const icon = document.getElementById('toggleIcon');
+
+        if (fields.style.display === 'none') {
+            fields.style.display = 'block';
+            icon.classList.add('rotated');
+        } else {
+            fields.style.display = 'none';
+            icon.classList.remove('rotated');
+        }
+    }
+
+    // Formatear RUT mientras se escribe
+    function formatearRut(input) {
+        let valor = input.value.replace(/[^0-9kK]/g, '');
+
+        if (valor.length > 1) {
+            const dv = valor.slice(-1).toUpperCase();
+            let numero = valor.slice(0, -1);
+
+            // Agregar puntos
+            numero = numero.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            input.value = numero + '-' + dv;
+        } else {
+            input.value = valor;
+        }
+    }
+
+    // Validar RUT chileno
+    function validarRut(rut) {
+        rut = rut.replace(/[^0-9kK]/g, '');
+
+        if (rut.length < 2) return false;
+
+        const dv = rut.slice(-1).toUpperCase();
+        const numero = rut.slice(0, -1);
+
+        let suma = 0;
+        let multiplicador = 2;
+
+        for (let i = numero.length - 1; i >= 0; i--) {
+            suma += parseInt(numero[i]) * multiplicador;
+            multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+        }
+
+        const resto = suma % 11;
+        const dvCalculado = 11 - resto;
+
+        let dvEsperado;
+        if (dvCalculado === 11) dvEsperado = '0';
+        else if (dvCalculado === 10) dvEsperado = 'K';
+        else dvEsperado = dvCalculado.toString();
+
+        return dv === dvEsperado;
+    }
+
     // Agregar event listeners
     document.addEventListener('DOMContentLoaded', function() {
+        // Calcular total
         ['cargo_fijo', 'cargo_consumo', 'otros_cargos', 'descuentos'].forEach(id => {
             document.getElementById(id).addEventListener('input', calcularTotal);
         });
-
         calcularTotal();
+
+        // Formatear y validar RUT
+        const rutInput = document.getElementById('rut_receptor');
+        if (rutInput) {
+            rutInput.addEventListener('input', function() {
+                formatearRut(this);
+            });
+
+            rutInput.addEventListener('blur', function() {
+                if (this.value.trim() !== '') {
+                    const esValido = validarRut(this.value);
+                    if (!esValido) {
+                        this.classList.add('is-invalid');
+                        if (!this.nextElementSibling || !this.nextElementSibling.classList.contains('invalid-feedback')) {
+                            const feedback = document.createElement('div');
+                            feedback.className = 'invalid-feedback';
+                            feedback.style.display = 'block';
+                            feedback.textContent = 'RUT inválido';
+                            this.parentNode.appendChild(feedback);
+                        }
+                    } else {
+                        this.classList.remove('is-invalid');
+                        const feedback = this.parentNode.querySelector('.invalid-feedback');
+                        if (feedback && feedback.textContent === 'RUT inválido') {
+                            feedback.remove();
+                        }
+                    }
+                }
+            });
+        }
+
+        // Auto-expandir si hay datos de factura o errores
+        const hasFacturaData = {{ old('rut_receptor', $boleta->rut_receptor) ? 'true' : 'false' }};
+        const hasErrors = {{ ($errors->has('rut_receptor') || $errors->has('razon_social_receptor') || $errors->has('giro_receptor') || $errors->has('direccion_receptor') || $errors->has('comuna_receptor')) ? 'true' : 'false' }};
+
+        if (hasFacturaData || hasErrors) {
+            const icon = document.getElementById('toggleIcon');
+            if (icon) {
+                icon.classList.add('rotated');
+            }
+        }
     });
 </script>
 @endsection

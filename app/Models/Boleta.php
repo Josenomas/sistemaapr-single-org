@@ -37,7 +37,13 @@ class Boleta extends Model
         'total',
         'estado',
         'observaciones',
-        'activo'
+        'activo',
+        // Campos opcionales para Facturas Electrónicas
+        'rut_receptor',
+        'razon_social_receptor',
+        'giro_receptor',
+        'direccion_receptor',
+        'comuna_receptor',
     ];
 
     protected $casts = [
@@ -392,5 +398,45 @@ class Boleta extends Model
         ];
 
         return $badges[$this->estado_dte] ?? '<span class="badge badge-secondary">' . ucfirst($this->estado_dte) . '</span>';
+    }
+
+    /**
+     * Verificar si es una factura electrónica (tiene RUT receptor)
+     */
+    public function esFactura()
+    {
+        return !empty($this->rut_receptor);
+    }
+
+    /**
+     * Obtener el tipo de documento tributario
+     */
+    public function getTipoDocumentoAttribute()
+    {
+        if ($this->tipo_dte == 33) {
+            return 'Factura Electrónica';
+        } elseif ($this->tipo_dte == 61) {
+            return 'Nota de Crédito';
+        } elseif ($this->tipo_dte == 56) {
+            return 'Nota de Débito';
+        } elseif ($this->tipo_dte == 39) {
+            return 'Boleta Electrónica';
+        }
+        return 'Documento Tipo ' . $this->tipo_dte;
+    }
+
+    /**
+     * Badge del tipo de documento
+     */
+    public function getTipoDocumentoBadgeAttribute()
+    {
+        $badges = [
+            33 => '<span class="badge" style="background: #3b82f6; color: white;"><i class="fas fa-file-invoice"></i> Factura (33)</span>',
+            39 => '<span class="badge" style="background: #10b981; color: white;"><i class="fas fa-receipt"></i> Boleta (39)</span>',
+            56 => '<span class="badge" style="background: #f59e0b; color: white;"><i class="fas fa-plus-circle"></i> N. Débito (56)</span>',
+            61 => '<span class="badge" style="background: #ef4444; color: white;"><i class="fas fa-minus-circle"></i> N. Crédito (61)</span>',
+        ];
+
+        return $badges[$this->tipo_dte] ?? '<span class="badge badge-secondary">Tipo ' . $this->tipo_dte . '</span>';
     }
 }

@@ -234,7 +234,8 @@
                             <td>{!! $boleta->estado_badge !!}</td>
                             <td>
                                 @if($boleta->tieneDTE())
-                                    {!! $boleta->estado_dte_badge !!}
+                                    {!! $boleta->tipo_documento_badge !!}
+                                    <br>{!! $boleta->estado_dte_badge !!}
                                     @if($boleta->folio_sii)
                                         <br><small class="text-muted">Folio: {{ $boleta->folio_sii }}</small>
                                     @endif

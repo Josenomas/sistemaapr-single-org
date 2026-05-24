@@ -77,21 +77,38 @@ class LibreDTEService
     }
 
     /**
-     * Preparar estructura de datos para boleta electrónica
+     * Preparar estructura de datos para boleta/factura electrónica
      */
     protected function prepararDTEBoleta(Boleta $boleta)
     {
         $socio = $boleta->socio;
         $organizacion = $boleta->organizacion;
 
-        // Determinar si es boleta nominativa o no nominativa
-        $rutReceptor = $socio->rut ?? '66666666-6'; // RUT genérico para boletas no nominativas
-        $nombreReceptor = $socio->nombre_completo ?? 'Consumidor Final';
+        // AUTO-DETECCIÓN: Si tiene RUT receptor → Factura (33), sino → Boleta (39)
+        $esFactura = !empty($boleta->rut_receptor);
+        $tipoDTE = $esFactura ? 33 : 39;
+
+        // Datos del receptor
+        if ($esFactura) {
+            // FACTURA: Usar datos del receptor desde la boleta
+            $rutReceptor = $boleta->rut_receptor;
+            $nombreReceptor = $boleta->razon_social_receptor;
+            $giroReceptor = $boleta->giro_receptor ?? 'Sin especificar';
+            $direccionReceptor = $boleta->direccion_receptor ?? ($socio->direccion ?? 'Sin dirección');
+            $comunaReceptor = $boleta->comuna_receptor ?? ($socio->comuna ?? $this->config->comuna);
+        } else {
+            // BOLETA: Usar datos del socio o genéricos
+            $rutReceptor = $socio->rut ?? '66666666-6';
+            $nombreReceptor = $socio->nombre_completo ?? 'Consumidor Final';
+            $giroReceptor = null;
+            $direccionReceptor = $socio->direccion ?? 'Sin dirección';
+            $comunaReceptor = $socio->comuna ?? $this->config->comuna;
+        }
 
         return [
             'Encabezado' => [
                 'IdDoc' => [
-                    'TipoDTE' => 39, // Boleta Electrónica
+                    'TipoDTE' => $tipoDTE,
                     'Folio' => 0, // 0 = asignación automática por LibreDTE
                     'FchEmis' => now()->format('Y-m-d'),
                 ],
@@ -104,12 +121,13 @@ class LibreDTEService
                     'CmnaOrigen' => $this->config->comuna,
                     'CiudadOrigen' => $this->config->ciudad,
                 ],
-                'Receptor' => [
+                'Receptor' => array_filter([
                     'RUTRecep' => $this->limpiarRut($rutReceptor),
                     'RznSocRecep' => $nombreReceptor,
-                    'DirRecep' => $socio->direccion ?? 'Sin dirección',
-                    'CmnaRecep' => $socio->comuna ?? $this->config->comuna,
-                ],
+                    'GiroRecep' => $esFactura ? $giroReceptor : null, // Solo para facturas
+                    'DirRecep' => $direccionReceptor,
+                    'CmnaRecep' => $comunaReceptor,
+                ]),
                 'Totales' => [
                     'MntNeto' => (int) round($boleta->total / 1.19), // Sin IVA
                     'TasaIVA' => 19,
