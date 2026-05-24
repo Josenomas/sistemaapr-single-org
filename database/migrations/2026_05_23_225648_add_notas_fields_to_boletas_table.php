@@ -15,8 +15,7 @@ return new class extends Migration
     {
         Schema::table('boletas', function (Blueprint $table) {
             // Campos para Notas de Crédito y Débito
-            $table->foreignId('boleta_referencia_id')->nullable()->after('comuna_receptor')
-                  ->constrained('boletas')->onDelete('set null')
+            $table->unsignedBigInteger('boleta_referencia_id')->nullable()->after('comuna_receptor')
                   ->comment('ID de la boleta original que se está referenciando (para notas de crédito/débito)');
 
             $table->string('motivo_nota', 500)->nullable()->after('boleta_referencia_id')
@@ -24,6 +23,12 @@ return new class extends Migration
 
             $table->decimal('monto_nota', 10, 2)->nullable()->after('motivo_nota')
                   ->comment('Monto de la nota (puede ser parcial o total)');
+
+            // Agregar foreign key por separado
+            $table->foreign('boleta_referencia_id')
+                  ->references('id')
+                  ->on('boletas')
+                  ->onDelete('set null');
         });
     }
 
