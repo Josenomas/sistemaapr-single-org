@@ -296,103 +296,117 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script>
-// Gráfico de DTEs por Mes
-const ctxMes = document.getElementById('chartDTEsPorMes');
-if (ctxMes) {
-    const dtesPorMes = @json($dtesPorMes);
+document.addEventListener('DOMContentLoaded', function() {
+    // Gráfico de DTEs por Mes
+    const ctxMes = document.getElementById('chartDTEsPorMes');
+    if (ctxMes) {
+        const dtesPorMes = @json($dtesPorMes);
+        console.log('DTEs por mes:', dtesPorMes);
 
-    const meses = dtesPorMes.map(d => {
-        const [año, mes] = d.mes.split('-');
-        const fecha = new Date(año, mes - 1);
-        return fecha.toLocaleDateString('es-CL', { month: 'short', year: 'numeric' });
-    });
-    const totales = dtesPorMes.map(d => d.total);
+        if (dtesPorMes && dtesPorMes.length > 0) {
+            const meses = dtesPorMes.map(d => {
+                const [año, mes] = d.mes.split('-');
+                const fecha = new Date(año, mes - 1);
+                return fecha.toLocaleDateString('es-CL', { month: 'short', year: 'numeric' });
+            });
+            const totales = dtesPorMes.map(d => d.total);
 
-    new Chart(ctxMes, {
-        type: 'bar',
-        data: {
-            labels: meses,
-            datasets: [{
-                label: 'DTEs Emitidos',
-                data: totales,
-                backgroundColor: 'rgba(124, 58, 237, 0.6)',
-                borderColor: 'rgb(124, 58, 237)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: false
+            new Chart(ctxMes, {
+                type: 'bar',
+                data: {
+                    labels: meses,
+                    datasets: [{
+                        label: 'DTEs Emitidos',
+                        data: totales,
+                        backgroundColor: 'rgba(124, 58, 237, 0.6)',
+                        borderColor: 'rgb(124, 58, 237)',
+                        borderWidth: 1
+                    }]
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'DTEs: ' + context.parsed.y;
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'DTEs: ' + context.parsed.y;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
                         }
                     }
                 }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            }
+            });
+        } else {
+            // Mostrar mensaje cuando no hay datos
+            ctxMes.parentElement.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> No hay datos para mostrar en los últimos 12 meses.</div>';
         }
-    });
+    }
 }
 
-// Gráfico de DTEs por Estado
-const ctxEstado = document.getElementById('chartDTEsPorEstado');
-if (ctxEstado) {
-    const dtesPorEstado = @json($dtesPorEstado);
+    // Gráfico de DTEs por Estado
+    const ctxEstado = document.getElementById('chartDTEsPorEstado');
+    if (ctxEstado) {
+        const dtesPorEstado = @json($dtesPorEstado);
+        console.log('DTEs por estado:', dtesPorEstado);
 
-    const estados = Object.keys(dtesPorEstado);
-    const valores = Object.values(dtesPorEstado);
+        const estados = Object.keys(dtesPorEstado);
+        const valores = Object.values(dtesPorEstado);
 
-    const coloresEstado = {
-        'pendiente': '#fbbf24',
-        'emitida': '#3b82f6',
-        'aceptada': '#10b981',
-        'rechazada': '#ef4444',
-        'anulada': '#6b7280'
-    };
+        if (estados.length > 0) {
+            const coloresEstado = {
+                'pendiente': '#fbbf24',
+                'emitida': '#3b82f6',
+                'aceptada': '#10b981',
+                'rechazada': '#ef4444',
+                'anulada': '#6b7280'
+            };
 
-    const colores = estados.map(e => coloresEstado[e] || '#9ca3af');
+            const colores = estados.map(e => coloresEstado[e] || '#9ca3af');
 
-    new Chart(ctxEstado, {
-        type: 'doughnut',
-        data: {
-            labels: estados.map(e => e.charAt(0).toUpperCase() + e.slice(1)),
-            datasets: [{
-                data: valores,
-                backgroundColor: colores,
-                borderWidth: 2,
-                borderColor: '#fff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
+            new Chart(ctxEstado, {
+                type: 'doughnut',
+                data: {
+                    labels: estados.map(e => e.charAt(0).toUpperCase() + e.slice(1)),
+                    datasets: [{
+                        data: valores,
+                        backgroundColor: colores,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.parsed;
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed;
+                                }
+                            }
                         }
                     }
                 }
-            }
+            });
+        } else {
+            ctxEstado.parentElement.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> No hay datos para mostrar.</div>';
         }
-    });
-}
+    }
+});
 </script>
 @endpush
