@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('boletas', function (Blueprint $table) {
             // Campos para Notas de Crédito y Débito
-            $table->unsignedBigInteger('boleta_referencia_id')->nullable()->after('comuna_receptor')
+            $table->unsignedInteger('boleta_referencia_id')->nullable()->after('comuna_receptor')
                   ->comment('ID de la boleta original que se está referenciando (para notas de crédito/débito)');
 
             $table->string('motivo_nota', 500)->nullable()->after('boleta_referencia_id')
