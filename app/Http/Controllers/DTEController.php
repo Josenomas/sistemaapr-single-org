@@ -63,6 +63,19 @@ class DTEController extends Controller
             ->limit(10)
             ->get();
 
+        // Boletas pendientes de emitir DTE (sin folio_sii)
+        $totalBoletasPendientes = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNull('folio_sii')
+            ->count();
+
+        // Últimas 20 boletas SIN DTE para emisión masiva
+        $boletasSinDTE = Boleta::where('id_organizacion', $idOrganizacion)
+            ->whereNull('folio_sii')
+            ->with('socio')
+            ->orderBy('fecha_emision', 'desc')
+            ->limit(20)
+            ->get();
+
         // Estado de conexión con LibreDTE
         $conexionLibreDTE = false;
         try {
@@ -81,6 +94,8 @@ class DTEController extends Controller
             'dtesPorMes',
             'montoTotalFacturado',
             'ultimosDTEs',
+            'totalBoletasPendientes',
+            'boletasSinDTE',
             'conexionLibreDTE',
             'config'
         ));
