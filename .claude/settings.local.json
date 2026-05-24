@@ -9,7 +9,10 @@
       "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && php artisan tinker --execute=\"\"DB::statement(''ALTER TABLE boletas DROP COLUMN IF EXISTS boleta_referencia_id'');DB::statement(''ALTER TABLE boletas DROP COLUMN IF EXISTS motivo_nota'');DB::statement(''ALTER TABLE boletas DROP COLUMN IF EXISTS monto_nota'');\"\" && php artisan migrate --path=database/migrations/2026_05_23_225648_add_notas_fields_to_boletas_table.php --force && php artisan view:clear && php artisan config:clear && php artisan cache:clear && php artisan route:clear && echo ''✅ Notas de Crédito/Débito desplegadas''\")",
       "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && php artisan tinker --execute=\"\"DB::statement(''ALTER TABLE boletas DROP COLUMN boleta_referencia_id, DROP COLUMN motivo_nota, DROP COLUMN monto_nota'');\"\" && php artisan migrate --path=database/migrations/2026_05_23_225648_add_notas_fields_to_boletas_table.php --force && php artisan view:clear && php artisan config:clear && php artisan cache:clear && php artisan route:clear && echo ''✅ Notas de Crédito/Débito desplegadas''\")",
       "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && php artisan tinker --execute=\"\"echo DB::select(''SHOW COLUMNS FROM boletas WHERE Field = \\\"\"id\\\"\"'')[0]->Type;\"\"\")",
-      "Bash(git commit -m \"Fix: Cambiar tipo de columna a unsignedInteger\")"
+      "Bash(git commit -m \"Fix: Cambiar tipo de columna a unsignedInteger\")",
+      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan tinker --execute=\"\"DB::statement(''ALTER TABLE boletas DROP COLUMN boleta_referencia_id, DROP COLUMN motivo_nota, DROP COLUMN monto_nota'');\"\" && php artisan migrate --path=database/migrations/2026_05_23_225648_add_notas_fields_to_boletas_table.php --force && php artisan view:clear && php artisan config:clear && php artisan cache:clear && php artisan route:clear && echo ''✅ Notas de Crédito/Débito desplegadas''\")",
+      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && php artisan tinker --execute=\"\"\\$col = DB::select(''SHOW COLUMNS FROM boletas WHERE Field = \\\"\"id\\\"\"'')[0]; echo ''Type: '' . \\$col->Type . '' | Key: '' . \\$col->Key . '' | Extra: '' . \\$col->Extra;\"\"\")",
+      "Bash(git commit -m \"Fix: Simplificar migración sin foreign key\")"
     ],
     "deny": [],
     "ask": []
