@@ -35,52 +35,56 @@
 @endif
 
 <!-- Cards de Estadísticas -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <i class="fas fa-file-invoice"></i>
+<div class="stats-grid-dte">
+    <div class="stat-card-dte">
+        <div class="stat-header-dte">
+            <span class="stat-title-dte">DTEs Emitidos</span>
+            <div class="stat-icon-dte primary-bg-dte">
+                <i class="fas fa-file-invoice"></i>
+            </div>
         </div>
-        <div class="stat-info">
-            <div class="stat-label">DTEs Emitidos</div>
-            <div class="stat-value">{{ number_format($totalDTEsEmitidos, 0, ',', '.') }}</div>
-        </div>
+        <div class="stat-value-dte">{{ number_format($totalDTEsEmitidos, 0, ',', '.') }}</div>
+        <div class="stat-description-dte">Total de documentos tributarios</div>
     </div>
 
-    <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-            <i class="fas fa-dollar-sign"></i>
+    <div class="stat-card-dte">
+        <div class="stat-header-dte">
+            <span class="stat-title-dte">Total Facturado</span>
+            <div class="stat-icon-dte success-bg-dte">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
         </div>
-        <div class="stat-info">
-            <div class="stat-label">Total Facturado</div>
-            <div class="stat-value">${{ number_format($montoTotalFacturado, 0, ',', '.') }}</div>
-        </div>
+        <div class="stat-value-dte">${{ number_format($montoTotalFacturado, 0, ',', '.') }}</div>
+        <div class="stat-description-dte">Monto total facturado electrónicamente</div>
     </div>
 
-    <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
-            <i class="fas fa-check-circle"></i>
+    <div class="stat-card-dte">
+        <div class="stat-header-dte">
+            <span class="stat-title-dte">Aceptados SII</span>
+            <div class="stat-icon-dte info-bg-dte">
+                <i class="fas fa-check-circle"></i>
+            </div>
         </div>
-        <div class="stat-info">
-            <div class="stat-label">Aceptados SII</div>
-            <div class="stat-value">{{ number_format($dtesPorEstado['aceptada'] ?? 0, 0, ',', '.') }}</div>
-        </div>
+        <div class="stat-value-dte">{{ number_format($dtesPorEstado['aceptada'] ?? 0, 0, ',', '.') }}</div>
+        <div class="stat-description-dte">Documentos aceptados por el SII</div>
     </div>
 
-    <div class="stat-card">
-        <div class="stat-icon" style="background: {{ $conexionLibreDTE ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }};">
-            <i class="fas {{ $conexionLibreDTE ? 'fa-wifi' : 'fa-exclamation-triangle' }}"></i>
+    <div class="stat-card-dte">
+        <div class="stat-header-dte">
+            <span class="stat-title-dte">LibreDTE</span>
+            <div class="stat-icon-dte {{ $conexionLibreDTE ? 'success-bg-dte' : 'danger-bg-dte' }}">
+                <i class="fas {{ $conexionLibreDTE ? 'fa-wifi' : 'fa-exclamation-triangle' }}"></i>
+            </div>
         </div>
-        <div class="stat-info">
-            <div class="stat-label">LibreDTE</div>
-            <div class="stat-value" style="font-size: 1rem;">{{ $conexionLibreDTE ? 'Conectado' : 'Desconectado' }}</div>
-        </div>
+        <div class="stat-value-dte" style="font-size: 1.5rem;">{{ $conexionLibreDTE ? 'Conectado' : 'Desconectado' }}</div>
+        <div class="stat-description-dte">Estado de conexión con LibreDTE</div>
     </div>
 </div>
 
 <!-- Gráficos -->
-<div class="charts-row">
+<div class="grid-charts">
     <!-- Gráfico de DTEs por Mes -->
-    <div class="chart-container chart-large">
+    <div class="chart-col-large">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
@@ -95,7 +99,7 @@
     </div>
 
     <!-- DTEs por Estado -->
-    <div class="chart-container chart-small">
+    <div class="chart-col-small">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
@@ -281,90 +285,112 @@ if (ctxEstado) {
 
 @push('styles')
 <style>
-.stats-grid {
+.stats-grid-dte {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
 }
 
-.stat-card {
-    background: white;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.stat-card-dte {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    transition: all 0.3s;
+    border: 1px solid var(--gray-200);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-dte::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+}
+
+.stat-card-dte:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+    border-color: var(--primary);
+}
+
+.stat-header-dte {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    transition: transform 0.2s, box-shadow 0.2s;
+    justify-content: space-between;
+    margin-bottom: 16px;
 }
 
-.stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+.stat-title-dte {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 600;
 }
 
-.stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
+.stat-icon-dte {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius);
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-}
-
-.stat-icon i {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     color: white;
 }
 
-.stat-info {
-    flex: 1;
+.primary-bg-dte {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
 }
 
-.stat-label {
-    font-size: 0.875rem;
-    color: #6b7280;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
+.success-bg-dte {
+    background: linear-gradient(135deg, var(--success), #059669);
 }
 
-.stat-value {
-    font-size: 1.8rem;
+.info-bg-dte {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.danger-bg-dte {
+    background: linear-gradient(135deg, var(--danger), #dc2626);
+}
+
+.stat-value-dte {
+    font-size: 2.25rem;
     font-weight: 700;
-    color: #1f2937;
+    margin-bottom: 8px;
+    color: var(--gray-900);
 }
 
-.charts-row {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+.stat-description-dte {
+    font-size: 0.875rem;
+    color: var(--gray-500);
 }
 
-.chart-container {
-    flex: 1;
+.grid-charts {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
 }
 
-.chart-large {
-    flex: 2;
+.chart-col-large,
+.chart-col-small {
+    min-width: 0;
 }
 
-.chart-small {
-    flex: 1;
+@media (max-width: 992px) {
+    .grid-charts {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 768px) {
-    .charts-row {
-        flex-direction: column;
-    }
-
-    .chart-large,
-    .chart-small {
-        flex: 1;
-    }
-
-    .stats-grid {
+    .stats-grid-dte {
         grid-template-columns: 1fr;
     }
 }
