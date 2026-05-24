@@ -130,7 +130,7 @@ class VerificarEstadoDTEs implements ShouldQueue
     protected function enviarNotificacionRechazo(Boleta $dte, $glosa)
     {
         try {
-            $config = $dte->organizacion->configuracionLibreDTE;
+            $config = $dte->organizacion->configuracionDTE;
             if ($config && $config->notificar_rechazos && $config->email_notificaciones) {
                 Mail::to($config->email_notificaciones)->send(new DTERechazoNotificacion($dte, $glosa));
 

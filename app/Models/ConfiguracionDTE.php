@@ -27,10 +27,13 @@ class ConfiguracionDTE extends Model
         'folio_factura_actual',
         'activo',
         'observaciones',
+        'notificar_rechazos',
+        'email_notificaciones',
     ];
 
     protected $casts = [
         'activo' => 'boolean',
+        'notificar_rechazos' => 'boolean',
         'folio_boleta_actual' => 'integer',
         'folio_factura_actual' => 'integer',
         'fecha_creacion' => 'datetime',
