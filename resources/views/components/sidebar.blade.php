@@ -65,7 +65,7 @@
                 <span>Folios SII</span>
                 <span class="badge-beta">BETA</span>
             </a>
-            <a href="{{ route('dte.configuracion') }}" class="nav-item {{ request()->routeIs('dte.*') ? 'active' : '' }}">
+            <a href="{{ route('dte.dashboard') }}" class="nav-item {{ request()->routeIs('dte.*') ? 'active' : '' }}">
                 <i class="fas fa-file-invoice-dollar"></i>
                 <span>Facturación Electrónica</span>
                 <span class="badge-new">NUEVO</span>
@@ -469,7 +469,21 @@
         box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
     }
 
-    .nav-item .badge-beta {
+    .badge-new {
+        display: inline-block;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        margin-left: auto;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+    }
+
+    .nav-item .badge-beta,
+    .nav-item .badge-new {
         font-size: 0.6rem;
         padding: 2px 5px;
     }
