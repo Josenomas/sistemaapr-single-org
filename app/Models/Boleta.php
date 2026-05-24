@@ -44,6 +44,10 @@ class Boleta extends Model
         'giro_receptor',
         'direccion_receptor',
         'comuna_receptor',
+        // Campos para Notas de Crédito/Débito
+        'boleta_referencia_id',
+        'motivo_nota',
+        'monto_nota',
     ];
 
     protected $casts = [
@@ -59,6 +63,7 @@ class Boleta extends Model
         'descuentos' => 'decimal:2',
         'subsidio' => 'decimal:2',
         'total' => 'decimal:2',
+        'monto_nota' => 'decimal:2',
         'activo' => 'boolean'
     ];
 
@@ -87,6 +92,27 @@ class Boleta extends Model
     public function folioSII()
     {
         return $this->belongsTo(FolioSII::class, 'id_folio_sii');
+    }
+
+    /**
+     * Relación con boleta referenciada (para notas de crédito/débito)
+     */
+    public function boletaReferencia()
+    {
+        return $this->belongsTo(Boleta::class, 'boleta_referencia_id');
+    }
+
+    /**
+     * Relación con notas de crédito/débito que referencian esta boleta
+     */
+    public function notasCredito()
+    {
+        return $this->hasMany(Boleta::class, 'boleta_referencia_id')->where('tipo_dte', 61);
+    }
+
+    public function notasDebito()
+    {
+        return $this->hasMany(Boleta::class, 'boleta_referencia_id')->where('tipo_dte', 56);
     }
 
     /**
@@ -438,5 +464,61 @@ class Boleta extends Model
         ];
 
         return $badges[$this->tipo_dte] ?? '<span class="badge badge-secondary">Tipo ' . $this->tipo_dte . '</span>';
+    }
+
+    /**
+     * Verificar si es una nota de crédito
+     */
+    public function esNotaCredito()
+    {
+        return $this->tipo_dte == 61;
+    }
+
+    /**
+     * Verificar si es una nota de débito
+     */
+    public function esNotaDebito()
+    {
+        return $this->tipo_dte == 56;
+    }
+
+    /**
+     * Verificar si es una nota (crédito o débito)
+     */
+    public function esNota()
+    {
+        return in_array($this->tipo_dte, [56, 61]);
+    }
+
+    /**
+     * Obtener el total neto de notas aplicadas a esta boleta
+     */
+    public function getTotalNotasCreditoAttribute()
+    {
+        return $this->notasCredito()->sum('monto_nota') ?? 0;
+    }
+
+    public function getTotalNotasDebitoAttribute()
+    {
+        return $this->notasDebito()->sum('monto_nota') ?? 0;
+    }
+
+    /**
+     * Obtener el saldo pendiente considerando notas
+     */
+    public function getSaldoPendienteAttribute()
+    {
+        $saldo = $this->total;
+
+        // Restar notas de crédito (reducciones)
+        $saldo -= $this->total_notas_credito;
+
+        // Sumar notas de débito (aumentos)
+        $saldo += $this->total_notas_debito;
+
+        // Restar pagos realizados
+        $saldo -= $this->total_pagado;
+
+        return max(0, $saldo); // No puede ser negativo
     }
 }

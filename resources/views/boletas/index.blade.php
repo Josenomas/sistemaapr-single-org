@@ -288,12 +288,28 @@
                                         @endif
 
                                         @if($boleta->estado_dte !== 'anulada' && in_array($boleta->estado_dte, ['emitida', 'aceptada']))
-                                            <button type="button"
-                                                    class="btn btn-sm btn-warning"
-                                                    title="Anular DTE (Nota de Crédito)"
-                                                    onclick="mostrarModalAnular({{ $boleta->id }}, '{{ $boleta->folio_sii }}', {{ $boleta->total }})">
-                                                <i class="fas fa-ban"></i>
-                                            </button>
+                                            <!-- Dropdown de acciones de DTE -->
+                                            <div class="dropdown" style="display: inline-block;">
+                                                <button class="btn btn-sm btn-secondary dropdown-toggle"
+                                                        type="button"
+                                                        id="dropdownDTE{{ $boleta->id }}"
+                                                        data-toggle="dropdown"
+                                                        aria-haspopup="true"
+                                                        aria-expanded="false"
+                                                        title="Opciones DTE">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownDTE{{ $boleta->id }}">
+                                                    <a class="dropdown-item" href="{{ route('dte.crear-nota-credito', $boleta->id) }}">
+                                                        <i class="fas fa-minus-circle text-danger"></i>
+                                                        Nota de Crédito
+                                                    </a>
+                                                    <a class="dropdown-item" href="{{ route('dte.crear-nota-debito', $boleta->id) }}">
+                                                        <i class="fas fa-plus-circle text-warning"></i>
+                                                        Nota de Débito
+                                                    </a>
+                                                </div>
+                                            </div>
                                         @endif
                                     @endif
 

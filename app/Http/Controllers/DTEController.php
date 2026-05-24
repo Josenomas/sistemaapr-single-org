@@ -607,4 +607,173 @@ class DTEController extends Controller
         $texto = str_replace([';', "\n", "\r", '"'], ' ', $texto);
         return trim($texto);
     }
+
+    /**
+     * Mostrar formulario para crear nota de crédito
+     */
+    public function crearNotaCredito($boletaId)
+    {
+        $boleta = Boleta::with('socio')->findOrFail($boletaId);
+
+        if (!$boleta->tieneDTE()) {
+            return redirect()->back()->with('error', 'La boleta no tiene DTE emitido. No se puede crear nota de crédito.');
+        }
+
+        if ($boleta->estado_dte == 'anulada') {
+            return redirect()->back()->with('error', 'La boleta ya está anulada.');
+        }
+
+        return view('dte.crear-nota-credito', compact('boleta'));
+    }
+
+    /**
+     * Emitir nota de crédito
+     */
+    public function emitirNotaCredito(Request $request)
+    {
+        $request->validate([
+            'boleta_id' => 'required|exists:boletas,id',
+            'motivo' => 'required|string|max:500',
+            'monto' => 'required|numeric|min:1',
+        ]);
+
+        $boletaOriginal = Boleta::findOrFail($request->boleta_id);
+
+        if (!$boletaOriginal->tieneDTE()) {
+            return redirect()->back()->with('error', 'La boleta no tiene DTE emitido.');
+        }
+
+        if ($request->monto > $boletaOriginal->total) {
+            return redirect()->back()->with('error', 'El monto de la nota de crédito no puede ser mayor al total de la boleta.');
+        }
+
+        try {
+            $idOrganizacion = auth()->user()->id_organizacion;
+
+            // Crear nueva "boleta" que será la nota de crédito
+            $notaCredito = Boleta::create([
+                'id_organizacion' => $idOrganizacion,
+                'id_socio' => $boletaOriginal->id_socio,
+                'numero_boleta' => 'NC-' . $boletaOriginal->numero_boleta,
+                'mes' => now()->format('Y-m'),
+                'fecha_emision' => now(),
+                'fecha_vencimiento' => now(),
+                'consumo_m3' => 0,
+                'cargo_fijo' => 0,
+                'cargo_consumo' => 0,
+                'otros_cargos' => 0,
+                'descuentos' => 0,
+                'total' => 0,
+                'estado' => 'pagada', // Las notas no tienen estados de pago
+                'tipo_dte' => 61, // Nota de Crédito
+                'boleta_referencia_id' => $boletaOriginal->id,
+                'motivo_nota' => $request->motivo,
+                'monto_nota' => $request->monto,
+                // Copiar datos del receptor si es factura
+                'rut_receptor' => $boletaOriginal->rut_receptor,
+                'razon_social_receptor' => $boletaOriginal->razon_social_receptor,
+                'giro_receptor' => $boletaOriginal->giro_receptor,
+                'direccion_receptor' => $boletaOriginal->direccion_receptor,
+                'comuna_receptor' => $boletaOriginal->comuna_receptor,
+            ]);
+
+            // Emitir DTE usando LibreDTE
+            $libreDTE = new \App\Services\LibreDTEService();
+            $result = $libreDTE->emitirDTE($notaCredito);
+
+            if ($result['success']) {
+                // Si es anulación total, marcar boleta original como anulada
+                if ($request->monto >= $boletaOriginal->total) {
+                    $boletaOriginal->update(['estado_dte' => 'anulada']);
+                }
+
+                return redirect()->route('dte.dashboard')
+                    ->with('success', 'Nota de crédito emitida exitosamente. Folio: ' . $notaCredito->fresh()->folio_sii);
+            } else {
+                $notaCredito->delete();
+                return redirect()->back()->with('error', 'Error al emitir nota de crédito: ' . $result['message']);
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Mostrar formulario para crear nota de débito
+     */
+    public function crearNotaDebito($boletaId)
+    {
+        $boleta = Boleta::with('socio')->findOrFail($boletaId);
+
+        if (!$boleta->tieneDTE()) {
+            return redirect()->back()->with('error', 'La boleta no tiene DTE emitido. No se puede crear nota de débito.');
+        }
+
+        return view('dte.crear-nota-debito', compact('boleta'));
+    }
+
+    /**
+     * Emitir nota de débito
+     */
+    public function emitirNotaDebito(Request $request)
+    {
+        $request->validate([
+            'boleta_id' => 'required|exists:boletas,id',
+            'motivo' => 'required|string|max:500',
+            'monto' => 'required|numeric|min:1',
+        ]);
+
+        $boletaOriginal = Boleta::findOrFail($request->boleta_id);
+
+        if (!$boletaOriginal->tieneDTE()) {
+            return redirect()->back()->with('error', 'La boleta no tiene DTE emitido.');
+        }
+
+        try {
+            $idOrganizacion = auth()->user()->id_organizacion;
+
+            // Crear nueva "boleta" que será la nota de débito
+            $notaDebito = Boleta::create([
+                'id_organizacion' => $idOrganizacion,
+                'id_socio' => $boletaOriginal->id_socio,
+                'numero_boleta' => 'ND-' . $boletaOriginal->numero_boleta,
+                'mes' => now()->format('Y-m'),
+                'fecha_emision' => now(),
+                'fecha_vencimiento' => now(),
+                'consumo_m3' => 0,
+                'cargo_fijo' => 0,
+                'cargo_consumo' => 0,
+                'otros_cargos' => 0,
+                'descuentos' => 0,
+                'total' => 0,
+                'estado' => 'pendiente',
+                'tipo_dte' => 56, // Nota de Débito
+                'boleta_referencia_id' => $boletaOriginal->id,
+                'motivo_nota' => $request->motivo,
+                'monto_nota' => $request->monto,
+                // Copiar datos del receptor si es factura
+                'rut_receptor' => $boletaOriginal->rut_receptor,
+                'razon_social_receptor' => $boletaOriginal->razon_social_receptor,
+                'giro_receptor' => $boletaOriginal->giro_receptor,
+                'direccion_receptor' => $boletaOriginal->direccion_receptor,
+                'comuna_receptor' => $boletaOriginal->comuna_receptor,
+            ]);
+
+            // Emitir DTE usando LibreDTE
+            $libreDTE = new \App\Services\LibreDTEService();
+            $result = $libreDTE->emitirDTE($notaDebito);
+
+            if ($result['success']) {
+                return redirect()->route('dte.dashboard')
+                    ->with('success', 'Nota de débito emitida exitosamente. Folio: ' . $notaDebito->fresh()->folio_sii);
+            } else {
+                $notaDebito->delete();
+                return redirect()->back()->with('error', 'Error al emitir nota de débito: ' . $result['message']);
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
 }

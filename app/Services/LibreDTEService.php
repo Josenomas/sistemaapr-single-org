@@ -77,16 +77,23 @@ class LibreDTEService
     }
 
     /**
-     * Preparar estructura de datos para boleta/factura electrónica
+     * Preparar estructura de datos para boleta/factura/nota electrónica
      */
     protected function prepararDTEBoleta(Boleta $boleta)
     {
         $socio = $boleta->socio;
         $organizacion = $boleta->organizacion;
 
-        // AUTO-DETECCIÓN: Si tiene RUT receptor → Factura (33), sino → Boleta (39)
-        $esFactura = !empty($boleta->rut_receptor);
-        $tipoDTE = $esFactura ? 33 : 39;
+        // Determinar tipo de DTE
+        if ($boleta->tipo_dte) {
+            // Si ya tiene tipo asignado (notas de crédito/débito), usar ese
+            $tipoDTE = $boleta->tipo_dte;
+            $esFactura = in_array($tipoDTE, [33, 56, 61]); // Facturas y sus notas
+        } else {
+            // AUTO-DETECCIÓN: Si tiene RUT receptor → Factura (33), sino → Boleta (39)
+            $esFactura = !empty($boleta->rut_receptor);
+            $tipoDTE = $esFactura ? 33 : 39;
+        }
 
         // Datos del receptor
         if ($esFactura) {
@@ -105,7 +112,7 @@ class LibreDTEService
             $comunaReceptor = $socio->comuna ?? $this->config->comuna;
         }
 
-        return [
+        $dte = [
             'Encabezado' => [
                 'IdDoc' => [
                     'TipoDTE' => $tipoDTE,
@@ -129,23 +136,40 @@ class LibreDTEService
                     'CmnaRecep' => $comunaReceptor,
                 ]),
                 'Totales' => [
-                    'MntNeto' => (int) round($boleta->total / 1.19), // Sin IVA
+                    'MntNeto' => (int) round(($boleta->monto_nota ?? $boleta->total) / 1.19), // Sin IVA
                     'TasaIVA' => 19,
-                    'IVA' => (int) round($boleta->total - ($boleta->total / 1.19)),
-                    'MntTotal' => (int) $boleta->total,
+                    'IVA' => (int) round(($boleta->monto_nota ?? $boleta->total) - (($boleta->monto_nota ?? $boleta->total) / 1.19)),
+                    'MntTotal' => (int) ($boleta->monto_nota ?? $boleta->total),
                 ],
             ],
             'Detalle' => [
                 [
                     'NroLinDet' => 1,
-                    'NmbItem' => "Consumo de Agua Potable - {$boleta->mes_texto}",
-                    'DscItem' => "Consumo: {$boleta->consumo_m3} m³",
+                    'NmbItem' => $this->obtenerNombreItem($boleta),
+                    'DscItem' => $this->obtenerDescripcionItem($boleta),
                     'QtyItem' => 1,
-                    'PrcItem' => (int) $boleta->total,
-                    'MontoItem' => (int) $boleta->total,
+                    'PrcItem' => (int) ($boleta->monto_nota ?? $boleta->total),
+                    'MontoItem' => (int) ($boleta->monto_nota ?? $boleta->total),
                 ],
             ],
         ];
+
+        // Si es una nota de crédito o débito, agregar referencia al documento original
+        if (in_array($tipoDTE, [56, 61]) && $boleta->boletaReferencia) {
+            $docRef = $boleta->boletaReferencia;
+            $dte['Referencia'] = [
+                [
+                    'NroLinRef' => 1,
+                    'TpoDocRef' => $docRef->tipo_dte ?? 39,
+                    'FolioRef' => $docRef->folio_sii,
+                    'FchRef' => $docRef->fecha_emision_dte->format('Y-m-d'),
+                    'CodRef' => $tipoDTE == 61 ? 1 : 2, // 1=Anula documento, 2=Corrige monto
+                    'RazonRef' => $boleta->motivo_nota ?? 'Corrección de documento',
+                ],
+            ];
+        }
+
+        return $dte;
     }
 
     /**
@@ -303,6 +327,30 @@ class LibreDTEService
                 ],
             ],
         ];
+    }
+
+    /**
+     * Obtener nombre del item según tipo de documento
+     */
+    protected function obtenerNombreItem(Boleta $boleta)
+    {
+        if ($boleta->esNotaCredito()) {
+            return "Nota de Crédito - Consumo de Agua Potable";
+        } elseif ($boleta->esNotaDebito()) {
+            return "Nota de Débito - Cargo Adicional";
+        }
+        return "Consumo de Agua Potable - {$boleta->mes_texto}";
+    }
+
+    /**
+     * Obtener descripción del item según tipo de documento
+     */
+    protected function obtenerDescripcionItem(Boleta $boleta)
+    {
+        if ($boleta->esNota()) {
+            return $boleta->motivo_nota ?? 'Corrección de documento';
+        }
+        return "Consumo: {$boleta->consumo_m3} m³";
     }
 
     /**
