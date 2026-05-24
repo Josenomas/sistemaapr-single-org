@@ -2,6 +2,120 @@
 
 @section('title', 'Dashboard DTE - Estadísticas')
 
+@section('styles')
+<style>
+.stats-grid-dte {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.stat-card-dte {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 24px;
+    transition: all 0.3s;
+    border: 1px solid #e5e7eb;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-dte::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #7c3aed, #5b21b6);
+}
+
+.stat-card-dte:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+    border-color: #7c3aed;
+}
+
+.stat-header-dte {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.stat-title-dte {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.stat-icon-dte {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.primary-bg-dte {
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+}
+
+.success-bg-dte {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.info-bg-dte {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.danger-bg-dte {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.stat-value-dte {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1f2937;
+}
+
+.stat-description-dte {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.grid-charts {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.chart-col-large,
+.chart-col-small {
+    min-width: 0;
+}
+
+@media (max-width: 992px) {
+    .grid-charts {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid-dte {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+@endsection
+
 @section('content')
 <div class="page-header">
     <h2 class="page-title">
@@ -281,118 +395,4 @@ if (ctxEstado) {
     });
 }
 </script>
-@endpush
-
-@push('styles')
-<style>
-.stats-grid-dte {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
-    margin-bottom: 32px;
-}
-
-.stat-card-dte {
-    background: var(--white);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 24px;
-    transition: all 0.3s;
-    border: 1px solid var(--gray-200);
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-card-dte::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, var(--primary), var(--primary-dark));
-}
-
-.stat-card-dte:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
-    border-color: var(--primary);
-}
-
-.stat-header-dte {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-}
-
-.stat-title-dte {
-    font-size: 0.875rem;
-    color: var(--gray-600);
-    font-weight: 600;
-}
-
-.stat-icon-dte {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    color: white;
-}
-
-.primary-bg-dte {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-}
-
-.success-bg-dte {
-    background: linear-gradient(135deg, var(--success), #059669);
-}
-
-.info-bg-dte {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-}
-
-.danger-bg-dte {
-    background: linear-gradient(135deg, var(--danger), #dc2626);
-}
-
-.stat-value-dte {
-    font-size: 2.25rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--gray-900);
-}
-
-.stat-description-dte {
-    font-size: 0.875rem;
-    color: var(--gray-500);
-}
-
-.grid-charts {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 24px;
-    margin-bottom: 32px;
-}
-
-.chart-col-large,
-.chart-col-small {
-    min-width: 0;
-}
-
-@media (max-width: 992px) {
-    .grid-charts {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .stats-grid-dte {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
 @endpush
