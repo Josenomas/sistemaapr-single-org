@@ -61,6 +61,20 @@ class Kernel extends ConsoleKernel
                  ->at('03:00')
                  ->emailOutputOnFailure('sistemaapr@gmail.com');
 
+        // ========================================
+        // VERIFICACIÓN AUTOMÁTICA DE DTES
+        // ========================================
+
+        // Verificar estado de DTEs en SII cada 6 horas
+        $schedule->call(function () {
+            \App\Jobs\VerificarEstadoDTEs::dispatch();
+        })->everyFourHours()
+          ->name('verificar-estado-dtes')
+          ->withoutOverlapping()
+          ->onFailure(function () {
+              \Log::error('Falló la verificación automática de estados DTE');
+          });
+
         // Alternativa: Enviar cada 3 días a las 9:00 AM
         // $schedule->command('notificaciones:boletas-vencidas')
         //          ->days([1, 4, 7, 10, 13, 16, 19, 22, 25, 28])

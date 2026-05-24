@@ -367,6 +367,54 @@ class LibreDTEService
     }
 
     /**
+     * Verificar estado de un DTE en el SII a través de LibreDTE
+     */
+    public function verificarEstadoSII($folio, $tipoDTE = 39)
+    {
+        if (!$this->config) {
+            throw new \Exception('Debe configurar la organización primero usando setOrganizacion()');
+        }
+
+        try {
+            $url = rtrim($this->config->libredte_url, '/') . '/api/dte/documentos/estado';
+
+            $response = $this->client->get($url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->config->libredte_hash,
+                    'Accept' => 'application/json',
+                ],
+                'query' => [
+                    'dte' => $tipoDTE,
+                    'folio' => $folio,
+                ],
+                'timeout' => 20,
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            // Estructura esperada: ['estado' => 'ACEPTADO' | 'RECHAZADO' | 'PENDIENTE', 'glosa' => '...']
+            return [
+                'success' => true,
+                'estado' => $data['estado'] ?? 'PENDIENTE',
+                'glosa' => $data['glosa'] ?? null,
+                'fecha_verificacion' => now(),
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error al verificar estado DTE en SII', [
+                'folio' => $folio,
+                'tipo_dte' => $tipoDTE,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Descargar PDF desde LibreDTE y guardarlo localmente
      */
     protected function descargarYGuardarPDF($pdfUrl, Boleta $boleta)

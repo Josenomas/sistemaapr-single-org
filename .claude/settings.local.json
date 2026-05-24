@@ -1,15 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && php artisan config:clear && echo ''✅ Fix aplicado - Dashboard DTE corregido''\")",
-      "Bash(git commit -m \"$(cat <<''EOF''\nStyle: Unificar diseño del dashboard DTE con el sistema\n\n- Cambiar page-actions → header-actions (consistencia)\n- Cambiar alert-danger → alert-error (clase estándar)\n- Simplificar grillas de stats y charts\n- Eliminar estilos personalizados conflictivos\n- Mantener funcionalidad de gráficos Chart.js\n- Usar clases CSS del sistema global\n\nEl dashboard ahora tiene el mismo diseño que el resto del sistema.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && echo ''✅ Diseño del dashboard DTE unificado con el sistema''\")",
-      "Bash(git commit -m \"$(cat <<''EOF''\nFix: Corregir diseño del dashboard DTE - usar clases CSS del sistema\n\n- Usar clases CSS propias (-dte suffix) para evitar conflictos\n- Estructura de stat-card igual al dashboard principal\n- Mantener :before border izquierdo decorativo\n- Grid responsivo con breakpoints correctos\n- Variables CSS del sistema (--primary, --gray-*, etc.)\n\nAhora las cards se renderizan correctamente sin barras de color.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && echo ''✅ Dashboard DTE corregido - diseño unificado''\")",
-      "Bash(git commit -m \"$(cat <<''EOF''\nFix: Mover estilos del dashboard DTE a @section(''styles'')\n\n- Cambiar @push(''styles'') → @section(''styles'')\n- Usar colores hexadecimales directos en lugar de variables CSS\n- Garantizar que los estilos se carguen antes del HTML\n- Eliminar duplicación de estilos\n\nEsto asegura que las cards se rendericen correctamente.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && php artisan cache:clear && echo ''✅ Estilos del dashboard DTE corregidos''\")",
-      "Bash(git commit -m \"$(cat <<''EOF''\nFix: Agregar DOMContentLoaded y validación de datos en gráficos\n\n- Envolver scripts de Chart.js en DOMContentLoaded\n- Agregar validación: solo renderizar si hay datos\n- Mostrar mensaje informativo cuando no hay datos\n- Agregar console.log para debug\n- Corregir indentación de código\n\nAhora los gráficos se renderizarán correctamente cuando haya datos.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && php artisan cache:clear && echo ''✅ Gráficos del dashboard DTE corregidos''\")"
+      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && php artisan config:clear && php artisan cache:clear && php artisan route:clear && echo ''✅ Gestión de Folios DTE desplegada''\")",
+      "Bash(php artisan make:job VerificarEstadoDTEs)",
+      "Bash(php artisan make:mail DTERechazoNotificacion)",
+      "Bash(php artisan make:migration add_notification_fields_to_configuracion_libredte_table)"
     ],
     "deny": [],
     "ask": []
