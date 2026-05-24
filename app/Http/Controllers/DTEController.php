@@ -170,12 +170,25 @@ class DTEController extends Controller
             $response = $this->libredteService->emitirBoleta($boleta);
 
             // Enviar email automático con PDF timbrado si el socio tiene email
-            if ($boleta->socio && $boleta->socio->email && $boleta->pdf_url) {
-                \App\Jobs\EnviarBoletaDTEEmail::dispatch($boleta->fresh());
-                return redirect()->back()->with('success', "Boleta electrónica emitida exitosamente. Folio: {$response['folio']}. Email enviado a {$boleta->socio->email}");
+            $emailEnviado = false;
+            if ($boleta->socio && $boleta->socio->email) {
+                try {
+                    \Mail::to($boleta->socio->email)->queue(new \App\Mail\DTEEmitidoMail($boleta->fresh()));
+                    $emailEnviado = true;
+                } catch (\Exception $e) {
+                    \Log::warning('Error al enviar email DTE', [
+                        'boleta_id' => $boleta->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
 
-            return redirect()->back()->with('success', "Boleta electrónica emitida exitosamente. Folio: {$response['folio']}");
+            $mensaje = "DTE emitido exitosamente. Folio: {$response['folio']}";
+            if ($emailEnviado) {
+                $mensaje .= ". Email enviado a {$boleta->socio->email}";
+            }
+
+            return redirect()->back()->with('success', $mensaje);
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error al emitir DTE: ' . $e->getMessage());
@@ -424,6 +437,18 @@ class DTEController extends Controller
                         'success' => true,
                         'folio' => $resultado['folio'] ?? null,
                     ];
+
+                    // Enviar email automático si el socio tiene email
+                    if ($boleta->socio && $boleta->socio->email) {
+                        try {
+                            \Mail::to($boleta->socio->email)->queue(new \App\Mail\DTEEmitidoMail($boleta->fresh()));
+                        } catch (\Exception $e) {
+                            \Log::warning('Error al enviar email DTE masivo', [
+                                'boleta_id' => $boleta->id,
+                                'error' => $e->getMessage()
+                            ]);
+                        }
+                    }
                 } else {
                     $errores++;
                     $resultados[] = [
@@ -609,6 +634,39 @@ class DTEController extends Controller
     }
 
     /**
+     * Reenviar email con DTE
+     */
+    public function reenviarEmail($boletaId)
+    {
+        try {
+            $boleta = Boleta::with('socio')->findOrFail($boletaId);
+
+            // Verificar multi-tenancy
+            if ($boleta->id_organizacion != auth()->user()->id_organizacion) {
+                return redirect()->back()->with('error', 'Acceso denegado');
+            }
+
+            // Verificar que tenga DTE emitido
+            if (!$boleta->tieneDTE()) {
+                return redirect()->back()->with('error', 'La boleta no tiene DTE emitido');
+            }
+
+            // Verificar que el socio tenga email
+            if (!$boleta->socio || !$boleta->socio->email) {
+                return redirect()->back()->with('error', 'El socio no tiene email registrado');
+            }
+
+            // Enviar email
+            \Mail::to($boleta->socio->email)->send(new \App\Mail\DTEEmitidoMail($boleta));
+
+            return redirect()->back()->with('success', "Email enviado exitosamente a {$boleta->socio->email}");
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al enviar email: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Mostrar formulario para crear nota de crédito
      */
     public function crearNotaCredito($boletaId)
@@ -679,12 +737,22 @@ class DTEController extends Controller
 
             // Emitir DTE usando LibreDTE
             $libreDTE = new \App\Services\LibreDTEService();
-            $result = $libreDTE->emitirDTE($notaCredito);
+            $libreDTE->setOrganizacion($idOrganizacion);
+            $result = $libreDTE->emitirBoleta($notaCredito);
 
             if ($result['success']) {
                 // Si es anulación total, marcar boleta original como anulada
                 if ($request->monto >= $boletaOriginal->total) {
                     $boletaOriginal->update(['estado_dte' => 'anulada']);
+                }
+
+                // Enviar email automático
+                if ($notaCredito->socio && $notaCredito->socio->email) {
+                    try {
+                        \Mail::to($notaCredito->socio->email)->queue(new \App\Mail\DTEEmitidoMail($notaCredito->fresh()));
+                    } catch (\Exception $e) {
+                        \Log::warning('Error al enviar email NC', ['error' => $e->getMessage()]);
+                    }
                 }
 
                 return redirect()->route('dte.dashboard')
@@ -762,9 +830,19 @@ class DTEController extends Controller
 
             // Emitir DTE usando LibreDTE
             $libreDTE = new \App\Services\LibreDTEService();
-            $result = $libreDTE->emitirDTE($notaDebito);
+            $libreDTE->setOrganizacion($idOrganizacion);
+            $result = $libreDTE->emitirBoleta($notaDebito);
 
             if ($result['success']) {
+                // Enviar email automático
+                if ($notaDebito->socio && $notaDebito->socio->email) {
+                    try {
+                        \Mail::to($notaDebito->socio->email)->queue(new \App\Mail\DTEEmitidoMail($notaDebito->fresh()));
+                    } catch (\Exception $e) {
+                        \Log::warning('Error al enviar email ND', ['error' => $e->getMessage()]);
+                    }
+                }
+
                 return redirect()->route('dte.dashboard')
                     ->with('success', 'Nota de débito emitida exitosamente. Folio: ' . $notaDebito->fresh()->folio_sii);
             } else {

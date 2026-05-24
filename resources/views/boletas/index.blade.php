@@ -300,6 +300,16 @@
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </button>
                                                 <div class="dropdown-menu" aria-labelledby="dropdownDTE{{ $boleta->id }}">
+                                                    @if($boleta->socio && $boleta->socio->email)
+                                                        <form action="{{ route('dte.reenviar-email', $boleta->id) }}" method="POST" style="display: inline;">
+                                                            @csrf
+                                                            <button type="submit" class="dropdown-item" onclick="return confirm('¿Reenviar DTE por email a {{ $boleta->socio->email }}?')">
+                                                                <i class="fas fa-envelope text-primary"></i>
+                                                                Reenviar Email
+                                                            </button>
+                                                        </form>
+                                                        <div class="dropdown-divider"></div>
+                                                    @endif
                                                     <a class="dropdown-item" href="{{ route('dte.crear-nota-credito', $boleta->id) }}">
                                                         <i class="fas fa-minus-circle text-danger"></i>
                                                         Nota de Crédito

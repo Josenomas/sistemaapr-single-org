@@ -324,6 +324,9 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
             Route::post('/nota-credito/emitir', [App\Http\Controllers\DTEController::class, 'emitirNotaCredito'])->name('emitir-nota-credito');
             Route::get('/nota-debito/crear/{boleta}', [App\Http\Controllers\DTEController::class, 'crearNotaDebito'])->name('crear-nota-debito');
             Route::post('/nota-debito/emitir', [App\Http\Controllers\DTEController::class, 'emitirNotaDebito'])->name('emitir-nota-debito');
+
+            // Reenviar email DTE
+            Route::post('/reenviar-email/{boleta}', [App\Http\Controllers\DTEController::class, 'reenviarEmail'])->name('reenviar-email');
         });
     });
 
