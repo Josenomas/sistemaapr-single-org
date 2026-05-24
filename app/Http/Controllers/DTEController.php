@@ -46,7 +46,7 @@ class DTEController extends Controller
                 DB::raw('DATE_FORMAT(fecha_emision_dte, "%Y-%m") as mes'),
                 DB::raw('count(*) as total')
             )
-            ->groupBy('mes')
+            ->groupBy(DB::raw('DATE_FORMAT(fecha_emision_dte, "%Y-%m")'))
             ->orderBy('mes', 'asc')
             ->get();
 

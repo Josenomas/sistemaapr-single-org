@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && php artisan config:clear && php artisan cache:clear && php artisan route:clear && echo ''✅ Dashboard de Estadísticas DTE desplegado''\")",
-      "Bash(git commit -m \"$(cat <<''EOF''\nFix: Agregar enlace al Dashboard DTE en menú lateral\n\n- Sidebar: Cambiar enlace de \"Facturación Electrónica\"\n  * Ahora apunta a /dte/dashboard en lugar de /dte/configuracion\n  * Badge \"NUEVO\" con gradiente verde\n- Estilos: Agregar clase .badge-new\n  * Gradiente verde (#10b981 a #059669)\n  * Sombra verde sutil\n  * Consistente con .badge-beta\n\nAhora el dashboard DTE es visible y accesible desde el menú.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nFix: Agregar enlace al Dashboard DTE en menú lateral\n\n- Sidebar: Cambiar enlace de \"Facturación Electrónica\"\n  * Ahora apunta a /dte/dashboard en lugar de /dte/configuracion\n  * Badge \"NUEVO\" con gradiente verde\n- Estilos: Agregar clase .badge-new\n  * Gradiente verde (#10b981 a #059669)\n  * Sombra verde sutil\n  * Consistente con .badge-beta\n\nAhora el dashboard DTE es visible y accesible desde el menú.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && echo ''✅ Enlace al Dashboard DTE agregado al menú''\")",
+      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && tail -50 storage/logs/laravel.log\")",
+      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && tail -100 storage/logs/laravel.log | grep -A 5 ''local.ERROR''\")",
+      "Bash(git commit -m \"$(cat <<''EOF''\nFix: Corregir error SQL GROUP BY en dashboard DTE\n\n- DTEController: Usar DB::raw() en groupBy para compatibilidad con ONLY_FULL_GROUP_BY\n  * Error: Expression #1 of SELECT list is not in GROUP BY clause\n  * Solución: groupBy(DB::raw(''DATE_FORMAT(fecha_emision_dte, \"%Y-%m\")''))\n  \nEsto corrige el error 500 en el dashboard DTE en producción.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []
