@@ -100,6 +100,14 @@ class Organizacion extends Model
     }
 
     /**
+     * Relación: Una organización tiene una configuración DTE
+     */
+    public function configuracionDTE()
+    {
+        return $this->hasOne(ConfiguracionDTE::class, 'id_organizacion');
+    }
+
+    /**
      * Verifica si la suscripción está activa
      */
     public function suscripcionActiva()
