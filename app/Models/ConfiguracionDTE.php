@@ -21,6 +21,8 @@ class ConfiguracionDTE extends Model
         'libredte_hash',
         'libredte_url',
         'ambiente',
+        'libredte_hash_certificacion',
+        'libredte_url_certificacion',
         'certificado_digital',
         'certificado_password',
         'folio_boleta_actual',
@@ -43,6 +45,7 @@ class ConfiguracionDTE extends Model
     protected $hidden = [
         'certificado_password',
         'libredte_hash',
+        'libredte_hash_certificacion',
     ];
 
     const CREATED_AT = 'fecha_creacion';
@@ -72,6 +75,34 @@ class ConfiguracionDTE extends Model
     public function esProduccion()
     {
         return $this->ambiente === 'produccion';
+    }
+
+    /**
+     * Verificar si está en ambiente de certificación
+     */
+    public function esCertificacion()
+    {
+        return $this->ambiente === 'certificacion';
+    }
+
+    /**
+     * Obtener hash según ambiente
+     */
+    public function getHashActivo()
+    {
+        return $this->esCertificacion() && $this->libredte_hash_certificacion
+            ? $this->libredte_hash_certificacion
+            : $this->libredte_hash;
+    }
+
+    /**
+     * Obtener URL según ambiente
+     */
+    public function getUrlActiva()
+    {
+        return $this->esCertificacion() && $this->libredte_url_certificacion
+            ? $this->libredte_url_certificacion
+            : $this->libredte_url;
     }
 
     /**

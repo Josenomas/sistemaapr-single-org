@@ -178,15 +178,15 @@ class LibreDTEService
     protected function enviarDTE(array $dte)
     {
         try {
-            $url = rtrim($this->config->libredte_url, '/') . '/api/dte/documentos/emitir';
+            $url = rtrim($this->config->getUrlActiva(), '/') . '/api/dte/documentos/emitir';
 
             if (config('libredte.log_requests')) {
-                Log::info('LibreDTE Request', ['url' => $url, 'data' => $dte]);
+                Log::info('LibreDTE Request', ['url' => $url, 'data' => $dte, 'ambiente' => $this->config->ambiente]);
             }
 
             $response = $this->client->post($url, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $this->config->libredte_hash,
+                    'Authorization' => 'Bearer ' . $this->config->getHashActivo(),
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
                 ],
@@ -221,11 +221,11 @@ class LibreDTEService
         }
 
         try {
-            $url = rtrim($this->config->libredte_url, '/') . '/api/dte/documentos/estado';
+            $url = rtrim($this->config->getUrlActiva(), '/') . '/api/dte/documentos/estado';
 
             $response = $this->client->get($url, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $this->config->libredte_hash,
+                    'Authorization' => 'Bearer ' . $this->config->getHashActivo(),
                     'Accept' => 'application/json',
                 ],
                 'query' => [
@@ -367,11 +367,11 @@ class LibreDTEService
     public function verificarConexion()
     {
         try {
-            $url = rtrim($this->config->libredte_url, '/') . '/api/ping';
+            $url = rtrim($this->config->getUrlActiva(), '/') . '/api/ping';
 
             $response = $this->client->get($url, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $this->config->libredte_hash,
+                    'Authorization' => 'Bearer ' . $this->config->getHashActivo(),
                 ],
                 'timeout' => 10,
             ]);
@@ -394,11 +394,11 @@ class LibreDTEService
 
         try {
             // Consultar folios para Boleta Electrónica (tipo 39)
-            $url = rtrim($this->config->libredte_url, '/') . '/api/dte/documentos/disponibles';
+            $url = rtrim($this->config->getUrlActiva(), '/') . '/api/dte/documentos/disponibles';
 
             $response = $this->client->get($url, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $this->config->libredte_hash,
+                    'Authorization' => 'Bearer ' . $this->config->getHashActivo(),
                     'Accept' => 'application/json',
                 ],
                 'query' => [
@@ -442,11 +442,11 @@ class LibreDTEService
         }
 
         try {
-            $url = rtrim($this->config->libredte_url, '/') . '/api/dte/documentos/estado';
+            $url = rtrim($this->config->getUrlActiva(), '/') . '/api/dte/documentos/estado';
 
             $response = $this->client->get($url, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $this->config->libredte_hash,
+                    'Authorization' => 'Bearer ' . $this->config->getHashActivo(),
                     'Accept' => 'application/json',
                 ],
                 'query' => [

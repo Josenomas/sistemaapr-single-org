@@ -146,34 +146,101 @@
             </div>
 
             <div class="form-row" style="margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--gray-200);">
-                <div class="form-group col-md-8">
-                    <label for="libredte_hash" class="form-label required">Hash de API LibreDTE</label>
-                    <input type="password"
-                           class="form-control @error('libredte_hash') is-invalid @enderror"
-                           id="libredte_hash"
-                           name="libredte_hash"
-                           value="{{ old('libredte_hash', $config->libredte_hash ?? '') }}"
-                           placeholder="Tu hash de API de LibreDTE"
-                           required>
-                    <small class="form-text">Obtén tu token en LibreDTE.cl → Configuración → Usuarios → API Token</small>
-                    @error('libredte_hash')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="ambiente" class="form-label required">Ambiente</label>
-                    <select class="form-control @error('ambiente') is-invalid @enderror" id="ambiente" name="ambiente" required>
+                <div class="form-group col-md-12">
+                    <label for="ambiente" class="form-label required">Ambiente de Emisión</label>
+                    <select class="form-control @error('ambiente') is-invalid @enderror" id="ambiente" name="ambiente" required onchange="toggleAmbienteFields()">
                         <option value="certificacion" {{ old('ambiente', $config->ambiente ?? 'certificacion') == 'certificacion' ? 'selected' : '' }}>
-                            Certificación (Pruebas)
+                            🧪 Certificación (Pruebas) - Recomendado para testing
                         </option>
                         <option value="produccion" {{ old('ambiente', $config->ambiente ?? '') == 'produccion' ? 'selected' : '' }}>
-                            Producción (Real)
+                            ✅ Producción (Real) - DTEs válidos ante el SII
                         </option>
                     </select>
-                    <small class="form-text">Usa Certificación para pruebas</small>
+                    <small class="form-text">
+                        <strong>Certificación:</strong> Para pruebas sin validez tributaria.
+                        <strong>Producción:</strong> DTEs reales con validez legal.
+                    </small>
                     @error('ambiente')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
+                </div>
+            </div>
+
+            <!-- Credenciales de PRODUCCIÓN -->
+            <div id="credenciales-produccion" style="display: none;">
+                <div class="ambiente-section produccion">
+                    <div class="ambiente-header">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Credenciales de Producción</h4>
+                        <span class="badge badge-success">Producción Real</span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="libredte_hash" class="form-label required">Hash de API LibreDTE (Producción)</label>
+                            <input type="password"
+                                   class="form-control @error('libredte_hash') is-invalid @enderror"
+                                   id="libredte_hash"
+                                   name="libredte_hash"
+                                   value="{{ old('libredte_hash', $config->libredte_hash ?? '') }}"
+                                   placeholder="Tu hash de API de LibreDTE para producción">
+                            <small class="form-text">Obtén tu token en LibreDTE.cl → Configuración → Usuarios → API Token</small>
+                            @error('libredte_hash')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="libredte_url" class="form-label">URL de API LibreDTE (Producción)</label>
+                            <input type="url"
+                                   class="form-control @error('libredte_url') is-invalid @enderror"
+                                   id="libredte_url"
+                                   name="libredte_url"
+                                   value="{{ old('libredte_url', $config->libredte_url ?? 'https://libredte.cl') }}"
+                                   placeholder="https://libredte.cl">
+                            <small class="form-text">Por defecto: https://libredte.cl</small>
+                            @error('libredte_url')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credenciales de CERTIFICACIÓN -->
+            <div id="credenciales-certificacion" style="display: none;">
+                <div class="ambiente-section certificacion">
+                    <div class="ambiente-header">
+                        <i class="fas fa-flask"></i>
+                        <h4>Credenciales de Certificación</h4>
+                        <span class="badge badge-warning">Ambiente de Pruebas</span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="libredte_hash_certificacion" class="form-label">Hash de API LibreDTE (Certificación)</label>
+                            <input type="password"
+                                   class="form-control @error('libredte_hash_certificacion') is-invalid @enderror"
+                                   id="libredte_hash_certificacion"
+                                   name="libredte_hash_certificacion"
+                                   value="{{ old('libredte_hash_certificacion', $config->libredte_hash_certificacion ?? '') }}"
+                                   placeholder="Tu hash de API para ambiente de certificación">
+                            <small class="form-text">Token de certificación de LibreDTE (opcional si tienes cuenta separada)</small>
+                            @error('libredte_hash_certificacion')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="libredte_url_certificacion" class="form-label">URL de API LibreDTE (Certificación)</label>
+                            <input type="url"
+                                   class="form-control @error('libredte_url_certificacion') is-invalid @enderror"
+                                   id="libredte_url_certificacion"
+                                   name="libredte_url_certificacion"
+                                   value="{{ old('libredte_url_certificacion', $config->libredte_url_certificacion ?? '') }}"
+                                   placeholder="https://certificacion.libredte.cl">
+                            <small class="form-text">URL del ambiente de certificación (opcional)</small>
+                            @error('libredte_url_certificacion')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -479,6 +546,69 @@
         margin-top: 4px;
     }
 
+    .ambiente-section {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: var(--radius);
+        border: 2px solid var(--gray-200);
+        background: var(--gray-50);
+    }
+
+    .ambiente-section.produccion {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    .ambiente-section.certificacion {
+        border-color: #f59e0b;
+        background: rgba(245, 158, 11, 0.05);
+    }
+
+    .ambiente-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .ambiente-header i {
+        font-size: 1.5rem;
+    }
+
+    .ambiente-section.produccion .ambiente-header i {
+        color: #10b981;
+    }
+
+    .ambiente-section.certificacion .ambiente-header i {
+        color: #f59e0b;
+    }
+
+    .ambiente-header h4 {
+        flex: 1;
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background: #10b981;
+        color: white;
+    }
+
+    .badge-warning {
+        background: #f59e0b;
+        color: white;
+    }
+
     @media (max-width: 768px) {
         .form-row {
             grid-template-columns: 1fr;
@@ -507,6 +637,32 @@
 </style>
 
 <script>
+// Toggle ambiente fields on load and change
+function toggleAmbienteFields() {
+    const ambiente = document.getElementById('ambiente').value;
+    const credencialesProduccion = document.getElementById('credenciales-produccion');
+    const credencialesCertificacion = document.getElementById('credenciales-certificacion');
+
+    if (ambiente === 'produccion') {
+        credencialesProduccion.style.display = 'block';
+        credencialesCertificacion.style.display = 'none';
+        // Hacer obligatorio el hash de producción
+        document.getElementById('libredte_hash').required = true;
+        document.getElementById('libredte_hash_certificacion').required = false;
+    } else {
+        credencialesProduccion.style.display = 'none';
+        credencialesCertificacion.style.display = 'block';
+        // Hacer opcional el hash de producción en certificación
+        document.getElementById('libredte_hash').required = false;
+        document.getElementById('libredte_hash_certificacion').required = false;
+    }
+}
+
+// Execute on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleAmbienteFields();
+});
+
 document.getElementById('btnVerificarConexion').addEventListener('click', function() {
     const btn = this;
     const originalHTML = btn.innerHTML;

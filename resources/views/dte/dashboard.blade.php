@@ -118,10 +118,27 @@
 
 @section('content')
 <div class="page-header">
-    <h2 class="page-title">
-        <i class="fas fa-chart-line"></i>
-        Dashboard de Facturación Electrónica
-    </h2>
+    <div class="header-left">
+        <h2 class="page-title">
+            <i class="fas fa-chart-line"></i>
+            Dashboard de Facturación Electrónica
+        </h2>
+        @if($config)
+            @if($config->ambiente === 'certificacion')
+                <div class="ambiente-badge certificacion">
+                    <i class="fas fa-flask"></i>
+                    <span>Ambiente de Certificación</span>
+                    <small>Documentos sin validez tributaria</small>
+                </div>
+            @else
+                <div class="ambiente-badge produccion">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Ambiente de Producción</span>
+                    <small>Documentos válidos ante el SII</small>
+                </div>
+            @endif
+        @endif
+    </div>
     <div class="header-actions">
         <a href="{{ route('dte.configuracion') }}" class="btn btn-secondary">
             <i class="fas fa-cog"></i>
@@ -622,4 +639,59 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<style>
+.header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ambiente-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    width: fit-content;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.ambiente-badge i {
+    font-size: 1.1rem;
+}
+
+.ambiente-badge span {
+    font-weight: 700;
+}
+
+.ambiente-badge small {
+    opacity: 0.85;
+    font-weight: 500;
+    font-size: 0.75rem;
+    margin-left: 4px;
+}
+
+.ambiente-badge.certificacion {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    border: 2px solid #fbbf24;
+}
+
+.ambiente-badge.produccion {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: 2px solid #34d399;
+}
+
+@media (max-width: 768px) {
+    .ambiente-badge {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}
+</style>
 @endpush
