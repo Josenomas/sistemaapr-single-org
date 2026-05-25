@@ -7,6 +7,27 @@
     <!-- <meta name="robots" content="noindex, nofollow"> -->
     <link rel="canonical" href="{{ url()->current() }}">
     <title>@yield('title', 'Sistema APR')</title>
+
+    <!-- Logo para Google Search -->
+    <link rel="icon" type="image/png" href="{{ asset('LogoSistemaAPR.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('LogoSistemaAPR.png') }}">
+
+    <!-- Schema.org para Google Knowledge Graph -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Sistema APR",
+        "url": "{{ url('/') }}",
+        "logo": "{{ asset('LogoSistemaAPR.png') }}",
+        "description": "Sistema completo de administración para Agua Potable Rural. Controla socios, lecturas, boletas, pagos y más en una sola plataforma moderna y fácil de usar.",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "Soporte Técnico",
+            "url": "{{ url('/') }}"
+        }
+    }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
