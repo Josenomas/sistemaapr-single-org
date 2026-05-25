@@ -93,6 +93,12 @@ class VerificarSuscripciones extends Command
             ->get();
 
         foreach ($pagosPorVencer as $pago) {
+            // Verificar que la organización exista
+            if (!$pago->organizacion) {
+                $this->warn("  → Pago ID {$pago->id} sin organización asociada");
+                continue;
+            }
+
             try {
                 Mail::to($pago->organizacion->email_contacto)->send(
                     new SuscripcionPorVencer($pago, $dias)
@@ -124,7 +130,12 @@ class VerificarSuscripciones extends Command
         foreach ($pagosVencidos as $pago) {
             $org = $pago->organizacion;
 
-            // Verificar que la organización no esté ya suspendida
+            // Verificar que la organización exista y no esté ya suspendida
+            if (!$org) {
+                $this->warn("  → Pago ID {$pago->id} sin organización asociada (probablemente eliminada)");
+                continue;
+            }
+
             if ($org->activo && $org->estado_suscripcion === 'activa') {
                 $org->update([
                     'activo' => false,
