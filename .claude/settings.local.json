@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan migrate --path=database/migrations/2026_05_23_232611_add_ambiente_certificacion_to_configuracion_dte.php --force && php artisan view:clear && php artisan config:clear && php artisan cache:clear && php artisan route:clear && echo ''✅ Ambiente de Certificación SII desplegado''\")"
+      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && php artisan config:clear && php artisan cache:clear && echo ''✅ Menú actualizado - Folios SII oculto''\")",
+      "Bash(git add -A)"
     ],
     "deny": [],
     "ask": []

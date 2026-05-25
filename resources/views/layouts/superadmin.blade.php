@@ -945,6 +945,14 @@
             </div>
 
             <div class="menu-section">
+                <div class="menu-section-title">Facturación Electrónica</div>
+                <a href="{{ route('superadmin.monitoreo-dte') }}" class="menu-item {{ request()->routeIs('superadmin.monitoreo-dte') ? 'active' : '' }}">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Monitoreo DTE</span>
+                </a>
+            </div>
+
+            <div class="menu-section">
                 <div class="menu-section-title">Sistema</div>
                 <a href="{{ route('superadmin.reclamos.index') }}" class="menu-item {{ request()->routeIs('superadmin.reclamos.*') ? 'active' : '' }}">
                     <i class="fas fa-book"></i>

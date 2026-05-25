@@ -13,6 +13,7 @@ use App\Models\TransaccionFlow;
 use App\Models\RegistroOrganizacion;
 use App\Models\RenovacionSuscripcion;
 use App\Models\Auditoria;
+use App\Models\ConfiguracionDTE;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -974,5 +975,80 @@ class SuperAdminController extends Controller
                 ->with('error', 'Error al actualizar el perfil: ' . $e->getMessage())
                 ->withInput();
         }
+    }
+
+    /**
+     * Monitoreo de DTEs de todas las organizaciones
+     */
+    public function monitoreoDTE()
+    {
+        // Obtener todas las configuraciones DTE con sus organizaciones
+        $configuraciones = ConfiguracionDTE::with('organizacion')
+            ->orderBy('id_organizacion', 'asc')
+            ->get();
+
+        // Estadísticas generales
+        $totalOrganizaciones = Organizacion::where('activo', true)->count();
+        $organizacionesConDTE = ConfiguracionDTE::where('activo', true)->distinct('id_organizacion')->count();
+        $organizacionesSinDTE = $totalOrganizaciones - $organizacionesConDTE;
+
+        // Contar por ambiente
+        $enCertificacion = ConfiguracionDTE::where('activo', true)
+            ->where('ambiente', 'certificacion')
+            ->count();
+        $enProduccion = ConfiguracionDTE::where('activo', true)
+            ->where('ambiente', 'produccion')
+            ->count();
+
+        // Total de DTEs emitidos (todas las organizaciones)
+        $totalDTEsEmitidos = Boleta::whereNotNull('folio_sii')->count();
+
+        // DTEs emitidos últimos 30 días
+        $dtesUltimos30Dias = Boleta::whereNotNull('folio_sii')
+            ->where('fecha_emision_dte', '>=', now()->subDays(30))
+            ->count();
+
+        // Organizaciones por ID con sus métricas DTE
+        $organizacionesMetricas = [];
+        foreach ($configuraciones as $config) {
+            $org = $config->organizacion;
+
+            // DTEs emitidos por esta organización
+            $dtesEmitidos = Boleta::where('id_organizacion', $config->id_organizacion)
+                ->whereNotNull('folio_sii')
+                ->count();
+
+            // DTEs últimos 30 días
+            $dtesRecientes = Boleta::where('id_organizacion', $config->id_organizacion)
+                ->whereNotNull('folio_sii')
+                ->where('fecha_emision_dte', '>=', now()->subDays(30))
+                ->count();
+
+            // Último DTE emitido
+            $ultimoDTE = Boleta::where('id_organizacion', $config->id_organizacion)
+                ->whereNotNull('folio_sii')
+                ->orderBy('fecha_emision_dte', 'desc')
+                ->first();
+
+            $organizacionesMetricas[] = [
+                'organizacion' => $org,
+                'config' => $config,
+                'dtes_emitidos' => $dtesEmitidos,
+                'dtes_recientes' => $dtesRecientes,
+                'ultimo_dte' => $ultimoDTE,
+            ];
+        }
+
+        return view('superadmin.monitoreo-dte', compact(
+            'configuraciones',
+            'totalOrganizaciones',
+            'organizacionesConDTE',
+            'organizacionesSinDTE',
+            'enCertificacion',
+            'enProduccion',
+            'totalDTEsEmitidos',
+            'dtesUltimos30Dias',
+            'organizacionesMetricas'
+        ));
     }
 }

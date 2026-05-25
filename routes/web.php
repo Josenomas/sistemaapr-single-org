@@ -654,4 +654,7 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->name('superadmi
     // Perfil del super admin
     Route::get('/perfil', [App\Http\Controllers\SuperAdminController::class, 'perfil'])->name('perfil');
     Route::put('/perfil', [App\Http\Controllers\SuperAdminController::class, 'actualizarPerfil'])->name('perfil.actualizar');
+
+    // Monitoreo DTE
+    Route::get('/monitoreo-dte', [App\Http\Controllers\SuperAdminController::class, 'monitoreoDTE'])->name('monitoreo-dte');
 });
