@@ -319,6 +319,9 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
             Route::get('/libro-ventas', [App\Http\Controllers\DTEController::class, 'libroVentas'])->name('libro-ventas');
             Route::post('/libro-ventas/descargar', [App\Http\Controllers\DTEController::class, 'descargarLibroVentas'])->name('descargar-libro-ventas');
 
+            // Alertas DTE
+            Route::post('/alerta/{id}/marcar-leida', [App\Http\Controllers\DTEController::class, 'marcarAlertaLeida'])->name('alerta.marcar-leida');
+
             // Notas de Crédito y Débito
             Route::get('/nota-credito/crear/{boleta}', [App\Http\Controllers\DTEController::class, 'crearNotaCredito'])->name('crear-nota-credito');
             Route::post('/nota-credito/emitir', [App\Http\Controllers\DTEController::class, 'emitirNotaCredito'])->name('emitir-nota-credito');

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Boleta;
 use App\Models\ConfiguracionDTE;
+use App\Models\AlertaDTE;
 use App\Services\LibreDTEService;
+use App\Services\AlertaDTEService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -88,6 +90,14 @@ class DTEController extends Controller
         // Configuración DTE
         $config = ConfiguracionDTE::where('id_organizacion', $idOrganizacion)->first();
 
+        // Verificar y obtener alertas
+        $alertaService = new AlertaDTEService();
+        if ($config) {
+            $alertaService->verificarAlertas($idOrganizacion);
+        }
+        $alertas = $alertaService->obtenerAlertasActivas($idOrganizacion);
+        $conteoAlertas = $alertaService->contarAlertas($idOrganizacion);
+
         return view('dte.dashboard', compact(
             'totalDTEsEmitidos',
             'dtesPorEstado',
@@ -97,7 +107,9 @@ class DTEController extends Controller
             'totalBoletasPendientes',
             'boletasSinDTE',
             'conexionLibreDTE',
-            'config'
+            'config',
+            'alertas',
+            'conteoAlertas'
         ));
     }
 
@@ -867,6 +879,28 @@ class DTEController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Marcar alerta como leída
+     */
+    public function marcarAlertaLeida($id)
+    {
+        try {
+            $alerta = AlertaDTE::findOrFail($id);
+
+            // Verificar multi-tenancy
+            if ($alerta->id_organizacion != auth()->user()->id_organizacion) {
+                return redirect()->back()->with('error', 'Acceso denegado');
+            }
+
+            $alerta->marcarComoLeida();
+
+            return redirect()->back()->with('success', 'Alerta marcada como leída');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al marcar alerta: ' . $e->getMessage());
         }
     }
 }

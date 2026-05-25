@@ -165,6 +165,49 @@
 </div>
 @endif
 
+<!-- Panel de Alertas -->
+@if($alertas && $alertas->count() > 0)
+<div class="alertas-panel mb-4">
+    <div class="alertas-header">
+        <h4>
+            <i class="fas fa-bell"></i>
+            Alertas Activas
+            <span class="badge bg-danger">{{ $conteoAlertas['total'] }}</span>
+        </h4>
+    </div>
+    <div class="alertas-grid">
+        @foreach($alertas as $alerta)
+        <div class="alerta-card alerta-{{ $alerta->clase_nivel }}">
+            <div class="alerta-icon">
+                <i class="fas {{ $alerta->icono_tipo }}"></i>
+            </div>
+            <div class="alerta-content">
+                <div class="alerta-titulo">
+                    <strong>{{ $alerta->titulo }}</strong>
+                    <span class="badge badge-{{ $alerta->clase_nivel }}">
+                        {{ ucfirst($alerta->nivel) }}
+                    </span>
+                </div>
+                <p class="alerta-mensaje">{{ $alerta->mensaje }}</p>
+                <small class="alerta-fecha">
+                    <i class="fas fa-clock"></i>
+                    {{ $alerta->created_at->diffForHumans() }}
+                </small>
+            </div>
+            <div class="alerta-actions">
+                <form action="{{ route('dte.alerta.marcar-leida', $alerta->id) }}" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn-alerta-accion" title="Marcar como leída">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
 <!-- Cards de Estadísticas -->
 <div class="stats-grid-dte">
     <div class="stat-card-dte">
@@ -684,6 +727,155 @@ document.addEventListener('DOMContentLoaded', function() {
     background: linear-gradient(135deg, #10b981, #059669);
     color: white;
     border: 2px solid #34d399;
+}
+
+/* Alertas Panel */
+.alertas-panel {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.alertas-header {
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    color: white;
+    padding: 16px 20px;
+}
+
+.alertas-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alertas-header .badge {
+    background: rgba(255,255,255,0.3);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+.alertas-grid {
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+}
+
+.alerta-card {
+    display: grid;
+    grid-template-columns: 50px 1fr auto;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.2s;
+}
+
+.alerta-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.alerta-card.alerta-danger {
+    border-left-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.alerta-card.alerta-warning {
+    border-left-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.05);
+}
+
+.alerta-card.alerta-info {
+    border-left-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.alerta-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.alerta-danger .alerta-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.alerta-warning .alerta-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.alerta-info .alerta-icon {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.alerta-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.alerta-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+}
+
+.alerta-titulo .badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+}
+
+.alerta-mensaje {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.alerta-fecha {
+    color: #9ca3af;
+    font-size: 0.8rem;
+}
+
+.alerta-actions {
+    display: flex;
+    align-items: center;
+}
+
+.btn-alerta-accion {
+    background: none;
+    border: 2px solid #d1d5db;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+}
+
+.btn-alerta-accion:hover {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+    transform: scale(1.1);
 }
 
 @media (max-width: 768px) {

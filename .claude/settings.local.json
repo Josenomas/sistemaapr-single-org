@@ -1,8 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && php artisan config:clear && php artisan cache:clear && echo ''✅ Menú actualizado - Folios SII oculto''\")",
-      "Bash(git add -A)"
+      "Bash(git push origin main)",
+      "Bash(ssh digitalocean-sistemaapr \"cd /var/www/ssr && git pull origin main && php artisan view:clear && php artisan config:clear && php artisan cache:clear && php artisan route:clear && echo ''✅ Panel Monitoreo DTE desplegado en Super Admin''\")",
+      "Bash(php artisan make:migration create_alertas_dte_table)",
+      "Bash(php artisan migrate --path=database/migrations/2026_05_24_212336_create_alertas_dte_table.php)"
     ],
     "deny": [],
     "ask": []
