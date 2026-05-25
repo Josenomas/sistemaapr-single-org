@@ -19,7 +19,7 @@
         "@type": "Organization",
         "name": "Sistema APR",
         "url": "{{ url('/') }}",
-        "logo": "{{ asset('LogoSistemaAPR.png') }}",
+        "logo": "{{ url('LogoSistemaAPR.png') }}",
         "description": "Sistema completo de administración para Agua Potable Rural. Controla socios, lecturas, boletas, pagos y más en una sola plataforma moderna y fácil de usar.",
         "contactPoint": {
             "@type": "ContactPoint",
