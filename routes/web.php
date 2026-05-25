@@ -294,7 +294,7 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
         // ========================================
         // DOCUMENTOS TRIBUTARIOS ELECTRÓNICOS (DTE)
         // ========================================
-        Route::prefix('dte')->name('dte.')->group(function () {
+        Route::prefix('dte')->name('dte.')->middleware('throttle:60,1')->group(function () {
             // Dashboard de estadísticas
             Route::get('/dashboard', [App\Http\Controllers\DTEController::class, 'dashboard'])->name('dashboard');
 

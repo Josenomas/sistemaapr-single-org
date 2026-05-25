@@ -6,6 +6,7 @@ use App\Models\Boleta;
 use App\Models\ConfiguracionDTE;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -385,6 +386,7 @@ class LibreDTEService
 
     /**
      * Obtener información de folios disponibles
+     * Cache: 5 minutos para reducir llamadas a API LibreDTE
      */
     public function obtenerFoliosDisponibles()
     {
@@ -392,44 +394,54 @@ class LibreDTEService
             throw new \Exception('Debe configurar la organización primero usando setOrganizacion()');
         }
 
-        try {
-            // Consultar folios para Boleta Electrónica (tipo 39)
-            $url = rtrim($this->config->getUrlActiva(), '/') . '/api/dte/documentos/disponibles';
+        // Cache key único por organización y ambiente
+        $cacheKey = sprintf(
+            'folios_disponibles_%s_%s',
+            $this->config->id_organizacion,
+            $this->config->ambiente
+        );
 
-            $response = $this->client->get($url, [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->config->getHashActivo(),
-                    'Accept' => 'application/json',
-                ],
-                'query' => [
-                    'dte' => 39, // Boleta Electrónica
-                ],
-                'timeout' => 15,
-            ]);
+        // Cache por 5 minutos (300 segundos)
+        return Cache::remember($cacheKey, 300, function () {
+            try {
+                // Consultar folios para Boleta Electrónica (tipo 39)
+                $url = rtrim($this->config->getUrlActiva(), '/') . '/api/dte/documentos/disponibles';
 
-            $data = json_decode($response->getBody()->getContents(), true);
+                $response = $this->client->get($url, [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->config->getHashActivo(),
+                        'Accept' => 'application/json',
+                    ],
+                    'query' => [
+                        'dte' => 39, // Boleta Electrónica
+                    ],
+                    'timeout' => 15,
+                ]);
 
-            // Estructura esperada de respuesta de LibreDTE
-            return [
-                'tipo_dte' => 39,
-                'disponibles' => $data['disponibles'] ?? 0,
-                'siguiente' => $data['siguiente'] ?? null,
-                'alerta' => ($data['disponibles'] ?? 0) < 50,
-            ];
+                $data = json_decode($response->getBody()->getContents(), true);
 
-        } catch (\Exception $e) {
-            Log::error('Error al consultar folios LibreDTE', [
-                'error' => $e->getMessage(),
-            ]);
+                // Estructura esperada de respuesta de LibreDTE
+                return [
+                    'tipo_dte' => 39,
+                    'disponibles' => $data['disponibles'] ?? 0,
+                    'siguiente' => $data['siguiente'] ?? null,
+                    'alerta' => ($data['disponibles'] ?? 0) < 50,
+                ];
 
-            return [
-                'tipo_dte' => 39,
-                'disponibles' => null,
-                'siguiente' => null,
-                'alerta' => false,
-                'error' => $e->getMessage(),
-            ];
-        }
+            } catch (\Exception $e) {
+                Log::error('Error al consultar folios LibreDTE', [
+                    'error' => $e->getMessage(),
+                ]);
+
+                return [
+                    'tipo_dte' => 39,
+                    'disponibles' => null,
+                    'siguiente' => null,
+                    'alerta' => false,
+                    'error' => $e->getMessage(),
+                ];
+            }
+        });
     }
 
     /**
