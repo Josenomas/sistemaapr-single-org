@@ -950,6 +950,10 @@
                     <i class="fas fa-file-invoice-dollar"></i>
                     <span>Monitoreo DTE</span>
                 </a>
+                <a href="{{ route('superadmin.reporte-facturacion-dte') }}" class="menu-item {{ request()->routeIs('superadmin.reporte-facturacion-dte') ? 'active' : '' }}">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reportes DTE</span>
+                </a>
             </div>
 
             <div class="menu-section">

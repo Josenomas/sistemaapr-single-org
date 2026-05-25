@@ -14,6 +14,7 @@ use App\Models\RegistroOrganizacion;
 use App\Models\RenovacionSuscripcion;
 use App\Models\Auditoria;
 use App\Models\ConfiguracionDTE;
+use App\Services\ReporteDTEService;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -1050,5 +1051,158 @@ class SuperAdminController extends Controller
             'dtesUltimos30Dias',
             'organizacionesMetricas'
         ));
+    }
+
+    /**
+     * Reporte avanzado de facturación DTE
+     */
+    public function reporteFacturacionDTE(Request $request)
+    {
+        $reporteService = new ReporteDTEService();
+
+        // Filtros opcionales
+        $filtros = [];
+        if ($request->has('fecha_desde')) {
+            $filtros['fecha_desde'] = $request->fecha_desde;
+        }
+        if ($request->has('fecha_hasta')) {
+            $filtros['fecha_hasta'] = $request->fecha_hasta;
+        }
+
+        // Obtener todos los datos del reporte
+        $resumenGeneral = $reporteService->obtenerResumenGeneral();
+        $facturacionPorOrg = $reporteService->obtenerFacturacionPorOrganizacion($filtros);
+        $evolucionMensual = $reporteService->obtenerEvolucionMensual();
+        $distribucionTipo = $reporteService->obtenerDistribucionPorTipo($filtros);
+        $analisisAdopcion = $reporteService->obtenerAnalisisAdopcion();
+        $top10Organizaciones = $reporteService->obtenerTop10Organizaciones($filtros);
+
+        return view('superadmin.reporte-facturacion-dte', compact(
+            'resumenGeneral',
+            'facturacionPorOrg',
+            'evolucionMensual',
+            'distribucionTipo',
+            'analisisAdopcion',
+            'top10Organizaciones',
+            'filtros'
+        ));
+    }
+
+    /**
+     * Exportar reporte de facturación DTE a Excel
+     */
+    public function exportarReporteDTEExcel(Request $request)
+    {
+        $reporteService = new ReporteDTEService();
+
+        // Filtros
+        $filtros = [];
+        if ($request->has('fecha_desde')) {
+            $filtros['fecha_desde'] = $request->fecha_desde;
+        }
+        if ($request->has('fecha_hasta')) {
+            $filtros['fecha_hasta'] = $request->fecha_hasta;
+        }
+
+        $facturacionPorOrg = $reporteService->obtenerFacturacionPorOrganizacion($filtros);
+        $evolucionMensual = $reporteService->obtenerEvolucionMensual();
+
+        // Generar CSV (compatible con Excel)
+        $filename = 'reporte_facturacion_dte_' . now()->format('Y-m-d_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function() use ($facturacionPorOrg, $evolucionMensual) {
+            $file = fopen('php://output', 'w');
+
+            // BOM para UTF-8 en Excel
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // Sección 1: Facturación por Organización
+            fputcsv($file, ['REPORTE DE FACTURACIÓN DTE POR ORGANIZACIÓN']);
+            fputcsv($file, ['Generado el', now()->format('d/m/Y H:i:s')]);
+            fputcsv($file, []);
+
+            fputcsv($file, [
+                'Organización',
+                'Razón Social',
+                'Total DTEs',
+                'Boletas',
+                'Facturas',
+                'NC',
+                'ND',
+                'Ingresos Totales',
+                'Último DTE'
+            ]);
+
+            foreach ($facturacionPorOrg as $org) {
+                fputcsv($file, [
+                    $org->nombre_organizacion,
+                    $org->razon_social,
+                    $org->total_dtes,
+                    $org->total_boletas,
+                    $org->total_facturas,
+                    $org->total_nc,
+                    $org->total_nd,
+                    '$' . number_format($org->ingresos_totales, 0, ',', '.'),
+                    $org->ultimo_dte ? Carbon::parse($org->ultimo_dte)->format('d/m/Y') : 'N/A'
+                ]);
+            }
+
+            // Sección 2: Evolución Mensual
+            fputcsv($file, []);
+            fputcsv($file, []);
+            fputcsv($file, ['EVOLUCIÓN MENSUAL DE DTEs (Últimos 12 meses)']);
+            fputcsv($file, ['Mes', 'Total DTEs', 'Ingresos']);
+
+            foreach ($evolucionMensual['data'] as $mes) {
+                fputcsv($file, [
+                    $mes['mes_nombre'],
+                    $mes['total_dtes'],
+                    '$' . number_format($mes['ingresos'], 0, ',', '.')
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Exportar reporte de facturación DTE a PDF
+     */
+    public function exportarReporteDTEPDF(Request $request)
+    {
+        $reporteService = new ReporteDTEService();
+
+        // Filtros
+        $filtros = [];
+        if ($request->has('fecha_desde')) {
+            $filtros['fecha_desde'] = $request->fecha_desde;
+        }
+        if ($request->has('fecha_hasta')) {
+            $filtros['fecha_hasta'] = $request->fecha_hasta;
+        }
+
+        $resumenGeneral = $reporteService->obtenerResumenGeneral();
+        $facturacionPorOrg = $reporteService->obtenerFacturacionPorOrganizacion($filtros);
+        $top10Organizaciones = $reporteService->obtenerTop10Organizaciones($filtros);
+
+        // Generar HTML para PDF simple
+        $html = view('superadmin.pdf.reporte-facturacion-dte', compact(
+            'resumenGeneral',
+            'facturacionPorOrg',
+            'top10Organizaciones',
+            'filtros'
+        ))->render();
+
+        // Retornar HTML que se puede imprimir como PDF desde el navegador
+        return response($html)
+            ->header('Content-Type', 'text/html')
+            ->header('Content-Disposition', 'inline; filename="reporte_dte.pdf"');
     }
 }
