@@ -146,7 +146,25 @@
             </div>
 
             <div class="form-row" style="margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--gray-200);">
-                <div class="form-group col-md-12">
+                <div class="form-group col-md-6">
+                    <label for="proveedor_dte" class="form-label required">Proveedor de Facturación</label>
+                    <select class="form-control @error('proveedor_dte') is-invalid @enderror" id="proveedor_dte" name="proveedor_dte" required onchange="toggleProveedorFields()">
+                        <option value="libredte" {{ old('proveedor_dte', $config->proveedor_dte ?? 'libredte') == 'libredte' ? 'selected' : '' }}>
+                            LibreDTE ($40.000/mes)
+                        </option>
+                        <option value="simpleapi" {{ old('proveedor_dte', $config->proveedor_dte ?? '') == 'simpleapi' ? 'selected' : '' }}>
+                            SimpleAPI (GRATIS hasta 500/mes) ⭐
+                        </option>
+                    </select>
+                    <small class="form-text text-muted">
+                        💡 <strong>Tip:</strong> SimpleAPI es gratis hasta 500 documentos/mes
+                    </small>
+                    @error('proveedor_dte')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-group col-md-6">
                     <label for="ambiente" class="form-label required">Ambiente de Emisión</label>
                     <select class="form-control @error('ambiente') is-invalid @enderror" id="ambiente" name="ambiente" required onchange="toggleAmbienteFields()">
                         <option value="certificacion" {{ old('ambiente', $config->ambiente ?? 'certificacion') == 'certificacion' ? 'selected' : '' }}>
@@ -637,8 +655,36 @@
 </style>
 
 <script>
+// Toggle proveedor fields
+function toggleProveedorFields() {
+    const proveedor = document.getElementById('proveedor_dte').value;
+    const credencialesProduccion = document.getElementById('credenciales-produccion');
+    const credencialesCertificacion = document.getElementById('credenciales-certificacion');
+
+    // SimpleAPI no usa hash de LibreDTE, solo certificado digital
+    if (proveedor === 'simpleapi') {
+        // Ocultar secciones de LibreDTE (hash)
+        if (credencialesProduccion) credencialesProduccion.style.display = 'none';
+        if (credencialesCertificacion) credencialesCertificacion.style.display = 'none';
+
+        // Hacer no obligatorios los hash
+        const hashProd = document.getElementById('libredte_hash');
+        const hashCert = document.getElementById('libredte_hash_certificacion');
+        if (hashProd) hashProd.required = false;
+        if (hashCert) hashCert.required = false;
+    } else {
+        // LibreDTE: mostrar según ambiente
+        toggleAmbienteFields();
+    }
+}
+
 // Toggle ambiente fields on load and change
 function toggleAmbienteFields() {
+    const proveedor = document.getElementById('proveedor_dte').value;
+
+    // Solo aplicar lógica si es LibreDTE
+    if (proveedor !== 'libredte') return;
+
     const ambiente = document.getElementById('ambiente').value;
     const credencialesProduccion = document.getElementById('credenciales-produccion');
     const credencialesCertificacion = document.getElementById('credenciales-certificacion');
@@ -660,6 +706,7 @@ function toggleAmbienteFields() {
 
 // Execute on page load
 document.addEventListener('DOMContentLoaded', function() {
+    toggleProveedorFields();
     toggleAmbienteFields();
 });
 

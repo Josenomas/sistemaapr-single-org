@@ -6,6 +6,7 @@ use App\Models\Boleta;
 use App\Models\ConfiguracionDTE;
 use App\Models\AlertaDTE;
 use App\Services\LibreDTEService;
+use App\Services\SimpleAPIService;
 use App\Services\AlertaDTEService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,10 +15,33 @@ use Illuminate\Support\Facades\Storage;
 class DTEController extends Controller
 {
     protected $libredteService;
+    protected $simpleapiService;
 
-    public function __construct(LibreDTEService $libredteService)
+    public function __construct(LibreDTEService $libredteService, SimpleAPIService $simpleapiService)
     {
         $this->libredteService = $libredteService;
+        $this->simpleapiService = $simpleapiService;
+    }
+
+    /**
+     * Obtener servicio DTE según configuración de la organización
+     */
+    protected function getDTEService($idOrganizacion)
+    {
+        $config = ConfiguracionDTE::where('id_organizacion', $idOrganizacion)
+            ->where('activo', true)
+            ->first();
+
+        if (!$config) {
+            throw new \Exception('No hay configuración DTE activa para esta organización');
+        }
+
+        if ($config->usaSimpleAPI()) {
+            return $this->simpleapiService->setOrganizacion($idOrganizacion);
+        }
+
+        // Por defecto usa LibreDTE
+        return $this->libredteService->setOrganizacion($idOrganizacion);
     }
 
     /**
@@ -190,11 +214,11 @@ class DTEController extends Controller
                 return redirect()->back()->with('error', 'La boleta ya tiene DTE emitido');
             }
 
-            // Configurar servicio
-            $this->libredteService->setOrganizacion($boleta->id_organizacion);
+            // Obtener servicio DTE correcto (LibreDTE o SimpleAPI)
+            $dteService = $this->getDTEService($boleta->id_organizacion);
 
             // Emitir boleta
-            $response = $this->libredteService->emitirBoleta($boleta);
+            $response = $dteService->emitirBoleta($boleta);
 
             // Enviar email automático con PDF timbrado si el socio tiene email
             $emailEnviado = false;
@@ -426,9 +450,9 @@ class DTEController extends Controller
             ], 403);
         }
 
-        // Verificar configuración DTE
+        // Verificar configuración DTE y obtener servicio correcto
         try {
-            $this->libredteService->setOrganizacion($idOrganizacion);
+            $dteService = $this->getDTEService($idOrganizacion);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -454,7 +478,7 @@ class DTEController extends Controller
             }
 
             try {
-                $resultado = $this->libredteService->emitirBoleta($boleta);
+                $resultado = $dteService->emitirBoleta($boleta);
 
                 if ($resultado['success']) {
                     $exitosos++;

@@ -28,6 +28,7 @@ class ConfiguracionDTE extends Model
         'folio_boleta_actual',
         'folio_factura_actual',
         'activo',
+        'proveedor_dte', // libredte o simpleapi
         'observaciones',
         'notificar_rechazos',
         'email_notificaciones',
@@ -64,9 +65,31 @@ class ConfiguracionDTE extends Model
      */
     public function estaConfigurado()
     {
-        return !empty($this->libredte_hash)
-            && !empty($this->rut_emisor)
-            && $this->activo;
+        $configuracionBasica = !empty($this->rut_emisor) && $this->activo;
+
+        if ($this->proveedor_dte === 'simpleapi') {
+            // SimpleAPI requiere certificado digital configurado
+            return $configuracionBasica && !empty($this->certificado_digital);
+        }
+
+        // LibreDTE requiere hash configurado
+        return $configuracionBasica && !empty($this->libredte_hash);
+    }
+
+    /**
+     * Verificar si usa SimpleAPI
+     */
+    public function usaSimpleAPI()
+    {
+        return $this->proveedor_dte === 'simpleapi';
+    }
+
+    /**
+     * Verificar si usa LibreDTE
+     */
+    public function usaLibreDTE()
+    {
+        return $this->proveedor_dte === 'libredte' || empty($this->proveedor_dte);
     }
 
     /**
