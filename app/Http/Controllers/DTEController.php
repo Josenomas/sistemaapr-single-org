@@ -173,6 +173,11 @@ class DTEController extends Controller
             // Certificado digital
             'certificado_digital' => 'nullable|file|mimes:pfx,p12|max:2048',
             'certificado_password' => 'nullable|string|max:100',
+            // Archivos CAF
+            'caf_boleta_39' => 'nullable|file|mimes:xml|max:1024',
+            'caf_factura_33' => 'nullable|file|mimes:xml|max:1024',
+            'caf_nota_credito_61' => 'nullable|file|mimes:xml|max:1024',
+            'caf_nota_debito_56' => 'nullable|file|mimes:xml|max:1024',
         ]);
 
         $idOrganizacion = auth()->user()->id_organizacion;
@@ -214,6 +219,29 @@ class DTEController extends Controller
                 unset($validated['certificado_password']);
             } else {
                 $validated['certificado_password'] = encrypt($validated['certificado_password']);
+            }
+        }
+
+        // Procesar archivos CAF
+        $cafFiles = ['caf_boleta_39', 'caf_factura_33', 'caf_nota_credito_61', 'caf_nota_debito_56'];
+        foreach ($cafFiles as $cafField) {
+            if ($request->hasFile($cafField)) {
+                $cafFile = $request->file($cafField);
+                $cafContent = file_get_contents($cafFile->getRealPath());
+                $validated[$cafField] = $cafContent;
+
+                // Extraer metadatos del CAF (solo para boleta y factura)
+                if ($cafField === 'caf_boleta_39') {
+                    $cafData = $this->parsearCAF($cafContent);
+                    $validated['caf_boleta_desde'] = $cafData['desde'];
+                    $validated['caf_boleta_hasta'] = $cafData['hasta'];
+                    $validated['caf_boleta_vencimiento'] = $cafData['vencimiento'];
+                } elseif ($cafField === 'caf_factura_33') {
+                    $cafData = $this->parsearCAF($cafContent);
+                    $validated['caf_factura_desde'] = $cafData['desde'];
+                    $validated['caf_factura_hasta'] = $cafData['hasta'];
+                    $validated['caf_factura_vencimiento'] = $cafData['vencimiento'];
+                }
             }
         }
 
@@ -968,6 +996,38 @@ class DTEController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error al marcar alerta: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Parsear archivo CAF XML y extraer metadatos
+     */
+    protected function parsearCAF($cafContent)
+    {
+        try {
+            $xml = simplexml_load_string($cafContent);
+
+            // Extraer datos del CAF
+            $rango = $xml->CAF->DA->RNG ?? $xml->xpath('//RNG')[0];
+            $desde = (int)$rango->D;
+            $hasta = (int)$rango->H;
+
+            // Extraer fecha de vencimiento
+            $fechaAutorizacion = $xml->CAF->DA->FA ?? $xml->xpath('//FA')[0];
+            $vencimiento = \Carbon\Carbon::parse((string)$fechaAutorizacion)->format('Y-m-d');
+
+            return [
+                'desde' => $desde,
+                'hasta' => $hasta,
+                'vencimiento' => $vencimiento,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error parseando CAF', ['error' => $e->getMessage()]);
+            return [
+                'desde' => null,
+                'hasta' => null,
+                'vencimiento' => null,
+            ];
         }
     }
 }

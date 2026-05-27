@@ -32,6 +32,17 @@ class ConfiguracionDTE extends Model
         'observaciones',
         'notificar_rechazos',
         'email_notificaciones',
+        // Archivos CAF
+        'caf_boleta_39',
+        'caf_factura_33',
+        'caf_nota_credito_61',
+        'caf_nota_debito_56',
+        'caf_boleta_desde',
+        'caf_boleta_hasta',
+        'caf_boleta_vencimiento',
+        'caf_factura_desde',
+        'caf_factura_hasta',
+        'caf_factura_vencimiento',
     ];
 
     protected $casts = [
@@ -41,6 +52,12 @@ class ConfiguracionDTE extends Model
         'folio_factura_actual' => 'integer',
         'fecha_creacion' => 'datetime',
         'fecha_actualizacion' => 'datetime',
+        'caf_boleta_vencimiento' => 'date',
+        'caf_factura_vencimiento' => 'date',
+        'caf_boleta_desde' => 'integer',
+        'caf_boleta_hasta' => 'integer',
+        'caf_factura_desde' => 'integer',
+        'caf_factura_hasta' => 'integer',
     ];
 
     protected $hidden = [
