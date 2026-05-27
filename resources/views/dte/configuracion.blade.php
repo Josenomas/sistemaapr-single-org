@@ -153,11 +153,14 @@
                             LibreDTE ($40.000/mes)
                         </option>
                         <option value="simpleapi" {{ old('proveedor_dte', $config->proveedor_dte ?? '') == 'simpleapi' ? 'selected' : '' }}>
-                            SimpleAPI (GRATIS hasta 500/mes) ⭐
+                            SimpleAPI (GRATIS hasta 500/mes)
+                        </option>
+                        <option value="simplefactura" {{ old('proveedor_dte', $config->proveedor_dte ?? '') == 'simplefactura' ? 'selected' : '' }}>
+                            SimpleFactura (ChileSystems) ⭐ RECOMENDADO
                         </option>
                     </select>
                     <small class="form-text text-muted">
-                        💡 <strong>Tip:</strong> SimpleAPI es gratis hasta 500 documentos/mes
+                        💡 <strong>Tip:</strong> SimpleFactura tiene SDK oficial y mejor documentación
                     </small>
                     @error('proveedor_dte')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -271,7 +274,7 @@
                     </h4>
                     <p class="text-muted" style="margin-bottom: 20px;">
                         <i class="fas fa-info-circle"></i>
-                        El certificado digital es <strong>obligatorio para SimpleAPI</strong> y opcional para LibreDTE.
+                        El certificado digital es <strong>obligatorio para SimpleAPI y SimpleFactura</strong>, opcional para LibreDTE.
                         Debe ser emitido por el SII y estar vigente.
                     </p>
                 </div>
@@ -279,7 +282,7 @@
                 <div class="form-group col-md-8">
                     <label for="certificado_digital" class="form-label">
                         Subir Certificado Digital
-                        @if($config && $config->proveedor_dte == 'simpleapi')
+                        @if($config && in_array($config->proveedor_dte, ['simpleapi', 'simplefactura']))
                             <span class="badge badge-danger">Obligatorio</span>
                         @else
                             <span class="badge badge-secondary">Opcional</span>
@@ -315,127 +318,6 @@
                     </small>
                     @error('certificado_password')
                         <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-            <!-- Archivos CAF (Código de Autorización de Folios) -->
-            <div class="form-row" style="margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--gray-200);">
-                <div class="col-md-12">
-                    <h4 style="margin-bottom: 16px;">
-                        <i class="fas fa-file-code"></i>
-                        Archivos CAF (Código de Autorización de Folios)
-                    </h4>
-                    <p class="text-muted" style="margin-bottom: 20px;">
-                        <i class="fas fa-info-circle"></i>
-                        Los archivos CAF contienen los folios autorizados por el SII para emitir documentos electrónicos.
-                        Descárgalos desde el sitio del SII (<a href="https://maullin.sii.cl/cvc_cgi/dte/of_solicita_folios" target="_blank">Certificación</a> o <a href="https://palena.sii.cl/cvc_cgi/dte/of_solicita_folios" target="_blank">Producción</a>).
-                    </p>
-                </div>
-
-                <!-- CAF Boleta Electrónica (39) -->
-                <div class="form-group col-md-6">
-                    <label for="caf_boleta_39" class="form-label">
-                        <i class="fas fa-receipt"></i>
-                        CAF Boleta Electrónica (Tipo 39)
-                        @if($config && $config->proveedor_dte == 'simpleapi')
-                            <span class="badge badge-warning">Recomendado</span>
-                        @endif
-                    </label>
-                    <input type="file"
-                           class="form-control-file @error('caf_boleta_39') is-invalid @enderror"
-                           id="caf_boleta_39"
-                           name="caf_boleta_39"
-                           accept=".xml">
-                    <small class="form-text text-muted">
-                        <i class="fas fa-file-code"></i>
-                        Archivo XML del SII
-                        @if($config && $config->caf_boleta_39)
-                            <br><i class="fas fa-check-circle text-success"></i>
-                            <strong>CAF cargado</strong> - Folios {{ $config->caf_boleta_desde }} a {{ $config->caf_boleta_hasta }}
-                            @if($config->caf_boleta_vencimiento)
-                                (Vence: {{ $config->caf_boleta_vencimiento->format('d/m/Y') }})
-                            @endif
-                        @endif
-                    </small>
-                    @error('caf_boleta_39')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- CAF Factura Electrónica (33) -->
-                <div class="form-group col-md-6">
-                    <label for="caf_factura_33" class="form-label">
-                        <i class="fas fa-file-invoice"></i>
-                        CAF Factura Electrónica (Tipo 33)
-                        <span class="badge badge-secondary">Opcional</span>
-                    </label>
-                    <input type="file"
-                           class="form-control-file @error('caf_factura_33') is-invalid @enderror"
-                           id="caf_factura_33"
-                           name="caf_factura_33"
-                           accept=".xml">
-                    <small class="form-text text-muted">
-                        <i class="fas fa-file-code"></i>
-                        Archivo XML del SII (solo si emites facturas)
-                        @if($config && $config->caf_factura_33)
-                            <br><i class="fas fa-check-circle text-success"></i>
-                            <strong>CAF cargado</strong> - Folios {{ $config->caf_factura_desde }} a {{ $config->caf_factura_hasta }}
-                            @if($config->caf_factura_vencimiento)
-                                (Vence: {{ $config->caf_factura_vencimiento->format('d/m/Y') }})
-                            @endif
-                        @endif
-                    </small>
-                    @error('caf_factura_33')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- CAF Nota de Crédito (61) -->
-                <div class="form-group col-md-6">
-                    <label for="caf_nota_credito_61" class="form-label">
-                        <i class="fas fa-file-minus"></i>
-                        CAF Nota de Crédito (Tipo 61)
-                        <span class="badge badge-secondary">Opcional</span>
-                    </label>
-                    <input type="file"
-                           class="form-control-file @error('caf_nota_credito_61') is-invalid @enderror"
-                           id="caf_nota_credito_61"
-                           name="caf_nota_credito_61"
-                           accept=".xml">
-                    <small class="form-text text-muted">
-                        <i class="fas fa-file-code"></i>
-                        Archivo XML del SII (solo si necesitas anular documentos)
-                        @if($config && $config->caf_nota_credito_61)
-                            <br><i class="fas fa-check-circle text-success"></i> <strong>CAF cargado</strong>
-                        @endif
-                    </small>
-                    @error('caf_nota_credito_61')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- CAF Nota de Débito (56) -->
-                <div class="form-group col-md-6">
-                    <label for="caf_nota_debito_56" class="form-label">
-                        <i class="fas fa-file-plus"></i>
-                        CAF Nota de Débito (Tipo 56)
-                        <span class="badge badge-secondary">Opcional</span>
-                    </label>
-                    <input type="file"
-                           class="form-control-file @error('caf_nota_debito_56') is-invalid @enderror"
-                           id="caf_nota_debito_56"
-                           name="caf_nota_debito_56"
-                           accept=".xml">
-                    <small class="form-text text-muted">
-                        <i class="fas fa-file-code"></i>
-                        Archivo XML del SII (solo si necesitas emitir cargos adicionales)
-                        @if($config && $config->caf_nota_debito_56)
-                            <br><i class="fas fa-check-circle text-success"></i> <strong>CAF cargado</strong>
-                        @endif
-                    </small>
-                    @error('caf_nota_debito_56')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
@@ -839,8 +721,8 @@ function toggleProveedorFields() {
     const credencialesProduccion = document.getElementById('credenciales-produccion');
     const credencialesCertificacion = document.getElementById('credenciales-certificacion');
 
-    // SimpleAPI no usa hash de LibreDTE, solo certificado digital
-    if (proveedor === 'simpleapi') {
+    // SimpleAPI y SimpleFactura no usan hash de LibreDTE, solo certificado digital
+    if (proveedor === 'simpleapi' || proveedor === 'simplefactura') {
         // Ocultar secciones de LibreDTE (hash)
         if (credencialesProduccion) credencialesProduccion.style.display = 'none';
         if (credencialesCertificacion) credencialesCertificacion.style.display = 'none';
