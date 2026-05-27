@@ -326,13 +326,19 @@ class DTEController extends Controller
             abort(403);
         }
 
-        // Prioridad 1: Descargar desde almacenamiento local si existe
+        // Prioridad 1: PDF unificado personalizado (boleta interna + timbre SII)
+        if ($boleta->pdf_personalizado_path && Storage::exists($boleta->pdf_personalizado_path)) {
+            $nombreArchivo = "Boleta_{$boleta->numero_boleta}_F{$boleta->folio_sii}.pdf";
+            return Storage::download($boleta->pdf_personalizado_path, $nombreArchivo);
+        }
+
+        // Prioridad 2: PDF local antiguo (si existe)
         if ($boleta->pdf_local_path && Storage::exists($boleta->pdf_local_path)) {
             $nombreArchivo = "DTE_{$boleta->tipo_dte}_F{$boleta->folio_sii}_B{$boleta->numero_boleta}.pdf";
             return Storage::download($boleta->pdf_local_path, $nombreArchivo);
         }
 
-        // Prioridad 2: Redirigir a LibreDTE si no hay copia local
+        // Prioridad 3: Redirigir a LibreDTE si no hay copia local
         if ($boleta->pdf_url) {
             return redirect($boleta->pdf_url);
         }

@@ -9,6 +9,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Services\PdfExportService;
 
 class SimpleAPIService
 {
@@ -70,7 +71,7 @@ class SimpleAPIService
         $timbreBase64 = $this->extraerTimbreDesdeXML($response['xml'] ?? null);
         $ted = $this->extraerTEDDesdeXML($response['xml'] ?? null);
 
-        // Actualizar boleta SOLO con datos legales (folio, timbre, ted, xml)
+        // Actualizar boleta con datos legales (folio, timbre, ted, xml)
         $boleta->update([
             'tipo_dte' => $dte['Encabezado']['IdDoc']['TipoDTE'] ?? 39,
             'estado_dte' => 'emitida',
@@ -80,6 +81,13 @@ class SimpleAPIService
             'ted' => $ted,
             'fecha_emision_dte' => now(),
         ]);
+
+        // Generar y guardar PDF unificado con timbre del SII
+        $pdfPath = $this->generarYGuardarPDFUnificado($boleta->fresh());
+
+        if ($pdfPath) {
+            $boleta->update(['pdf_personalizado_path' => $pdfPath]);
+        }
 
         return $response;
     }
@@ -222,6 +230,56 @@ class SimpleAPIService
             'certificado' => base64_encode(Storage::get($this->config->certificado_digital)),
             'password' => decrypt($this->config->password_certificado),
         ];
+    }
+
+    /**
+     * Generar y guardar PDF unificado (boleta interna + timbre SII)
+     */
+    protected function generarYGuardarPDFUnificado(Boleta $boleta)
+    {
+        try {
+            // Generar PDF usando el servicio de PDFs
+            $pdfService = new PdfExportService();
+            $pdf = $pdfService->boleta($boleta, $boleta->organizacion);
+
+            // Crear estructura de directorios: boletas/YYYY/MM/
+            $año = now()->format('Y');
+            $mes = now()->format('m');
+            $directorio = "boletas/{$año}/{$mes}";
+
+            // Crear directorio si no existe
+            if (!Storage::exists($directorio)) {
+                Storage::makeDirectory($directorio, 0755, true);
+            }
+
+            // Nombre del archivo: boleta_[id]_F[folio]_[timestamp].pdf
+            $nombreArchivo = sprintf(
+                'boleta_%s_F%s_%s.pdf',
+                $boleta->id,
+                $boleta->folio_sii ?? 'PENDING',
+                now()->timestamp
+            );
+
+            $rutaCompleta = "{$directorio}/{$nombreArchivo}";
+
+            // Guardar PDF en storage/app/boletas/
+            Storage::put($rutaCompleta, $pdf->output());
+
+            Log::info('PDF unificado con timbre guardado', [
+                'boleta_id' => $boleta->id,
+                'folio_sii' => $boleta->folio_sii,
+                'ruta' => $rutaCompleta,
+            ]);
+
+            return $rutaCompleta;
+
+        } catch (\Exception $e) {
+            Log::error('Error al generar PDF unificado', [
+                'boleta_id' => $boleta->id,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
     }
 
     /**
