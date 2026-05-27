@@ -15,7 +15,8 @@
         "laravel/tinker": "^2.7",
         "libredte/libredte-api-client": "^2.0",
         "phpoffice/phpspreadsheet": "^1.28",
-        "spatie/laravel-backup": "*"
+        "spatie/laravel-backup": "*",
+        "tecnickcom/tcpdf": "^6.11"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

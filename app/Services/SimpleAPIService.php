@@ -226,8 +226,10 @@ class SimpleAPIService
             throw new \Exception('No hay certificado digital configurado');
         }
 
+        // El certificado YA está en base64 en la BD
+        // No hacer doble encoding
         return [
-            'certificado' => base64_encode(Storage::get($this->config->certificado_digital)),
+            'certificado' => $this->config->certificado_digital,
             'password' => decrypt($this->config->password_certificado),
         ];
     }
@@ -312,11 +314,8 @@ class SimpleAPIService
                 return null;
             }
 
-            // Generar imagen del timbre usando la librería chilean-bundle o similar
-            // Por ahora retornamos null y el PDF mostrará el placeholder
-            // TODO: Implementar generación de imagen PDF417 desde TED
-
-            return null;
+            // Generar imagen PDF417 del timbre
+            return $this->generarImagenPDF417($ted);
 
         } catch (\Exception $e) {
             Log::error('Error extrayendo timbre de XML', [
@@ -349,6 +348,65 @@ class SimpleAPIService
 
         } catch (\Exception $e) {
             Log::error('Error extrayendo TED de XML', [
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Generar imagen PNG del código PDF417 desde el TED
+     */
+    protected function generarImagenPDF417($tedXML)
+    {
+        try {
+            // Crear instancia de TCPDF
+            $pdf = new \TCPDF('P', 'mm', array(80, 30), true, 'UTF-8', false);
+
+            // Configurar PDF
+            $pdf->SetPrintHeader(false);
+            $pdf->SetPrintFooter(false);
+            $pdf->SetMargins(0, 0, 0);
+            $pdf->SetAutoPageBreak(false, 0);
+            $pdf->AddPage();
+
+            // Estilo del código PDF417
+            $style = [
+                'border' => 0,
+                'vpadding' => 0,
+                'hpadding' => 0,
+                'fgcolor' => array(0, 0, 0),
+                'bgcolor' => false,
+                'module_width' => 1,
+                'module_height' => 1,
+            ];
+
+            // Generar código PDF417 del TED completo
+            $pdf->write2DBarcode($tedXML, 'PDF417', 0, 0, 80, 30, $style, 'N');
+
+            // Obtener imagen PNG del código
+            $imageData = $pdf->Output('', 'S'); // Retorna string binario del PDF
+
+            // Convertir PDF a PNG usando Imagick si está disponible
+            if (extension_loaded('imagick')) {
+                $imagick = new \Imagick();
+                $imagick->setResolution(300, 300);
+                $imagick->readImageBlob($imageData);
+                $imagick->setImageFormat('png');
+                $imagick->setImageBackgroundColor('white');
+                $imagick->setImageAlphaChannel(\Imagick::ALPHACHANNEL_REMOVE);
+                $pngData = $imagick->getImageBlob();
+                $imagick->clear();
+                $imagick->destroy();
+
+                return base64_encode($pngData);
+            }
+
+            // Si no hay Imagick, retornar el PDF como base64 (menos ideal pero funciona)
+            return base64_encode($imageData);
+
+        } catch (\Exception $e) {
+            Log::error('Error generando imagen PDF417', [
                 'error' => $e->getMessage()
             ]);
             return null;
