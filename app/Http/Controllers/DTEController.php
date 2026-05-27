@@ -163,21 +163,58 @@ class DTEController extends Controller
             'telefono' => 'nullable|string|max:20',
             'email_contacto' => 'required|email|max:150',
             'ambiente' => 'required|in:certificacion,produccion',
+            'proveedor_dte' => 'required|in:libredte,simpleapi',
             // Credenciales de producción
             'libredte_hash' => 'nullable|string|max:100',
             'libredte_url' => 'nullable|url|max:255',
             // Credenciales de certificación
             'libredte_hash_certificacion' => 'nullable|string|max:100',
             'libredte_url_certificacion' => 'nullable|url|max:255',
+            // Certificado digital
+            'certificado_digital' => 'nullable|file|mimes:pfx,p12|max:2048',
+            'certificado_password' => 'nullable|string|max:100',
         ]);
 
         $idOrganizacion = auth()->user()->id_organizacion;
 
-        // Validar que al menos tenga credenciales del ambiente seleccionado
-        if ($validated['ambiente'] === 'produccion' && empty($validated['libredte_hash'])) {
-            return redirect()->back()
-                ->withErrors(['libredte_hash' => 'El hash de producción es obligatorio cuando se selecciona ambiente de producción'])
-                ->withInput();
+        // Validaciones específicas por proveedor
+        if ($validated['proveedor_dte'] === 'simpleapi') {
+            // SimpleAPI requiere certificado digital
+            $configExistente = ConfiguracionDTE::where('id_organizacion', $idOrganizacion)->first();
+            if (!$request->hasFile('certificado_digital') && (!$configExistente || !$configExistente->certificado_digital)) {
+                return redirect()->back()
+                    ->withErrors(['certificado_digital' => 'SimpleAPI requiere un certificado digital. Por favor, suba el archivo .pfx'])
+                    ->withInput();
+            }
+        } elseif ($validated['proveedor_dte'] === 'libredte') {
+            // LibreDTE requiere hash según ambiente
+            if ($validated['ambiente'] === 'produccion' && empty($validated['libredte_hash'])) {
+                return redirect()->back()
+                    ->withErrors(['libredte_hash' => 'El hash de producción es obligatorio cuando se selecciona ambiente de producción con LibreDTE'])
+                    ->withInput();
+            }
+        }
+
+        // Procesar certificado digital si se subió
+        if ($request->hasFile('certificado_digital')) {
+            $certificado = $request->file('certificado_digital');
+            $certificadoBase64 = base64_encode(file_get_contents($certificado->getRealPath()));
+            $validated['certificado_digital'] = $certificadoBase64;
+
+            // Encriptar contraseña del certificado
+            if (!empty($validated['certificado_password'])) {
+                $validated['certificado_password'] = encrypt($validated['certificado_password']);
+            }
+        } else {
+            // No sobrescribir certificado existente si no se subió uno nuevo
+            unset($validated['certificado_digital']);
+
+            // Solo actualizar contraseña si se proporcionó una nueva
+            if (empty($validated['certificado_password'])) {
+                unset($validated['certificado_password']);
+            } else {
+                $validated['certificado_password'] = encrypt($validated['certificado_password']);
+            }
         }
 
         ConfiguracionDTE::updateOrCreate(

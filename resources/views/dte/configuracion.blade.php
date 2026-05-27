@@ -39,7 +39,7 @@
         <h3 class="card-title">Datos del Emisor</h3>
     </div>
     <div class="card-body">
-        <form action="{{ route('dte.guardar-configuracion') }}" method="POST" id="formConfigDTE">
+        <form action="{{ route('dte.guardar-configuracion') }}" method="POST" id="formConfigDTE" enctype="multipart/form-data">
             @csrf
 
             <div class="form-row">
@@ -259,6 +259,63 @@
                             @enderror
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Certificado Digital -->
+            <div class="form-row" style="margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--gray-200);">
+                <div class="col-md-12">
+                    <h4 style="margin-bottom: 16px;">
+                        <i class="fas fa-certificate"></i>
+                        Certificado Digital (.pfx/.p12)
+                    </h4>
+                    <p class="text-muted" style="margin-bottom: 20px;">
+                        <i class="fas fa-info-circle"></i>
+                        El certificado digital es <strong>obligatorio para SimpleAPI</strong> y opcional para LibreDTE.
+                        Debe ser emitido por el SII y estar vigente.
+                    </p>
+                </div>
+
+                <div class="form-group col-md-8">
+                    <label for="certificado_digital" class="form-label">
+                        Subir Certificado Digital
+                        @if($config && $config->proveedor_dte == 'simpleapi')
+                            <span class="badge badge-danger">Obligatorio</span>
+                        @else
+                            <span class="badge badge-secondary">Opcional</span>
+                        @endif
+                    </label>
+                    <input type="file"
+                           class="form-control-file @error('certificado_digital') is-invalid @enderror"
+                           id="certificado_digital"
+                           name="certificado_digital"
+                           accept=".pfx,.p12">
+                    <small class="form-text text-muted">
+                        <i class="fas fa-file-upload"></i>
+                        Formatos aceptados: .pfx, .p12 (máx. 2MB)
+                        @if($config && $config->certificado_digital)
+                            <br><i class="fas fa-check-circle text-success"></i> <strong>Certificado ya cargado</strong>
+                        @endif
+                    </small>
+                    @error('certificado_digital')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-group col-md-4">
+                    <label for="certificado_password" class="form-label">Contraseña del Certificado</label>
+                    <input type="password"
+                           class="form-control @error('certificado_password') is-invalid @enderror"
+                           id="certificado_password"
+                           name="certificado_password"
+                           placeholder="Contraseña del .pfx"
+                           autocomplete="new-password">
+                    <small class="form-text text-muted">
+                        Solo ingresar si subes un nuevo certificado
+                    </small>
+                    @error('certificado_password')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
