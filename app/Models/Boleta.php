@@ -20,8 +20,11 @@ class Boleta extends Model
         'tipo_dte',
         'estado_dte',
         'xml_dte',
+        'timbre_base64', // Timbre en base64
+        'ted', // Timbre Electrónico Digital
         'pdf_url',
         'pdf_local_path',
+        'pdf_personalizado_path', // PDF unificado con timbre
         'fecha_emision_dte',
         'id_socio',
         'id_lectura',

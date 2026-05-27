@@ -66,20 +66,18 @@ class SimpleAPIService
         // Enviar a SimpleAPI
         $response = $this->enviarDTE($dte);
 
-        // Descargar y guardar PDF localmente
-        $pdfLocalPath = null;
-        if (isset($response['pdfBase64'])) {
-            $pdfLocalPath = $this->guardarPDFDesdeBase64($response['pdfBase64'], $boleta);
-        }
+        // Extraer timbre y TED del XML de respuesta
+        $timbreBase64 = $this->extraerTimbreDesdeXML($response['xml'] ?? null);
+        $ted = $this->extraerTEDDesdeXML($response['xml'] ?? null);
 
-        // Actualizar boleta con los datos del DTE
+        // Actualizar boleta SOLO con datos legales (folio, timbre, ted, xml)
         $boleta->update([
             'tipo_dte' => $dte['Encabezado']['IdDoc']['TipoDTE'] ?? 39,
             'estado_dte' => 'emitida',
             'folio_sii' => $response['folio'] ?? null,
             'xml_dte' => $response['xml'] ?? null,
-            'pdf_url' => null, // SimpleAPI no proporciona URL, solo base64
-            'pdf_local_path' => $pdfLocalPath,
+            'timbre_base64' => $timbreBase64,
+            'ted' => $ted,
             'fecha_emision_dte' => now(),
         ]);
 
@@ -227,19 +225,74 @@ class SimpleAPIService
     }
 
     /**
-     * Guardar PDF desde base64
+     * Extraer imagen del timbre desde XML DTE (TED)
+     * El TED contiene el código de barras PDF417 que debe mostrarse en el documento
      */
-    protected function guardarPDFDesdeBase64($pdfBase64, Boleta $boleta)
+    protected function extraerTimbreDesdeXML($xml)
     {
+        if (!$xml) {
+            return null;
+        }
+
         try {
-            $filename = "boletas/pdf/boleta_{$boleta->id}_" . time() . ".pdf";
-            $pdfContent = base64_decode($pdfBase64);
+            // Parsear XML
+            $xmlObj = simplexml_load_string($xml);
 
-            Storage::disk('public')->put($filename, $pdfContent);
+            // Registrar namespace si existe
+            $namespaces = $xmlObj->getNamespaces(true);
 
-            return $filename;
+            // Extraer TED (Timbre Electrónico Digital)
+            $ted = null;
+            if (isset($xmlObj->TED)) {
+                $ted = $xmlObj->TED->asXML();
+            } elseif (isset($xmlObj->Signature->Object->TED)) {
+                $ted = $xmlObj->Signature->Object->TED->asXML();
+            }
+
+            if (!$ted) {
+                Log::warning('No se encontró TED en el XML de SimpleAPI');
+                return null;
+            }
+
+            // Generar imagen del timbre usando la librería chilean-bundle o similar
+            // Por ahora retornamos null y el PDF mostrará el placeholder
+            // TODO: Implementar generación de imagen PDF417 desde TED
+
+            return null;
+
         } catch (\Exception $e) {
-            Log::error('Error guardando PDF: ' . $e->getMessage());
+            Log::error('Error extrayendo timbre de XML', [
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Extraer TED (Timbre Electrónico Digital) completo desde XML
+     */
+    protected function extraerTEDDesdeXML($xml)
+    {
+        if (!$xml) {
+            return null;
+        }
+
+        try {
+            $xmlObj = simplexml_load_string($xml);
+
+            // Buscar TED en diferentes ubicaciones posibles
+            if (isset($xmlObj->TED)) {
+                return $xmlObj->TED->asXML();
+            } elseif (isset($xmlObj->Signature->Object->TED)) {
+                return $xmlObj->Signature->Object->TED->asXML();
+            }
+
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Error extrayendo TED de XML', [
+                'error' => $e->getMessage()
+            ]);
             return null;
         }
     }

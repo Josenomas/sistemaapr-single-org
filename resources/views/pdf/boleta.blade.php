@@ -279,26 +279,35 @@
 <!-- TIMBRE SII -->
 @if(method_exists($boleta, 'tieneFolioSII') && $boleta->tieneFolioSII())
 <div class="timbre-section">
-  <svg class="timbre-qr" width="68" height="68" viewBox="0 0 68 68" xmlns="http://www.w3.org/2000/svg">
-    <rect width="68" height="68" fill="white" stroke="#ddd" stroke-width="0.5"/>
-    <rect x="4" y="4" width="20" height="20" rx="1" fill="none" stroke="#222" stroke-width="1.8"/>
-    <rect x="7" y="7" width="14" height="14" fill="#222"/>
-    <rect x="44" y="4" width="20" height="20" rx="1" fill="none" stroke="#222" stroke-width="1.8"/>
-    <rect x="47" y="7" width="14" height="14" fill="#222"/>
-    <rect x="4" y="44" width="20" height="20" rx="1" fill="none" stroke="#222" stroke-width="1.8"/>
-    <rect x="7" y="47" width="14" height="14" fill="#222"/>
-    <rect x="28" y="28" width="12" height="12" fill="#222"/>
-  </svg>
+  @if($boleta->timbre_base64)
+    {{-- Timbre REAL del SII en base64 --}}
+    <img src="data:image/png;base64,{{ $boleta->timbre_base64 }}" class="timbre-qr" alt="Timbre SII" />
+  @else
+    {{-- QR placeholder (se elimina cuando se implemente SimpleAPI/LibreDTE) --}}
+    <svg class="timbre-qr" width="68" height="68" viewBox="0 0 68 68" xmlns="http://www.w3.org/2000/svg">
+      <rect width="68" height="68" fill="white" stroke="#ddd" stroke-width="0.5"/>
+      <rect x="4" y="4" width="20" height="20" rx="1" fill="none" stroke="#222" stroke-width="1.8"/>
+      <rect x="7" y="7" width="14" height="14" fill="#222"/>
+      <rect x="44" y="4" width="20" height="20" rx="1" fill="none" stroke="#222" stroke-width="1.8"/>
+      <rect x="47" y="7" width="14" height="14" fill="#222"/>
+      <rect x="4" y="44" width="20" height="20" rx="1" fill="none" stroke="#222" stroke-width="1.8"/>
+      <rect x="7" y="47" width="14" height="14" fill="#222"/>
+      <rect x="28" y="28" width="12" height="12" fill="#222"/>
+    </svg>
+  @endif
   <div>
     <div class="t-title">Timbre Electrónico SII — Boleta Electrónica</div>
     <div class="t-row">
       <div><div class="t-label">RUT Emisor</div><div class="t-val">{{ $organizacion->rut }}</div></div>
       <div><div class="t-label">Tipo DTE</div><div class="t-val">39 — Boleta Electrónica</div></div>
       <div><div class="t-label">Folio</div><div class="t-val">{{ $boleta->folio_sii }}</div></div>
-      <div><div class="t-label">Fecha emisión</div><div class="t-val">{{ \Carbon\Carbon::parse($boleta->fecha_emision)->format('Y-m-d') }}</div></div>
+      <div><div class="t-label">Fecha emisión</div><div class="t-val">{{ \Carbon\Carbon::parse($boleta->fecha_emision_dte ?? $boleta->fecha_emision)->format('Y-m-d') }}</div></div>
       <div><div class="t-label">Monto</div><div class="t-val">${{ number_format($boleta->total, 0, ',', '.') }}</div></div>
     </div>
     <div class="t-legal">Resolución Ex. SII N° 45 del 01/09/2003 — Documento válido sin firma ni timbre físico. Verifique en www.sii.cl</div>
+    @if($boleta->ted)
+    <div class="t-legal" style="margin-top:3px;font-size:7px;color:#888;">TED: {{ substr($boleta->ted, 0, 60) }}...</div>
+    @endif
   </div>
 </div>
 @endif

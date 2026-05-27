@@ -57,20 +57,18 @@ class LibreDTEService
         // Enviar a LibreDTE
         $response = $this->enviarDTE($dte);
 
-        // Descargar y guardar PDF localmente
-        $pdfLocalPath = null;
-        if (isset($response['pdf'])) {
-            $pdfLocalPath = $this->descargarYGuardarPDF($response['pdf'], $boleta);
-        }
+        // Extraer timbre y TED del XML de respuesta
+        $timbreBase64 = $this->extraerTimbreDesdeXML($response['xml'] ?? null);
+        $ted = $this->extraerTEDDesdeXML($response['xml'] ?? null);
 
-        // Actualizar boleta con los datos del DTE
+        // Actualizar boleta SOLO con datos legales (folio, timbre, ted, xml)
         $boleta->update([
             'tipo_dte' => 39, // Boleta Electrónica
             'estado_dte' => 'emitida',
             'folio_sii' => $response['folio'] ?? null,
             'xml_dte' => $response['xml'] ?? null,
-            'pdf_url' => $response['pdf'] ?? null,
-            'pdf_local_path' => $pdfLocalPath,
+            'timbre_base64' => $timbreBase64,
+            'ted' => $ted,
             'fecha_emision_dte' => now(),
         ]);
 
@@ -493,53 +491,74 @@ class LibreDTEService
     }
 
     /**
-     * Descargar PDF desde LibreDTE y guardarlo localmente
+     * Extraer imagen del timbre desde XML DTE (TED)
+     * El TED contiene el código de barras PDF417 que debe mostrarse en el documento
      */
-    protected function descargarYGuardarPDF($pdfUrl, Boleta $boleta)
+    protected function extraerTimbreDesdeXML($xml)
     {
+        if (!$xml) {
+            return null;
+        }
+
         try {
-            // Descargar PDF desde LibreDTE
-            $pdfContent = $this->client->get($pdfUrl)->getBody()->getContents();
+            // Parsear XML
+            $xmlObj = simplexml_load_string($xml);
 
-            // Crear estructura de directorios: dtes/YYYY/MM/
-            $año = now()->format('Y');
-            $mes = now()->format('m');
-            $directorio = "dtes/{$año}/{$mes}";
+            // Registrar namespace si existe
+            $namespaces = $xmlObj->getNamespaces(true);
 
-            // Crear directorio si no existe
-            if (!Storage::exists($directorio)) {
-                Storage::makeDirectory($directorio, 0755, true);
+            // Extraer TED (Timbre Electrónico Digital)
+            $ted = null;
+            if (isset($xmlObj->TED)) {
+                $ted = $xmlObj->TED->asXML();
+            } elseif (isset($xmlObj->Signature->Object->TED)) {
+                $ted = $xmlObj->Signature->Object->TED->asXML();
             }
 
-            // Nombre del archivo: DTE_[tipo]_[folio]_[id_boleta].pdf
-            $nombreArchivo = sprintf(
-                'DTE_%s_F%s_B%s.pdf',
-                $boleta->tipo_dte ?? 39,
-                $boleta->folio_sii ?? 'PENDING',
-                $boleta->id
-            );
+            if (!$ted) {
+                Log::warning('No se encontró TED en el XML de LibreDTE');
+                return null;
+            }
 
-            $rutaCompleta = "{$directorio}/{$nombreArchivo}";
+            // Generar imagen del timbre usando la librería chilean-bundle o similar
+            // Por ahora retornamos null y el PDF mostrará el placeholder
+            // TODO: Implementar generación de imagen PDF417 desde TED
 
-            // Guardar PDF en storage/app/dtes/
-            Storage::put($rutaCompleta, $pdfContent);
-
-            Log::info('PDF DTE guardado localmente', [
-                'boleta_id' => $boleta->id,
-                'ruta' => $rutaCompleta,
-                'tamaño' => strlen($pdfContent) . ' bytes',
-            ]);
-
-            return $rutaCompleta;
+            return null;
 
         } catch (\Exception $e) {
-            Log::error('Error al guardar PDF localmente', [
-                'boleta_id' => $boleta->id,
-                'pdf_url' => $pdfUrl,
-                'error' => $e->getMessage(),
+            Log::error('Error extrayendo timbre de XML', [
+                'error' => $e->getMessage()
             ]);
+            return null;
+        }
+    }
 
-            // No lanzar excepción - el PDF ya está en LibreDTE
+    /**
+     * Extraer TED (Timbre Electrónico Digital) completo desde XML
+     */
+    protected function extraerTEDDesdeXML($xml)
+    {
+        if (!$xml) {
+            return null;
+        }
+
+        try {
+            $xmlObj = simplexml_load_string($xml);
+
+            // Buscar TED en diferentes ubicaciones posibles
+            if (isset($xmlObj->TED)) {
+                return $xmlObj->TED->asXML();
+            } elseif (isset($xmlObj->Signature->Object->TED)) {
+                return $xmlObj->Signature->Object->TED->asXML();
+            }
+
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Error extrayendo TED de XML', [
+                'error' => $e->getMessage()
+            ]);
             return null;
         }
     }
