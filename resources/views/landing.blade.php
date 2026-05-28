@@ -685,10 +685,13 @@
                 <li><a href="#contact">Contacto</a></li>
             </ul>
             <div style="display: flex; gap: 10px; align-items: center;">
+                {{-- Registro temporalmente deshabilitado --}}
+                {{--
                 <a href="{{ route('registro.formulario') }}" class="btn-registro">
                     <i class="fas fa-user-plus"></i>
                     Registrarse Gratis
                 </a>
+                --}}
                 <a href="{{ route('login') }}" class="btn-login">
                     <i class="fas fa-sign-in-alt"></i>
                     Iniciar Sesión
@@ -703,10 +706,13 @@
             <h1>💧 Gestión Integral para tu SSR</h1>
             <p>Sistema completo de administración para Agua Potable Rural. Controla socios, lecturas, boletas, pagos y más en una sola plataforma moderna y fácil de usar.</p>
             <div class="cta-buttons">
+                {{-- Registro temporalmente deshabilitado --}}
+                {{--
                 <a href="{{ route('registro.formulario') }}" class="btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); font-size: 1.1rem; padding: 1rem 2rem;">
                     <i class="fas fa-rocket"></i>
                     Empieza Gratis - 30 Días
                 </a>
+                --}}
                 <a href="{{ route('conoce.boleta') }}" class="btn-secondary">
                     <i class="fas fa-file-invoice"></i>
                     Conoce tu Boleta
