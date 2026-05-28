@@ -29,6 +29,9 @@ class ConfiguracionDTE extends Model
         'folio_factura_actual',
         'activo',
         'proveedor_dte', // libredte, simpleapi o simplefactura
+        'simpleapi_token',
+        'simplefactura_usuario',
+        'simplefactura_password',
         'observaciones',
         'notificar_rechazos',
         'email_notificaciones',
@@ -47,6 +50,8 @@ class ConfiguracionDTE extends Model
         'certificado_password',
         'libredte_hash',
         'libredte_hash_certificacion',
+        'simpleapi_token',
+        'simplefactura_password',
     ];
 
     const CREATED_AT = 'fecha_creacion';

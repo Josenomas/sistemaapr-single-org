@@ -174,12 +174,16 @@ class DTEController extends Controller
             'email_contacto' => 'required|email|max:150',
             'ambiente' => 'required|in:certificacion,produccion',
             'proveedor_dte' => 'required|in:libredte,simpleapi,simplefactura',
-            // Credenciales de producción
+            // Credenciales LibreDTE
             'libredte_hash' => 'nullable|string|max:100',
             'libredte_url' => 'nullable|url|max:255',
-            // Credenciales de certificación
             'libredte_hash_certificacion' => 'nullable|string|max:100',
             'libredte_url_certificacion' => 'nullable|url|max:255',
+            // Credenciales SimpleAPI
+            'simpleapi_token' => 'nullable|string|max:255',
+            // Credenciales SimpleFactura
+            'simplefactura_usuario' => 'nullable|email|max:150',
+            'simplefactura_password' => 'nullable|string|max:150',
             // Certificado digital
             'certificado_digital' => 'nullable|file|mimes:pfx,p12|max:2048',
             'certificado_password' => 'nullable|string|max:100',
@@ -188,12 +192,35 @@ class DTEController extends Controller
         $idOrganizacion = auth()->user()->id_organizacion;
 
         // Validaciones específicas por proveedor
-        if (in_array($validated['proveedor_dte'], ['simpleapi', 'simplefactura'])) {
-            // SimpleAPI y SimpleFactura requieren certificado digital
-            $configExistente = ConfiguracionDTE::where('id_organizacion', $idOrganizacion)->first();
+        $configExistente = ConfiguracionDTE::where('id_organizacion', $idOrganizacion)->first();
+
+        if ($validated['proveedor_dte'] === 'simpleapi') {
+            // SimpleAPI requiere certificado digital Y token
             if (!$request->hasFile('certificado_digital') && (!$configExistente || !$configExistente->certificado_digital)) {
                 return redirect()->back()
-                    ->withErrors(['certificado_digital' => 'Este proveedor requiere un certificado digital. Por favor, suba el archivo .pfx'])
+                    ->withErrors(['certificado_digital' => 'SimpleAPI requiere un certificado digital. Por favor, suba el archivo .pfx'])
+                    ->withInput();
+            }
+            if (empty($validated['simpleapi_token'])) {
+                return redirect()->back()
+                    ->withErrors(['simpleapi_token' => 'El token de API de SimpleAPI es obligatorio'])
+                    ->withInput();
+            }
+        } elseif ($validated['proveedor_dte'] === 'simplefactura') {
+            // SimpleFactura requiere certificado digital, usuario y contraseña
+            if (!$request->hasFile('certificado_digital') && (!$configExistente || !$configExistente->certificado_digital)) {
+                return redirect()->back()
+                    ->withErrors(['certificado_digital' => 'SimpleFactura requiere un certificado digital. Por favor, suba el archivo .pfx'])
+                    ->withInput();
+            }
+            if (empty($validated['simplefactura_usuario'])) {
+                return redirect()->back()
+                    ->withErrors(['simplefactura_usuario' => 'El usuario de SimpleFactura es obligatorio'])
+                    ->withInput();
+            }
+            if (empty($validated['simplefactura_password'])) {
+                return redirect()->back()
+                    ->withErrors(['simplefactura_password' => 'La contraseña de SimpleFactura es obligatoria'])
                     ->withInput();
             }
         } elseif ($validated['proveedor_dte'] === 'libredte') {
@@ -224,6 +251,16 @@ class DTEController extends Controller
                 unset($validated['certificado_password']);
             } else {
                 $validated['certificado_password'] = encrypt($validated['certificado_password']);
+            }
+        }
+
+        // Encriptar contraseña de SimpleFactura
+        if (!empty($validated['simplefactura_password'])) {
+            $validated['simplefactura_password'] = encrypt($validated['simplefactura_password']);
+        } else {
+            // No sobrescribir si no se proporcionó nueva contraseña
+            if ($configExistente && $configExistente->simplefactura_password) {
+                unset($validated['simplefactura_password']);
             }
         }
 

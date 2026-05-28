@@ -22,18 +22,7 @@ class SimpleAPIService
      */
     public function __construct()
     {
-        $this->apiKey = config('simpleapi.api_key');
-
-        $this->client = new Client([
-            'base_uri' => config('simpleapi.url'),
-            'timeout' => config('simpleapi.timeout', 30),
-            'verify' => true,
-            'headers' => [
-                'Authorization' => $this->apiKey,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ]
-        ]);
+        // El cliente se inicializa en setOrganizacion() con las credenciales correctas
     }
 
     /**
@@ -48,6 +37,21 @@ class SimpleAPIService
         if (!$this->config || !$this->config->estaConfigurado()) {
             throw new \Exception('SimpleAPI no está configurado para esta organización');
         }
+
+        // Usar credenciales de BD o fallback a .env
+        $this->apiKey = $this->config->simpleapi_token ?? config('simpleapi.api_key');
+
+        // Inicializar cliente con las credenciales de la organización
+        $this->client = new Client([
+            'base_uri' => config('simpleapi.url'),
+            'timeout' => config('simpleapi.timeout', 30),
+            'verify' => true,
+            'headers' => [
+                'Authorization' => $this->apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ]
+        ]);
 
         return $this;
     }

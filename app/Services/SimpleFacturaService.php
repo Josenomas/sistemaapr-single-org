@@ -59,10 +59,16 @@ class SimpleFacturaService
         // Cachear token por 23 horas (válido 24h)
         $this->token = Cache::remember($cacheKey, 82800, function () {
             try {
+                // Usar credenciales de BD o fallback a .env
+                $username = $this->config->simplefactura_usuario ?? config('simplefactura.username');
+                $password = $this->config->simplefactura_password
+                    ? decrypt($this->config->simplefactura_password)
+                    : config('simplefactura.password');
+
                 $response = $this->client->post('/authentication', [
                     'json' => [
-                        'username' => $this->config->usuario ?? config('simplefactura.username'),
-                        'password' => $this->config->password ?? config('simplefactura.password'),
+                        'username' => $username,
+                        'password' => $password,
                     ],
                 ]);
 

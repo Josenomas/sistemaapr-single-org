@@ -187,38 +187,98 @@
                 </div>
             </div>
 
-            <!-- Credenciales de PRODUCCIÓN -->
-            <div id="credenciales-produccion" style="display: none;">
+            <!-- Credenciales LibreDTE -->
+            <div id="credenciales-libredte" style="display: none;">
                 <div class="ambiente-section produccion">
                     <div class="ambiente-header">
                         <i class="fas fa-shield-alt"></i>
-                        <h4>Credenciales de Producción</h4>
-                        <span class="badge badge-success">Producción Real</span>
+                        <h4>Credenciales LibreDTE</h4>
+                    </div>
+                    <div id="credenciales-produccion" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="libredte_hash" class="form-label required">Hash de API LibreDTE (Producción)</label>
+                                <input type="password"
+                                       class="form-control @error('libredte_hash') is-invalid @enderror"
+                                       id="libredte_hash"
+                                       name="libredte_hash"
+                                       value="{{ old('libredte_hash', $config->libredte_hash ?? '') }}"
+                                       placeholder="Tu hash de API de LibreDTE para producción">
+                                <small class="form-text">Obtén tu token en LibreDTE.cl → Configuración → Usuarios → API Token</small>
+                                @error('libredte_hash')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="libredte_url" class="form-label">URL de API LibreDTE (Producción)</label>
+                                <input type="url"
+                                       class="form-control @error('libredte_url') is-invalid @enderror"
+                                       id="libredte_url"
+                                       name="libredte_url"
+                                       value="{{ old('libredte_url', $config->libredte_url ?? 'https://libredte.cl') }}"
+                                       placeholder="https://libredte.cl">
+                                <small class="form-text">Por defecto: https://libredte.cl</small>
+                                @error('libredte_url')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="credenciales-certificacion-libredte" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="libredte_hash_certificacion" class="form-label">Hash de API LibreDTE (Certificación)</label>
+                                <input type="password"
+                                       class="form-control @error('libredte_hash_certificacion') is-invalid @enderror"
+                                       id="libredte_hash_certificacion"
+                                       name="libredte_hash_certificacion"
+                                       value="{{ old('libredte_hash_certificacion', $config->libredte_hash_certificacion ?? '') }}"
+                                       placeholder="Tu hash de API para ambiente de certificación">
+                                <small class="form-text">Token de certificación de LibreDTE (opcional si tienes cuenta separada)</small>
+                                @error('libredte_hash_certificacion')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="libredte_url_certificacion" class="form-label">URL de API LibreDTE (Certificación)</label>
+                                <input type="url"
+                                       class="form-control @error('libredte_url_certificacion') is-invalid @enderror"
+                                       id="libredte_url_certificacion"
+                                       name="libredte_url_certificacion"
+                                       value="{{ old('libredte_url_certificacion', $config->libredte_url_certificacion ?? 'https://libredte.cl') }}"
+                                       placeholder="https://libredte.cl">
+                                <small class="form-text">URL para ambiente de certificación</small>
+                                @error('libredte_url_certificacion')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credenciales SimpleAPI -->
+            <div id="credenciales-simpleapi" style="display: none;">
+                <div class="ambiente-section simpleapi">
+                    <div class="ambiente-header">
+                        <i class="fas fa-key"></i>
+                        <h4>Credenciales SimpleAPI</h4>
+                        <span class="badge badge-info">GRATIS hasta 500 DTEs/mes</span>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="libredte_hash" class="form-label required">Hash de API LibreDTE (Producción)</label>
+                        <div class="form-group col-md-12">
+                            <label for="simpleapi_token" class="form-label required">Token de API SimpleAPI</label>
                             <input type="password"
-                                   class="form-control @error('libredte_hash') is-invalid @enderror"
-                                   id="libredte_hash"
-                                   name="libredte_hash"
-                                   value="{{ old('libredte_hash', $config->libredte_hash ?? '') }}"
-                                   placeholder="Tu hash de API de LibreDTE para producción">
-                            <small class="form-text">Obtén tu token en LibreDTE.cl → Configuración → Usuarios → API Token</small>
-                            @error('libredte_hash')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="libredte_url" class="form-label">URL de API LibreDTE (Producción)</label>
-                            <input type="url"
-                                   class="form-control @error('libredte_url') is-invalid @enderror"
-                                   id="libredte_url"
-                                   name="libredte_url"
-                                   value="{{ old('libredte_url', $config->libredte_url ?? 'https://libredte.cl') }}"
-                                   placeholder="https://libredte.cl">
-                            <small class="form-text">Por defecto: https://libredte.cl</small>
-                            @error('libredte_url')
+                                   class="form-control @error('simpleapi_token') is-invalid @enderror"
+                                   id="simpleapi_token"
+                                   name="simpleapi_token"
+                                   value="{{ old('simpleapi_token', $config->simpleapi_token ?? '') }}"
+                                   placeholder="Tu token de API de SimpleAPI">
+                            <small class="form-text">
+                                Obtén tu token en: <a href="https://www.simpleapi.cl" target="_blank">www.simpleapi.cl</a> → Panel → API Token
+                            </small>
+                            @error('simpleapi_token')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -226,44 +286,47 @@
                 </div>
             </div>
 
-            <!-- Credenciales de CERTIFICACIÓN -->
-            <div id="credenciales-certificacion" style="display: none;">
-                <div class="ambiente-section certificacion">
+            <!-- Credenciales SimpleFactura -->
+            <div id="credenciales-simplefactura" style="display: none;">
+                <div class="ambiente-section simplefactura">
                     <div class="ambiente-header">
-                        <i class="fas fa-flask"></i>
-                        <h4>Credenciales de Certificación</h4>
-                        <span class="badge badge-warning">Ambiente de Pruebas</span>
+                        <i class="fas fa-star"></i>
+                        <h4>Credenciales SimpleFactura (ChileSystems)</h4>
+                        <span class="badge badge-success">⭐ RECOMENDADO</span>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label for="libredte_hash_certificacion" class="form-label">Hash de API LibreDTE (Certificación)</label>
-                            <input type="password"
-                                   class="form-control @error('libredte_hash_certificacion') is-invalid @enderror"
-                                   id="libredte_hash_certificacion"
-                                   name="libredte_hash_certificacion"
-                                   value="{{ old('libredte_hash_certificacion', $config->libredte_hash_certificacion ?? '') }}"
-                                   placeholder="Tu hash de API para ambiente de certificación">
-                            <small class="form-text">Token de certificación de LibreDTE (opcional si tienes cuenta separada)</small>
-                            @error('libredte_hash_certificacion')
+                            <label for="simplefactura_usuario" class="form-label required">Usuario SimpleFactura</label>
+                            <input type="email"
+                                   class="form-control @error('simplefactura_usuario') is-invalid @enderror"
+                                   id="simplefactura_usuario"
+                                   name="simplefactura_usuario"
+                                   value="{{ old('simplefactura_usuario', $config->simplefactura_usuario ?? '') }}"
+                                   placeholder="usuario@tuempresa.com">
+                            <small class="form-text">Email de tu cuenta SimpleFactura</small>
+                            @error('simplefactura_usuario')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="libredte_url_certificacion" class="form-label">URL de API LibreDTE (Certificación)</label>
-                            <input type="url"
-                                   class="form-control @error('libredte_url_certificacion') is-invalid @enderror"
-                                   id="libredte_url_certificacion"
-                                   name="libredte_url_certificacion"
-                                   value="{{ old('libredte_url_certificacion', $config->libredte_url_certificacion ?? '') }}"
-                                   placeholder="https://certificacion.libredte.cl">
-                            <small class="form-text">URL del ambiente de certificación (opcional)</small>
-                            @error('libredte_url_certificacion')
+                            <label for="simplefactura_password" class="form-label required">Contraseña SimpleFactura</label>
+                            <input type="password"
+                                   class="form-control @error('simplefactura_password') is-invalid @enderror"
+                                   id="simplefactura_password"
+                                   name="simplefactura_password"
+                                   value="{{ old('simplefactura_password', $config->simplefactura_password ?? '') }}"
+                                   placeholder="Tu contraseña de SimpleFactura">
+                            <small class="form-text">
+                                Regístrate en: <a href="https://www.simplefactura.cl" target="_blank">www.simplefactura.cl</a>
+                            </small>
+                            @error('simplefactura_password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
                 </div>
             </div>
+
 
             <!-- Certificado Digital -->
             <div class="form-row" style="margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--gray-200);">
@@ -718,23 +781,40 @@
 // Toggle proveedor fields
 function toggleProveedorFields() {
     const proveedor = document.getElementById('proveedor_dte').value;
-    const credencialesProduccion = document.getElementById('credenciales-produccion');
-    const credencialesCertificacion = document.getElementById('credenciales-certificacion');
 
-    // SimpleAPI y SimpleFactura no usan hash de LibreDTE, solo certificado digital
-    if (proveedor === 'simpleapi' || proveedor === 'simplefactura') {
-        // Ocultar secciones de LibreDTE (hash)
-        if (credencialesProduccion) credencialesProduccion.style.display = 'none';
-        if (credencialesCertificacion) credencialesCertificacion.style.display = 'none';
+    // Ocultar todas las secciones de credenciales primero
+    const credencialesLibredte = document.getElementById('credenciales-libredte');
+    const credencialesSimpleapi = document.getElementById('credenciales-simpleapi');
+    const credencialesSimplefactura = document.getElementById('credenciales-simplefactura');
 
-        // Hacer no obligatorios los hash
-        const hashProd = document.getElementById('libredte_hash');
-        const hashCert = document.getElementById('libredte_hash_certificacion');
-        if (hashProd) hashProd.required = false;
-        if (hashCert) hashCert.required = false;
-    } else {
-        // LibreDTE: mostrar según ambiente
-        toggleAmbienteFields();
+    if (credencialesLibredte) credencialesLibredte.style.display = 'none';
+    if (credencialesSimpleapi) credencialesSimpleapi.style.display = 'none';
+    if (credencialesSimplefactura) credencialesSimplefactura.style.display = 'none';
+
+    // Resetear required en todos los campos
+    const hashProd = document.getElementById('libredte_hash');
+    const hashCert = document.getElementById('libredte_hash_certificacion');
+    const simpleapiToken = document.getElementById('simpleapi_token');
+    const simplefacturaUsuario = document.getElementById('simplefactura_usuario');
+    const simplefacturaPassword = document.getElementById('simplefactura_password');
+
+    if (hashProd) hashProd.required = false;
+    if (hashCert) hashCert.required = false;
+    if (simpleapiToken) simpleapiToken.required = false;
+    if (simplefacturaUsuario) simplefacturaUsuario.required = false;
+    if (simplefacturaPassword) simplefacturaPassword.required = false;
+
+    // Mostrar sección según proveedor
+    if (proveedor === 'libredte') {
+        if (credencialesLibredte) credencialesLibredte.style.display = 'block';
+        toggleAmbienteFields(); // Llamar para manejar producción/certificación
+    } else if (proveedor === 'simpleapi') {
+        if (credencialesSimpleapi) credencialesSimpleapi.style.display = 'block';
+        if (simpleapiToken) simpleapiToken.required = true;
+    } else if (proveedor === 'simplefactura') {
+        if (credencialesSimplefactura) credencialesSimplefactura.style.display = 'block';
+        if (simplefacturaUsuario) simplefacturaUsuario.required = true;
+        if (simplefacturaPassword) simplefacturaPassword.required = true;
     }
 }
 
@@ -747,20 +827,20 @@ function toggleAmbienteFields() {
 
     const ambiente = document.getElementById('ambiente').value;
     const credencialesProduccion = document.getElementById('credenciales-produccion');
-    const credencialesCertificacion = document.getElementById('credenciales-certificacion');
+    const credencialesCertificacionLibredte = document.getElementById('credenciales-certificacion-libredte');
 
     if (ambiente === 'produccion') {
-        credencialesProduccion.style.display = 'block';
-        credencialesCertificacion.style.display = 'none';
+        if (credencialesProduccion) credencialesProduccion.style.display = 'block';
+        if (credencialesCertificacionLibredte) credencialesCertificacionLibredte.style.display = 'none';
         // Hacer obligatorio el hash de producción
-        document.getElementById('libredte_hash').required = true;
-        document.getElementById('libredte_hash_certificacion').required = false;
+        const hashProd = document.getElementById('libredte_hash');
+        if (hashProd) hashProd.required = true;
     } else {
-        credencialesProduccion.style.display = 'none';
-        credencialesCertificacion.style.display = 'block';
-        // Hacer opcional el hash de producción en certificación
-        document.getElementById('libredte_hash').required = false;
-        document.getElementById('libredte_hash_certificacion').required = false;
+        if (credencialesProduccion) credencialesProduccion.style.display = 'none';
+        if (credencialesCertificacionLibredte) credencialesCertificacionLibredte.style.display = 'block';
+        // En certificación, el hash no es estrictamente obligatorio
+        const hashProd = document.getElementById('libredte_hash');
+        if (hashProd) hashProd.required = false;
     }
 }
 
