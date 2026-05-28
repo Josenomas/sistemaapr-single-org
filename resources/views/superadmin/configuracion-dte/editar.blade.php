@@ -1,21 +1,16 @@
-@ extends('layouts.superadmin')
+@extends('layouts.superadmin')
 
-@section('title', 'Configuración DTE - Facturación Electrónica')
+@section('title', 'Configuración DTE - Super Admin')
 
 @section('content')
-<div class="page-header">
-    <h2 class="page-title">
-        <i class="fas fa-file-invoice-dollar"></i>
-        Configuración de Facturación Electrónica
-    </h2>
-    <div class="page-actions">
-        <button type="button" class="btn btn-info" onclick="mostrarAyuda()">
-            <i class="fas fa-question-circle"></i>
-            Ayuda
-        </button>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-cog"></i>
+            Configuración DTE - {{ $organizacion->nombre_apr }}
+        </h2>
         <a href="{{ route('superadmin.configuracion-dte') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i>
-            Volver
+            <i class="fas fa-arrow-left"></i> Volver
         </a>
     </div>
 </div>
@@ -39,7 +34,7 @@
         <h3 class="card-title">Datos del Emisor</h3>
     </div>
     <div class="card-body">
-        <form action="{{ route('superadmin.configuracion-dte.guardar', ->id) }}" method="POST" id="formConfigDTE" enctype="multipart/form-data">
+        <form action="{{ route('superadmin.configuracion-dte.guardar', $organizacion->id) }}" method="POST" id="formConfigDTE" enctype="multipart/form-data">
             @csrf
 
             <div class="form-row">
@@ -394,7 +389,7 @@
                     <i class="fas fa-plug"></i>
                     Verificar Conexión
                 </button>
-                <a href="{{ route('superadmin.configuracion-dte') }}" class="btn btn-secondary">
+                <a href="{{ route('dashboard') }}" class="btn btn-secondary">
                     <i class="fas fa-times"></i>
                     Cancelar
                 </a>
