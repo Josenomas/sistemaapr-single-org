@@ -389,7 +389,7 @@
                     <i class="fas fa-plug"></i>
                     Verificar Conexión
                 </button>
-                <a href="{{ route('dashboard') }}" class="btn btn-secondary">
+                <a href="{{ route('superadmin.configuracion-dte') }}" class="btn btn-secondary">
                     <i class="fas fa-times"></i>
                     Cancelar
                 </a>
