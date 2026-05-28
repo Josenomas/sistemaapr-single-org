@@ -1205,4 +1205,136 @@ class SuperAdminController extends Controller
             ->header('Content-Type', 'text/html')
             ->header('Content-Disposition', 'inline; filename="reporte_dte.pdf"');
     }
+
+    /**
+     * Lista de configuraciones DTE de todas las organizaciones
+     */
+    public function configuracionDTE()
+    {
+        $organizaciones = Organizacion::with('configuracionDTE')
+            ->where('activo', true)
+            ->orderBy('nombre', 'asc')
+            ->get();
+
+        return view('superadmin.configuracion-dte.index', compact('organizaciones'));
+    }
+
+    /**
+     * Formulario de edición de configuración DTE
+     */
+    public function editarConfiguracionDTE($organizacionId)
+    {
+        $organizacion = Organizacion::findOrFail($organizacionId);
+        $config = ConfiguracionDTE::where('id_organizacion', $organizacionId)->first();
+
+        return view('superadmin.configuracion-dte.editar', compact('organizacion', 'config'));
+    }
+
+    /**
+     * Guardar configuración DTE
+     */
+    public function guardarConfiguracionDTE(Request $request, $organizacionId)
+    {
+        $validated = $request->validate([
+            'rut_emisor' => 'required|string|max:12',
+            'razon_social' => 'required|string|max:200',
+            'giro' => 'required|string|max:200',
+            'direccion_casa_matriz' => 'required|string|max:255',
+            'comuna' => 'required|string|max:100',
+            'ciudad' => 'required|string|max:100',
+            'telefono' => 'nullable|string|max:20',
+            'email_contacto' => 'required|email|max:150',
+            'ambiente' => 'required|in:certificacion,produccion',
+            'proveedor_dte' => 'required|in:libredte,simpleapi,simplefactura',
+            // Credenciales LibreDTE
+            'libredte_hash' => 'nullable|string|max:100',
+            'libredte_url' => 'nullable|url|max:255',
+            'libredte_hash_certificacion' => 'nullable|string|max:100',
+            'libredte_url_certificacion' => 'nullable|url|max:255',
+            // Credenciales SimpleAPI
+            'simpleapi_token' => 'nullable|string|max:255',
+            // Credenciales SimpleFactura
+            'simplefactura_usuario' => 'nullable|email|max:150',
+            'simplefactura_password' => 'nullable|string|max:150',
+            // Certificado digital
+            'certificado_digital' => 'nullable|file|mimes:pfx,p12|max:2048',
+            'certificado_password' => 'nullable|string|max:100',
+        ]);
+
+        $configExistente = ConfiguracionDTE::where('id_organizacion', $organizacionId)->first();
+
+        // Validaciones específicas por proveedor
+        if ($validated['proveedor_dte'] === 'simpleapi') {
+            if (!$request->hasFile('certificado_digital') && (!$configExistente || !$configExistente->certificado_digital)) {
+                return redirect()->back()
+                    ->withErrors(['certificado_digital' => 'SimpleAPI requiere un certificado digital'])
+                    ->withInput();
+            }
+            if (empty($validated['simpleapi_token'])) {
+                return redirect()->back()
+                    ->withErrors(['simpleapi_token' => 'El token de API de SimpleAPI es obligatorio'])
+                    ->withInput();
+            }
+        } elseif ($validated['proveedor_dte'] === 'simplefactura') {
+            if (!$request->hasFile('certificado_digital') && (!$configExistente || !$configExistente->certificado_digital)) {
+                return redirect()->back()
+                    ->withErrors(['certificado_digital' => 'SimpleFactura requiere un certificado digital'])
+                    ->withInput();
+            }
+            if (empty($validated['simplefactura_usuario'])) {
+                return redirect()->back()
+                    ->withErrors(['simplefactura_usuario' => 'El usuario de SimpleFactura es obligatorio'])
+                    ->withInput();
+            }
+            if (empty($validated['simplefactura_password'])) {
+                return redirect()->back()
+                    ->withErrors(['simplefactura_password' => 'La contraseña de SimpleFactura es obligatoria'])
+                    ->withInput();
+            }
+        } elseif ($validated['proveedor_dte'] === 'libredte') {
+            if ($validated['ambiente'] === 'produccion' && empty($validated['libredte_hash'])) {
+                return redirect()->back()
+                    ->withErrors(['libredte_hash' => 'El hash de producción es obligatorio'])
+                    ->withInput();
+            }
+        }
+
+        // Procesar certificado digital
+        if ($request->hasFile('certificado_digital')) {
+            $certificado = $request->file('certificado_digital');
+            $certificadoBase64 = base64_encode(file_get_contents($certificado->getRealPath()));
+            $validated['certificado_digital'] = $certificadoBase64;
+
+            if (!empty($validated['certificado_password'])) {
+                $validated['certificado_password'] = encrypt($validated['certificado_password']);
+            }
+        } else {
+            unset($validated['certificado_digital']);
+            if (empty($validated['certificado_password'])) {
+                unset($validated['certificado_password']);
+            } else {
+                $validated['certificado_password'] = encrypt($validated['certificado_password']);
+            }
+        }
+
+        // Encriptar contraseña de SimpleFactura
+        if (!empty($validated['simplefactura_password'])) {
+            $validated['simplefactura_password'] = encrypt($validated['simplefactura_password']);
+        } else {
+            if ($configExistente && $configExistente->simplefactura_password) {
+                unset($validated['simplefactura_password']);
+            }
+        }
+
+        ConfiguracionDTE::updateOrCreate(
+            ['id_organizacion' => $organizacionId],
+            array_merge($validated, [
+                'libredte_url' => $validated['libredte_url'] ?? 'https://libredte.cl',
+                'activo' => true,
+            ])
+        );
+
+        return redirect()->route('superadmin.configuracion-dte')
+            ->with('success', 'Configuración DTE guardada exitosamente');
+    }
 }

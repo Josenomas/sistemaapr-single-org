@@ -950,7 +950,7 @@
                     <i class="fas fa-file-invoice-dollar"></i>
                     <span>Monitoreo DTE</span>
                 </a>
-                <a href="{{ route('dte.configuracion') }}" class="menu-item {{ request()->routeIs('dte.configuracion') ? 'active' : '' }}">
+                <a href="{{ route('superadmin.configuracion-dte') }}" class="menu-item {{ request()->routeIs('superadmin.configuracion-dte*') ? 'active' : '' }}">
                     <i class="fas fa-cog"></i>
                     <span>Configuración DTE</span>
                 </a>

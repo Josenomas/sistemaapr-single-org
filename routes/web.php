@@ -661,6 +661,11 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->name('superadmi
     // Monitoreo DTE
     Route::get('/monitoreo-dte', [App\Http\Controllers\SuperAdminController::class, 'monitoreoDTE'])->name('monitoreo-dte');
 
+    // Configuración DTE
+    Route::get('/configuracion-dte', [App\Http\Controllers\SuperAdminController::class, 'configuracionDTE'])->name('configuracion-dte');
+    Route::get('/configuracion-dte/{organizacionId}', [App\Http\Controllers\SuperAdminController::class, 'editarConfiguracionDTE'])->name('configuracion-dte.editar');
+    Route::post('/configuracion-dte/{organizacionId}', [App\Http\Controllers\SuperAdminController::class, 'guardarConfiguracionDTE'])->name('configuracion-dte.guardar');
+
     // Reportes DTE
     Route::get('/reporte-facturacion-dte', [App\Http\Controllers\SuperAdminController::class, 'reporteFacturacionDTE'])->name('reporte-facturacion-dte');
     Route::get('/exportar-reporte-dte-excel', [App\Http\Controllers\SuperAdminController::class, 'exportarReporteDTEExcel'])->name('exportar-reporte-dte-excel');
