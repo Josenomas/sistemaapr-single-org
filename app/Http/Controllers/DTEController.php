@@ -173,12 +173,7 @@ class DTEController extends Controller
             'telefono' => 'nullable|string|max:20',
             'email_contacto' => 'required|email|max:150',
             'ambiente' => 'required|in:certificacion,produccion',
-            'proveedor_dte' => 'required|in:libredte,simpleapi,simplefactura',
-            // Credenciales LibreDTE
-            'libredte_hash' => 'nullable|string|max:100',
-            'libredte_url' => 'nullable|url|max:255',
-            'libredte_hash_certificacion' => 'nullable|string|max:100',
-            'libredte_url_certificacion' => 'nullable|url|max:255',
+            'proveedor_dte' => 'required|in:simpleapi,simplefactura',
             // Credenciales SimpleAPI
             'simpleapi_token' => 'nullable|string|max:255',
             // Credenciales SimpleFactura
@@ -221,13 +216,6 @@ class DTEController extends Controller
             if (empty($validated['simplefactura_password'])) {
                 return redirect()->back()
                     ->withErrors(['simplefactura_password' => 'La contraseña de SimpleFactura es obligatoria'])
-                    ->withInput();
-            }
-        } elseif ($validated['proveedor_dte'] === 'libredte') {
-            // LibreDTE requiere hash según ambiente
-            if ($validated['ambiente'] === 'produccion' && empty($validated['libredte_hash'])) {
-                return redirect()->back()
-                    ->withErrors(['libredte_hash' => 'El hash de producción es obligatorio cuando se selecciona ambiente de producción con LibreDTE'])
                     ->withInput();
             }
         }
