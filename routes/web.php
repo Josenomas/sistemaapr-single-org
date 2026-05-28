@@ -301,10 +301,9 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
             // Gestión de folios
             Route::get('/folios', [App\Http\Controllers\DTEController::class, 'folios'])->name('folios');
 
-            // Configuración
-            Route::get('/configuracion', [App\Http\Controllers\DTEController::class, 'configuracion'])->name('configuracion');
-            Route::post('/configuracion', [App\Http\Controllers\DTEController::class, 'guardarConfiguracion'])->name('guardar-configuracion');
-            Route::get('/verificar-conexion', [App\Http\Controllers\DTEController::class, 'verificarConexion'])->name('verificar-conexion');
+            // Configuración DTE (BLOQUEADA - Solo SuperAdmin puede configurar)
+            // Las rutas de configuración están deshabilitadas para usuarios normales
+            // SuperAdmin gestiona configuraciones desde /superadmin/configuracion-dte
 
             // Operaciones sobre boletas
             Route::post('/boleta/{id}/emitir', [App\Http\Controllers\DTEController::class, 'emitir'])->name('boleta.emitir');
