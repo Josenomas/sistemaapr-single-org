@@ -102,10 +102,6 @@
                 <i class="fas fa-book"></i>
                 <span>Libro de Ventas</span>
             </a>
-            <a href="{{ route('dte.configuracion') }}" class="nav-item {{ request()->routeIs('dte.configuracion') ? 'active' : '' }}">
-                <i class="fas fa-cog"></i>
-                <span>Configuración DTE</span>
-            </a>
         </div>
 
         <!-- Pagos -->
