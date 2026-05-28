@@ -1325,4 +1325,109 @@ class SuperAdminController extends Controller
         return redirect()->route('superadmin.configuracion-dte')
             ->with('success', 'Configuración DTE guardada exitosamente');
     }
+
+    /**
+     * Verificar conexión DTE de una organización
+     */
+    public function verificarConexionDTE($organizacionId)
+    {
+        try {
+            $config = ConfiguracionDTE::where('id_organizacion', $organizacionId)->first();
+
+            if (!$config) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No hay configuración DTE para esta organización'
+                ], 404);
+            }
+
+            if (!$config->estaConfigurado()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'La configuración DTE está incompleta. Verifica que todos los campos requeridos estén completos.'
+                ], 400);
+            }
+
+            // Obtener el servicio DTE apropiado
+            if ($config->proveedor_dte === 'simpleapi') {
+                $service = app(\App\Services\SimpleAPIService::class);
+                $service->setOrganizacion($organizacionId);
+
+                // SimpleAPI: Verificar obteniendo folios disponibles
+                $folios = $service->obtenerFoliosDisponibles();
+
+                if (isset($folios['error'])) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Error al conectar con SimpleAPI: ' . $folios['error']
+                    ], 400);
+                }
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => '✅ Conexión exitosa con SimpleAPI. Folios disponibles: Boleta ' . ($folios['boleta']['disponibles'] ?? 0) . ', Factura ' . ($folios['factura']['disponibles'] ?? 0),
+                    'data' => $folios
+                ]);
+
+            } elseif ($config->proveedor_dte === 'simplefactura') {
+                $service = app(\App\Services\SimpleFacturaService::class);
+                $service->setOrganizacion($organizacionId);
+
+                // SimpleFactura: Verificar autenticación
+                try {
+                    // Intentar obtener folios para verificar conexión completa
+                    $folios = $service->obtenerFoliosDisponibles();
+
+                    if (isset($folios['error'])) {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Error al conectar con SimpleFactura: ' . $folios['error']
+                        ], 400);
+                    }
+
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => '✅ Conexión exitosa con SimpleFactura. Credenciales válidas.',
+                        'data' => $folios
+                    ]);
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Error al autenticar con SimpleFactura: ' . $e->getMessage()
+                    ], 400);
+                }
+
+            } elseif ($config->proveedor_dte === 'libredte') {
+                $service = app(\App\Services\LibreDTEService::class);
+                $service->setOrganizacion($organizacionId);
+
+                // LibreDTE: Verificar obteniendo folios
+                $folios = $service->obtenerFoliosDisponibles();
+
+                if (isset($folios['error'])) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Error al conectar con LibreDTE: ' . $folios['error']
+                    ], 400);
+                }
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => '✅ Conexión exitosa con LibreDTE. Folios disponibles: Boleta ' . ($folios['39'] ?? 0) . ', Factura ' . ($folios['33'] ?? 0),
+                    'data' => $folios
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Proveedor DTE no válido: ' . $config->proveedor_dte
+            ], 400);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al verificar conexión: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

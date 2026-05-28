@@ -310,6 +310,10 @@
                     <i class="fas fa-save"></i>
                     Guardar Configuración
                 </button>
+                <button type="button" class="btn btn-info" id="btnVerificarConexion">
+                    <i class="fas fa-plug"></i>
+                    Verificar Conexión
+                </button>
                 <a href="{{ route('superadmin.configuracion-dte') }}" class="btn btn-secondary">
                     <i class="fas fa-times"></i>
                     Cancelar
@@ -730,7 +734,46 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleProveedorFields();
 });
 
-// Botón "Verificar Conexión" removido - La validación se hace al guardar
+// Verificar Conexión DTE
+document.getElementById('btnVerificarConexion').addEventListener('click', function() {
+    const btn = this;
+    const originalHTML = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+
+    fetch('{{ route('superadmin.configuracion-dte.verificar', $organizacion->id) }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire({
+                    title: '¡Conexión Exitosa!',
+                    text: data.message,
+                    icon: 'success',
+                    confirmButtonText: 'Entendido'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error de Conexión',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonText: 'Entendido'
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al verificar conexión. Verifica que la configuración esté completa.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+        });
+});
 
 function mostrarAyuda() {
     const ayuda = `
@@ -750,6 +793,7 @@ function mostrarAyuda() {
                 <li>Ingresa las credenciales correspondientes</li>
                 <li>Sube el certificado digital (.pfx/.p12)</li>
                 <li>Selecciona el ambiente (usa Certificación para pruebas)</li>
+                <li>Haz clic en "Verificar Conexión" para comprobar las credenciales</li>
                 <li>Guarda la configuración</li>
             </ol>
 
