@@ -1213,7 +1213,7 @@ class SuperAdminController extends Controller
     {
         $organizaciones = Organizacion::with('configuracionDTE')
             ->where('activo', true)
-            ->orderBy('nombre', 'asc')
+            ->orderBy('nombre_apr', 'asc')
             ->get();
 
         return view('superadmin.configuracion-dte.index', compact('organizaciones'));

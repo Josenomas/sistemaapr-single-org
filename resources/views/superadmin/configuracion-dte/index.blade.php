@@ -36,7 +36,7 @@
                         @forelse($organizaciones as $org)
                         <tr>
                             <td>
-                                <strong>{{ $org->nombre }}</strong>
+                                <strong>{{ $org->nombre_apr }}</strong>
                             </td>
                             <td>
                                 @if($org->configuracionDTE)
