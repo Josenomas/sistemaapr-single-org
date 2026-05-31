@@ -256,13 +256,13 @@
 
     <div class="stat-card-dte">
         <div class="stat-header-dte">
-            <span class="stat-title-dte">LibreDTE</span>
-            <div class="stat-icon-dte {{ $conexionLibreDTE ? 'success-bg-dte' : 'danger-bg-dte' }}">
-                <i class="fas {{ $conexionLibreDTE ? 'fa-wifi' : 'fa-exclamation-triangle' }}"></i>
+            <span class="stat-title-dte">{{ $proveedorNombre }}</span>
+            <div class="stat-icon-dte {{ $conexionDTE ? 'success-bg-dte' : 'danger-bg-dte' }}">
+                <i class="fas {{ $conexionDTE ? 'fa-wifi' : 'fa-exclamation-triangle' }}"></i>
             </div>
         </div>
-        <div class="stat-value-dte" style="font-size: 1.5rem;">{{ $conexionLibreDTE ? 'Conectado' : 'Desconectado' }}</div>
-        <div class="stat-description-dte">Estado de conexión con LibreDTE</div>
+        <div class="stat-value-dte" style="font-size: 1.5rem;">{{ $conexionDTE ? 'Configurado' : 'No configurado' }}</div>
+        <div class="stat-description-dte">Proveedor DTE activo</div>
     </div>
 </div>
 

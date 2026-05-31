@@ -112,17 +112,32 @@ class DTEController extends Controller
             ->limit(20)
             ->get();
 
-        // Estado de conexión con LibreDTE
-        $conexionLibreDTE = false;
-        try {
-            $this->libredteService->setOrganizacion($idOrganizacion);
-            $conexionLibreDTE = $this->libredteService->verificarConexion();
-        } catch (\Exception $e) {
-            // Conexión fallida
-        }
-
         // Configuración DTE
         $config = ConfiguracionDTE::where('id_organizacion', $idOrganizacion)->first();
+
+        // Estado de conexión con proveedor DTE configurado
+        $conexionDTE = false;
+        $proveedorNombre = 'No configurado';
+        if ($config && $config->estaConfigurado()) {
+            try {
+                if ($config->proveedor_dte === 'simpleapi') {
+                    $this->simpleapiService->setOrganizacion($idOrganizacion);
+                    $conexionDTE = true;
+                    $proveedorNombre = 'SimpleAPI';
+                } elseif ($config->proveedor_dte === 'simplefactura') {
+                    $this->simplefacturaService->setOrganizacion($idOrganizacion);
+                    $conexionDTE = true;
+                    $proveedorNombre = 'SimpleFactura';
+                } elseif ($config->proveedor_dte === 'libredte') {
+                    $this->libredteService->setOrganizacion($idOrganizacion);
+                    $conexionDTE = true;
+                    $proveedorNombre = 'LibreDTE';
+                }
+            } catch (\Exception $e) {
+                // Conexión fallida
+                $conexionDTE = false;
+            }
+        }
 
         // Verificar y obtener alertas
         $alertaService = new AlertaDTEService();
@@ -140,7 +155,8 @@ class DTEController extends Controller
             'ultimosDTEs',
             'totalBoletasPendientes',
             'boletasSinDTE',
-            'conexionLibreDTE',
+            'conexionDTE',
+            'proveedorNombre',
             'config',
             'alertas',
             'conteoAlertas'
