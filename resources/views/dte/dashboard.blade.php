@@ -140,10 +140,7 @@
         @endif
     </div>
     <div class="header-actions">
-        <a href="{{ route('dte.configuracion') }}" class="btn btn-secondary">
-            <i class="fas fa-cog"></i>
-            Configuración
-        </a>
+        {{-- Configuración DTE ahora solo disponible para SuperAdmin --}}
         <a href="{{ route('boletas.index') }}" class="btn btn-primary">
             <i class="fas fa-file-invoice"></i>
             Ver Boletas
