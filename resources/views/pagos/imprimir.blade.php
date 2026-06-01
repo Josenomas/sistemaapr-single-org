@@ -184,11 +184,11 @@
                     </tr>
                     <tr>
                         <td class="label-cell">FUNCIONAMIENTO MES:</td>
-                        <td class="value-cell">{{ strtoupper($pago->boleta->mes_texto) }}</td>
+                        <td class="value-cell">{{ $pago->boleta ? strtoupper($pago->boleta->mes_texto) : strtoupper(\Carbon\Carbon::parse($pago->fecha_pago)->locale('es')->isoFormat('MMMM YYYY')) }}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">AÑO:</td>
-                        <td class="value-cell">{{ date('Y', strtotime($pago->boleta->mes . '-01')) }}</td>
+                        <td class="value-cell">{{ $pago->boleta ? date('Y', strtotime($pago->boleta->mes . '-01')) : date('Y', strtotime($pago->fecha_pago)) }}</td>
                     </tr>
                 </table>
             </div>
@@ -224,7 +224,13 @@
             </tr>
             <tr>
                 <td class="label-cell">CONCEPTO:</td>
-                <td class="value-cell" colspan="3">PAGO DE BOLETA {{ $pago->boleta->numero_boleta }} - PERÍODO {{ $pago->boleta->mes_texto }}</td>
+                <td class="value-cell" colspan="3">
+                    @if($pago->boleta)
+                        PAGO DE BOLETA {{ $pago->boleta->numero_boleta }} - PERÍODO {{ $pago->boleta->mes_texto }}
+                    @else
+                        PAGO DE SERVICIO DE AGUA POTABLE
+                    @endif
+                </td>
             </tr>
         </table>
 
@@ -261,17 +267,17 @@
             @if(count($pagos ?? []) > 1)
                 @foreach($pagos as $p)
                 <tr>
-                    <td style="font-weight: bold;">{{ $p->boleta->numero_boleta }}</td>
+                    <td style="font-weight: bold;">{{ $p->boleta ? $p->boleta->numero_boleta : 'N/A' }}</td>
                     <td>SERVICIO DE AGUA POTABLE</td>
-                    <td>{{ $p->boleta->mes_texto }}</td>
+                    <td>{{ $p->boleta ? $p->boleta->mes_texto : \Carbon\Carbon::parse($p->fecha_pago)->locale('es')->isoFormat('MMMM YYYY') }}</td>
                     <td style="font-weight: bold;">{{ $p->monto_pagado_formateado }}</td>
                 </tr>
                 @endforeach
             @else
                 <tr>
-                    <td style="font-weight: bold;">{{ $pago->boleta->numero_boleta }}</td>
+                    <td style="font-weight: bold;">{{ $pago->boleta ? $pago->boleta->numero_boleta : 'N/A' }}</td>
                     <td>SERVICIO DE AGUA POTABLE</td>
-                    <td>{{ $pago->boleta->mes_texto }}</td>
+                    <td>{{ $pago->boleta ? $pago->boleta->mes_texto : \Carbon\Carbon::parse($pago->fecha_pago)->locale('es')->isoFormat('MMMM YYYY') }}</td>
                     <td style="font-weight: bold;">{{ $pago->monto_pagado_formateado }}</td>
                 </tr>
             @endif
@@ -292,6 +298,7 @@
         @endif
 
         <!-- Información adicional -->
+        @if($pago->boleta)
         <table style="margin-top: 20px;">
             <tr>
                 <td class="label-cell">TOTAL BOLETA:</td>
@@ -300,6 +307,7 @@
                 <td class="value-cell" style="font-weight: bold; color: #059669;">{{ strtoupper($pago->boleta->estado) }}</td>
             </tr>
         </table>
+        @endif
 
         <!-- Sección de Firmas -->
         <div class="seccion-firma">
