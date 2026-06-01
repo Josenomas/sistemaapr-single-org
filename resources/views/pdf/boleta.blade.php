@@ -75,8 +75,20 @@
     $totalAdeudado = $totalAdeudado ?? 0;
     $mesesAdeudados = $mesesAdeudados ?? 0;
 
-    // Calcular consumo máximo para la barra
-    $consumoMaximo = 18;
+    // Calcular consumo máximo histórico del socio para la barra
+    $consumoMaximo = 18; // Valor por defecto
+    if ($historialConsumo && $historialConsumo->count() > 0) {
+        $consumosHistoricos = [];
+        foreach($historialConsumo as $item) {
+            $c = is_array($item) ? ($item['consumo_m3'] ?? $item['consumo'] ?? 0) : ($item->consumo_m3 ?? $item->consumo ?? 0);
+            if ($c > 0) $consumosHistoricos[] = $c;
+        }
+        if (count($consumosHistoricos) > 0) {
+            $consumoMaximo = max($consumosHistoricos);
+            // Asegurar mínimo de 10 m³ para que la barra se vea proporcionada
+            $consumoMaximo = max($consumoMaximo, 10);
+        }
+    }
     $porcentajeConsumo = min(100, ($boleta->consumo_m3 / $consumoMaximo) * 100);
 
     // Calcular tramos
