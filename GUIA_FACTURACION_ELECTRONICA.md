@@ -34,7 +34,27 @@ Es un archivo digital que permite firmar electrónicamente las boletas, otorgán
 
 ---
 
-### 2. Datos de la Organización 📋
+### 2. Autorización de Folios en el SII 📝
+
+**¿Qué son los folios?**
+Los folios son los números consecutivos que el SII asigna a cada boleta electrónica. Debes solicitar autorización de un rango de folios antes de emitir.
+
+**¿Cómo obtenerlos?**
+
+1. Ingresar al sitio web del SII: [www.sii.cl](https://www.sii.cl)
+2. Acceder con la Clave Tributaria del representante legal
+3. Ir a **Facturación Electrónica** → **Administrar Folios**
+4. Seleccionar tipo de documento: **Boleta Electrónica (39)**
+5. Solicitar rango de folios (recomendado: 1000 folios)
+6. Descargar archivo CAF (Código de Autorización de Folios)
+
+**Costo:** Gratis
+**Tiempo:** 5-10 minutos
+**Nota:** Cuando se agoten los folios, deberás solicitar un nuevo rango
+
+---
+
+### 3. Datos de la Organización 📋
 
 Debes proporcionar los siguientes datos:
 
@@ -53,7 +73,7 @@ Debes proporcionar los siguientes datos:
 
 ---
 
-### 3. Contratación de SimpleFactura 💰
+### 4. Contratación de SimpleFactura 💰
 
 **¿Qué es SimpleFactura?**
 Es el servicio que conecta nuestro sistema con el SII para la emisión de boletas electrónicas.
@@ -86,12 +106,17 @@ Es el servicio que conecta nuestro sistema con el SII para la emisión de boleta
 - Guardar el archivo `.pfx` o `.p12` de forma segura
 - Anotar la contraseña del certificado
 
-### Paso 2: Contratar SimpleFactura
+### Paso 2: Solicitar Folios en el SII
+- Ingresar al SII y solicitar rango de folios para Boleta Electrónica (39)
+- Descargar archivo CAF (Código de Autorización de Folios)
+- Guardar el archivo `.xml` del CAF
+
+### Paso 3: Contratar SimpleFactura
 - Crear cuenta en SimpleFactura
 - Contratar Plan Independiente
 - Configurar método de pago
 
-### Paso 3: Enviar Información al Administrador del Sistema
+### Paso 4: Enviar Información al Administrador del Sistema
 Enviar por email la siguiente información:
 
 ```
@@ -114,6 +139,7 @@ Representante Legal:
 Archivos adjuntos:
 - Certificado Digital (.pfx o .p12)
 - Documento con la contraseña del certificado
+- Archivo CAF de folios (.xml)
 
 Credenciales SimpleFactura:
 - Usuario:
@@ -121,15 +147,16 @@ Credenciales SimpleFactura:
 - RUT registrado:
 ```
 
-### Paso 4: Configuración en el Sistema
+### Paso 5: Configuración en el Sistema
 El administrador del sistema realizará la configuración técnica (demora 1-2 días hábiles):
 
 - Subir certificado a SimpleFactura
+- Subir archivo CAF de folios
 - Configurar credenciales API
 - Realizar pruebas de emisión
 - Activar módulo de facturación electrónica
 
-### Paso 5: ¡Listo para Emitir!
+### Paso 6: ¡Listo para Emitir!
 Una vez configurado, el sistema automáticamente:
 - Generará boletas electrónicas cada mes
 - Enviará las boletas por email a los socios
@@ -171,7 +198,10 @@ SimpleFactura tiene respaldo de todos los documentos emitidos. Además, nuestro 
 Una vez recibida toda la información, la activación toma entre 1-2 días hábiles.
 
 ### ¿Necesito conocimientos técnicos?
-No. Solo debes obtener el certificado del SII y contratar SimpleFactura. La configuración técnica la realiza el administrador del sistema.
+No. Solo debes obtener el certificado y folios del SII, y contratar SimpleFactura. La configuración técnica la realiza el administrador del sistema.
+
+### ¿Qué pasa cuando se agoten los folios?
+Cuando estés por agotar el rango de folios asignado, debes solicitar un nuevo rango en el SII y enviarlo al administrador del sistema para actualizarlo.
 
 ### ¿Puedo cancelar el servicio?
 Sí, pero ten en cuenta que sin facturación electrónica no podrás emitir boletas válidas ante el SII.
