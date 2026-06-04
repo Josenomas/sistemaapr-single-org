@@ -22,7 +22,7 @@ class ContactoController extends Controller
 
         try {
             // Email del administrador del sistema (cámbialo por tu email)
-            $emailDestino = env('MAIL_CONTACT', 'aravenanacho890@gmail.com');
+            $emailDestino = env('MAIL_CONTACT', 'sistemaapr@gmail.com');
 
             // Enviar email
             Mail::send('emails.contacto', ['datos' => $validated], function ($message) use ($validated, $emailDestino) {
