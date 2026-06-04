@@ -34,7 +34,30 @@ Es un archivo digital que permite firmar electrónicamente las boletas, otorgán
 
 ---
 
-### 2. Autorización de Folios en el SII 📝
+### 2. Resolución de Facturación Electrónica del SII 📋
+
+**¿Qué es?**
+Es la autorización formal del SII que habilita a la organización como "Facturador Electrónico" para emitir documentos tributarios electrónicos.
+
+**¿Cómo obtenerla?**
+
+1. Ingresar al sitio web del SII: [www.sii.cl](https://www.sii.cl)
+2. Acceder con la Clave Tributaria del representante legal
+3. Ir a **Facturación Electrónica** → **Registro de Facturadores Electrónicos**
+4. Completar formulario de inscripción con datos de la organización
+5. Adjuntar Certificado Digital
+6. Enviar solicitud
+7. El SII revisará y emitirá la Resolución (puede demorar 1-3 días hábiles)
+8. Descargar el documento de Resolución
+
+**Costo:** Gratis
+**Tiempo:** 1-3 días hábiles (revisión del SII)
+**Validez:** Indefinida (mientras el RUT esté activo)
+**Importante:** Sin esta resolución, NO puedes emitir DTEs
+
+---
+
+### 3. Autorización de Folios en el SII 📝
 
 **¿Qué son los folios?**
 Los folios son los números consecutivos que el SII asigna a cada boleta electrónica. Debes solicitar autorización de un rango de folios antes de emitir.
@@ -54,7 +77,7 @@ Los folios son los números consecutivos que el SII asigna a cada boleta electr�
 
 ---
 
-### 3. Datos de la Organización 📋
+### 4. Datos de la Organización 📋
 
 Debes proporcionar los siguientes datos:
 
@@ -73,7 +96,7 @@ Debes proporcionar los siguientes datos:
 
 ---
 
-### 4. Contratación de SimpleFactura 💰
+### 5. Contratación de SimpleFactura 💰
 
 **¿Qué es SimpleFactura?**
 Es el servicio que conecta nuestro sistema con el SII para la emisión de boletas electrónicas.
@@ -106,17 +129,23 @@ Es el servicio que conecta nuestro sistema con el SII para la emisión de boleta
 - Guardar el archivo `.pfx` o `.p12` de forma segura
 - Anotar la contraseña del certificado
 
-### Paso 2: Solicitar Folios en el SII
+### Paso 2: Solicitar Resolución de Facturación Electrónica
+- Ingresar al SII y completar formulario de inscripción
+- Adjuntar certificado digital
+- Esperar aprobación del SII (1-3 días hábiles)
+- Descargar documento de Resolución
+
+### Paso 3: Solicitar Folios en el SII
 - Ingresar al SII y solicitar rango de folios para Boleta Electrónica (39)
 - Descargar archivo CAF (Código de Autorización de Folios)
 - Guardar el archivo `.xml` del CAF
 
-### Paso 3: Contratar SimpleFactura
+### Paso 4: Contratar SimpleFactura
 - Crear cuenta en SimpleFactura
 - Contratar Plan Independiente
 - Configurar método de pago
 
-### Paso 4: Enviar Información al Administrador del Sistema
+### Paso 5: Enviar Información al Administrador del Sistema
 Enviar por email la siguiente información:
 
 ```
@@ -139,6 +168,7 @@ Representante Legal:
 Archivos adjuntos:
 - Certificado Digital (.pfx o .p12)
 - Documento con la contraseña del certificado
+- Resolución de Facturación Electrónica (PDF del SII)
 - Archivo CAF de folios (.xml)
 
 Credenciales SimpleFactura:
@@ -147,7 +177,7 @@ Credenciales SimpleFactura:
 - RUT registrado:
 ```
 
-### Paso 5: Configuración en el Sistema
+### Paso 6: Configuración en el Sistema
 El administrador del sistema realizará la configuración técnica (demora 1-2 días hábiles):
 
 - Subir certificado a SimpleFactura
@@ -156,7 +186,7 @@ El administrador del sistema realizará la configuración técnica (demora 1-2 d
 - Realizar pruebas de emisión
 - Activar módulo de facturación electrónica
 
-### Paso 6: ¡Listo para Emitir!
+### Paso 7: ¡Listo para Emitir!
 Una vez configurado, el sistema automáticamente:
 - Generará boletas electrónicas cada mes
 - Enviará las boletas por email a los socios
