@@ -44,7 +44,9 @@ class ActivosFijosController extends Controller
 
         $activos = $query->orderBy('fecha_creacion', 'desc')->paginate(15);
 
-        $responsables = Usuario::where('activo', 1)->orderBy('nombre')->get();
+        $responsables = Usuario::where('activo', 1)
+            ->where('id_organizacion', auth()->user()->id_organizacion)
+            ->orderBy('nombre')->get();
 
         return view('activos-fijos.index', compact('activos', 'responsables'));
     }
@@ -54,7 +56,9 @@ class ActivosFijosController extends Controller
      */
     public function create()
     {
-        $responsables = Usuario::where('activo', 1)->orderBy('nombre')->get();
+        $responsables = Usuario::where('activo', 1)
+            ->where('id_organizacion', auth()->user()->id_organizacion)
+            ->orderBy('nombre')->get();
         $codigo = ActivoFijo::generarCodigoActivo();
 
         return view('activos-fijos.create', compact('responsables', 'codigo'));
@@ -137,7 +141,9 @@ class ActivosFijosController extends Controller
     public function edit($id)
     {
         $activo = ActivoFijo::findOrFail($id);
-        $responsables = Usuario::where('activo', 1)->orderBy('nombre')->get();
+        $responsables = Usuario::where('activo', 1)
+            ->where('id_organizacion', auth()->user()->id_organizacion)
+            ->orderBy('nombre')->get();
 
         return view('activos-fijos.edit', compact('activo', 'responsables'));
     }
