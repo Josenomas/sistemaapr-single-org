@@ -1002,16 +1002,6 @@
                 </div>
             </div>
 
-            <div class="info-badge" id="weather-badge">
-                <i class="fas fa-cloud-sun info-badge-icon"></i>
-                <div class="info-badge-content">
-                    <div class="info-badge-label">Clima Local</div>
-                    <div class="info-badge-value" id="weather-info">
-                        <span id="weather-temp">--°C</span>
-                    </div>
-                </div>
-            </div>
-
             <div class="info-badge">
                 <i class="fas fa-user-circle info-badge-icon"></i>
                 <div class="info-badge-content">
