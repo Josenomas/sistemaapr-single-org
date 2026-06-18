@@ -474,17 +474,43 @@ class PagosController extends Controller
      */
     public function descargarRecibo($id)
     {
-        $pago = Pago::with(['boleta.socio', 'socio'])->findOrFail($id);
+        try {
+            $pago = Pago::with(['boleta.socio.organizacion', 'socio'])->findOrFail($id);
 
-        // Registrar actividad
-        ActividadHelper::registrar(
-            'Pagos',
-            "Recibo descargado [{$pago->numero_recibo}] - Socio: {$pago->socio->nombre_completo}",
-            auth()->id()
-        );
+            // Validar multi-tenancy
+            if ($pago->id_organizacion != auth()->user()->id_organizacion) {
+                abort(403, 'Acceso denegado');
+            }
 
-        $pdf = \PDF::loadView('pagos.imprimir', compact('pago'));
-        return $pdf->download('Recibo-' . $pago->numero_recibo . '.pdf');
+            // Validar que tenga boleta asociada
+            if (!$pago->boleta) {
+                return redirect()->back()->with('error', 'Este pago no tiene una boleta asociada.');
+            }
+
+            // Validar que tenga socio
+            if (!$pago->socio) {
+                return redirect()->back()->with('error', 'Este pago no tiene un socio asociado.');
+            }
+
+            // Registrar actividad
+            ActividadHelper::registrar(
+                'Pagos',
+                "Recibo descargado [{$pago->numero_recibo}] - Socio: {$pago->socio->nombre_completo}",
+                auth()->id()
+            );
+
+            $pdf = \PDF::loadView('pagos.imprimir', compact('pago'));
+            return $pdf->download('Recibo-' . $pago->numero_recibo . '.pdf');
+
+        } catch (\Exception $e) {
+            \Log::error('Error al descargar recibo', [
+                'pago_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()->with('error', 'Error al generar el recibo: ' . $e->getMessage());
+        }
     }
 
     /**
