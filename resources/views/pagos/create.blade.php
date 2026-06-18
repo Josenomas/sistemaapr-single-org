@@ -229,44 +229,56 @@
             <div id="calculadoraVuelto" style="display: none;" class="mb-4">
                 <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
                     <div class="card-body" style="padding: 1.5rem;">
-                        <h5 style="color: white; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-calculator"></i>
-                            Calculadora de Vuelto
+                        <h5 style="color: white; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; font-size: 1.25rem;">
+                            <i class="fas fa-calculator" style="font-size: 1.5rem;"></i>
+                            <span>Calculadora de Vuelto</span>
                         </h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 0.875rem;">Monto a Pagar</label>
-                                <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 0.75rem; backdrop-filter: blur(10px);">
-                                    <div style="color: white; font-size: 1.5rem; font-weight: 700;" id="montoAPagar">$0</div>
+
+                        <!-- Monto a Pagar - Destacado arriba -->
+                        <div class="mb-4">
+                            <label style="color: rgba(255,255,255,0.85); font-weight: 500; font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">
+                                💵 Monto a Pagar
+                            </label>
+                            <div style="background: rgba(255,255,255,0.25); border-radius: 10px; padding: 1.25rem; text-align: center; backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3);">
+                                <div style="color: #fbbf24; font-size: 2rem; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.3);" id="montoAPagar">$0</div>
+                            </div>
+                        </div>
+
+                        <!-- Monto Recibido -->
+                        <div class="mb-3">
+                            <label for="montoRecibido" style="color: rgba(255,255,255,0.85); font-weight: 500; font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">
+                                💰 Monto Recibido del Cliente
+                            </label>
+                            <input type="number"
+                                   class="form-control"
+                                   id="montoRecibido"
+                                   placeholder="Ingrese el monto recibido..."
+                                   step="1"
+                                   min="0"
+                                   style="background: white; border: 3px solid rgba(255,255,255,0.4); font-size: 1.5rem; padding: 1rem; font-weight: 700; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                        </div>
+
+                        <!-- Resultado del Vuelto -->
+                        <div id="resultadoVuelto" style="display: none; margin-top: 1.5rem;">
+                            <div style="background: rgba(16, 185, 129, 0.25); border: 3px solid #10b981; border-radius: 10px; padding: 1.5rem; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                                <div style="text-align: center;">
+                                    <div style="color: rgba(255,255,255,0.9); font-weight: 600; font-size: 1rem; margin-bottom: 0.75rem;">
+                                        🎉 Vuelto a Entregar
+                                    </div>
+                                    <div style="color: #10b981; font-size: 2.5rem; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.3);" id="montoVuelto">
+                                        $0
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="montoRecibido" style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 0.875rem;">
-                                    💵 Monto Recibido
-                                </label>
-                                <input type="number"
-                                       class="form-control"
-                                       id="montoRecibido"
-                                       placeholder="Ej: 20000"
-                                       step="1"
-                                       min="0"
-                                       style="background: white; border: 2px solid rgba(255,255,255,0.3); font-size: 1.25rem; padding: 0.75rem; font-weight: 600;">
-                            </div>
                         </div>
-                        <div id="resultadoVuelto" style="display: none; background: rgba(16, 185, 129, 0.2); border-left: 4px solid #10b981; border-radius: 8px; padding: 1rem; margin-top: 1rem; backdrop-filter: blur(10px);">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="color: white; font-weight: 600; font-size: 1rem;">
-                                    💰 Vuelto a Entregar:
-                                </span>
-                                <span style="color: #10b981; font-size: 1.75rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2);" id="montoVuelto">
-                                    $0
-                                </span>
-                            </div>
-                        </div>
-                        <div id="errorVuelto" style="display: none; background: rgba(239, 68, 68, 0.2); border-left: 4px solid #ef4444; border-radius: 8px; padding: 1rem; margin-top: 1rem; backdrop-filter: blur(10px);">
-                            <div style="color: #fecaca; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span id="mensajeError"></span>
+
+                        <!-- Error de Monto Insuficiente -->
+                        <div id="errorVuelto" style="display: none; margin-top: 1.5rem;">
+                            <div style="background: rgba(239, 68, 68, 0.25); border: 3px solid #ef4444; border-radius: 10px; padding: 1.25rem; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                                <div style="color: #fecaca; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; font-size: 0.95rem;">
+                                    <i class="fas fa-exclamation-triangle" style="font-size: 1.25rem;"></i>
+                                    <span id="mensajeError"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
