@@ -225,7 +225,7 @@
                            id="monto_pagado"
                            name="monto_pagado"
                            value="{{ old('monto_pagado', $boleta->total ?? '') }}"
-                           step="0.01"
+                           step="1"
                            min="0"
                            required>
                     @error('monto_pagado')
@@ -1108,12 +1108,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Autocompletar monto si está en modo completo
                 if (tipoCompleto.checked) {
-                    montoInput.value = totalNum;
+                    montoInput.value = Math.round(totalNum);
                     montoInput.setAttribute('readonly', 'readonly');
                     ayudaMonto.textContent = 'Monto total de la boleta';
                 } else {
                     montoInput.removeAttribute('readonly');
-                    montoInput.setAttribute('max', totalNum);
+                    montoInput.setAttribute('max', Math.round(totalNum));
                     ayudaMonto.textContent = `Ingrese un monto entre $1 y ${totalFmt}`;
                 }
 
@@ -1129,7 +1129,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Manejar cambio de tipo de pago
     tipoCompleto.addEventListener('change', function() {
         if (this.checked && totalBoleta > 0) {
-            montoInput.value = totalBoleta;
+            montoInput.value = Math.round(totalBoleta);
             montoInput.setAttribute('readonly', 'readonly');
             ayudaMonto.textContent = 'Monto total de la boleta';
         }
@@ -1156,7 +1156,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (tipoParcial.checked && totalBoleta > 0) {
             const monto = parseFloat(this.value);
             if (monto > totalBoleta) {
-                this.value = totalBoleta;
+                this.value = Math.round(totalBoleta);
                 ayudaMonto.textContent = 'El monto no puede exceder el total de la boleta';
                 ayudaMonto.style.color = '#ef4444';
             } else {
