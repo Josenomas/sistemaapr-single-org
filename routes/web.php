@@ -341,6 +341,7 @@ Route::middleware(['auth', 'suscripcion.activa'])->group(function () {
         Route::get('/pagos/{id}/imprimir', [PagosController::class, 'imprimir'])->name('pagos.imprimir');
         Route::get('/pagos/{id}/descargar-recibo', [PagosController::class, 'descargarRecibo'])->name('pagos.descargar-recibo');
         Route::post('/pagos/buscar-por-rut', [PagosController::class, 'buscarPorRut'])->name('pagos.buscarPorRut');
+        Route::post('/pagos/buscar-por-nombre', [PagosController::class, 'buscarPorNombre'])->name('pagos.buscarPorNombre');
         Route::get('/api/socios/{id}/boletas-pendientes', [PagosController::class, 'boletasPendientes'])->name('pagos.boletasPendientes');
         Route::get('/reporte-caja', [PagosController::class, 'reporteCaja'])->name('pagos.reporteCaja');
         Route::get('/reporte-caja-imprimir', [PagosController::class, 'reporteCajaImprimir'])->name('pagos.reporteCaja.imprimir');

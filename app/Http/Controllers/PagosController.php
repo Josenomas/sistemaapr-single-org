@@ -655,6 +655,71 @@ class PagosController extends Controller
     }
 
     /**
+     * Buscar socios por nombre
+     */
+    public function buscarPorNombre(Request $request)
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|string|min:2',
+        ]);
+
+        try {
+            $nombre = $validated['nombre'];
+
+            // Buscar socios por nombre o apellido (activo o moroso)
+            $socios = Socio::where(function($query) use ($nombre) {
+                    $query->where('nombre', 'like', "%{$nombre}%")
+                          ->orWhere('apellido_paterno', 'like', "%{$nombre}%")
+                          ->orWhere('apellido_materno', 'like', "%{$nombre}%");
+                })
+                ->whereIn('estado', ['activo', 'moroso'])
+                ->orderBy('nombre')
+                ->orderBy('apellido_paterno')
+                ->get();
+
+            if ($socios->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se encontraron socios que coincidan con: ' . $nombre,
+                ], 404);
+            }
+
+            // Formatear socios para el frontend
+            $sociosFormateados = $socios->map(function($socio) {
+                $boletasPendientes = Boleta::where('id_socio', $socio->id)
+                                           ->whereIn('estado', ['pendiente', 'vencida'])
+                                           ->count();
+
+                return [
+                    'id' => $socio->id,
+                    'nombre_completo' => $socio->nombre_completo,
+                    'rut' => $socio->rut,
+                    'numero_socio' => $socio->numero_socio,
+                    'boletas_count' => $boletasPendientes,
+                ];
+            });
+
+            // Registrar actividad
+            ActividadHelper::registrar(
+                'Pagos',
+                "Búsqueda por nombre realizada - Búsqueda: '{$nombre}' - Resultados: " . $socios->count(),
+                auth()->id()
+            );
+
+            return response()->json([
+                'success' => true,
+                'socios' => $sociosFormateados,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al buscar socios: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Obtener boletas pendientes de un socio (API)
      */
     public function boletasPendientes($socioId)

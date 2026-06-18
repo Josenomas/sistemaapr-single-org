@@ -53,9 +53,12 @@
                 </div>
             </div>
 
-            <!-- Búsqueda por RUT -->
+
+            <!-- Búsqueda por RUT o Nombre -->
             <div class="search-box">
-                <h4><i class="fas fa-search"></i> Búsqueda Rápida por RUT</h4>
+                <h4><i class="fas fa-search"></i> Búsqueda Rápida de Socio</h4>
+
+                <!-- Búsqueda por RUT -->
                 <div class="form-row">
                     <div class="form-group col-md-8">
                         <label for="buscar_rut" class="form-label">RUT del Socio</label>
@@ -73,6 +76,30 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Separador -->
+                <div style="text-align: center; margin: 1rem 0; color: #64748b; font-weight: 500;">
+                    - O -
+                </div>
+
+                <!-- Búsqueda por Nombre -->
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="buscar_nombre" class="form-label">Nombre del Socio</label>
+                        <input type="text"
+                               class="form-control"
+                               id="buscar_nombre"
+                               placeholder="Ingrese nombre o apellido">
+                        <small class="form-help">Busca por nombre, apellido o ambos</small>
+                    </div>
+                    <div class="form-group col-md-4" style="display: flex; align-items: flex-end;">
+                        <button type="button" class="btn btn-success" id="btnBuscarNombre" style="width: 100%;">
+                            <i class="fas fa-user-search"></i>
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+
                 <div id="resultadoBusqueda" style="display: none;"></div>
             </div>
 
@@ -933,6 +960,127 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Enter') {
             e.preventDefault();
             btnBuscarRut.click();
+        }
+    });
+
+    // Búsqueda por Nombre
+    const buscarNombreInput = document.getElementById('buscar_nombre');
+    const btnBuscarNombre = document.getElementById('btnBuscarNombre');
+
+    btnBuscarNombre.addEventListener('click', async function() {
+        const nombre = buscarNombreInput.value.trim();
+
+        if (!nombre) {
+            alert('Por favor ingrese un nombre');
+            buscarNombreInput.focus();
+            return;
+        }
+
+        // Deshabilitar botón
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+
+        try {
+            const response = await fetch('{{ route("pagos.buscarPorNombre") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ nombre: nombre })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.socios.length > 0) {
+                // Mostrar lista de socios encontrados
+                let htmlSocios = `
+                    <div class="alert" style="background: #dbeafe; border: 1px solid #3b82f6; color: #1e40af; margin-top: 12px;">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Se encontraron ${data.socios.length} socio(s)</strong>
+                            <p style="margin: 4px 0 8px 0;">Seleccione un socio para cargar sus boletas:</p>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                `;
+
+                data.socios.forEach(socio => {
+                    const boletasText = socio.boletas_count > 0 
+                        ? `${socio.boletas_count} boleta(s) pendiente(s)` 
+                        : 'Sin boletas pendientes';
+                    const bgColor = socio.boletas_count > 0 ? '#f0fdf4' : '#fef3c7';
+                    const borderColor = socio.boletas_count > 0 ? '#22c55e' : '#f59e0b';
+                    
+                    htmlSocios += `
+                        <div class="socio-item" 
+                             data-rut="${socio.rut}" 
+                             style="background: ${bgColor}; 
+                                    border: 2px solid ${borderColor}; 
+                                    border-radius: 8px; 
+                                    padding: 12px; 
+                                    margin: 8px 0; 
+                                    cursor: pointer;
+                                    transition: all 0.2s;"
+                             onmouseover="this.style.transform='scale(1.02)'"
+                             onmouseout="this.style.transform='scale(1)'">
+                            <strong>${socio.nombre_completo}</strong><br>
+                            <small>RUT: ${socio.rut}</small><br>
+                            <small style="color: #059669;"><i class="fas fa-file-invoice"></i> ${boletasText}</small>
+                        </div>
+                    `;
+                });
+
+                htmlSocios += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                resultadoBusqueda.style.display = 'block';
+                resultadoBusqueda.innerHTML = htmlSocios;
+
+                // Agregar event listeners a los items de socios
+                document.querySelectorAll('.socio-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const rutSocio = this.getAttribute('data-rut');
+                        // Llenar el campo RUT y ejecutar búsqueda
+                        buscarRutInput.value = rutSocio;
+                        btnBuscarRut.click();
+                        // Limpiar búsqueda por nombre
+                        buscarNombreInput.value = '';
+                    });
+                });
+
+            } else {
+                // No se encontraron socios
+                resultadoBusqueda.style.display = 'block';
+                resultadoBusqueda.innerHTML = `
+                    <div class="alert" style="background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; margin-top: 12px;">
+                        <i class="fas fa-times-circle"></i>
+                        <div>
+                            <strong>No se encontraron socios</strong>
+                            <p style="margin: 4px 0 0 0;">No hay socios que coincidan con "${nombre}"</p>
+                        </div>
+                    </div>
+                `;
+
+                // Limpiar select
+                selectBoleta.innerHTML = '<option value="">Seleccione una boleta</option>';
+            }
+        } catch (error) {
+            alert('Error al buscar socios: ' + error.message);
+            resultadoBusqueda.style.display = 'none';
+        } finally {
+            // Rehabilitar botón
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-user-search"></i> Buscar';
+        }
+    });
+
+    // Buscar al presionar Enter en el campo Nombre
+    buscarNombreInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            btnBuscarNombre.click();
         }
     });
 
