@@ -225,6 +225,54 @@
                 </div>
             </div>
 
+            <!-- Calculadora de Vuelto para Efectivo -->
+            <div id="calculadoraVuelto" style="display: none;" class="mb-4">
+                <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                    <div class="card-body" style="padding: 1.5rem;">
+                        <h5 style="color: white; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-calculator"></i>
+                            Calculadora de Vuelto
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 0.875rem;">Monto a Pagar</label>
+                                <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 0.75rem; backdrop-filter: blur(10px);">
+                                    <div style="color: white; font-size: 1.5rem; font-weight: 700;" id="montoAPagar">$0</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="montoRecibido" style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 0.875rem;">
+                                    💵 Monto Recibido
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="montoRecibido"
+                                       placeholder="Ej: 20000"
+                                       step="1"
+                                       min="0"
+                                       style="background: white; border: 2px solid rgba(255,255,255,0.3); font-size: 1.25rem; padding: 0.75rem; font-weight: 600;">
+                            </div>
+                        </div>
+                        <div id="resultadoVuelto" style="display: none; background: rgba(16, 185, 129, 0.2); border-left: 4px solid #10b981; border-radius: 8px; padding: 1rem; margin-top: 1rem; backdrop-filter: blur(10px);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: white; font-weight: 600; font-size: 1rem;">
+                                    💰 Vuelto a Entregar:
+                                </span>
+                                <span style="color: #10b981; font-size: 1.75rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2);" id="montoVuelto">
+                                    $0
+                                </span>
+                            </div>
+                        </div>
+                        <div id="errorVuelto" style="display: none; background: rgba(239, 68, 68, 0.2); border-left: 4px solid #ef4444; border-radius: 8px; padding: 1rem; margin-top: 1rem; backdrop-filter: blur(10px);">
+                            <div style="color: #fecaca; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span id="mensajeError"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Sección Flow para débito/crédito -->
             <div id="seccionFlow" style="display: none;" class="flow-section">
                 <div class="alert alert-info">
@@ -925,6 +973,7 @@ document.addEventListener('DOMContentLoaded', function() {
             montoInput.setAttribute('readonly', 'readonly');
             ayudaMonto.textContent = 'Monto total de la boleta';
         }
+        actualizarCalculadora();
     });
 
     tipoParcial.addEventListener('change', function() {
@@ -958,6 +1007,61 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Elementos de la calculadora de vuelto
+    const calculadoraVuelto = document.getElementById('calculadoraVuelto');
+    const montoAPagarDisplay = document.getElementById('montoAPagar');
+    const montoRecibidoInput = document.getElementById('montoRecibido');
+    const resultadoVuelto = document.getElementById('resultadoVuelto');
+    const montoVueltoDisplay = document.getElementById('montoVuelto');
+    const errorVuelto = document.getElementById('errorVuelto');
+    const mensajeError = document.getElementById('mensajeError');
+
+    // Función para formatear montos
+    function formatearMonto(monto) {
+        return '$' + Math.round(monto).toLocaleString('es-CL');
+    }
+
+    // Función para mostrar/ocultar calculadora
+    function actualizarCalculadora() {
+        const metodo = metodoPago.value;
+        const tipoPago = tipoCompleto.checked ? 'completo' : 'parcial';
+        const montoPagar = parseFloat(montoInput.value) || 0;
+
+        // Mostrar solo si: Efectivo + Pago Completo + Hay monto
+        if (metodo === 'efectivo' && tipoPago === 'completo' && montoPagar > 0) {
+            calculadoraVuelto.style.display = 'block';
+            montoAPagarDisplay.textContent = formatearMonto(montoPagar);
+        } else {
+            calculadoraVuelto.style.display = 'none';
+            montoRecibidoInput.value = '';
+            resultadoVuelto.style.display = 'none';
+            errorVuelto.style.display = 'none';
+        }
+    }
+
+    // Calcular vuelto cuando se ingresa monto recibido
+    montoRecibidoInput.addEventListener('input', function() {
+        const montoPagar = parseFloat(montoInput.value) || 0;
+        const montoRecibido = parseFloat(this.value) || 0;
+
+        // Ocultar mensajes previos
+        resultadoVuelto.style.display = 'none';
+        errorVuelto.style.display = 'none';
+
+        if (montoRecibido > 0) {
+            if (montoRecibido < montoPagar) {
+                // Monto insuficiente
+                errorVuelto.style.display = 'block';
+                mensajeError.textContent = `El monto recibido (${formatearMonto(montoRecibido)}) es menor al monto a pagar (${formatearMonto(montoPagar)})`;
+            } else {
+                // Calcular vuelto
+                const vuelto = montoRecibido - montoPagar;
+                montoVueltoDisplay.textContent = formatearMonto(vuelto);
+                resultadoVuelto.style.display = 'block';
+            }
+        }
+    });
+
     // Manejar cambio de método de pago
     metodoPago.addEventListener('change', function() {
         const metodo = this.value;
@@ -980,6 +1084,9 @@ document.addEventListener('DOMContentLoaded', function() {
             formPago.querySelector('button[type="submit"]').disabled = false;
             formPago.querySelector('button[type="submit"]').style.opacity = '1';
         }
+
+        // Actualizar calculadora
+        actualizarCalculadora();
     });
 
     // Generar link de pago Flow
