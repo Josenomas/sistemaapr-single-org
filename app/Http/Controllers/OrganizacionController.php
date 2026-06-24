@@ -491,8 +491,8 @@ class OrganizacionController extends Controller
             'monto_diferencia' => $montoDiferencia,
         ]);
 
-        // Si es upgrade, generar pago con Flow
-        if ($tipo === 'upgrade' && $montoDiferencia > 0) {
+        // Si es upgrade O (es downgrade con suscripción vencida), generar pago con Flow
+        if (($tipo === 'upgrade' || $organizacion->suscripcionVencida()) && $montoDiferencia > 0) {
             // Verificar si ya existe un cambio de plan COMPLETADO
             $cambioPlanCompletado = \App\Models\CambioPlan::where('id_organizacion', $organizacion->id)
                 ->where('id_suscripcion_nueva', $idSuscripcionNueva)
