@@ -122,6 +122,24 @@ class CambioPlan extends Model
                 'activo' => true,
                 'dias_prueba_restantes' => 0,
             ]);
+
+            // Cancelar pagos pendientes antiguos del plan anterior
+            \App\Models\PagoSuscripcion::where('id_organizacion', $this->id_organizacion)
+                ->where('estado', 'pendiente')
+                ->update(['estado' => 'cancelado']);
+
+            // Crear registro de pago para el cambio de plan
+            \App\Models\PagoSuscripcion::create([
+                'id_organizacion' => $this->id_organizacion,
+                'id_suscripcion' => $this->id_suscripcion_nueva,
+                'monto' => $this->monto_diferencia,
+                'estado' => 'pagado',
+                'periodo_inicio' => now(),
+                'periodo_fin' => now()->addMonth(),
+                'fecha_pago' => now(),
+                'metodo_pago' => 'flow',
+                'token_flow' => $this->token_flow,
+            ]);
         } else {
             // Si está activa, solo cambiar el plan (el cambio se aplicará en la renovación)
             $this->organizacion->update([
