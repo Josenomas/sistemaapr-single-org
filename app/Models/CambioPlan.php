@@ -112,9 +112,22 @@ class CambioPlan extends Model
             return false;
         }
 
-        $this->organizacion->update([
-            'id_suscripcion' => $this->id_suscripcion_nueva,
-        ]);
+        // Si la suscripción está vencida, reactivarla con el nuevo plan
+        if ($this->organizacion->suscripcionVencida()) {
+            $this->organizacion->update([
+                'id_suscripcion' => $this->id_suscripcion_nueva,
+                'estado_suscripcion' => 'activa',
+                'fecha_inicio_suscripcion' => now(),
+                'fecha_fin_suscripcion' => now()->addMonth(),
+                'activo' => true,
+                'dias_prueba_restantes' => 0,
+            ]);
+        } else {
+            // Si está activa, solo cambiar el plan (el cambio se aplicará en la renovación)
+            $this->organizacion->update([
+                'id_suscripcion' => $this->id_suscripcion_nueva,
+            ]);
+        }
 
         $this->update([
             'estado' => 'completado',
