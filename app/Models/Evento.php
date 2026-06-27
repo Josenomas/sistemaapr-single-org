@@ -42,7 +42,13 @@ class Evento extends Model
      */
     public function scopeActivos($query)
     {
-        return $query->where('activo', 1);
+        return $query->where('activo', 1)
+                     ->where(function($q) {
+                         // Eventos recurrentes siempre se muestran
+                         $q->where('recurrencia', '!=', 'ninguna')
+                           // O eventos cuya fecha no ha pasado
+                           ->orWhere('fecha_evento', '>=', now()->toDateString());
+                     });
     }
 
     /**
