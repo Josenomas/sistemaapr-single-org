@@ -500,10 +500,6 @@
     }
 
     function eliminarNotificacion(id, event) {
-        if (!confirm('¿Eliminar esta notificación?')) {
-            return;
-        }
-
         fetch(`/notificaciones-sistema/${id}`, {
             method: 'DELETE',
             headers: {
