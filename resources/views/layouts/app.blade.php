@@ -139,6 +139,17 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            text-decoration: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .user-info:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
         }
 
         .user-avatar {
@@ -392,7 +403,7 @@
                         </a>
                     </div>
 
-                    <div class="user-info">
+                    <a href="{{ route('usuarios.show', auth()->user()->id) }}" class="user-info">
                         <div class="user-avatar">
                             {{ auth()->user()->iniciales }}
                         </div>
@@ -400,7 +411,7 @@
                             <div class="user-name">{{ auth()->user()->nombre_completo }}</div>
                             <div class="user-role">{{ ucfirst(auth()->user()->rol) }}</div>
                         </div>
-                    </div>
+                    </a>
 
                     <form action="{{ route('logout') }}" method="POST" id="logout-form">
                         @csrf
