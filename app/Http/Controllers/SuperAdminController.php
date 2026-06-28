@@ -312,8 +312,18 @@ class SuperAdminController extends Controller
 
         $registro->update(['estado' => 'rechazado']);
 
+        // Enviar email de notificación al solicitante
+        try {
+            \Mail::send('emails.registro-rechazado', ['registro' => $registro], function($message) use ($registro) {
+                $message->to($registro->email_contacto)
+                        ->subject('Actualización sobre tu Solicitud de Registro - Sistema APR');
+            });
+        } catch (\Exception $e) {
+            \Log::error('Error al enviar email de rechazo de registro: ' . $e->getMessage());
+        }
+
         return redirect()->back()
-            ->with('success', 'Registro rechazado exitosamente.');
+            ->with('success', 'Registro rechazado exitosamente. Se ha enviado notificación por email.');
     }
 
     /**
