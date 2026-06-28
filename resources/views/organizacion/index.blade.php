@@ -279,6 +279,14 @@
                     <th>Vencimiento</th>
                     <td><strong>{{ \Carbon\Carbon::parse($organizacion->fecha_fin_suscripcion)->format('d/m/Y') }}</strong></td>
                 </tr>
+                <tr>
+                    <td colspan="2" class="text-muted" style="font-size: 13px; padding: 10px 15px; background-color: #f8f9fa;">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Ciclo de facturación:</strong>
+                        Los pagos mensuales se procesan cada día {{ \Carbon\Carbon::parse($organizacion->fecha_fin_suscripcion)->day }} de cada mes.
+                        Tu próxima renovación será el {{ \Carbon\Carbon::parse($organizacion->fecha_fin_suscripcion)->format('d/m/Y') }}.
+                    </td>
+                </tr>
                 @endif
                 @if($organizacion->proximo_pago)
                 <tr>

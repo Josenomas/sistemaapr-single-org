@@ -104,9 +104,9 @@ class SolicitudPagoManual extends Model
         $organizacion->update([
             'estado_suscripcion' => 'activa',
             'fecha_inicio_suscripcion' => now(),
-            'fecha_fin_suscripcion' => now()->addMonth(),
+            'fecha_fin_suscripcion' => now()->addMonthNoOverflow(),
             'metodo_pago' => 'transferencia',
-            'proximo_pago' => now()->addMonth(),
+            'proximo_pago' => now()->addMonthNoOverflow(),
         ]);
     }
 

@@ -53,9 +53,10 @@ class VerificarSuscripciones extends Command
 
         foreach ($organizaciones as $org) {
             // Verificar si ya tiene un pago para el próximo período
-            $finPeriodoActual = $org->fecha_fin_periodo ?? now()->endOfMonth();
+            // Usar fecha_fin_suscripcion individual de cada organización (respeta su ciclo de pago)
+            $finPeriodoActual = $org->fecha_fin_suscripcion;
             $inicioPeriodoNuevo = $finPeriodoActual->copy()->addDay();
-            $finPeriodoNuevo = $inicioPeriodoNuevo->copy()->endOfMonth();
+            $finPeriodoNuevo = $finPeriodoActual->copy()->addMonthNoOverflow(); // Exactamente 1 mes desde fin actual
 
             $pagoExiste = PagoSuscripcion::where('id_organizacion', $org->id)
                 ->where('periodo_inicio', $inicioPeriodoNuevo->format('Y-m-d'))

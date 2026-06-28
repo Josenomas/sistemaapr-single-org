@@ -163,6 +163,13 @@
                     {{ $pago->fecha_vencimiento->format('d/m/Y') }}
                 </span>
             </div>
+
+            <div class="info-row">
+                <span class="info-label">Ciclo de facturación:</span>
+                <span class="info-value" style="font-size: 13px; color: #64748b;">
+                    Día {{ $pago->fecha_vencimiento->day }} de cada mes
+                </span>
+            </div>
         </div>
 
         <div style="text-align: center;">

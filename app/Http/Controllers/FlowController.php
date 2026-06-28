@@ -467,12 +467,12 @@ class FlowController extends Controller
             if ($organizacion->estado_suscripcion === 'vencida' || $organizacion->estado_suscripcion === 'suspendida') {
                 // Reactivar desde vencida/suspendida
                 $nuevaFechaInicio = now();
-                $nuevaFechaFin = now()->addMonth();
+                $nuevaFechaFin = now()->addMonthNoOverflow();
             } else {
                 // Extender desde activa
                 $fechaActualFin = $organizacion->fecha_fin_suscripcion ?? now();
                 $nuevaFechaInicio = $fechaActualFin->isPast() ? now() : $fechaActualFin;
-                $nuevaFechaFin = $nuevaFechaInicio->copy()->addMonth();
+                $nuevaFechaFin = $nuevaFechaInicio->copy()->addMonthNoOverflow();
             }
 
             $organizacion->update([

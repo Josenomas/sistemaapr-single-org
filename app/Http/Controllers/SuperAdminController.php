@@ -536,7 +536,7 @@ class SuperAdminController extends Controller
 
         // Extender la suscripción de la organización
         $org = $renovacion->organizacion;
-        $nuevaFecha = Carbon::parse($org->fecha_fin_suscripcion)->addMonth();
+        $nuevaFecha = Carbon::parse($org->fecha_fin_suscripcion)->addMonthNoOverflow();
         $org->update([
             'fecha_fin_suscripcion' => $nuevaFecha,
             'estado_suscripcion' => 'activa',

@@ -118,7 +118,7 @@ class CambioPlan extends Model
                 'id_suscripcion' => $this->id_suscripcion_nueva,
                 'estado_suscripcion' => 'activa',
                 'fecha_inicio_suscripcion' => now(),
-                'fecha_fin_suscripcion' => now()->addMonth(),
+                'fecha_fin_suscripcion' => now()->addMonthNoOverflow(),
                 'activo' => true,
                 'dias_prueba_restantes' => 0,
             ]);
@@ -135,7 +135,7 @@ class CambioPlan extends Model
                 'monto' => $this->monto_diferencia,
                 'estado' => 'pagado',
                 'periodo_inicio' => now(),
-                'periodo_fin' => now()->addMonth(),
+                'periodo_fin' => now()->addMonthNoOverflow(),
                 'fecha_pago' => now(),
                 'metodo_pago' => 'flow',
                 'token_flow' => $this->token_flow,
