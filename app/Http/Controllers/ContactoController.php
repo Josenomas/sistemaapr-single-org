@@ -22,17 +22,23 @@ class ContactoController extends Controller
 
         try {
             // Email del administrador del sistema (cámbialo por tu email)
-            $emailDestino = env('MAIL_CONTACT', 'sistemaapr@gmail.com');
+            $emailDestino = env('MAIL_CONTACT', 'soportesistemaapr@gmail.com');
 
-            // Enviar email
+            // 1. Enviar email al admin (notificación de nueva consulta)
             Mail::send('emails.contacto', ['datos' => $validated], function ($message) use ($validated, $emailDestino) {
                 $message->to($emailDestino)
                         ->subject('Nueva Consulta desde Sistema APR - ' . $validated['apr'])
                         ->replyTo($validated['email'], $validated['nombre']);
             });
 
+            // 2. Enviar email de confirmación al usuario
+            Mail::send('emails.contacto-confirmacion', ['datos' => $validated], function ($message) use ($validated) {
+                $message->to($validated['email'])
+                        ->subject('Confirmación de Solicitud Recibida - Sistema APR');
+            });
+
             return redirect()->route('landing')
-                ->with('success', '¡Gracias por tu consulta! Te contactaremos pronto.');
+                ->with('success', '¡Gracias por tu consulta! Hemos enviado una confirmación a tu email.');
 
         } catch (\Exception $e) {
             return redirect()->back()
