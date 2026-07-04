@@ -301,6 +301,31 @@ class ReportesController extends Controller
                         ->orderBy('fecha_compra', 'desc')
                         ->get();
 
+        // Subsidios entregados en el período
+        $subsidiosEntregados = Boleta::where('activo', 1)
+            ->whereBetween('fecha_emision', [$fecha_inicio, $fecha_fin])
+            ->sum('subsidio');
+
+        $descuentosAplicados = Boleta::where('activo', 1)
+            ->whereBetween('fecha_emision', [$fecha_inicio, $fecha_fin])
+            ->sum('descuentos');
+
+        // Detalle de subsidios por socio
+        $subsidiosPorSocio = Boleta::with('socio')
+            ->where('activo', 1)
+            ->whereBetween('fecha_emision', [$fecha_inicio, $fecha_fin])
+            ->where(function($q) {
+                $q->where('subsidio', '>', 0)
+                  ->orWhere('descuentos', '>', 0);
+            })
+            ->select('id_socio',
+                     DB::raw('SUM(subsidio) as total_subsidio'),
+                     DB::raw('SUM(descuentos) as total_descuento'),
+                     DB::raw('COUNT(*) as cantidad_boletas'))
+            ->groupBy('id_socio')
+            ->orderBy('total_subsidio', 'desc')
+            ->get();
+
         // Estadísticas
         $estadisticas = [
             'total_ingresos' => $ingresos->sum('monto_pagado'),
@@ -308,12 +333,16 @@ class ReportesController extends Controller
             'balance' => $ingresos->sum('monto_pagado') - $egresos->sum('total'),
             'ingresos_por_metodo' => $ingresos->groupBy('metodo_pago')->map->sum('monto_pagado'),
             'egresos_por_tipo' => $egresos->groupBy('tipo_compra')->map->sum('total'),
+            'total_subsidios' => $subsidiosEntregados + $descuentosAplicados,
         ];
 
         $pdf = Pdf::loadView('reportes.pdf.financiero', compact(
             'ingresos',
             'egresos',
             'estadisticas',
+            'subsidiosEntregados',
+            'descuentosAplicados',
+            'subsidiosPorSocio',
             'fecha_inicio',
             'fecha_fin'
         ));

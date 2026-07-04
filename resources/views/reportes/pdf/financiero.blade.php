@@ -63,7 +63,7 @@
             background: #f3f4f6;
             border: 1px solid #e5e7eb;
             text-align: center;
-            width: 33.33%;
+            width: 25%;
         }
 
         .stat-card h3 {
@@ -185,6 +185,10 @@
                 <h3>BALANCE</h3>
                 <div class="value">${{ number_format($estadisticas['balance'], 0, ',', '.') }}</div>
             </div>
+            <div class="stat-card" style="background: #fef3c7; border: 1px solid #fbbf24;">
+                <h3 style="color: #92400e;">SUBSIDIOS ENTREGADOS</h3>
+                <div class="value" style="color: #d97706;">${{ number_format($estadisticas['total_subsidios'] ?? 0, 0, ',', '.') }}</div>
+            </div>
         </div>
     </div>
 
@@ -303,6 +307,44 @@
             @endif
         </tbody>
     </table>
+
+    @if(isset($subsidiosPorSocio) && $subsidiosPorSocio->count() > 0)
+    <h2 class="section-title">SUBSIDIOS Y DESCUENTOS ENTREGADOS</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>N° Socio</th>
+                <th>Nombre</th>
+                <th>Tipo Subsidio</th>
+                <th class="text-center">Boletas</th>
+                <th class="text-right">Subsidio (%)</th>
+                <th class="text-right">Desc. Fijo</th>
+                <th class="text-right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($subsidiosPorSocio as $index => $item)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $item->socio->numero_socio }}</td>
+                <td style="font-size: 8px;">{{ $item->socio->nombre }} {{ $item->socio->apellido_paterno }}</td>
+                <td style="font-size: 8px;">{{ $item->socio->observaciones_subsidio ?? '-' }}</td>
+                <td class="text-center">{{ $item->cantidad_boletas }}</td>
+                <td class="text-right" style="color: #d97706;">${{ number_format($item->total_subsidio, 0, ',', '.') }}</td>
+                <td class="text-right" style="color: #0ea5e9;">${{ number_format($item->total_descuento, 0, ',', '.') }}</td>
+                <td class="text-right" style="color: #10b981; font-weight: bold;">${{ number_format($item->total_subsidio + $item->total_descuento, 0, ',', '.') }}</td>
+            </tr>
+            @endforeach
+            <tr class="total-row">
+                <td colspan="5" class="text-right">TOTAL GENERAL:</td>
+                <td class="text-right" style="color: #d97706;">${{ number_format($subsidiosPorSocio->sum('total_subsidio'), 0, ',', '.') }}</td>
+                <td class="text-right" style="color: #0ea5e9;">${{ number_format($subsidiosPorSocio->sum('total_descuento'), 0, ',', '.') }}</td>
+                <td class="text-right" style="color: #10b981; font-weight: bold;">${{ number_format($subsidiosEntregados + $descuentosAplicados, 0, ',', '.') }}</td>
+            </tr>
+        </tbody>
+    </table>
+    @endif
 
     <div class="footer">
         <p>Sistema APR - Reporte generado automáticamente</p>
