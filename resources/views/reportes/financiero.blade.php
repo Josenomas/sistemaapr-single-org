@@ -407,6 +407,17 @@
             <div class="stat-value">${{ number_format($boletasPendientes, 0, ',', '.') }}</div>
             <div class="stat-description">Por cobrar</div>
         </div>
+
+        <div class="stat-card warning">
+            <div class="stat-header">
+                <div class="stat-title">Subsidios Entregados</div>
+                <div class="stat-icon warning-bg">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+            </div>
+            <div class="stat-value">${{ number_format($subsidiosEntregados + $descuentosAplicados, 0, ',', '.') }}</div>
+            <div class="stat-description">Período seleccionado</div>
+        </div>
     </div>
 
     <!-- Filtros -->
@@ -547,6 +558,82 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <!-- Tabla de Subsidios por Socio -->
+    <div class="table-container" style="margin-top: 32px;">
+        <h4 class="chart-title">
+            <i class="fas fa-hand-holding-heart"></i>
+            Subsidios y Descuentos Entregados por Socio
+        </h4>
+
+        @if($subsidiosPorSocio->count() > 0)
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>N° Socio</th>
+                        <th>Nombre Completo</th>
+                        <th>RUT</th>
+                        <th>Tipo Subsidio/Convenio</th>
+                        <th class="text-center">Boletas</th>
+                        <th style="text-align: right;">Subsidio (%)</th>
+                        <th style="text-align: right;">Descuento Fijo</th>
+                        <th style="text-align: right;">Total Beneficio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($subsidiosPorSocio as $index => $item)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td><strong>{{ $item->socio->numero_socio }}</strong></td>
+                        <td>{{ $item->socio->nombre }} {{ $item->socio->apellido_paterno }} {{ $item->socio->apellido_materno }}</td>
+                        <td>{{ $item->socio->rut }}</td>
+                        <td>
+                            @if($item->socio->observaciones_subsidio)
+                                <span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 0.8125rem;">
+                                    {{ $item->socio->observaciones_subsidio }}
+                                </span>
+                            @else
+                                <span style="color: var(--gray-400);">-</span>
+                            @endif
+                        </td>
+                        <td class="text-center">{{ $item->cantidad_boletas }}</td>
+                        <td style="text-align: right; color: #f59e0b; font-weight: 600;">
+                            ${{ number_format($item->total_subsidio, 0, ',', '.') }}
+                        </td>
+                        <td style="text-align: right; color: #0ea5e9; font-weight: 600;">
+                            ${{ number_format($item->total_descuento, 0, ',', '.') }}
+                        </td>
+                        <td style="text-align: right;">
+                            <strong style="color: #10b981;">
+                                ${{ number_format($item->total_subsidio + $item->total_descuento, 0, ',', '.') }}
+                            </strong>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+                <tfoot>
+                    <tr style="background: linear-gradient(135deg, var(--gray-50), var(--gray-100)); font-weight: 700;">
+                        <td colspan="6" style="text-align: right; padding: 14px 16px;">TOTAL GENERAL:</td>
+                        <td style="text-align: right; color: #f59e0b;">
+                            ${{ number_format($subsidiosPorSocio->sum('total_subsidio'), 0, ',', '.') }}
+                        </td>
+                        <td style="text-align: right; color: #0ea5e9;">
+                            ${{ number_format($subsidiosPorSocio->sum('total_descuento'), 0, ',', '.') }}
+                        </td>
+                        <td style="text-align: right; color: #10b981;">
+                            ${{ number_format($subsidiosEntregados + $descuentosAplicados, 0, ',', '.') }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        @else
+            <div style="background: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; border-radius: 6px; color: #1e40af;">
+                <i class="fas fa-info-circle"></i>
+                No se encontraron subsidios ni descuentos en el período seleccionado.
+            </div>
+        @endif
     </div>
 </div>
 @endsection

@@ -224,6 +224,31 @@ class ReportesController extends Controller
                                    ->whereBetween('fecha_emision', [$fechaInicio, $fechaFin])
                                    ->sum('total');
 
+        // Subsidios entregados en el período
+        $subsidiosEntregados = Boleta::where('activo', 1)
+            ->whereBetween('fecha_emision', [$fechaInicio, $fechaFin])
+            ->sum('subsidio');
+
+        $descuentosAplicados = Boleta::where('activo', 1)
+            ->whereBetween('fecha_emision', [$fechaInicio, $fechaFin])
+            ->sum('descuentos');
+
+        // Detalle de subsidios por socio
+        $subsidiosPorSocio = Boleta::with('socio')
+            ->where('activo', 1)
+            ->whereBetween('fecha_emision', [$fechaInicio, $fechaFin])
+            ->where(function($q) {
+                $q->where('subsidio', '>', 0)
+                  ->orWhere('descuentos', '>', 0);
+            })
+            ->select('id_socio',
+                     DB::raw('SUM(subsidio) as total_subsidio'),
+                     DB::raw('SUM(descuentos) as total_descuento'),
+                     DB::raw('COUNT(*) as cantidad_boletas'))
+            ->groupBy('id_socio')
+            ->orderBy('total_subsidio', 'desc')
+            ->get();
+
         // Gráfico de ingresos vs egresos por mes
         $mesesPeriodo = $this->obtenerMesesEntreFechas($fechaInicio, $fechaFin);
         $comparativoMensual = [];
@@ -248,6 +273,9 @@ class ReportesController extends Controller
             'balance',
             'boletasPendientes',
             'comparativoMensual',
+            'subsidiosEntregados',
+            'descuentosAplicados',
+            'subsidiosPorSocio',
             'fechaInicio',
             'fechaFin'
         ));
