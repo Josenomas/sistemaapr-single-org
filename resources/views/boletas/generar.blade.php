@@ -61,6 +61,28 @@
             </div>
         </div>
 
+        <div class="alert alert-warning" style="border-left: 4px solid #f59e0b; margin-top: 24px;">
+            <h5 style="margin-bottom: 12px;">
+                <i class="fas fa-sync-alt"></i>
+                RECORDATORIO IMPORTANTE: ¿Ya sincronizó las nuevas lecturas?
+            </h5>
+            <p style="margin-bottom: 12px;">
+                Antes de generar las boletas masivas, asegúrese de haber completado estos pasos:
+            </p>
+            <ul style="margin-bottom: 12px;">
+                <li><strong>Sincronizar lecturas:</strong> Vaya al módulo "Historial de Consumo" y ejecute la sincronización</li>
+                <li><strong>Verificar importación:</strong> Confirme que todas las lecturas del mes estén en el sistema</li>
+                <li><strong>Revisar anomalías:</strong> Verifique que no haya lecturas con errores pendientes</li>
+            </ul>
+            <p style="margin: 0;">
+                <i class="fas fa-info-circle"></i>
+                <strong>Si no ha sincronizado:</strong>
+                <a href="{{ route('historial-consumo.index') }}" style="font-weight: 600;">
+                    Ir a Historial de Consumo <i class="fas fa-arrow-right"></i>
+                </a>
+            </p>
+        </div>
+
         <form action="{{ route('boletas.storeGenerar') }}" method="POST" onsubmit="return confirm('¿Está seguro de generar las boletas para el mes seleccionado? Esta acción no se puede deshacer.');">
             @csrf
 
