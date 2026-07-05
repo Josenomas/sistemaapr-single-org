@@ -418,6 +418,17 @@
             <div class="stat-value">${{ number_format($subsidiosEntregados + $descuentosAplicados, 0, ',', '.') }}</div>
             <div class="stat-description">Período seleccionado</div>
         </div>
+
+        <div class="stat-card info">
+            <div class="stat-header">
+                <div class="stat-title">Sueldos Pagados</div>
+                <div class="stat-icon info-bg">
+                    <i class="fas fa-money-check-alt"></i>
+                </div>
+            </div>
+            <div class="stat-value">${{ number_format($sueldosPagados ?? 0, 0, ',', '.') }}</div>
+            <div class="stat-description">Período seleccionado</div>
+        </div>
     </div>
 
     <!-- Filtros -->
@@ -632,6 +643,80 @@
             <div style="background: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; border-radius: 6px; color: #1e40af;">
                 <i class="fas fa-info-circle"></i>
                 No se encontraron subsidios ni descuentos en el período seleccionado.
+            </div>
+        @endif
+    </div>
+
+    <!-- Tabla de Sueldos Pagados -->
+    <div class="table-container" style="margin-top: 32px;">
+        <h4 class="chart-title">
+            <i class="fas fa-money-check-alt"></i>
+            Sueldos Pagados por Funcionario
+        </h4>
+
+        @if(isset($sueldosPorFuncionario) && $sueldosPorFuncionario->count() > 0)
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>RUT</th>
+                        <th>Nombre Completo</th>
+                        <th>Cargo</th>
+                        <th class="text-center">Pagos</th>
+                        <th style="text-align: right;">Bonos</th>
+                        <th style="text-align: right;">Descuentos</th>
+                        <th style="text-align: right;">Total Pagado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($sueldosPorFuncionario as $index => $item)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $item->funcionario->rut }}</td>
+                        <td>{{ $item->funcionario->nombre }} {{ $item->funcionario->apellido_paterno }} {{ $item->funcionario->apellido_materno }}</td>
+                        <td>
+                            @if($item->funcionario->cargo)
+                                <span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 0.8125rem;">
+                                    {{ $item->funcionario->cargo }}
+                                </span>
+                            @else
+                                <span style="color: var(--gray-400);">-</span>
+                            @endif
+                        </td>
+                        <td class="text-center">{{ $item->cantidad_pagos }}</td>
+                        <td style="text-align: right; color: #10b981; font-weight: 600;">
+                            ${{ number_format($item->total_bonos, 0, ',', '.') }}
+                        </td>
+                        <td style="text-align: right; color: #ef4444; font-weight: 600;">
+                            ${{ number_format($item->total_descuentos, 0, ',', '.') }}
+                        </td>
+                        <td style="text-align: right;">
+                            <strong style="color: #0ea5e9;">
+                                ${{ number_format($item->total_pagado, 0, ',', '.') }}
+                            </strong>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+                <tfoot>
+                    <tr style="background: linear-gradient(135deg, var(--gray-50), var(--gray-100)); font-weight: 700;">
+                        <td colspan="5" style="text-align: right; padding: 14px 16px;">TOTAL GENERAL:</td>
+                        <td style="text-align: right; color: #10b981;">
+                            ${{ number_format($sueldosPorFuncionario->sum('total_bonos'), 0, ',', '.') }}
+                        </td>
+                        <td style="text-align: right; color: #ef4444;">
+                            ${{ number_format($sueldosPorFuncionario->sum('total_descuentos'), 0, ',', '.') }}
+                        </td>
+                        <td style="text-align: right; color: #0ea5e9;">
+                            ${{ number_format($sueldosPagados ?? 0, 0, ',', '.') }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        @else
+            <div style="background: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; border-radius: 6px; color: #1e40af;">
+                <i class="fas fa-info-circle"></i>
+                No se encontraron pagos de sueldos en el período seleccionado.
             </div>
         @endif
     </div>

@@ -14,6 +14,7 @@ use App\Models\TrabajoRealizado;
 use App\Models\Compra;
 use App\Models\Inventario;
 use App\Models\HistorialConsumo;
+use App\Models\Sueldo;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -249,6 +250,26 @@ class ReportesController extends Controller
             ->orderBy('total_subsidio', 'desc')
             ->get();
 
+        // Sueldos pagados en el período
+        $sueldosPagados = Sueldo::where('activo', 1)
+            ->where('estado', 'pagado')
+            ->whereBetween('fecha_pago', [$fechaInicio, $fechaFin])
+            ->sum('total_liquido');
+
+        // Detalle de sueldos por funcionario
+        $sueldosPorFuncionario = Sueldo::with('funcionario')
+            ->where('activo', 1)
+            ->where('estado', 'pagado')
+            ->whereBetween('fecha_pago', [$fechaInicio, $fechaFin])
+            ->select('id_funcionario',
+                     DB::raw('SUM(total_liquido) as total_pagado'),
+                     DB::raw('SUM(bonos) as total_bonos'),
+                     DB::raw('SUM(descuentos) as total_descuentos'),
+                     DB::raw('COUNT(*) as cantidad_pagos'))
+            ->groupBy('id_funcionario')
+            ->orderBy('total_pagado', 'desc')
+            ->get();
+
         // Gráfico de ingresos vs egresos por mes
         $mesesPeriodo = $this->obtenerMesesEntreFechas($fechaInicio, $fechaFin);
         $comparativoMensual = [];
@@ -276,6 +297,8 @@ class ReportesController extends Controller
             'subsidiosEntregados',
             'descuentosAplicados',
             'subsidiosPorSocio',
+            'sueldosPagados',
+            'sueldosPorFuncionario',
             'fechaInicio',
             'fechaFin'
         ));
@@ -326,6 +349,26 @@ class ReportesController extends Controller
             ->orderBy('total_subsidio', 'desc')
             ->get();
 
+        // Sueldos pagados en el período
+        $sueldosPagados = Sueldo::where('activo', 1)
+            ->where('estado', 'pagado')
+            ->whereBetween('fecha_pago', [$fecha_inicio, $fecha_fin])
+            ->sum('total_liquido');
+
+        // Detalle de sueldos por funcionario
+        $sueldosPorFuncionario = Sueldo::with('funcionario')
+            ->where('activo', 1)
+            ->where('estado', 'pagado')
+            ->whereBetween('fecha_pago', [$fecha_inicio, $fecha_fin])
+            ->select('id_funcionario',
+                     DB::raw('SUM(total_liquido) as total_pagado'),
+                     DB::raw('SUM(bonos) as total_bonos'),
+                     DB::raw('SUM(descuentos) as total_descuentos'),
+                     DB::raw('COUNT(*) as cantidad_pagos'))
+            ->groupBy('id_funcionario')
+            ->orderBy('total_pagado', 'desc')
+            ->get();
+
         // Estadísticas
         $estadisticas = [
             'total_ingresos' => $ingresos->sum('monto_pagado'),
@@ -334,6 +377,7 @@ class ReportesController extends Controller
             'ingresos_por_metodo' => $ingresos->groupBy('metodo_pago')->map->sum('monto_pagado'),
             'egresos_por_tipo' => $egresos->groupBy('tipo_compra')->map->sum('total'),
             'total_subsidios' => $subsidiosEntregados + $descuentosAplicados,
+            'total_sueldos' => $sueldosPagados,
         ];
 
         $pdf = Pdf::loadView('reportes.pdf.financiero', compact(
@@ -343,6 +387,8 @@ class ReportesController extends Controller
             'subsidiosEntregados',
             'descuentosAplicados',
             'subsidiosPorSocio',
+            'sueldosPagados',
+            'sueldosPorFuncionario',
             'fecha_inicio',
             'fecha_fin'
         ));

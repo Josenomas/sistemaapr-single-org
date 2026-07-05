@@ -63,7 +63,7 @@
             background: #f3f4f6;
             border: 1px solid #e5e7eb;
             text-align: center;
-            width: 25%;
+            width: 20%;
         }
 
         .stat-card h3 {
@@ -188,6 +188,10 @@
             <div class="stat-card" style="background: #fef3c7; border: 1px solid #fbbf24;">
                 <h3 style="color: #92400e;">SUBSIDIOS ENTREGADOS</h3>
                 <div class="value" style="color: #d97706;">${{ number_format($estadisticas['total_subsidios'] ?? 0, 0, ',', '.') }}</div>
+            </div>
+            <div class="stat-card" style="background: #dbeafe; border: 1px solid #3b82f6;">
+                <h3 style="color: #1e40af;">SUELDOS PAGADOS</h3>
+                <div class="value" style="color: #0ea5e9;">${{ number_format($estadisticas['total_sueldos'] ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
     </div>
@@ -341,6 +345,44 @@
                 <td class="text-right" style="color: #d97706;">${{ number_format($subsidiosPorSocio->sum('total_subsidio'), 0, ',', '.') }}</td>
                 <td class="text-right" style="color: #0ea5e9;">${{ number_format($subsidiosPorSocio->sum('total_descuento'), 0, ',', '.') }}</td>
                 <td class="text-right" style="color: #10b981; font-weight: bold;">${{ number_format($subsidiosEntregados + $descuentosAplicados, 0, ',', '.') }}</td>
+            </tr>
+        </tbody>
+    </table>
+    @endif
+
+    @if(isset($sueldosPorFuncionario) && $sueldosPorFuncionario->count() > 0)
+    <h2 class="section-title">SUELDOS PAGADOS POR FUNCIONARIO</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>RUT</th>
+                <th>Nombre</th>
+                <th>Cargo</th>
+                <th class="text-center">Pagos</th>
+                <th class="text-right">Bonos</th>
+                <th class="text-right">Descuentos</th>
+                <th class="text-right">Total Pagado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($sueldosPorFuncionario as $index => $item)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td style="font-size: 8px;">{{ $item->funcionario->rut }}</td>
+                <td style="font-size: 8px;">{{ $item->funcionario->nombre }} {{ $item->funcionario->apellido_paterno }}</td>
+                <td style="font-size: 8px;">{{ $item->funcionario->cargo ?? '-' }}</td>
+                <td class="text-center">{{ $item->cantidad_pagos }}</td>
+                <td class="text-right" style="color: #10b981;">${{ number_format($item->total_bonos, 0, ',', '.') }}</td>
+                <td class="text-right" style="color: #ef4444;">${{ number_format($item->total_descuentos, 0, ',', '.') }}</td>
+                <td class="text-right" style="color: #0ea5e9; font-weight: bold;">${{ number_format($item->total_pagado, 0, ',', '.') }}</td>
+            </tr>
+            @endforeach
+            <tr class="total-row">
+                <td colspan="5" class="text-right">TOTAL GENERAL:</td>
+                <td class="text-right" style="color: #10b981;">${{ number_format($sueldosPorFuncionario->sum('total_bonos'), 0, ',', '.') }}</td>
+                <td class="text-right" style="color: #ef4444;">${{ number_format($sueldosPorFuncionario->sum('total_descuentos'), 0, ',', '.') }}</td>
+                <td class="text-right" style="color: #0ea5e9; font-weight: bold;">${{ number_format($sueldosPagados ?? 0, 0, ',', '.') }}</td>
             </tr>
         </tbody>
     </table>
