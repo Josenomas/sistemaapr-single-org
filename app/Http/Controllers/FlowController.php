@@ -209,7 +209,14 @@ class FlowController extends Controller
             if ($transaccion->estado === 'pagado') {
                 // Pago exitoso - redirigir según tipo
                 if ($transaccion->tipo_pago === 'suscripcion') {
-                    // Es un pago de suscripción
+                    // Es un pago de suscripción - redirigir a página pública de confirmación
+                    $pagoSuscripcion = \App\Models\PagoSuscripcion::where('id', $transaccion->referencia_id)->first();
+
+                    if ($pagoSuscripcion && $pagoSuscripcion->estado === 'pagado') {
+                        return redirect()->route('pago-suscripcion.confirmacion', $pagoSuscripcion->id);
+                    }
+
+                    // Si aún no está procesado, redirigir al dashboard con mensaje de espera
                     return redirect()->route('dashboard')
                                    ->with('success', '¡Suscripción renovada exitosamente! Tu acceso ha sido extendido por un mes más.');
                 } elseif ($transaccion->tipo_pago === 'cambio_plan') {

@@ -129,4 +129,20 @@ class PagosSuscripcionController extends Controller
                 ->with('error', 'Error al procesar el pago. Por favor, intenta nuevamente.');
         }
     }
+
+    /**
+     * Página pública de confirmación de pago de suscripción
+     */
+    public function confirmacion($id)
+    {
+        $pago = PagoSuscripcion::with(['organizacion', 'suscripcion'])->findOrFail($id);
+
+        // Verificar que el pago esté pagado
+        if ($pago->estado !== 'pagado') {
+            return redirect()->route('landing')
+                ->with('error', 'Este pago aún no ha sido confirmado');
+        }
+
+        return view('organizacion.confirmacion-pago-suscripcion', compact('pago'));
+    }
 }
