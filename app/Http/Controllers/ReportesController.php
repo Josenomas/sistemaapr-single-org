@@ -103,8 +103,8 @@ class ReportesController extends Controller
         // Top 10 Socios con mayor deuda
         $topDeudores = Boleta::with('socio')
                             ->where('activo', 1)
-                            ->where('estado', 'pendiente')
-                            ->select('id_socio', DB::raw('sum(total) as deuda_total'))
+                            ->whereIn('estado', ['pendiente', 'vencida'])
+                            ->select('id_socio', DB::raw('sum(total) as deuda_total'), DB::raw('count(*) as boletas_pendientes'))
                             ->groupBy('id_socio')
                             ->orderBy('deuda_total', 'desc')
                             ->limit(10)

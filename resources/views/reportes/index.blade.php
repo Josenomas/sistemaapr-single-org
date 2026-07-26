@@ -636,10 +636,10 @@
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $deudor->socio->nombre_completo }}</td>
                     <td>{{ $deudor->socio->sector ?? 'N/A' }}</td>
-                    <td>{{ $deudor->socio->boletas()->where('estado', 'pendiente')->count() }}</td>
+                    <td>{{ $deudor->boletas_pendientes }}</td>
                     <td>${{ number_format($deudor->deuda_total, 0, ',', '.') }}</td>
                     <td>
-                        <span class="badge badge-warning">Pendiente</span>
+                        <span class="badge badge-danger">Moroso</span>
                     </td>
                 </tr>
                 @empty
