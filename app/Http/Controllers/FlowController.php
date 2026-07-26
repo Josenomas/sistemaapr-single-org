@@ -483,16 +483,6 @@ class FlowController extends Controller
                 'dias_prueba_restantes' => 0,
             ]);
 
-            // Registrar en auditoría
-            \App\Models\Auditoria::registrar(
-                'suscripciones',
-                'pago_procesado',
-                "Pago de suscripción procesado vía Flow. Monto: $" . number_format($pagoSuscripcion->monto, 0, ',', '.') . ". Suscripción extendida hasta " . $nuevaFechaFin->format('d/m/Y'),
-                'pagos_suscripcion',
-                $pagoSuscripcion->id,
-                $organizacion->id
-            );
-
             DB::commit();
 
             Log::info('Flow - Suscripción extendida exitosamente', [
@@ -500,6 +490,24 @@ class FlowController extends Controller
                 'nueva_fecha_fin' => $nuevaFechaFin->toDateString(),
                 'pago_id' => $pagoSuscripcion->id,
             ]);
+
+            // Registrar en auditoría (después del commit, no crítico)
+            try {
+                \App\Models\Auditoria::registrar(
+                    'suscripciones',
+                    'pago_procesado',
+                    "Pago de suscripción procesado vía Flow. Monto: $" . number_format($pagoSuscripcion->monto, 0, ',', '.') . ". Suscripción extendida hasta " . $nuevaFechaFin->format('d/m/Y'),
+                    'pagos_suscripcion',
+                    $pagoSuscripcion->id,
+                    $organizacion->id
+                );
+            } catch (\Exception $e) {
+                // Si falla auditoría, solo loguear (el pago ya fue procesado correctamente)
+                Log::warning('Flow - Error al registrar auditoría (pago procesado correctamente)', [
+                    'error' => $e->getMessage(),
+                    'pago_id' => $pagoSuscripcion->id,
+                ]);
+            }
 
         } catch (\Exception $e) {
             DB::rollBack();
