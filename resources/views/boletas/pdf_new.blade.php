@@ -480,7 +480,9 @@
       Generado electrónicamente {{ \Carbon\Carbon::now()->format('d/m/Y H:i:s') }}
     @endif
   </span>
-  <span class="sii-badge">SII — DTE Tipo 39</span>
+  @if($boleta->dte_emitido)
+    <span class="sii-badge">SII — DTE Tipo 39</span>
+  @endif
 </div>
 
 </div><!-- /page-container -->
