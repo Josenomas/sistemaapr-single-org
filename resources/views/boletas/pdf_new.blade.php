@@ -74,8 +74,8 @@
     $totalAdeudado = $totalAdeudado ?? 0;
     $mesesAdeudados = $mesesAdeudados ?? 0;
 
-    // Calcular consumo máximo para la barra
-    $consumoMaximo = 18;
+    // Calcular consumo máximo para la barra (basado en consumo actual con margen del 20%)
+    $consumoMaximo = max(ceil($boleta->consumo_m3 * 1.2), 10);
     $porcentajeConsumo = min(100, ($boleta->consumo_m3 / $consumoMaximo) * 100);
 
     // Calcular promedio para el gráfico
