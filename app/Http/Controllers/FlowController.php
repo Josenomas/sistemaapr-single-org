@@ -93,11 +93,12 @@ class FlowController extends Controller
             if (isset($resultado['message']) && strpos($resultado['message'], '"code":105') !== false) {
                 $transaccion = \App\Models\TransaccionFlow::where('token', $token)->first();
 
-                if ($transaccion && $transaccion->tipo_pago === 'cambio_plan' && $transaccion->estado === 'pendiente') {
-                    Log::warning('Flow - Error 105 detectado, aplicando cambio automáticamente', [
+                if ($transaccion && $transaccion->estado === 'pendiente') {
+                    Log::warning('Flow - Error 105 detectado, procesando pago automáticamente', [
                         'token' => $token,
                         'transaccion_id' => $transaccion->id,
                         'flow_order' => $transaccion->flow_order,
+                        'tipo_pago' => $transaccion->tipo_pago,
                         'razon' => 'Flow llamó al callback (pago confirmado) pero su API tiene error temporal'
                     ]);
 
@@ -113,17 +114,36 @@ class FlowController extends Controller
                         ]),
                     ]);
 
-                    // Aplicar cambio de plan
-                    $cambioPlan = \App\Models\CambioPlan::find($transaccion->referencia_id);
-                    if ($cambioPlan && $cambioPlan->aplicar()) {
-                        Log::info('Flow - Cambio de plan aplicado exitosamente (bypass error 105)', [
-                            'cambio_plan_id' => $cambioPlan->id,
-                            'organizacion_id' => $cambioPlan->id_organizacion,
-                            'plan_nuevo' => $cambioPlan->id_suscripcion_nueva,
-                        ]);
-                    } else {
-                        Log::error('Flow - Error al aplicar cambio de plan', [
-                            'cambio_plan_id' => $transaccion->referencia_id,
+                    // Procesar según tipo de pago
+                    try {
+                        if ($transaccion->tipo_pago === 'suscripcion') {
+                            // Procesar pago de suscripción
+                            $this->procesarPagoSuscripcion($transaccion, ['status' => 2]);
+                            Log::info('Flow - Pago de suscripción procesado (bypass error 105)', [
+                                'transaccion_id' => $transaccion->id,
+                                'referencia_id' => $transaccion->referencia_id,
+                            ]);
+                        } elseif ($transaccion->tipo_pago === 'cambio_plan') {
+                            // Aplicar cambio de plan
+                            $cambioPlan = \App\Models\CambioPlan::find($transaccion->referencia_id);
+                            if ($cambioPlan && $cambioPlan->aplicar()) {
+                                Log::info('Flow - Cambio de plan aplicado exitosamente (bypass error 105)', [
+                                    'cambio_plan_id' => $cambioPlan->id,
+                                    'organizacion_id' => $cambioPlan->id_organizacion,
+                                    'plan_nuevo' => $cambioPlan->id_suscripcion_nueva,
+                                ]);
+                            }
+                        } else {
+                            // Pago de boleta
+                            $this->crearRegistroPago($transaccion, ['status' => 2]);
+                            Log::info('Flow - Pago de boleta procesado (bypass error 105)', [
+                                'transaccion_id' => $transaccion->id,
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('Flow - Error al procesar pago con bypass error 105', [
+                            'transaccion_id' => $transaccion->id,
+                            'error' => $e->getMessage(),
                         ]);
                     }
                 }
