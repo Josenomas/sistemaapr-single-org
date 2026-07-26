@@ -303,6 +303,12 @@
         <td style="color:#666; padding:4px 0;">Subtotal</td>
         <td style="text-align:right; padding:4px 0;">${{ number_format($boleta->subtotal, 0, ',', '.') }}</td>
       </tr>
+      @if($boleta->descuentos > 0)
+      <tr>
+        <td style="color:#10b981; padding:4px 0;">Descuentos</td>
+        <td style="text-align:right; padding:4px 0; color:#10b981;">-${{ number_format($boleta->descuentos, 0, ',', '.') }}</td>
+      </tr>
+      @endif
       <tr>
         <td style="color:#666; padding:4px 0;">IVA (19%)</td>
         <td style="text-align:right; padding:4px 0;">{{ $boleta->iva > 0 ? '$'.number_format($boleta->iva, 0, ',', '.') : 'Exento' }}</td>
