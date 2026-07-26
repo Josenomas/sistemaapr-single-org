@@ -220,7 +220,14 @@ class FlowController extends Controller
                     return redirect()->route('dashboard')
                                    ->with('success', '¡Suscripción renovada exitosamente! Tu acceso ha sido extendido por un mes más.');
                 } elseif ($transaccion->tipo_pago === 'cambio_plan') {
-                    // Es un cambio de plan
+                    // Es un cambio de plan - redirigir a página pública de confirmación
+                    $cambioPlan = \App\Models\CambioPlan::where('id', $transaccion->referencia_id)->first();
+
+                    if ($cambioPlan && $cambioPlan->estado === 'completado') {
+                        return redirect()->route('cambio-plan.confirmacion', $cambioPlan->id);
+                    }
+
+                    // Si aún no está procesado, redirigir al dashboard con mensaje de espera
                     return redirect()->route('organizacion.index')
                                    ->with('success', '¡Cambio de plan realizado exitosamente! Tu plan ha sido actualizado.');
                 } else {

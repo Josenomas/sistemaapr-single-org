@@ -589,6 +589,27 @@ class OrganizacionController extends Controller
     }
 
     /**
+     * Página pública de confirmación de cambio de plan
+     */
+    public function confirmacionCambioPlan($id)
+    {
+        $cambioPlan = \App\Models\CambioPlan::with([
+            'organizacion',
+            'suscripcionAnterior',
+            'suscripcionNueva',
+            'transaccionFlow'
+        ])->findOrFail($id);
+
+        // Verificar que el cambio esté completado
+        if ($cambioPlan->estado !== 'completado') {
+            return redirect()->route('landing')
+                ->with('error', 'Este cambio de plan aún no ha sido confirmado');
+        }
+
+        return view('organizacion.confirmacion-cambio-plan', compact('cambioPlan'));
+    }
+
+    /**
      * Calcular diferencia prorrateada del plan
      */
     private function calcularDiferenciaPlan($organizacion, $planAnterior, $planNuevo, $tipo)
