@@ -80,6 +80,10 @@
 
     // Calcular promedio para el gráfico
     $promedioConsumo = $historialConsumo->count() > 0 ? $historialConsumo->avg('consumo') : 0;
+
+    // Calcular valores correctos si están en 0 (por inconsistencias en BD)
+    $montoConsumoReal = $boleta->monto_consumo > 0 ? $boleta->monto_consumo : $boleta->cargo_consumo;
+    $subtotalReal = $boleta->subtotal > 0 ? $boleta->subtotal : ($boleta->cargo_consumo + $boleta->cargo_fijo + $boleta->otros_cargos);
 @endphp
 <div class="page-container">
 
@@ -292,7 +296,7 @@
       @else
         <tr>
           <td style="color:#666; padding:4px 0; width:55%">Consumo agua ({{ number_format($boleta->consumo_m3, 0) }} m³)</td>
-          <td style="text-align:right; padding:4px 0;">${{ number_format($boleta->monto_consumo, 0, ',', '.') }}</td>
+          <td style="text-align:right; padding:4px 0;">${{ number_format($montoConsumoReal, 0, ',', '.') }}</td>
         </tr>
         <tr>
           <td style="color:#666; padding:4px 0;">Cargo fijo mensual</td>
@@ -301,7 +305,7 @@
       @endif
       <tr>
         <td style="color:#666; padding:4px 0;">Subtotal</td>
-        <td style="text-align:right; padding:4px 0;">${{ number_format($boleta->subtotal, 0, ',', '.') }}</td>
+        <td style="text-align:right; padding:4px 0;">${{ number_format($subtotalReal, 0, ',', '.') }}</td>
       </tr>
       @if($boleta->descuentos > 0)
       <tr>
