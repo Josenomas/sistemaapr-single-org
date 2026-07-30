@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema APR - Gestión Integral de Agua Potable Rural</title>
+    <title>Agua Potable Rural - Gestión Digital para tu APR</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -673,7 +673,7 @@
         <nav class="nav">
             <a href="{{ route('landing') }}" class="logo">
                 <i class="fas fa-tint"></i>
-                Sistema APR
+                APR Digital
             </a>
             <button class="menu-toggle" id="menuToggle">
                 <i class="fas fa-bars"></i>
@@ -703,8 +703,8 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h1>💧 Gestión Integral para tu SSR</h1>
-            <p>Sistema completo de administración para Agua Potable Rural. Controla socios, lecturas, boletas, pagos y más en una sola plataforma moderna y fácil de usar.</p>
+            <h1>💧 Tu APR Digitalizada</h1>
+            <p>Plataforma moderna de gestión para Agua Potable Rural. Administra socios, lecturas, boletas, pagos y operaciones diarias desde una interfaz simple e intuitiva.</p>
             <div class="cta-buttons">
                 {{-- Registro temporalmente deshabilitado --}}
                 {{--
@@ -724,8 +724,8 @@
     <!-- Features Section -->
     <section id="features" class="features">
         <div class="section-title">
-            <h2>¿Por qué elegir Sistema APR?</h2>
-            <p>Una solución completa diseñada específicamente para la gestión de agua potable rural</p>
+            <h2>Gestión Moderna para tu APR</h2>
+            <p>Una plataforma completa diseñada específicamente para sistemas de agua potable rural</p>
         </div>
         <div class="features-grid">
             <div class="feature-card">
@@ -1278,22 +1278,8 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p><strong>Sistema APR</strong> - Gestión Integral de Agua Potable Rural</p>
+        <p><strong>Plataforma de Gestión APR</strong> - Agua Potable Rural Digitalizada</p>
         <p>&copy; 2026 Todos los derechos reservados</p>
-        <div class="social-links">
-            <a href="https://facebook.com/sistemaapr" target="_blank" rel="noopener noreferrer" title="Síguenos en Facebook">
-                <i class="fab fa-facebook"></i>
-            </a>
-            <a href="https://twitter.com/sistemaapr" target="_blank" rel="noopener noreferrer" title="Síguenos en Twitter">
-                <i class="fab fa-twitter"></i>
-            </a>
-            <a href="https://instagram.com/sistemaapr" target="_blank" rel="noopener noreferrer" title="Síguenos en Instagram">
-                <i class="fab fa-instagram"></i>
-            </a>
-            <a href="https://linkedin.com/company/sistemaapr" target="_blank" rel="noopener noreferrer" title="Síguenos en LinkedIn">
-                <i class="fab fa-linkedin"></i>
-            </a>
-        </div>
     </footer>
 
     <script>
