@@ -69,32 +69,58 @@ class InstallAPR extends Command
         }
 
         try {
-            DB::beginTransaction();
-
             // 1. Limpiar datos anteriores si existen
             $this->info('🗑️  Limpiando datos anteriores...');
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            DB::table('users')->truncate();
             DB::table('usuarios')->truncate();
             DB::table('organizaciones')->truncate();
+            DB::table('suscripciones')->truncate();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-            // 2. Crear organización
+            DB::beginTransaction();
+
+            // 2. Crear suscripción por defecto
+            $this->info('📋 Creando suscripción...');
+            $suscripcion = DB::table('suscripciones')->insertGetId([
+                'nombre' => 'plan_cliente',
+                'nombre_mostrar' => 'Plan Cliente',
+                'precio_mensual' => 0, // El SuperAdmin configurará el precio después
+                'max_socios' => null, // Ilimitado
+                'max_usuarios' => null, // Ilimitado
+                'modulos_permitidos' => json_encode(['todos']),
+                'features' => json_encode(['Todos los módulos', 'Soporte técnico', 'Actualizaciones incluidas']),
+                'permite_dominio_personalizado' => true,
+                'permite_modulo_noticias' => true,
+                'activo' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // 3. Crear organización
             $this->info('🏢 Creando organización...');
+            $slug = \Illuminate\Support\Str::slug($nombre);
             $organizacion = Organizacion::create([
-                'nombre' => $nombre,
+                'nombre_apr' => $nombre,
+                'slug' => $slug,
                 'rut' => $rut,
                 'email' => $email,
                 'telefono' => $telefono,
                 'direccion' => $direccion,
                 'ciudad' => $ciudad,
                 'region' => $region,
+                'id_suscripcion' => $suscripcion,
+                'fecha_inicio_suscripcion' => now(),
+                'fecha_fin_suscripcion' => now()->addYear(), // 1 año de suscripción inicial
+                'estado_suscripcion' => 'activa',
                 'activo' => 1,
-                'fecha_registro' => now(),
             ]);
 
-            // 3. Crear usuario administrador
+            // 4. Crear usuario administrador
             $this->info('👤 Creando usuario administrador...');
             $usuario = User::create([
                 'id_organizacion' => $organizacion->id,
-                'nombre' => 'Administrador',
+                'name' => 'Administrador',
                 'email' => $email,
                 'password' => Hash::make($password),
                 'rol' => 'admin',

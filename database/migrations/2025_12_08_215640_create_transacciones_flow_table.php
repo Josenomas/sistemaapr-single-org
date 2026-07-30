@@ -34,8 +34,10 @@ return new class extends Migration
             $table->timestamp('fecha_creacion')->nullable();
             $table->timestamp('fecha_actualizacion')->nullable();
 
-            $table->foreign('id_socio')->references('id')->on('socios')->onDelete('set null');
-            $table->foreign('id_boleta')->references('id')->on('boletas')->onDelete('set null');
+            // Claves foráneas comentadas - tablas aún no existen en este punto
+            // Se agregan posteriormente en 2026_03_28_014722_add_foreign_keys_to_transacciones_flow_table
+            // $table->foreign('id_socio')->references('id')->on('socios')->onDelete('set null');
+            // $table->foreign('id_boleta')->references('id')->on('boletas')->onDelete('set null');
 
             $table->index('flow_order');
             $table->index('token');
