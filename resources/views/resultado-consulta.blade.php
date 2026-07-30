@@ -500,7 +500,7 @@
                     @endforeach
                 </div>
 
-                <form action="{{ route('consulta.generar.pago') }}" method="POST">
+                <form action="{{ route('consulta.generar-pago') }}" method="POST">
                     @csrf
                     <input type="hidden" name="id_socio" value="{{ $socio->id }}">
                     <input type="hidden" name="boletas" value="{{ $boletas->pluck('id')->implode(',') }}">
