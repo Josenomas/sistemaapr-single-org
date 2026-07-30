@@ -80,15 +80,9 @@ Route::get('/reclamo/{numeroReclamo}/confirmacion', [App\Http\Controllers\Reclam
 // Formulario de contacto
 Route::post('/contacto', [ContactoController::class, 'enviar'])->name('contacto.enviar');
 
-// Rutas de registro público
-Route::middleware('guest')->group(function () {
-    Route::get('/registro', [App\Http\Controllers\RegistroController::class, 'mostrarFormulario'])->name('registro.formulario');
-    Route::post('/registro', [App\Http\Controllers\RegistroController::class, 'registrar'])->name('registro.procesar');
-    Route::get('/registro/confirmacion', [App\Http\Controllers\RegistroController::class, 'confirmacion'])->name('registro.confirmacion');
-});
-
-// Ruta de verificación de email (sin middleware guest porque el usuario ya está registrando)
-Route::get('/registro/verificar/{token}', [App\Http\Controllers\RegistroController::class, 'verificarEmail'])->name('registro.verificar');
+// Rutas de registro público - DESHABILITADAS en versión single-org
+// El registro se hace mediante comando artisan apr:install
+// Route::get('/registro', ...)
 
 // Rutas públicas (sin autenticación)
 Route::middleware('guest')->group(function () {
