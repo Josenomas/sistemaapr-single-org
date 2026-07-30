@@ -57,6 +57,11 @@ Route::get('/conoce-tu-boleta', function () {
     return view('conoce-boleta');
 })->name('conoce.boleta');
 
+// Consulta Pública de Pagos (sin autenticación)
+Route::get('/consulta-pago', [ConsultaPublicaController::class, 'mostrarFormulario'])->name('consulta.pago');
+Route::post('/consulta/buscar', [ConsultaPublicaController::class, 'buscarPorRut'])->name('consulta.buscar');
+Route::post('/consulta/generar-pago', [ConsultaPublicaController::class, 'generarPago'])->name('consulta.generar-pago');
+
 // Términos y Condiciones
 Route::get('/terminos-y-condiciones', function () {
     return view('terminos-condiciones');

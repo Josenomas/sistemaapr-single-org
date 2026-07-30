@@ -370,7 +370,8 @@
             <ul class="nav-links">
                 <li><a href="#nosotros">Nosotros</a></li>
                 <li><a href="#servicios">Servicios</a></li>
-                <li><a href="{{ route('conoce.boleta') }}">Consulta tu Boleta</a></li>
+                <li><a href="{{ route('consulta.pago') }}">Pagar Boletas</a></li>
+                <li><a href="{{ route('conoce.boleta') }}">Conoce tu Boleta</a></li>
                 <li><a href="#contact">Contacto</a></li>
             </ul>
             <div>
@@ -388,13 +389,13 @@
             <h1>💧 APR Pitrelahue</h1>
             <p>Agua Potable Rural de calidad para nuestra comunidad. Comprometidos con el servicio y bienestar de nuestros socios.</p>
             <div class="cta-buttons">
-                <a href="{{ route('conoce.boleta') }}" class="btn-primary">
-                    <i class="fas fa-file-invoice"></i>
-                    Consulta tu Boleta
+                <a href="{{ route('consulta.pago') }}" class="btn-primary">
+                    <i class="fas fa-credit-card"></i>
+                    Pagar tus Boletas
                 </a>
-                <a href="#contact" class="btn-secondary">
-                    <i class="fas fa-phone"></i>
-                    Contáctanos
+                <a href="{{ route('conoce.boleta') }}" class="btn-secondary">
+                    <i class="fas fa-file-invoice"></i>
+                    Conoce tu Boleta
                 </a>
             </div>
         </div>
