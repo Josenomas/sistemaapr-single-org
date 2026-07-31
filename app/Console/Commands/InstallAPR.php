@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Organizacion;
-use App\Models\User;
+use App\Models\Usuario;
 
 class InstallAPR extends Command
 {
@@ -19,7 +19,9 @@ class InstallAPR extends Command
                             {--telefono= : Teléfono de contacto}
                             {--direccion= : Dirección física}
                             {--ciudad= : Ciudad}
-                            {--region= : Región}';
+                            {--region= : Región}
+                            {--superadmin-email= : Email del SuperAdmin (opcional)}
+                            {--superadmin-password= : Contraseña del SuperAdmin (opcional)}';
 
     protected $description = 'Instalación inicial del Sistema APR para cliente único';
 
@@ -118,9 +120,11 @@ class InstallAPR extends Command
 
             // 4. Crear usuario administrador
             $this->info('👤 Creando usuario administrador...');
-            $usuario = User::create([
+            $usuario = Usuario::create([
                 'id_organizacion' => $organizacion->id,
-                'name' => 'Administrador',
+                'nombre' => 'Admin',
+                'apellido' => 'APR',
+                'nombre_usuario' => 'admin',
                 'email' => $email,
                 'password' => Hash::make($password),
                 'rol' => 'admin',
@@ -154,19 +158,42 @@ class InstallAPR extends Command
                 ]),
             ]);
 
+            // 5. Crear SuperAdmin si se proporcionaron credenciales
+            $superadminEmail = $this->option('superadmin-email');
+            $superadminPassword = $this->option('superadmin-password');
+
+            if ($superadminEmail && $superadminPassword) {
+                $this->info('👨‍💼 Creando SuperAdmin...');
+                Usuario::create([
+                    'nombre' => 'Super',
+                    'apellido' => 'Admin',
+                    'nombre_usuario' => 'superadmin',
+                    'email' => $superadminEmail,
+                    'password' => Hash::make($superadminPassword),
+                    'rol' => 'superadmin',
+                    'activo' => 1,
+                ]);
+            }
+
             DB::commit();
 
             $this->newLine();
             $this->info('✅ ¡Instalación completada exitosamente!');
             $this->newLine();
             $this->info('📌 Credenciales de acceso:');
+
+            $credentials = [
+                ['Tipo', 'URL', 'Email', 'Contraseña'],
+                ['Admin', env('APP_URL', 'http://localhost'), $email, $password],
+            ];
+
+            if ($superadminEmail && $superadminPassword) {
+                $credentials[] = ['SuperAdmin', env('APP_URL', 'http://localhost') . '/superadmin', $superadminEmail, $superadminPassword];
+            }
+
             $this->table(
-                ['Campo', 'Valor'],
-                [
-                    ['URL', env('APP_URL', 'http://localhost')],
-                    ['Email', $email],
-                    ['Contraseña', $password],
-                ]
+                ['Tipo', 'URL', 'Email', 'Contraseña'],
+                array_slice($credentials, 1)
             );
             $this->newLine();
             $this->info('🔧 Próximos pasos:');

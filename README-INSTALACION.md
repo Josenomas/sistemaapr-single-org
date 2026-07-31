@@ -104,13 +104,18 @@ php artisan apr:install \
   --telefono="+56912345678" \
   --direccion="Calle Principal 123" \
   --ciudad="Puerto Montt" \
-  --region="Los Lagos"
+  --region="Los Lagos" \
+  --superadmin-email="soporte@tuempresa.cl" \
+  --superadmin-password="SuperAdmin123"
 ```
 
 Este comando creará:
 - ✅ La organización con los datos proporcionados
 - ✅ Usuario administrador con permisos completos
+- ✅ Usuario SuperAdmin para soporte técnico (si se especifica `--superadmin-email`)
 - ✅ Configuración inicial lista para usar
+
+**Nota**: Los parámetros `--superadmin-email` y `--superadmin-password` son opcionales. Si no los especificas, solo se creará el usuario administrador del cliente.
 
 ### 9. Crear Symlink de Storage
 
@@ -245,27 +250,31 @@ MAIL_ENCRYPTION=tls
 
 ## 👨‍💼 Acceso SuperAdmin (Soporte)
 
-Como desarrollador, puedes crear tu usuario SuperAdmin para soporte:
+El usuario SuperAdmin se crea automáticamente durante la instalación si proporcionas los parámetros `--superadmin-email` y `--superadmin-password` en el comando `php artisan apr:install`.
+
+Si no lo creaste durante la instalación, puedes crearlo manualmente:
 
 ```bash
 php artisan tinker
 ```
 
 ```php
-$superadmin = new App\Models\User;
-$superadmin->nombre = 'Jose Norambuena';
-$superadmin->email = 'aravenanacho@gmail.com';
+$superadmin = new App\Models\Usuario;
+$superadmin->nombre = 'Super';
+$superadmin->apellido = 'Admin';
+$superadmin->nombre_usuario = 'superadmin';
+$superadmin->email = 'soporte@tuempresa.cl';
 $superadmin->password = Hash::make('tu_contraseña_segura');
 $superadmin->rol = 'superadmin';
 $superadmin->activo = 1;
 $superadmin->save();
 ```
 
-Esto te permite:
+El SuperAdmin te permite:
 - ✅ Acceder al panel `/superadmin`
-- ✅ Configurar precio mensual de suscripción
+- ✅ Configurar precio mensual de suscripción del cliente
 - ✅ Monitorear facturación DTE
-- ✅ Ver métricas y auditoría
+- ✅ Ver métricas y auditoría de todas las organizaciones
 
 ---
 
